@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Catálogo Virtual</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #0b0f19;
+            --card-bg: #151c2e;
+            --primary: #00d26a;
+            --primary-hover: #00b359;
+            --text-main: #ffffff;
+            --text-muted: #94a3b8;
+            --danger: #ef4444;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Poppins', sans-serif; }
+        body { background-color: var(--bg-color); color: var(--text-main); padding: 25px 15px 80px; }
+        header { text-align: center; margin-bottom: 25px; display: flex; flex-direction: column; align-items: center; }
+        .brand-badge { background: rgba(0, 210, 106, 0.15); color: var(--primary); padding: 6px 14px; border-radius: 20px; font-size: 0.82rem; font-weight: 600; margin-bottom: 12px; border: 1px solid rgba(0, 210, 106, 0.3); }
+        .brand-header-flex { display: flex; align-items: center; justify-content: center; gap: 12px; margin-bottom: 8px; }
+        .brand-logo-img { width: 52px; height: 52px; border-radius: 50%; object-fit: cover; border: 2px solid var(--primary); }
+        h1 { font-size: 1.85rem; font-weight: 700; }
+        p.subtitle { color: var(--text-muted); font-size: 0.95rem; }
+        .grid-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; max-width: 1100px; margin: 0 auto; }
+        .card { background-color: var(--card-bg); border-radius: 14px; overflow: hidden; border: 1px solid #1f293d; display: flex; flex-direction: column; justify-content: space-between; }
+        .card-img { width: 100%; height: 160px; object-fit: cover; background: #1e293b; display: block; }
+        .card-body { padding: 18px; display: flex; flex-direction: column; flex-grow: 1; justify-content: space-between; }
+        .service-title { font-size: 1.2rem; font-weight: 700; margin-bottom: 8px; color: #fff; }
+        .service-detail { color: var(--text-muted); font-size: 0.88rem; margin-bottom: 15px; line-height: 1.4; }
+        .pricing-list { margin-bottom: 18px; border-top: 1px solid #1f293d; padding-top: 12px; }
+        .price-item { display: flex; justify-content: space-between; margin-bottom: 6px; font-size: 0.9rem; }
+        .price-val { color: var(--primary); font-weight: 700; }
+        .btn-order { background-color: var(--primary); color: #05140b; text-decoration: none; padding: 12px; border-radius: 10px; font-weight: 700; text-align: center; font-size: 0.95rem; display: block; }
+        .wa-float-btn { position: fixed; bottom: 22px; right: 20px; background: linear-gradient(135deg, #25d366, #128c7e); color: #ffffff; text-decoration: none; padding: 12px 18px; border-radius: 30px; font-weight: 700; font-size: 0.92rem; display: flex; align-items: center; gap: 8px; box-shadow: 0 6px 18px rgba(37, 211, 102, 0.45); z-index: 1000; }
+        .banner-suspendido { max-width: 500px; margin: 60px auto; background: #1f1b2e; border: 1px solid var(--danger); padding: 30px; border-radius: 14px; text-align: center; }
+    </style>
+</head>
+<body>
+
+    <div id="vistaCatalogo">
+        <header>
+            <span class="brand-badge">⚡ DISTRIBUIDOR AUTORIZADO</span>
+            <div class="brand-header-flex">
+                <img class="brand-logo-img" id="headerLogo" src="./logo.png" alt="Logo">
+                <h1 id="headerNombre">Cargando...</h1>
+            </div>
+            <p class="subtitle">Catálogo Oficial de Streaming y Cuentas Premium</p>
+        </header>
+
+        <div class="grid-container" id="catalogoGrid"></div>
+
+        <a class="wa-float-btn" id="waFloatBtn" href="#" target="_blank">
+            <span>💬 Contáctanos</span>
+        </a>
+    </div>
+
+    <div id="vistaSuspendida" style="display:none;" class="banner-suspendido">
+        <h2 style="color:var(--danger); margin-bottom:12px;">⚠️ Catálogo Inactivo</h2>
+        <p style="color:var(--text-muted); margin-bottom:20px;">Este catálogo se encuentra temporalmente fuera de servicio por renovación de suscripción.</p>
+        <a id="btnSoporteSuspendido" class="btn-order" href="#">Contactar al Vendedor</a>
+    </div>
+
+    <script>
+        const params = new URLSearchParams(window.location.search);
+        const tiendaSlug = params.get('tienda') || 'fullmovies';
+
+        fetch(`/api/catalogo/${tiendaSlug}`)
+            .then(res => res.json())
+            .then(data => {
+                if (data.error) {
+                    document.body.innerHTML = `<h2 style="text-align:center; margin-top:50px;">${data.error}</h2>`;
+                    return;
+                }
+
+                if (data.suspendido) {
+                    document.getElementById('vistaCatalogo').style.display = 'none';
+                    document.getElementById('vistaSuspendida').style.display = 'block';
+                    document.getElementById('btnSoporteSuspendido').href = `https://wa.me/${data.whatsapp}?text=Hola%20${encodeURIComponent(data.nombreTienda)},%20tu%20catalogo%20aparece%20suspendido`;
+                    return;
+                }
+
+                document.getElementById('headerNombre').innerText = data.nombreTienda;
+                if (data.logo) document.getElementById('headerLogo').src = data.logo;
+                document.getElementById('waFloatBtn').href = `https://wa.me/${data.whatsapp}?text=Hola%20${encodeURIComponent(data.nombreTienda)},%20tengo%20una%20consulta`;
+
+                const grid = document.getElementById('catalogoGrid');
+                grid.innerHTML = "";
+
+                if (!data.servicios || data.servicios.length === 0) {
+                    grid.innerHTML = "<p style='text-align:center; grid-column:1/-1; color:#94a3b8;'>Próximamente nuevos servicios disponibles.</p>";
+                    return;
+                }
+
+                data.servicios.forEach(s => {
+                    let preciosHtml = "";
+                    s.precios.forEach(p => {
+                        preciosHtml += `<div class="price-item"><span>${p.item}:</span><span class="price-val">${p.valor}</span></div>`;
+                    });
+
+                    const msgWa = encodeURIComponent(`Hola ${data.nombreTienda}, deseo contratar ${s.nombre}`);
+                    const card = document.createElement("div");
+                    card.className = "card";
+                    card.innerHTML = `
+                        <img class="card-img" src="${s.imagen || './logo.png'}" alt="${s.nombre}">
+                        <div class="card-body">
+                            <div>
+                                <div class="service-title">${s.nombre}</div>
+                                <div class="service-detail">${s.desc}</div>
+                                <div class="pricing-list">${preciosHtml}</div>
+                            </div>
+                            <a class="btn-order" href="https://wa.me/${data.whatsapp}?text=${msgWa}" target="_blank">Pedir por WhatsApp 📲</a>
+                        </div>
+                    `;
+                    grid.appendChild(card);
+                });
+            })
+            .catch(() => {
+                document.body.innerHTML = "<h3 style='text-align:center; margin-top:50px;'>Error conectando al servidor</h3>";
+            });
+    </script>
+</body>
+</html>

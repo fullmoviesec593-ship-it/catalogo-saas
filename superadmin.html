@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Súper Admin | Control SaaS</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root { --bg-color:#0b0f19; --card-bg:#151c2e; --primary:#00d26a; --danger:#ef4444; --blue:#3b82f6; --warning:#f59e0b; }
+        * { box-sizing: border-box; margin:0; padding:0; font-family:'Poppins', sans-serif; }
+        body { background: var(--bg-color); color:#fff; padding:25px 15px; }
+        .container { max-width:1000px; margin:0 auto; }
+        .card { background:var(--card-bg); padding:20px; border-radius:12px; border:1px solid #1f293d; margin-bottom:20px; }
+        .grid-form { display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:12px; margin-bottom:12px; }
+        label { display:block; font-size:0.8rem; color:#94a3b8; margin-bottom:4px; }
+        input { width:100%; background:#0b0f19; border:1px solid #334155; color:#fff; padding:10px; border-radius:8px; font-size:0.9rem; }
+        .btn { padding:9px 14px; border-radius:8px; font-weight:600; border:none; cursor:pointer; font-size:0.85rem; }
+        .btn-primary { background:var(--primary); color:#05140b; }
+        .btn-danger { background:var(--danger); color:#fff; }
+        .btn-blue { background:var(--blue); color:#fff; }
+        .user-card { background:#111827; border:1px solid #1f293d; border-radius:10px; padding:16px; margin-bottom:12px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; }
+        .badge { padding:4px 8px; border-radius:12px; font-size:0.75rem; font-weight:700; }
+        .badge-active { background:rgba(0,210,106,0.15); color:var(--primary); }
+        .badge-inactive { background:rgba(239,68,68,0.15); color:var(--danger); }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Login Dueño -->
+        <div class="card" id="loginBox" style="max-width:380px; margin:50px auto; text-align:center;">
+            <h2 style="margin-bottom:15px; color:var(--warning);">👑 Acceso Dueño</h2>
+            <div style="margin-bottom:12px; text-align:left;">
+                <label>Correo</label>
+                <input type="email" id="superEmail" value="admin@fullmovies.ec">
+            </div>
+            <div style="margin-bottom:15px; text-align:left;">
+                <label>Contraseña Maestra</label>
+                <input type="password" id="superPass" placeholder="••••••••">
+            </div>
+            <button class="btn btn-primary" style="width:100%;" onclick="ingresar()">Acceder al Control</button>
+        </div>
+
+        <!-- Panel Dueño -->
+        <div id="panelBox" style="display:none;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+                <div>
+                    <h2>👑 Súper Panel de Control</h2>
+                    <p style="color:#94a3b8; font-size:0.85rem;">Full Movies Ec — Plataforma SaaS Multi-Revendedores</p>
+                </div>
+                <button class="btn btn-danger" onclick="location.reload()">Cerrar Sesión</button>
+            </div>
+
+            <!-- REGISTRO MANUAL DE REVENDEDORES -->
+            <div class="card" style="border-color:var(--primary);">
+                <h3 style="margin-bottom:12px; color:var(--primary);">➕ Registrar Nuevo Revendedor (Manual)</h3>
+                <div class="grid-form">
+                    <div>
+                        <label>Nombre de la Tienda</label>
+                        <input type="text" id="manTienda" placeholder="Ej: Elite Streaming">
+                    </div>
+                    <div>
+                        <label>Identificador Slug (enlace)</label>
+                        <input type="text" id="manSlug" placeholder="ej: elitestreaming">
+                    </div>
+                    <div>
+                        <label>WhatsApp del Cliente</label>
+                        <input type="tel" id="manWa" placeholder="593982766054">
+                    </div>
+                    <div>
+                        <label>Correo Electrónico</label>
+                        <input type="email" id="manCorreo" placeholder="cliente@correo.com">
+                    </div>
+                    <div>
+                        <label>Contraseña que le asignarás</label>
+                        <input type="text" id="manClave" value="123456">
+                    </div>
+                    <div>
+                        <label>Días de Suscripción Inicial</label>
+                        <input type="number" id="manDias" value="30">
+                    </div>
+                </div>
+                <button class="btn btn-primary" onclick="crearRevendedorManual()">Dar de Alta Revendedor</button>
+            </div>
+
+            <!-- LISTA DE REVENDEDORES -->
+            <h3 style="margin-bottom:12px;">Revendedores Registrados</h3>
+            <div id="usuariosLista"></div>
+        </div>
+    </div>
+
+    <script>
+        async function ingresar() {
+            const res = await fetch('/api/superadmin/login', {
+                method:'POST',
+                headers:{'Content-Type':'application/json'},
+                body: JSON.stringify({
+                    correo: document.getElementById('superEmail').value,
+                    clave: document.getElementById('superPass').value
+                })
+            });
+            const out = await res.json();
+            if (out.error) return alert(out.error);
+            document.getElementById('loginBox').style.display = 'none';
+            document.getElementById('panelBox').style.display = 'block';
+            cargarUsuarios();
+        }
+
+        async function crearRevendedorManual() {
+            const data = {
+                nombreTienda: document.getElementById('manTienda').value.trim(),
+                slug: document.getElementById('manSlug').value.trim(),
+                whatsapp: document.getElementById('manWa').value.trim(),
+                correo: document.getElementById('manCorreo').value.trim(),
+                clave: document.getElementById('manClave').value.trim(),
+                diasSuscripcion: document.getElementById('manDias').value
+            };
+
+            const res = await fetch('/api/superadmin/crear-usuario', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(data)
+            });
+            const out = await res.json();
+            if (out.error) return alert(out.error);
+
+            alert("¡Revendedor registrado con éxito!");
+            document.getElementById('manTienda').value = "";
+            document.getElementById('manSlug').value = "";
+            document.getElementById('manWa').value = "";
+            document.getElementById('manCorreo').value = "";
+            cargarUsuarios();
+        }
+
+        async function cargarUsuarios() {
+            const res = await fetch('/api/superadmin/usuarios');
+            const data = await res.json();
+            const cont = document.getElementById('usuariosLista');
+            cont.innerHTML = "";
+
+            data.usuarios.forEach(u => {
+                const card = document.createElement('div');
+                card.className = 'user-card';
+                card.innerHTML = `
+                    <div>
+                        <strong style="font-size:1.1rem;">${u.nombreTienda}</strong> 
+                        <span class="badge ${u.activo ? 'badge-active' : 'badge-inactive'}">${u.activo ? 'ACTIVO' : 'SUSPENDIDO'}</span>
+                        <div style="font-size:0.82rem; color:#94a3b8; margin-top:5px;">
+                            Enlace: <code>?tienda=${u.slug}</code> | WhatsApp: <strong>+${u.whatsapp}</strong> | Clave: <code>${u.clave}</code><br>
+                            Vence: <strong>${u.vencimiento}</strong> | Servicios activos: <strong>${u.totalServicios}</strong>
+                        </div>
+                    </div>
+                    <div style="display:flex; gap:8px; align-items:center;">
+                        <button class="btn btn-blue" onclick="modificar('${u.slug}', 'sumar_30_dias')">+30 Días</button>
+                        <button class="btn ${u.activo ? 'btn-danger' : 'btn-primary'}" onclick="modificar('${u.slug}', 'toggle_activo')">
+                            ${u.activo ? 'Suspender' : 'Habilitar'}
+                        </button>
+                        <button class="btn btn-danger" style="background:#b91c1c;" onclick="modificar('${u.slug}', 'eliminar')">🗑️</button>
+                    </div>
+                `;
+                cont.appendChild(card);
+            });
+        }
+
+        async function modificar(slug, accion) {
+            if (accion === 'eliminar' && !confirm(`¿Estás seguro de eliminar por completo a ${slug}?`)) return;
+            await fetch('/api/superadmin/modificar-estado', {
+                method:'POST',
+                headers:{'Content-Type':'application/json'},
+                body: JSON.stringify({ slug, accion })
+            });
+            cargarUsuarios();
+        }
+    </script>
+</body>
+</html>
