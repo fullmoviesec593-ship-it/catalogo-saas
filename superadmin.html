@@ -86,6 +86,25 @@
       border-color: var(--neon-green);
       box-shadow: 0 0 10px var(--neon-glow);
     }
+    .remember-container {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin: 14px 0 18px 0;
+      cursor: pointer;
+    }
+    .remember-container input[type="checkbox"] {
+      width: 18px;
+      height: 18px;
+      accent-color: var(--neon-green);
+      cursor: pointer;
+    }
+    .remember-container span {
+      font-size: 14px;
+      color: #cbd5e1;
+      font-weight: 600;
+      user-select: none;
+    }
     button {
       width: 100%;
       padding: 13px;
@@ -242,6 +261,13 @@
       <label>Contraseña Maestra</label>
       <input type="password" id="password" placeholder="Ingresa tu clave">
     </div>
+
+    <!-- CASILLA GUARDAR INICIO DE SESIÓN -->
+    <label class="remember-container">
+      <input type="checkbox" id="check-remember" checked>
+      <span>Mantener sesión iniciada en este dispositivo</span>
+    </label>
+
     <button class="btn-neon" onclick="iniciarSesion()">ACCEDER AL CONTROL</button>
     <button style="background:transparent; color:#64748b; font-size:14px; margin-top:10px;" onclick="mostrarRecuperacion()">¿Olvidaste tu contraseña?</button>
   </div>
@@ -272,7 +298,7 @@
           <div style="font-size:11px; color:#64748b;">Panel Súper Administrador</div>
         </div>
       </div>
-      <button onclick="location.reload()" style="width:auto; padding:6px 12px; background:#dc2626; color:#fff; font-size:12px;">Cerrar</button>
+      <button onclick="cerrarSesion()" style="width:auto; padding:6px 12px; background:#dc2626; color:#fff; font-size:12px;">Cerrar Sesión</button>
     </div>
 
     <!-- Pestañas -->
@@ -284,7 +310,6 @@
 
     <!-- LISTA DE USUARIOS CON BUSCADOR -->
     <div id="tab-users">
-      <!-- BUSCADOR MULTICAMPO -->
       <div class="search-box-container">
         <input type="text" id="input-busqueda" class="search-input" placeholder="🔍 Buscar por nombre, WhatsApp, correo o slug..." oninput="filtrarRevendedores()">
         <button class="btn-clear-search" onclick="limpiarBusqueda()">Limpiar</button>
@@ -399,6 +424,7 @@
     let dbData = null;
     let listaRevendedoresCache = [];
     const PIN_DEFAULT = "5930";
+    const STORAGE_KEY = "fm_superadmin_auth";
 
     async function cargarBD() {
       try {
@@ -411,9 +437,26 @@
       }
     }
 
-    async function iniciarSesion() {
+    function verificarSesionGuardada() {
+      const savedAuth = localStorage.getItem(STORAGE_KEY);
+      if (savedAuth) {
+        try {
+          const auth = JSON.parse(savedAuth);
+          if (auth.email && auth.password) {
+            document.getElementById('email').value = auth.email;
+            document.getElementById('password').value = auth.password;
+            iniciarSesion(true); // Autologin
+          }
+        } catch (e) {
+          localStorage.removeItem(STORAGE_KEY);
+        }
+      }
+    }
+
+    async function iniciarSesion(esAutoLogin = false) {
       const email = document.getElementById('email').value.trim();
       const pass = document.getElementById('password').value.trim();
+      const recordar = document.getElementById('check-remember').checked;
 
       if (!dbData) await cargarBD();
 
@@ -422,6 +465,10 @@
                          (email === 'admin@fullmovies.ec' && (pass === 'admin123' || pass === '12345678'));
 
       if (esCorrecto) {
+        if (recordar || esAutoLogin) {
+          localStorage.setItem(STORAGE_KEY, JSON.stringify({ email, password: pass }));
+        }
+
         document.getElementById('login-section').classList.add('hidden');
         document.getElementById('dashboard-section').classList.remove('hidden');
         document.getElementById('cfg-email').value = sa.email || 'admin@fullmovies.ec';
@@ -429,8 +476,17 @@
         document.getElementById('cfg-pin').value = sa.pin || PIN_DEFAULT;
         prepararYRenderizarRevendedores();
       } else {
-        alert('Contraseña o correo incorrectos.');
+        if (!esAutoLogin) {
+          alert('Contraseña o correo incorrectos.');
+        } else {
+          localStorage.removeItem(STORAGE_KEY);
+        }
       }
+    }
+
+    function cerrarSesion() {
+      localStorage.removeItem(STORAGE_KEY);
+      location.reload();
     }
 
     function mostrarRecuperacion() {
@@ -460,6 +516,7 @@
         await persistir();
         alert('¡Contraseña reestablecida correctamente! Ya puedes ingresar.');
         document.getElementById('password').value = nuevaClave;
+        localStorage.removeItem(STORAGE_KEY);
         volverAlLogin();
       } else {
         alert('El PIN maestro ingresado es incorrecto.');
@@ -532,7 +589,6 @@
       filtrarRevendedores();
     }
 
-    // BUSCADOR EN TIEMPO REAL
     function filtrarRevendedores() {
       const query = (document.getElementById('input-busqueda').value || '').trim().toLowerCase();
       
@@ -807,7 +863,10 @@ _Ingresa a tu panel para configurar tu número de WhatsApp y tus precios. ¡Éxi
       });
     }
 
-    cargarBD();
+    // Inicializar BD y verificar autologin
+    cargarBD().then(() => {
+      verificarSesionGuardada();
+    });
   </script>
 </body>
 </html>
