@@ -13,6 +13,8 @@
       --card-bg: #0f1626;
       --border-color: #1e293b;
       --cyan-neon: #38bdf8;
+      --alert-red: #ef4444;
+      --alert-yellow: #eab308;
     }
     * { box-sizing: border-box; font-family: 'Rajdhani', sans-serif; }
     body {
@@ -138,19 +140,43 @@
       margin-bottom: 14px;
       border-left: 5px solid var(--neon-green);
       box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+      position: relative;
     }
-    .user-card.demo { border-left-color: #a855f7; }
-    .user-card.suspendido { border-left-color: #ef4444; }
-    .badge {
-      padding: 4px 8px;
-      border-radius: 6px;
-      font-size: 11px;
-      font-weight: 700;
+    .user-card.urgente { border-left-color: var(--alert-red); }
+    .user-card.aviso { border-left-color: var(--alert-yellow); }
+    .user-card.suspendido { border-left-color: #64748b; opacity: 0.8; }
+
+    .tag-countdown {
       font-family: 'Orbitron', sans-serif;
+      font-size: 12px;
+      font-weight: 800;
+      padding: 5px 10px;
+      border-radius: 8px;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
     }
-    .badge-active { background: rgba(34, 197, 94, 0.15); color: #4ade80; border: 1px solid #22c55e; }
-    .badge-demo { background: rgba(168, 85, 247, 0.15); color: #c084fc; border: 1px solid #a855f7; }
-    .badge-off { background: rgba(239, 68, 68, 0.15); color: #f87171; border: 1px solid #ef4444; }
+    .tag-countdown.red {
+      background: rgba(239, 68, 68, 0.2);
+      color: #f87171;
+      border: 1px solid #ef4444;
+      animation: pulse 1.8s infinite;
+    }
+    .tag-countdown.yellow {
+      background: rgba(234, 179, 8, 0.2);
+      color: #facc15;
+      border: 1px solid #eab308;
+    }
+    .tag-countdown.green {
+      background: rgba(34, 197, 94, 0.2);
+      color: #4ade80;
+      border: 1px solid #22c55e;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.6; }
+    }
+
     .btn-copy-all {
       background: #1e293b;
       color: #38bdf8;
@@ -164,6 +190,7 @@
       justify-content: center;
       gap: 6px;
       margin-top: 10px;
+      cursor: pointer;
     }
     .btn-copy-all:active {
       background: var(--neon-green);
@@ -262,7 +289,7 @@
           <input type="text" id="reg-pass" placeholder="Ej: acceso123">
         </div>
         <div class="form-group">
-          <label id="lbl-dias">Días de Acceso</label>
+          <label id="lbl-dias">Días de Acceso (Calendario)</label>
           <input type="number" id="reg-dias" value="30">
         </div>
 
@@ -315,7 +342,7 @@
           </select>
         </div>
         <div class="form-group">
-          <label>Renovar días de vigencia (desde hoy)</label>
+          <label>Renovar días a partir de hoy (Calendario)</label>
           <input type="number" id="edit-dias" value="30">
         </div>
         <div style="display:flex; gap:10px;">
@@ -426,8 +453,24 @@
         document.getElementById('lbl-dias').innerText = 'Días de Prueba (Demo)';
       } else {
         document.getElementById('reg-dias').value = 30;
-        document.getElementById('lbl-dias').innerText = 'Días de Suscripción Oficial';
+        document.getElementById('lbl-dias').innerText = 'Días de Suscripción (Calendario)';
       }
+    }
+
+    // Calcula los días restantes exactos
+    function calcularDiasRestantes(fechaVencimiento) {
+      if (!fechaVencimiento) return 999;
+      const ahora = new Date();
+      const vence = new Date(fechaVencimiento);
+      const diffMs = vence.getTime() - ahora.getTime();
+      return Math.ceil(diffMs / (1000 * 60 * 60 * 24));
+    }
+
+    function formatearFecha(fechaStr) {
+      if (!fechaStr) return 'N/A';
+      const f = new Date(fechaStr);
+      const opciones = { day: '2-digit', month: '2-digit', year: 'numeric' };
+      return f.toLocaleDateString('es-EC', opciones);
     }
 
     function renderRevendedores() {
@@ -442,85 +485,107 @@
         return;
       }
 
-      const host = window.location.origin;
-
-      slugs.forEach(slug => {
+      // Ordenar por días restantes (los más próximos a vencer o vencidos van primero)
+      const listaOrdenada = slugs.map(slug => {
         const r = revendedores[slug];
-        const isDemo = r.isDemo || false;
-        const isActive = r.activo !== false;
+        const dias = calcularDiasRestantes(r.vencimiento);
+        return { slug, ...r, diasRestantes: dias };
+      }).sort((a, b) => a.diasRestantes - b.diasRestantes);
 
-        let badgeClass = 'badge-active';
-        let badgeText = 'ACTIVO';
+      listaOrdenada.forEach(item => {
+        const isDemo = item.isDemo || false;
+        const isActive = item.activo !== false;
+        const dias = item.diasRestantes;
+
+        let claseCard = '';
+        let claseBadge = 'green';
+        let textoDias = `${dias} DÍAS RESTANTES`;
+
         if (!isActive) {
-          badgeClass = 'badge-off';
-          badgeText = 'SUSPENDIDO';
-        } else if (isDemo) {
-          badgeClass = 'badge-demo';
-          badgeText = 'DEMO';
+          claseCard = 'suspendido';
+          claseBadge = 'red';
+          textoDias = 'SUSPENDIDO';
+        } else if (dias <= 0) {
+          claseCard = 'urgente';
+          claseBadge = 'red';
+          textoDias = dias === 0 ? 'VENCE HOY' : `VENCIDO (${Math.abs(dias)}d)`;
+        } else if (dias <= 3) {
+          claseCard = 'urgente';
+          claseBadge = 'red';
+          textoDias = `⚠️ ${dias} ${dias === 1 ? 'DÍA' : 'DÍAS'} RESTANTES`;
+        } else if (dias <= 7) {
+          claseCard = 'aviso';
+          claseBadge = 'yellow';
+          textoDias = `⏳ ${dias} DÍAS RESTANTES`;
         }
 
-        const fechaInicio = r.fechaCreacion ? new Date(r.fechaCreacion).toLocaleDateString() : 'Activa';
-        const fechaVence = r.vencimiento ? new Date(r.vencimiento).toLocaleDateString() : 'Ilimitada';
+        const fechaInicio = formatearFecha(item.fechaCreacion);
+        const fechaVence = formatearFecha(item.vencimiento);
 
         const card = document.createElement('div');
-        card.className = `user-card ${isDemo ? 'demo' : ''} ${!isActive ? 'suspendido' : ''}`;
+        card.className = `user-card ${claseCard}`;
         card.innerHTML = `
           <div style="display:flex; justify-content:space-between; align-items:center;">
-            <strong style="font-size:17px; color:#fff; font-family:'Orbitron';">${r.nombre || slug}</strong>
-            <span class="badge ${badgeClass}">${badgeText}</span>
+            <div>
+              <strong style="font-size:17px; color:#fff; font-family:'Orbitron';">${item.nombre || item.slug}</strong>
+              ${isDemo ? '<span style="font-size:11px; background:#a855f7; color:#fff; padding:2px 6px; border-radius:4px; margin-left:6px; font-weight:bold;">DEMO</span>' : ''}
+            </div>
+            <!-- INDICADOR DE DÍAS RESTANTES -->
+            <span class="tag-countdown ${claseBadge}">${textoDias}</span>
           </div>
 
           <div style="margin:10px 0; font-size:14px; color:#94a3b8; line-height:1.5;">
-            <div>👤 <b>Usuario/Correo:</b> <span style="color:#fff;">${r.email}</span></div>
-            <div>🔑 <b>Contraseña:</b> <span style="color:var(--neon-green); font-weight:bold;">${r.password}</span></div>
-            <div>📅 <b>Inicio:</b> ${fechaInicio} | ⏳ <b>Vence:</b> ${fechaVence}</div>
+            <div>👤 <b>Usuario/Correo:</b> <span style="color:#fff;">${item.email}</span></div>
+            <div>🔑 <b>Contraseña:</b> <span style="color:var(--neon-green); font-weight:bold;">${item.password}</span></div>
+            <div>📅 <b>Inicio:</b> ${fechaInicio} | ⏳ <b>Vence:</b> <span style="color:#f8fafc; font-weight:bold;">${fechaVence}</span></div>
           </div>
 
-          <!-- BOTÓN ÚNICO QUE COPIA TODA LA INFORMACIÓN -->
-          <button class="btn-copy-all" onclick="copiarFichaRevendedor('${slug}')">
+          <!-- BOTÓN ÚNICO COPIAR FICHA WHATSAPP -->
+          <button class="btn-copy-all" onclick="copiarFichaRevendedor('${item.slug}')">
             📋 COPIAR DATOS DE ACCESO PARA WHATSAPP
           </button>
 
           <div style="display:flex; gap:8px; margin-top:10px;">
-            <button style="background:#1e293b; color:#38bdf8; padding:8px; font-size:13px; border:1px solid #334155;" onclick="abrirModalEdit('${slug}')">✏️ Editar</button>
-            <button style="background:#dc2626; color:#fff; padding:8px; font-size:13px; width:110px;" onclick="eliminarRevendedor('${slug}')">🗑️ Eliminar</button>
+            <button style="background:#1e293b; color:#38bdf8; padding:8px; font-size:13px; border:1px solid #334155;" onclick="abrirModalEdit('${item.slug}')">✏️ Editar / Renovar</button>
+            <button style="background:#dc2626; color:#fff; padding:8px; font-size:13px; width:110px;" onclick="eliminarRevendedor('${item.slug}')">🗑️ Eliminar</button>
           </div>
         `;
         lista.appendChild(card);
       });
     }
 
-    // COPIA DE FORMA IMPECABLE TODA LA FICHA EN UN SOLO CLIC
     function copiarFichaRevendedor(slug) {
       const r = dbData.revendedores[slug];
       const host = window.location.origin;
       const linkAdmin = `${host}/admin.html`;
       const linkCatalogo = `${host}/?tienda=${slug}`;
-      const fInicio = r.fechaCreacion ? new Date(r.fechaCreacion).toLocaleDateString() : 'Inmediata';
-      const fVence = r.vencimiento ? new Date(r.vencimiento).toLocaleDateString() : '30 Días';
+      const fInicio = formatearFecha(r.fechaCreacion);
+      const fVence = formatearFecha(r.vencimiento);
 
       const textoWhatsapp = 
 `🎬 *¡BIENVENIDO A TU PANEL DE CATÁLOGO VIRTUAL!* 🎬
 *FULL MOVIES EC*
 
-Hola *${r.nombre || slug}*, tus datos de acceso son los siguientes:
+Hola *${r.nombre || slug}*, tus accesos han sido activados exitosamente:
 
 🔐 *PANEL DE ADMINISTRACIÓN (Tus productos y precios):*
 👉 ${linkAdmin}
 
-👤 *Usuario/Correo:* ${r.email}
+👤 *Usuario / Correo:* ${r.email}
 🔑 *Contraseña:* ${r.password}
 
 📅 *Fecha de Activación:* ${fInicio}
 ⏳ *Fecha de Vencimiento:* ${fVence}
 
+⚠️ *IMPORTANTE:* Tu servicio vence el día *${fVence}*. Para renovar tu suscripción sin interrupciones, por favor realizar el pago 1 día antes de la fecha de vencimiento.
+
 🌐 *TU CATÁLOGO PÚBLICO (Para tus clientes):*
 👉 ${linkCatalogo}
 
-_Ingresa a tu panel para configurar tu número de WhatsApp y tus precios. ¡Buenas ventas!_`;
+_Ingresa a tu panel para configurar tu número de WhatsApp y tus precios. ¡Éxitos en tus ventas!_`;
 
       navigator.clipboard.writeText(textoWhatsapp).then(() => {
-        alert('¡Datos completos de ' + (r.nombre || slug) + ' copiados!\nListo para pegar en WhatsApp.');
+        alert('¡Datos completos de ' + (r.nombre || slug) + ' copiados!\nListo para enviar por WhatsApp.');
       }).catch(() => {
         prompt('Copia manualmente los datos de acceso:', textoWhatsapp);
       });
@@ -580,6 +645,7 @@ _Ingresa a tu panel para configurar tu número de WhatsApp y tus precios. ¡Buen
       document.getElementById('edit-email').value = r.email || '';
       document.getElementById('edit-pass').value = r.password || '';
       document.getElementById('edit-estado').value = (r.activo !== false) ? 'true' : 'false';
+      document.getElementById('edit-dias').value = 30;
       document.getElementById('modal-edit').classList.remove('hidden');
     }
 
@@ -606,9 +672,9 @@ _Ingresa a tu panel para configurar tu número de WhatsApp y tus precios. ¡Buen
       dbData.revendedores[slug].activo = activo;
 
       if (dias > 0) {
-        const f = new Date();
-        f.setDate(f.getDate() + dias);
-        dbData.revendedores[slug].vencimiento = f.toISOString();
+        const hoy = new Date();
+        hoy.setDate(hoy.getDate() + dias);
+        dbData.revendedores[slug].vencimiento = hoy.toISOString();
       }
 
       if (dbData.tiendas && dbData.tiendas[slug]) {
@@ -616,7 +682,7 @@ _Ingresa a tu panel para configurar tu número de WhatsApp y tus precios. ¡Buen
       }
 
       await persistir();
-      alert('¡Datos actualizados!');
+      alert('¡Datos y vigencia actualizados!');
       cerrarModalEdit();
       renderRevendedores();
     }
