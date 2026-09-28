@@ -1,305 +1,235 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Panel de Revendedor | Gestión</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
-    <style>
-        :root { --bg-color:#0b0f19; --card-bg:#151c2e; --primary:#00d26a; --text-muted:#94a3b8; --danger:#ef4444; --blue:#3b82f6; --purple:#8b5cf6; }
-        * { box-sizing: border-box; margin:0; padding:0; font-family:'Poppins', sans-serif; }
-        body { background: var(--bg-color); color:#fff; padding:20px 15px 60px; }
-        .container { max-width:920px; margin:0 auto; }
-        .auth-card { max-width:420px; margin:40px auto; background:var(--card-bg); padding:30px; border-radius:14px; border:1px solid #1f293d; }
-        .auth-tabs { display:flex; gap:8px; margin-bottom:20px; border-bottom:1px solid #334155; padding-bottom:10px; }
-        .auth-tab-btn { background:none; border:none; color:var(--text-muted); font-size:0.9rem; font-weight:600; cursor:pointer; padding:6px 12px; }
-        .auth-tab-btn.active { color:var(--primary); background:rgba(0,210,106,0.12); border-radius:6px; }
-        .form-group { margin-bottom:14px; }
-        label { display:block; font-size:0.82rem; color:var(--text-muted); margin-bottom:5px; }
-        input, textarea { width:100%; background:#0b0f19; border:1px solid #334155; color:#fff; padding:10px; border-radius:8px; font-size:0.9rem; }
-        .btn { padding:10px 16px; border-radius:8px; font-weight:600; border:none; cursor:pointer; font-size:0.9rem; }
-        .btn-full { width:100%; }
-        .btn-primary { background:var(--primary); color:#05140b; }
-        .btn-danger { background:var(--danger); color:#fff; }
-        .btn-blue { background:var(--blue); color:#fff; }
-        .panel-box { background:var(--card-bg); padding:20px; border-radius:12px; border:1px solid #1f293d; margin-bottom:20px; }
-        .service-row { background:#111827; padding:12px; border-radius:10px; display:flex; align-items:center; gap:12px; margin-bottom:10px; border:1px solid #1f293d; }
-        .service-thumb { width:52px; height:52px; border-radius:8px; object-fit:cover; }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Panel Revendedor | Catálogo</title>
+  <style>
+    * { box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+    body { background-color: #0f172a; color: #f8fafc; margin: 0; padding: 20px; display: flex; justify-content: center; }
+    .card { background-color: #1e293b; border-radius: 12px; padding: 24px; width: 100%; max-width: 500px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); }
+    h2, h3 { text-align: center; color: #38bdf8; margin-top: 0; }
+    .form-group { margin-bottom: 16px; }
+    label { display: block; margin-bottom: 6px; font-size: 14px; color: #94a3b8; }
+    input, textarea { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #334155; background-color: #0f172a; color: #fff; font-size: 15px; outline: none; }
+    input:focus { border-color: #38bdf8; }
+    button { width: 100%; padding: 12px; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; transition: 0.2s; }
+    .btn-primary { background-color: #38bdf8; color: #000; margin-top: 10px; }
+    .btn-success { background-color: #22c55e; color: #000; margin-top: 10px; }
+    .hidden { display: none !important; }
+    .producto-item { background: #0f172a; padding: 12px; border-radius: 8px; margin-bottom: 10px; border-left: 4px solid #22c55e; display: flex; justify-content: space-between; align-items: center; }
+  </style>
 </head>
 <body>
-    <div class="container">
-        <!-- Login / Registro -->
-        <div class="auth-card" id="authBox">
-            <div class="auth-tabs">
-                <button class="auth-tab-btn active" id="tabBtnLogin" onclick="cambiarTab('login')">Ingresar</button>
-                <button class="auth-tab-btn" id="tabBtnRegister" onclick="cambiarTab('register')">Registrarse</button>
-            </div>
 
-            <div id="viewLogin">
-                <div class="form-group"><label>Correo</label><input type="email" id="loginEmail"></div>
-                <div class="form-group"><label>Contraseña</label><input type="password" id="loginPass"></div>
-                <button class="btn btn-primary btn-full" onclick="iniciarSesion()">Entrar al Panel</button>
-            </div>
+  <!-- LOGIN REVENDEDOR -->
+  <div id="login-section" class="card">
+    <h2>💼 Acceso Revendedor</h2>
+    <div class="form-group">
+      <label>Correo Electrónico</label>
+      <input type="email" id="email" placeholder="admin@fullmovies.ec" value="admin@fullmovies.ec">
+    </div>
+    <div class="form-group">
+      <label>Contraseña</label>
+      <input type="password" id="password" placeholder="Tu contraseña">
+    </div>
+    <button class="btn-primary" onclick="iniciarSesion()">Ingresar a mi Panel</button>
+  </div>
 
-            <div id="viewRegister" style="display:none;">
-                <div class="form-group"><label>Nombre de tu Tienda</label><input type="text" id="regTienda" placeholder="Ej: Play Streaming"></div>
-                <div class="form-group"><label>Identificador web (Slug)</label><input type="text" id="regSlug" placeholder="ej: playstreaming"></div>
-                <div class="form-group"><label>WhatsApp (Ej: 593982766054)</label><input type="tel" id="regWa"></div>
-                <div class="form-group"><label>Correo</label><input type="email" id="regEmail"></div>
-                <div class="form-group"><label>Contraseña</label><input type="password" id="regPass"></div>
-                <button class="btn btn-primary btn-full" onclick="crearCuenta()">Crear mi Tienda</button>
-            </div>
-        </div>
-
-        <!-- Panel del Revendedor -->
-        <div id="adminContent" style="display:none;">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
-                <div>
-                    <h2 id="txtTituloTienda">Mi Tienda</h2>
-                    <p style="color:var(--text-muted); font-size:0.85rem;" id="txtVencimiento"></p>
-                </div>
-                <button class="btn btn-danger" onclick="cerrarSesion()">Salir</button>
-            </div>
-
-            <!-- Enlace comercial -->
-            <div class="panel-box" style="border-color:var(--primary);">
-                <label>Tu enlace público de ventas para compartir a clientes:</label>
-                <input type="text" id="enlaceCompartir" readonly style="color:var(--primary); font-weight:700;">
-            </div>
-
-            <!-- Identidad: Cambiar Nombre, WhatsApp y Logo -->
-            <div class="panel-box">
-                <h4 style="margin-bottom:12px; color:var(--purple);">⚙️ Identidad de mi Catálogo</h4>
-                <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:12px;">
-                    <div class="form-group">
-                        <label>Nombre de la Tienda</label>
-                        <input type="text" id="editNombreTienda">
-                    </div>
-                    <div class="form-group">
-                        <label>WhatsApp de Contacto</label>
-                        <input type="tel" id="editWaTienda">
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label>Subir o Cambiar Logo (Desde la Galería)</label>
-                    <input type="file" accept="image/*" onchange="subirLogo(event)">
-                </div>
-                <div style="display:flex; align-items:center; gap:12px; margin-top:8px;">
-                    <img id="prevLogo" src="" style="width:60px; height:60px; border-radius:50%; border:2px solid var(--primary); object-fit:cover; display:none;">
-                    <button class="btn btn-blue" onclick="guardarIdentidad()">Guardar Nombre y WhatsApp</button>
-                </div>
-            </div>
-
-            <!-- Formulario Producto -->
-            <div class="panel-box">
-                <h4 style="margin-bottom:12px; color:var(--primary);" id="formTitle">Agregar Servicio al Catálogo</h4>
-                <input type="hidden" id="editIdx" value="-1">
-                <div class="form-group"><label>Nombre de la plataforma</label><input type="text" id="srvNombre" placeholder="Ej: Netflix 4K"></div>
-                <div class="form-group"><label>Foto del Servicio</label><input type="file" accept="image/*" onchange="subirFotoSrv(event)"></div>
-                <div class="form-group"><label>Precio Opción 1</label><input type="text" id="srvP1" placeholder="1 Pantalla - $3.50"></div>
-                <div class="form-group"><label>Precio Opción 2 (Opcional)</label><input type="text" id="srvP2" placeholder="Cuenta Completa - $10.00"></div>
-                <div class="form-group"><label>Descripción</label><input type="text" id="srvDesc" placeholder="Bot de códigos 24/7 y garantía."></div>
-                <button class="btn btn-primary" onclick="guardarSrv()">Guardar Servicio</button>
-                <button class="btn" style="background:#475569; color:#fff;" onclick="limpiarForm()">Cancelar</button>
-            </div>
-
-            <h3>Mis Servicios Publicados</h3>
-            <div id="listaSrv" style="margin-top:12px;"></div>
-        </div>
+  <!-- PANEL DASHBOARD REVENDEDOR -->
+  <div id="dashboard-section" class="card hidden" style="max-width: 650px;">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+      <h3 style="margin:0;" id="titulo-tienda">Mi Tienda</h3>
+      <button onclick="location.reload()" style="width:auto; padding:6px 12px; background:#ef4444; color:#fff;">Salir</button>
     </div>
 
-    <script>
-        let sesion = null;
-        let fotoTemp = "";
+    <!-- Ajustes Tienda -->
+    <div style="background:#0f172a; padding:16px; border-radius:8px; margin-bottom:20px;">
+      <h4 style="margin-top:0; color:#38bdf8;">Configuración de Tienda</h4>
+      <div class="form-group">
+        <label>Nombre Comercial</label>
+        <input type="text" id="conf-nombre">
+      </div>
+      <div class="form-group">
+        <label>WhatsApp de Ventas (con código país, ej: 593999999999)</label>
+        <input type="text" id="conf-whatsapp">
+      </div>
+      <button class="btn-primary" onclick="guardarAjustes()">Guardar Datos de Tienda</button>
+      <p style="margin-top:12px; font-size:14px;">
+        <b>Enlace público para tus clientes:</b><br>
+        <a id="link-publico" href="#" target="_blank" style="color:#22c55e; word-break:break-all;"></a>
+      </p>
+    </div>
 
-        function cambiarTab(tab) {
-            document.getElementById('viewLogin').style.display = tab === 'login' ? 'block' : 'none';
-            document.getElementById('viewRegister').style.display = tab === 'register' ? 'block' : 'none';
-            document.getElementById('tabBtnLogin').classList.toggle('active', tab === 'login');
-            document.getElementById('tabBtnRegister').classList.toggle('active', tab === 'register');
+    <!-- Gestión Productos -->
+    <div style="background:#0f172a; padding:16px; border-radius:8px;">
+      <h4 style="margin-top:0; color:#22c55e;">Agregar Producto / Servicio</h4>
+      <div class="form-group">
+        <label>Nombre del Producto</label>
+        <input type="text" id="prod-nombre" placeholder="Ej: Netflix 1 Pantalla">
+      </div>
+      <div class="form-group">
+        <label>Precio</label>
+        <input type="text" id="prod-precio" placeholder="Ej: 3.50">
+      </div>
+      <div class="form-group">
+        <label>Descripción corta</label>
+        <input type="text" id="prod-desc" placeholder="Ej: Cuenta completa garantizada">
+      </div>
+      <button class="btn-success" onclick="agregarProducto()">Agregar Producto al Catálogo</button>
+
+      <h4 style="margin-top:20px;">Productos en Catálogo</h4>
+      <div id="lista-productos"></div>
+    </div>
+  </div>
+
+  <script>
+    let dbData = null;
+    let revendedorActual = null;
+    let slugActual = null;
+
+    async function cargarBD() {
+      try {
+        const res = await fetch('/api/db');
+        dbData = await res.json();
+      } catch (e) {
+        alert('Error conectando al servidor: ' + e.message);
+      }
+    }
+
+    async function iniciarSesion() {
+      const email = document.getElementById('email').value.trim();
+      const pass = document.getElementById('password').value.trim();
+
+      if (!dbData) await cargarBD();
+
+      if (!dbData || !dbData.revendedores) {
+        alert('No se pudo leer la base de datos.');
+        return;
+      }
+
+      // Buscar revendedor por email y clave
+      const revendedores = dbData.revendedores;
+      slugActual = Object.keys(revendedores).find(slug => {
+        const r = revendedores[slug];
+        return r.email === email && r.password === pass;
+      });
+
+      if (slugActual) {
+        revendedorActual = revendedores[slugActual];
+
+        if (revendedorActual.activo === false) {
+          alert('Tu suscripción está inactiva o suspendida. Contacta al administrador.');
+          return;
         }
 
-        async function crearCuenta() {
-            const data = {
-                nombreTienda: document.getElementById('regTienda').value,
-                slug: document.getElementById('regSlug').value,
-                whatsapp: document.getElementById('regWa').value,
-                correo: document.getElementById('regEmail').value,
-                clave: document.getElementById('regPass').value
-            };
-            const res = await fetch('/api/registro', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify(data)
-            });
-            const out = await res.json();
-            if (out.error) return alert(out.error);
-            alert("¡Tienda registrada con éxito!");
-            cambiarTab('login');
-        }
+        document.getElementById('login-section').classList.add('hidden');
+        document.getElementById('dashboard-section').classList.remove('hidden');
 
-        async function iniciarSesion() {
-            const res = await fetch('/api/login', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({
-                    correo: document.getElementById('loginEmail').value,
-                    clave: document.getElementById('loginPass').value
-                })
-            });
-            const out = await res.json();
-            if (out.error) return alert(out.error);
-            sesion = out.usuario;
-            mostrarPanel();
-        }
+        cargarDatosDashboard();
+      } else {
+        alert('Correo o contraseña incorrectos.');
+      }
+    }
 
-        function mostrarPanel() {
-            document.getElementById('authBox').style.display = 'none';
-            document.getElementById('adminContent').style.display = 'block';
-            document.getElementById('txtTituloTienda').innerText = sesion.nombreTienda;
-            document.getElementById('txtVencimiento').innerText = `Suscripción activa hasta: ${sesion.vencimiento}`;
-            document.getElementById('enlaceCompartir').value = `${window.location.origin}/?tienda=${sesion.slug}`;
-            
-            document.getElementById('editNombreTienda').value = sesion.nombreTienda;
-            document.getElementById('editWaTienda').value = sesion.whatsapp;
+    function cargarDatosDashboard() {
+      if (!dbData.tiendas) dbData.tiendas = {};
+      if (!dbData.tiendas[slugActual]) {
+        dbData.tiendas[slugActual] = {
+          nombre: revendedorActual.nombre || slugActual,
+          whatsapp: "593999999999",
+          productos: []
+        };
+      }
 
-            if (sesion.logo) {
-                const img = document.getElementById('prevLogo');
-                img.src = sesion.logo;
-                img.style.display = 'block';
-            }
-            renderLista();
-        }
+      const tienda = dbData.tiendas[slugActual];
+      document.getElementById('titulo-tienda').innerText = tienda.nombre || slugActual;
+      document.getElementById('conf-nombre').value = tienda.nombre || '';
+      document.getElementById('conf-whatsapp').value = tienda.whatsapp || '';
 
-        function subirLogo(e) {
-            const f = e.target.files[0];
-            if (!f) return;
-            const r = new FileReader();
-            r.onload = async () => {
-                sesion.logo = r.result;
-                document.getElementById('prevLogo').src = r.result;
-                document.getElementById('prevLogo').style.display = 'block';
-                await sincronizar();
-                alert("¡Logo actualizado en tu catálogo!");
-            };
-            r.readAsDataURL(f);
-        }
+      const link = window.location.origin + '/?tienda=' + slugActual;
+      const elLink = document.getElementById('link-publico');
+      elLink.href = link;
+      elLink.innerText = link;
 
-        async function guardarIdentidad() {
-            sesion.nombreTienda = document.getElementById('editNombreTienda').value.trim();
-            sesion.whatsapp = document.getElementById('editWaTienda').value.trim();
-            document.getElementById('txtTituloTienda').innerText = sesion.nombreTienda;
-            await sincronizar();
-            alert("Nombre y WhatsApp actualizados correctamente.");
-        }
+      renderProductos();
+    }
 
-        function subirFotoSrv(e) {
-            const f = e.target.files[0];
-            if (!f) return;
-            const r = new FileReader();
-            r.onload = () => { fotoTemp = r.result; };
-            r.readAsDataURL(f);
-        }
+    function renderProductos() {
+      const lista = document.getElementById('lista-productos');
+      lista.innerHTML = '';
+      const productos = dbData.tiendas[slugActual].productos || [];
 
-        async function guardarSrv() {
-            const nombre = document.getElementById('srvNombre').value.trim();
-            const p1 = document.getElementById('srvP1').value.trim();
-            const p2 = document.getElementById('srvP2').value.trim();
-            const desc = document.getElementById('srvDesc').value.trim();
-            const idx = parseInt(document.getElementById('editIdx').value);
+      if (productos.length === 0) {
+        lista.innerHTML = '<p style="color:#64748b; font-size:14px;">No tienes productos cargados aún.</p>';
+        return;
+      }
 
-            if (!nombre || !p1) return alert("Completa nombre y al menos el precio 1");
+      productos.forEach((p, idx) => {
+        const item = document.createElement('div');
+        item.className = 'producto-item';
+        item.innerHTML = `
+          <div>
+            <strong>${p.nombre}</strong> - $${p.precio}<br>
+            <small style="color:#94a3b8;">${p.descripcion || ''}</small>
+          </div>
+          <button onclick="eliminarProducto(${idx})" style="width:auto; padding:6px 10px; background:#ef4444; color:#fff; font-size:12px;">X</button>
+        `;
+        lista.appendChild(item);
+      });
+    }
 
-            const precios = [];
-            const [i1, v1] = p1.split("-");
-            precios.push({ item: (i1||"Precio").trim(), valor: (v1||p1).trim() });
-            if (p2) {
-                const [i2, v2] = p2.split("-");
-                precios.push({ item: (i2||"Opción 2").trim(), valor: (v2||p2).trim() });
-            }
+    async function guardarAjustes() {
+      const nuevoNombre = document.getElementById('conf-nombre').value.trim();
+      const nuevoWhatsapp = document.getElementById('conf-whatsapp').value.trim();
 
-            const srv = {
-                nombre,
-                desc,
-                precios,
-                imagen: fotoTemp || (idx >= 0 ? sesion.servicios[idx].imagen : '')
-            };
+      dbData.tiendas[slugActual].nombre = nuevoNombre;
+      dbData.tiendas[slugActual].whatsapp = nuevoWhatsapp;
+      dbData.revendedores[slugActual].nombre = nuevoNombre;
 
-            if (!sesion.servicios) sesion.servicios = [];
-            if (idx >= 0) sesion.servicios[idx] = srv;
-            else sesion.servicios.push(srv);
+      await persistir();
+      alert('¡Configuración guardada!');
+      document.getElementById('titulo-tienda').innerText = nuevoNombre;
+    }
 
-            await sincronizar();
-            limpiarForm();
-            renderLista();
-        }
+    async function agregarProducto() {
+      const nombre = document.getElementById('prod-nombre').value.trim();
+      const precio = document.getElementById('prod-precio').value.trim();
+      const descripcion = document.getElementById('prod-desc').value.trim();
 
-        async function sincronizar() {
-            await fetch('/api/actualizar-tienda', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({
-                    slug: sesion.slug,
-                    clave: sesion.clave,
-                    servicios: sesion.servicios,
-                    logo: sesion.logo,
-                    nombreTienda: sesion.nombreTienda,
-                    whatsapp: sesion.whatsapp
-                })
-            });
-        }
+      if (!nombre || !precio) {
+        alert('Nombre y precio son obligatorios.');
+        return;
+      }
 
-        function renderLista() {
-            const cont = document.getElementById('listaSrv');
-            cont.innerHTML = "";
-            (sesion.servicios || []).forEach((s, idx) => {
-                const d = document.createElement('div');
-                d.className = 'service-row';
-                d.innerHTML = `
-                    <img class="service-thumb" src="${s.imagen || './logo.png'}">
-                    <div style="flex-grow:1;">
-                        <strong>${s.nombre}</strong>
-                        <div style="font-size:0.8rem; color:#94a3b8;">${s.desc}</div>
-                    </div>
-                    <div style="display:flex; gap:6px;">
-                        <button class="btn btn-blue" onclick="editarSrv(${idx})">✏️</button>
-                        <button class="btn btn-danger" onclick="borrarSrv(${idx})">🗑️</button>
-                    </div>
-                `;
-                cont.appendChild(d);
-            });
-        }
+      if (!dbData.tiendas[slugActual].productos) {
+        dbData.tiendas[slugActual].productos = [];
+      }
 
-        function editarSrv(idx) {
-            const s = sesion.servicios[idx];
-            document.getElementById('srvNombre').value = s.nombre;
-            document.getElementById('srvDesc').value = s.desc;
-            document.getElementById('srvP1').value = s.precios[0] ? `${s.precios[0].item} - ${s.precios[0].valor}` : "";
-            document.getElementById('srvP2').value = s.precios[1] ? `${s.precios[1].item} - ${s.precios[1].valor}` : "";
-            document.getElementById('editIdx').value = idx;
-            document.getElementById('formTitle').innerText = "Editando: " + s.nombre;
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        }
+      dbData.tiendas[slugActual].productos.push({ nombre, precio, descripcion });
+      await persistir();
 
-        async function borrarSrv(idx) {
-            if (!confirm("¿Eliminar este servicio?")) return;
-            sesion.servicios.splice(idx, 1);
-            await sincronizar();
-            renderLista();
-        }
+      document.getElementById('prod-nombre').value = '';
+      document.getElementById('prod-precio').value = '';
+      document.getElementById('prod-desc').value = '';
+      renderProductos();
+    }
 
-        function limpiarForm() {
-            document.getElementById('srvNombre').value = "";
-            document.getElementById('srvP1').value = "";
-            document.getElementById('srvP2').value = "";
-            document.getElementById('srvDesc').value = "";
-            document.getElementById('editIdx').value = "-1";
-            document.getElementById('formTitle').innerText = "Agregar Servicio al Catálogo";
-            fotoTemp = "";
-        }
+    async function eliminarProducto(idx) {
+      dbData.tiendas[slugActual].productos.splice(idx, 1);
+      await persistir();
+      renderProductos();
+    }
 
-        function cerrarSesion() { location.reload(); }
-    </script>
+    async function persistir() {
+      await fetch('/api/save', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(dbData)
+      });
+    }
+
+    cargarBD();
+  </script>
 </body>
 </html>
