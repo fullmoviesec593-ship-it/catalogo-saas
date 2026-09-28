@@ -3,85 +3,203 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Súper Admin | Control SaaS</title>
+  <title>Súper Admin | Panel Dueño Full Movies Ec</title>
   <style>
     * { box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
-    body { background-color: #0f172a; color: #f8fafc; margin: 0; padding: 20px; display: flex; justify-content: center; }
-    .card { background-color: #1e293b; border-radius: 12px; padding: 24px; width: 100%; max-width: 500px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); }
-    h2, h3 { text-align: center; color: #f59e0b; margin-top: 0; }
-    .form-group { margin-bottom: 16px; }
-    label { display: block; margin-bottom: 6px; font-size: 14px; color: #94a3b8; }
-    input, select { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #334155; background-color: #0f172a; color: #fff; font-size: 15px; outline: none; }
-    input:focus { border-color: #22c55e; }
-    button { width: 100%; padding: 12px; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; transition: 0.2s; }
-    .btn-primary { background-color: #22c55e; color: #000; margin-top: 10px; }
-    .btn-primary:active { transform: scale(0.98); }
+    body { background-color: #0b0f19; color: #f8fafc; margin: 0; padding: 16px; display: flex; justify-content: center; }
+    .card { background-color: #1e293b; border-radius: 14px; padding: 22px; width: 100%; max-width: 680px; box-shadow: 0 10px 30px rgba(0,0,0,0.6); border: 1px solid #334155; }
+    h2, h3, h4 { color: #f59e0b; margin-top: 0; text-align: center; }
+    .logo-container { text-align: center; margin-bottom: 16px; }
+    .logo-badge { display: inline-flex; align-items: center; gap: 8px; background: #0f172a; padding: 8px 16px; border-radius: 30px; border: 1px solid #3b82f6; font-weight: bold; color: #38bdf8; font-size: 15px; }
+    .form-group { margin-bottom: 14px; }
+    label { display: block; margin-bottom: 5px; font-size: 13px; color: #94a3b8; font-weight: 500; }
+    input, select { width: 100%; padding: 11px 14px; border-radius: 8px; border: 1px solid #334155; background-color: #0f172a; color: #fff; font-size: 14px; outline: none; }
+    input:focus, select:focus { border-color: #22c55e; }
+    button { width: 100%; padding: 12px; border: none; border-radius: 8px; font-size: 15px; font-weight: bold; cursor: pointer; transition: 0.2s; }
+    .btn-primary { background-color: #22c55e; color: #052e16; margin-top: 6px; }
+    .btn-secondary { background-color: #3b82f6; color: #fff; margin-top: 6px; }
+    .btn-danger { background-color: #ef4444; color: #fff; }
+    .btn-copy { background-color: #334155; color: #38bdf8; padding: 6px 12px; font-size: 12px; width: auto; border-radius: 6px; }
+    .btn-copy:active { background-color: #22c55e; color: #000; }
+    .btn-demo { background-color: #8b5cf6; color: #fff; margin-top: 6px; }
     .hidden { display: none !important; }
-    .revendedor-item { background: #0f172a; padding: 14px; border-radius: 8px; margin-bottom: 12px; border-left: 4px solid #3b82f6; }
-    .badge { display: inline-block; padding: 3px 8px; border-radius: 4px; font-size: 12px; font-weight: bold; background: #22c55e; color: #000; }
+    .nav-tabs { display: flex; gap: 8px; margin-bottom: 18px; border-bottom: 1px solid #334155; padding-bottom: 10px; }
+    .nav-tab { flex: 1; padding: 10px; text-align: center; background: #0f172a; border-radius: 8px; cursor: pointer; font-size: 13px; font-weight: bold; color: #94a3b8; }
+    .nav-tab.active { background: #3b82f6; color: #fff; }
+    .user-card { background: #0f172a; border: 1px solid #334155; border-radius: 10px; padding: 14px; margin-bottom: 14px; border-left: 5px solid #22c55e; }
+    .user-card.demo { border-left-color: #8b5cf6; }
+    .user-card.suspendido { border-left-color: #ef4444; }
+    .badge { padding: 3px 8px; border-radius: 4px; font-size: 11px; font-weight: bold; }
+    .badge-active { background: rgba(34, 197, 94, 0.2); color: #4ade80; border: 1px solid #22c55e; }
+    .badge-demo { background: rgba(139, 92, 246, 0.2); color: #c084fc; border: 1px solid #8b5cf6; }
+    .badge-off { background: rgba(239, 68, 68, 0.2); color: #f87171; border: 1px solid #ef4444; }
+    .link-row { display: flex; align-items: center; justify-content: space-between; background: #1e293b; padding: 8px 12px; border-radius: 6px; margin-top: 6px; font-size: 12px; }
   </style>
 </head>
 <body>
 
-  <!-- LOGIN -->
+  <!-- PANTALLA 1: LOGIN DUEÑO -->
   <div id="login-section" class="card">
-    <h2>👑 Acceso Dueño</h2>
+    <div class="logo-container">
+      <div class="logo-badge">🎬 FULL MOVIES EC 👑</div>
+    </div>
+    <h2>Acceso Súper Dueño</h2>
     <div class="form-group">
-      <label>Correo</label>
-      <input type="email" id="email" placeholder="admin@fullmovies.ec" value="admin@fullmovies.ec">
+      <label>Correo de Administrador</label>
+      <input type="email" id="email" value="admin@fullmovies.ec">
     </div>
     <div class="form-group">
       <label>Contraseña Maestra</label>
       <input type="password" id="password" placeholder="Tu contraseña">
     </div>
-    <button class="btn-primary" onclick="iniciarSesion()">Acceder al Control</button>
+    <button class="btn-primary" onclick="iniciarSesion()">Acceder al Panel</button>
+    <button style="background:transparent; color:#94a3b8; font-size:13px; margin-top:10px;" onclick="mostrarRecuperacion()">¿Olvidaste tu contraseña?</button>
   </div>
 
-  <!-- PANEL DASHBOARD -->
-  <div id="dashboard-section" class="card hidden" style="max-width: 750px;">
-    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
-      <h3 style="margin:0;">⚙️ Gestión de Revendedores</h3>
-      <button onclick="location.reload()" style="width:auto; padding:6px 12px; background:#ef4444; color:#fff;">Cerrar</button>
+  <!-- PANTALLA 1.1: RECUPERAR CONTRASEÑA -->
+  <div id="recover-section" class="card hidden">
+    <h2>🔑 Recuperar Acceso</h2>
+    <p style="font-size:13px; color:#94a3b8; text-align:center;">Ingresa tu código PIN maestro de seguridad (por defecto: <b>5930</b>) para restablecer la contraseña.</p>
+    <div class="form-group">
+      <label>PIN Maestro de Recuperación</label>
+      <input type="password" id="rec-pin" placeholder="Ingresa PIN (5930)">
+    </div>
+    <div class="form-group">
+      <label>Nueva Contraseña</label>
+      <input type="text" id="rec-new-pass" placeholder="Escribe tu nueva clave">
+    </div>
+    <button class="btn-primary" onclick="reestablecerClave()">Restablecer Contraseña Ahora</button>
+    <button style="background:#334155; color:#fff; margin-top:8px;" onclick="volverAlLogin()">Volver</button>
+  </div>
+
+  <!-- PANTALLA 2: DASHBOARD DUEÑO -->
+  <div id="dashboard-section" class="card hidden">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px; border-bottom:1px solid #334155; padding-bottom:12px;">
+      <div style="font-weight:bold; color:#38bdf8; display:flex; align-items:center; gap:8px;">
+        <span style="font-size:20px;">🎬</span> FULL MOVIES EC (Súper Admin)
+      </div>
+      <button onclick="location.reload()" style="width:auto; padding:6px 12px; background:#ef4444; color:#fff; font-size:12px;">Cerrar Sesión</button>
     </div>
 
-    <div style="background:#0f172a; padding:16px; border-radius:8px; margin-bottom:24px;">
-      <h4 style="margin-top:0; color:#38bdf8;">Registrar Nuevo Revendedor</h4>
-      <div class="form-group">
-        <label>Nombre de la Tienda / Revendedor</label>
-        <input type="text" id="nuevo-nombre" placeholder="Ej: Streaming Loja">
-      </div>
-      <div class="form-group">
-        <label>Identificador Único (Slug - sin espacios ni caracteres raros)</label>
-        <input type="text" id="nuevo-slug" placeholder="Ej: loja">
-      </div>
-      <div class="form-group">
-        <label>Correo del Revendedor</label>
-        <input type="email" id="nuevo-correo" placeholder="cliente@gmail.com">
-      </div>
-      <div class="form-group">
-        <label>Contraseña para su panel</label>
-        <input type="text" id="nueva-clave" placeholder="clave123">
-      </div>
-      <div class="form-group">
-        <label>Días de Suscripción</label>
-        <input type="number" id="nuevo-dias" value="30">
-      </div>
-      <button class="btn-primary" onclick="crearRevendedor()">Crear Cuenta y Activar</button>
+    <!-- Pestañas de navegación -->
+    <div class="nav-tabs">
+      <div id="tab-btn-users" class="nav-tab active" onclick="cambiarTab('users')">👥 Revendedores</div>
+      <div id="tab-btn-create" class="nav-tab" onclick="cambiarTab('create')">➕ Registrar Nuevo</div>
+      <div id="tab-btn-security" class="nav-tab" onclick="cambiarTab('security')">🔒 Seguridad & Clave</div>
     </div>
 
-    <h4>Revendedores Activos</h4>
-    <div id="lista-revendedores"></div>
+    <!-- PESTAÑA: LISTA DE USUARIOS -->
+    <div id="tab-users">
+      <h4 style="text-align:left; color:#cbd5e1; margin-bottom:12px;">Revendedores y Demos en el Sistema</h4>
+      <div id="lista-revendedores"></div>
+    </div>
+
+    <!-- PESTAÑA: CREAR / REGISTRAR MANUALMENTE -->
+    <div id="tab-create" class="hidden">
+      <div style="background:#0f172a; padding:16px; border-radius:10px; border:1px solid #334155;">
+        <h4 style="color:#22c55e; margin-bottom:14px;">Alta Manual de Revendedor / Demo</h4>
+        
+        <div class="form-group">
+          <label>Tipo de Cuenta</label>
+          <select id="reg-tipo" onchange="ajustarTipoRegistro()">
+            <option value="oficial">Revendedor Oficial (Mensual)</option>
+            <option value="demo">Demo de Prueba (Gratis / 2 Días)</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Nombre de la Tienda o Cliente</label>
+          <input type="text" id="reg-nombre" placeholder="Ej: Streaming Guayaquil">
+        </div>
+        <div class="form-group">
+          <label>Identificador Único (Slug - sin espacios ni caracteres especiales)</label>
+          <input type="text" id="reg-slug" placeholder="Ej: guayaquil">
+        </div>
+        <div class="form-group">
+          <label>Correo Electrónico (Para que inicie sesión)</label>
+          <input type="email" id="reg-email" placeholder="cliente@gmail.com">
+        </div>
+        <div class="form-group">
+          <label>Contraseña Asignada</label>
+          <input type="text" id="reg-pass" placeholder="Ej: clave123">
+        </div>
+        <div class="form-group">
+          <label id="lbl-dias">Días de Acceso (Vigencia)</label>
+          <input type="number" id="reg-dias" value="30">
+        </div>
+
+        <button class="btn-primary" onclick="guardarNuevoUsuario()">Registrar y Activar Cuenta</button>
+      </div>
+    </div>
+
+    <!-- PESTAÑA: SEGURIDAD (CAMBIO DE CLAVE DUEÑO) -->
+    <div id="tab-security" class="hidden">
+      <div style="background:#0f172a; padding:16px; border-radius:10px; border:1px solid #334155;">
+        <h4 style="color:#38bdf8;">Cambiar mi Contraseña de Súper Dueño</h4>
+        <div class="form-group">
+          <label>Nuevo Correo Maestro</label>
+          <input type="email" id="cfg-email" value="admin@fullmovies.ec">
+        </div>
+        <div class="form-group">
+          <label>Nueva Contraseña Maestra</label>
+          <input type="text" id="cfg-pass" placeholder="Ingresa tu nueva clave maestra">
+        </div>
+        <div class="form-group">
+          <label>PIN Maestro de Recuperación (Por si la olvidas)</label>
+          <input type="text" id="cfg-pin" placeholder="5930">
+        </div>
+        <button class="btn-secondary" onclick="actualizarCredencialesMaster()">Guardar Nuevas Credenciales</button>
+      </div>
+    </div>
+
+    <!-- MODAL EDITAR USUARIO -->
+    <div id="modal-edit" class="hidden" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); display:flex; align-items:center; justify-content:center; padding:15px; z-index:9999;">
+      <div class="card" style="max-width:500px; background:#1e293b;">
+        <h3 style="color:#38bdf8;">Editar Revendedor</h3>
+        <input type="hidden" id="edit-slug">
+        <div class="form-group">
+          <label>Nombre de Tienda</label>
+          <input type="text" id="edit-nombre">
+        </div>
+        <div class="form-group">
+          <label>Correo Electrónico</label>
+          <input type="email" id="edit-email">
+        </div>
+        <div class="form-group">
+          <label>Contraseña</label>
+          <input type="text" id="edit-pass">
+        </div>
+        <div class="form-group">
+          <label>Estado del Acceso</label>
+          <select id="edit-estado">
+            <option value="true">Activo (Habilitado)</option>
+            <option value="false">Suspendido (Bloqueado)</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Sumar más días de vigencia a partir de hoy</label>
+          <input type="number" id="edit-dias" value="30">
+        </div>
+        <div style="display:flex; gap:10px;">
+          <button class="btn-primary" onclick="guardarEdicion()">Guardar Cambios</button>
+          <button class="btn-danger" style="width:120px;" onclick="cerrarModalEdit()">Cancelar</button>
+        </div>
+      </div>
+    </div>
+
   </div>
 
   <script>
     let dbData = null;
+    const PIN_DEFAULT = "5930";
 
     async function cargarBD() {
       try {
         const res = await fetch('/api/db');
         dbData = await res.json();
+        if (!dbData.superadmin) dbData.superadmin = {};
+        if (!dbData.superadmin.pin) dbData.superadmin.pin = PIN_DEFAULT;
       } catch (e) {
-        alert('Error conectando al servidor API: ' + e.message);
+        alert('Error conectando al servidor: ' + e.message);
       }
     }
 
@@ -91,65 +209,172 @@
 
       if (!dbData) await cargarBD();
 
-      if (!dbData) {
-        alert('No se pudo cargar la base de datos.');
+      const sa = dbData.superadmin || {};
+      const esCorrecto = (sa.email && email === sa.email && pass === sa.password) ||
+                         (email === 'admin@fullmovies.ec' && (pass === 'admin123' || pass === '12345678'));
+
+      if (esCorrecto) {
+        document.getElementById('login-section').classList.add('hidden');
+        document.getElementById('dashboard-section').classList.remove('hidden');
+        document.getElementById('cfg-email').value = sa.email || 'admin@fullmovies.ec';
+        document.getElementById('cfg-pass').value = sa.password || 'admin123';
+        document.getElementById('cfg-pin').value = sa.pin || PIN_DEFAULT;
+        renderRevendedores();
+      } else {
+        alert('Contraseña o correo incorrectos.');
+      }
+    }
+
+    function mostrarRecuperacion() {
+      document.getElementById('login-section').classList.add('hidden');
+      document.getElementById('recover-section').classList.remove('hidden');
+    }
+
+    function volverAlLogin() {
+      document.getElementById('recover-section').classList.add('hidden');
+      document.getElementById('login-section').classList.remove('hidden');
+    }
+
+    async function reestablecerClave() {
+      const pin = document.getElementById('rec-pin').value.trim();
+      const nuevaClave = document.getElementById('rec-new-pass').value.trim();
+
+      if (!pin || !nuevaClave) {
+        alert('Por favor llena todos los campos.');
         return;
       }
 
-      const superadmin = dbData.superadmin || {};
-      
-      // Valida credenciales desde database.json o maestro por defecto
-      if ((superadmin.email && email === superadmin.email && pass === superadmin.password) || 
-          (email === 'admin@fullmovies.ec' && pass === '12345678') ||
-          (email === 'admin@fullmovies.ec' && pass === 'admin123')) {
-        document.getElementById('login-section').classList.add('hidden');
-        document.getElementById('dashboard-section').classList.remove('hidden');
-        renderRevendedores();
+      if (!dbData) await cargarBD();
+      const pinValido = (dbData.superadmin && dbData.superadmin.pin) ? dbData.superadmin.pin : PIN_DEFAULT;
+
+      if (pin === pinValido) {
+        dbData.superadmin.password = nuevaClave;
+        await persistir();
+        alert('¡Contraseña restablecida exitosamente! Ya puedes iniciar sesión.');
+        document.getElementById('password').value = nuevaClave;
+        volverAlLogin();
       } else {
-        alert('Credenciales incorrectas. Verifica correo y contraseña.');
+        alert('El PIN de seguridad no es correcto.');
+      }
+    }
+
+    function cambiarTab(tab) {
+      document.getElementById('tab-users').classList.add('hidden');
+      document.getElementById('tab-create').classList.add('hidden');
+      document.getElementById('tab-security').classList.add('hidden');
+
+      document.getElementById('tab-btn-users').classList.remove('active');
+      document.getElementById('tab-btn-create').classList.remove('active');
+      document.getElementById('tab-btn-security').classList.remove('active');
+
+      if (tab === 'users') {
+        document.getElementById('tab-users').classList.remove('hidden');
+        document.getElementById('tab-btn-users').classList.add('active');
+        renderRevendedores();
+      } else if (tab === 'create') {
+        document.getElementById('tab-create').classList.remove('hidden');
+        document.getElementById('tab-btn-create').classList.add('active');
+      } else if (tab === 'security') {
+        document.getElementById('tab-security').classList.remove('hidden');
+        document.getElementById('tab-btn-security').classList.add('active');
+      }
+    }
+
+    function ajustarTipoRegistro() {
+      const tipo = document.getElementById('reg-tipo').value;
+      if (tipo === 'demo') {
+        document.getElementById('reg-dias').value = 2;
+        document.getElementById('lbl-dias').innerText = 'Días de Prueba (Demo)';
+      } else {
+        document.getElementById('reg-dias').value = 30;
+        document.getElementById('lbl-dias').innerText = 'Días de Suscripción Oficial';
       }
     }
 
     function renderRevendedores() {
-      const contenedor = document.getElementById('lista-revendedores');
-      contenedor.innerHTML = '';
-      const revendedores = dbData.revendedores || {};
+      const lista = document.getElementById('lista-revendedores');
+      lista.innerHTML = '';
 
+      const revendedores = dbData.revendedores || {};
       const slugs = Object.keys(revendedores);
+
       if (slugs.length === 0) {
-        contenedor.innerHTML = '<p style="color:#64748b;">No hay revendedores registrados todavía.</p>';
+        lista.innerHTML = '<p style="color:#64748b; font-size:14px; text-align:center;">No hay revendedores registrados todavía.</p>';
         return;
       }
 
+      const host = window.location.origin;
+
       slugs.forEach(slug => {
         const r = revendedores[slug];
-        const item = document.createElement('div');
-        item.className = 'revendedor-item';
-        item.innerHTML = `
-          <div style="display:flex; justify-content:space-between;">
-            <strong>${r.nombre || slug}</strong>
-            <span class="badge">${r.activo ? 'ACTIVO' : 'SUSPENDIDO'}</span>
+        const isDemo = r.isDemo || false;
+        const isActive = r.activo !== false;
+
+        let badgeClass = 'badge-active';
+        let badgeText = 'ACTIVO';
+        if (!isActive) {
+          badgeClass = 'badge-off';
+          badgeText = 'SUSPENDIDO';
+        } else if (isDemo) {
+          badgeClass = 'badge-demo';
+          badgeText = 'DEMO PRUEBA';
+        }
+
+        const linkAdmin = `${host}/admin.html`;
+        const linkCatalogo = `${host}/?tienda=${slug}`;
+
+        const card = document.createElement('div');
+        card.className = `user-card ${isDemo ? 'demo' : ''} ${!isActive ? 'suspendido' : ''}`;
+        card.innerHTML = `
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <strong style="font-size:16px; color:#fff;">${r.nombre || slug}</strong>
+            <span class="badge ${badgeClass}">${badgeText}</span>
           </div>
-          <p style="margin:6px 0; font-size:13px; color:#94a3b8;">
-            <b>Slug:</b> ${slug} | <b>Correo:</b> ${r.email} | <b>Clave:</b> ${r.password}
-          </p>
-          <p style="margin:4px 0; font-size:13px;">
-            <b>Link Catálogo:</b> <a href="/?tienda=${slug}" target="_blank" style="color:#38bdf8;">/?tienda=${slug}</a>
-          </p>
+
+          <div style="margin:8px 0; font-size:13px; color:#94a3b8; line-height:1.5;">
+            <div><b>Slug / Tienda:</b> <span style="color:#38bdf8;">${slug}</span></div>
+            <div><b>Correo:</b> ${r.email} | <b>Contraseña:</b> <span style="color:#22c55e;">${r.password}</span></div>
+            <div><b>Vence:</b> ${r.vencimiento ? new Date(r.vencimiento).toLocaleDateString() : 'Ilimitado'}</div>
+          </div>
+
+          <!-- ENLACES CON BOTONES DE COPIAR -->
+          <div class="link-row">
+            <span><b>Panel Revendedor:</b> /admin.html</span>
+            <button class="btn-copy" onclick="copiarAlPortapapeles('${linkAdmin}')">Copiar Link Admin</button>
+          </div>
+
+          <div class="link-row">
+            <span><b>Catálogo Tienda:</b> /?tienda=${slug}</span>
+            <button class="btn-copy" onclick="copiarAlPortapapeles('${linkCatalogo}')">Copiar Link Catálogo</button>
+          </div>
+
+          <div style="display:flex; gap:8px; margin-top:12px;">
+            <button style="background:#3b82f6; color:#fff; padding:8px; font-size:13px;" onclick="abrirModalEdit('${slug}')">✏️ Editar Datos</button>
+            <button style="background:#ef4444; color:#fff; padding:8px; font-size:13px; width:110px;" onclick="eliminarRevendedor('${slug}')">🗑️ Eliminar</button>
+          </div>
         `;
-        contenedor.appendChild(item);
+        lista.appendChild(card);
       });
     }
 
-    async function crearRevendedor() {
-      const nombre = document.getElementById('nuevo-nombre').value.trim();
-      const slug = document.getElementById('nuevo-slug').value.trim().toLowerCase();
-      const email = document.getElementById('nuevo-correo').value.trim();
-      const password = document.getElementById('nueva-clave').value.trim();
-      const dias = parseInt(document.getElementById('nuevo-dias').value) || 30;
+    function copiarAlPortapapeles(texto) {
+      navigator.clipboard.writeText(texto).then(() => {
+        alert('¡Enlace copiado al portapapeles!\n' + texto);
+      }).catch(() => {
+        prompt('Copia manualmente este enlace:', texto);
+      });
+    }
+
+    async function guardarNuevoUsuario() {
+      const tipo = document.getElementById('reg-tipo').value;
+      const nombre = document.getElementById('reg-nombre').value.trim();
+      const slug = document.getElementById('reg-slug').value.trim().toLowerCase().replace(/[^a-z0-9]/g, '');
+      const email = document.getElementById('reg-email').value.trim();
+      const password = document.getElementById('reg-pass').value.trim();
+      const dias = parseInt(document.getElementById('reg-dias').value) || (tipo === 'demo' ? 2 : 30);
 
       if (!nombre || !slug || !email || !password) {
-        alert('Por favor completa todos los campos.');
+        alert('Por favor llena todos los datos obligatorios.');
         return;
       }
 
@@ -164,34 +389,109 @@
         email,
         password,
         vencimiento: vencimiento.toISOString(),
-        activo: true
+        activo: true,
+        isDemo: (tipo === 'demo')
       };
 
       if (!dbData.tiendas[slug]) {
         dbData.tiendas[slug] = {
           nombre: nombre,
           whatsapp: "593999999999",
-          moneda: "$",
           productos: []
         };
       }
 
-      const res = await fetch('/api/save', {
+      await persistir();
+      alert('¡Cuenta creada y activada con éxito!');
+      document.getElementById('reg-nombre').value = '';
+      document.getElementById('reg-slug').value = '';
+      document.getElementById('reg-email').value = '';
+      document.getElementById('reg-pass').value = '';
+      cambiarTab('users');
+    }
+
+    function abrirModalEdit(slug) {
+      const r = dbData.revendedores[slug];
+      document.getElementById('edit-slug').value = slug;
+      document.getElementById('edit-nombre').value = r.nombre || '';
+      document.getElementById('edit-email').value = r.email || '';
+      document.getElementById('edit-pass').value = r.password || '';
+      document.getElementById('edit-estado').value = (r.activo !== false) ? 'true' : 'false';
+      document.getElementById('modal-edit').classList.remove('hidden');
+    }
+
+    function cerrarModalEdit() {
+      document.getElementById('modal-edit').classList.add('hidden');
+    }
+
+    async function guardarEdicion() {
+      const slug = document.getElementById('edit-slug').value;
+      const nombre = document.getElementById('edit-nombre').value.trim();
+      const email = document.getElementById('edit-email').value.trim();
+      const pass = document.getElementById('edit-pass').value.trim();
+      const activo = document.getElementById('edit-estado').value === 'true';
+      const dias = parseInt(document.getElementById('edit-dias').value) || 0;
+
+      if (!nombre || !email || !pass) {
+        alert('Completa los campos.');
+        return;
+      }
+
+      dbData.revendedores[slug].nombre = nombre;
+      dbData.revendedores[slug].email = email;
+      dbData.revendedores[slug].password = pass;
+      dbData.revendedores[slug].activo = activo;
+
+      if (dias > 0) {
+        const f = new Date();
+        f.setDate(f.getDate() + dias);
+        dbData.revendedores[slug].vencimiento = f.toISOString();
+      }
+
+      if (dbData.tiendas && dbData.tiendas[slug]) {
+        dbData.tiendas[slug].nombre = nombre;
+      }
+
+      await persistir();
+      alert('¡Datos actualizados correctamente!');
+      cerrarModalEdit();
+      renderRevendedores();
+    }
+
+    async function eliminarRevendedor(slug) {
+      if (confirm(`¿Seguro que deseas eliminar al revendedor "${slug}" y toda su tienda?`)) {
+        delete dbData.revendedores[slug];
+        if (dbData.tiendas) delete dbData.tiendas[slug];
+        await persistir();
+        renderRevendedores();
+      }
+    }
+
+    async function actualizarCredencialesMaster() {
+      const nuevoEmail = document.getElementById('cfg-email').value.trim();
+      const nuevaPass = document.getElementById('cfg-pass').value.trim();
+      const nuevoPin = document.getElementById('cfg-pin').value.trim();
+
+      if (!nuevoEmail || !nuevaPass) {
+        alert('Correo y contraseña no pueden estar vacíos.');
+        return;
+      }
+
+      if (!dbData.superadmin) dbData.superadmin = {};
+      dbData.superadmin.email = nuevoEmail;
+      dbData.superadmin.password = nuevaPass;
+      dbData.superadmin.pin = nuevoPin || PIN_DEFAULT;
+
+      await persistir();
+      alert('¡Tus credenciales de Súper Dueño han sido actualizadas con éxito!');
+    }
+
+    async function persistir() {
+      await fetch('/api/save', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(dbData)
       });
-
-      if (res.ok) {
-        alert('¡Revendedor creado con éxito!');
-        renderRevendedores();
-        document.getElementById('nuevo-nombre').value = '';
-        document.getElementById('nuevo-slug').value = '';
-        document.getElementById('nuevo-correo').value = '';
-        document.getElementById('nueva-clave').value = '';
-      } else {
-        alert('Error al guardar datos en el servidor.');
-      }
     }
 
     cargarBD();
