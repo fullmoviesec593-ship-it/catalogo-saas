@@ -2,7 +2,10 @@ const express = require('express');
 const cors = require('cors');
 const fs = require('fs');
 const path = require('path');
-const admin = require('firebase-admin');
+const firebaseAdmin = require('firebase-admin');
+
+// Soporte robusto de importacion CJS / ESM
+const admin = firebaseAdmin.default || firebaseAdmin;
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -15,25 +18,26 @@ app.use(express.static(__dirname));
 let dbFirestore = null;
 let firebaseStatus = "No configurado";
 
-// Inicialización blindada de Firebase
+// Inicializacion blindada
 if (process.env.FIREBASE_SERVICE_ACCOUNT) {
   try {
     let raw = process.env.FIREBASE_SERVICE_ACCOUNT.trim();
-    // Si viene envuelto en comillas simples accidentales, limpiarlas
     if (raw.startsWith("'") && raw.endsWith("'")) {
       raw = raw.slice(1, -1);
     }
     const serviceAccount = JSON.parse(raw);
 
-    // Corregir posibles problemas con saltos de línea en la clave privada
     if (serviceAccount.private_key) {
       serviceAccount.private_key = serviceAccount.private_key.replace(/\\n/g, '\n');
     }
 
-    const apps = admin.apps || [];
-    if (apps.length === 0) {
+    const certFn = (admin.credential && admin.credential.cert) 
+      ? admin.credential.cert 
+      : firebaseAdmin.credential.cert;
+
+    if (!admin.apps || admin.apps.length === 0) {
       admin.initializeApp({
-        credential: admin.credential.cert(serviceAccount)
+        credential: certFn(serviceAccount)
       });
     }
 
@@ -46,7 +50,7 @@ if (process.env.FIREBASE_SERVICE_ACCOUNT) {
   }
 }
 
-// Ruta para ver el estado en vivo
+// Ruta de estado en vivo
 app.get('/api/status', (req, res) => {
   res.json({
     firebase_conectado: !!dbFirestore,
