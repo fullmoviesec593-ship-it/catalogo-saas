@@ -15,17 +15,23 @@ app.use(express.static(__dirname));
 let dbFirestore = null;
 let firebaseStatus = "No configurado";
 
-// Inicializar Firebase Firestore de forma blindada contra saltos de linea
+// Inicialización blindada de Firebase
 if (process.env.FIREBASE_SERVICE_ACCOUNT) {
   try {
     let raw = process.env.FIREBASE_SERVICE_ACCOUNT.trim();
-    let serviceAccount = JSON.parse(raw);
+    // Si viene envuelto en comillas simples accidentales, limpiarlas
+    if (raw.startsWith("'") && raw.endsWith("'")) {
+      raw = raw.slice(1, -1);
+    }
+    const serviceAccount = JSON.parse(raw);
 
+    // Corregir posibles problemas con saltos de línea en la clave privada
     if (serviceAccount.private_key) {
       serviceAccount.private_key = serviceAccount.private_key.replace(/\\n/g, '\n');
     }
 
-    if (!admin.apps.length) {
+    const apps = admin.apps || [];
+    if (apps.length === 0) {
       admin.initializeApp({
         credential: admin.credential.cert(serviceAccount)
       });
@@ -33,14 +39,14 @@ if (process.env.FIREBASE_SERVICE_ACCOUNT) {
 
     dbFirestore = admin.firestore();
     firebaseStatus = "Conectado exitosamente";
-    console.log(">>> Firebase Firestore CONECTADO PERMANENTEMENTE <<<");
+    console.log(">>> FIREBASE FIRESTORE CONECTADO EXITOSAMENTE <<<");
   } catch (err) {
     firebaseStatus = "Error de conexion: " + err.message;
-    console.error("Error al inicializar Firebase:", err.message);
+    console.error("Error al conectar Firebase:", err.message);
   }
 }
 
-// Ruta para verificar conexion en vivo
+// Ruta para ver el estado en vivo
 app.get('/api/status', (req, res) => {
   res.json({
     firebase_conectado: !!dbFirestore,
@@ -92,7 +98,6 @@ app.post('/api/save', async (req, res) => {
 
     if (dbFirestore) {
       await dbFirestore.collection('saas_data').doc('principal').set(data);
-      console.log("Datos guardados en Firestore correctamente.");
     }
     res.json({ success: true, firestore: !!dbFirestore });
   } catch (err) {
