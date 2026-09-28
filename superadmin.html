@@ -177,6 +177,33 @@
       50% { opacity: 0.6; }
     }
 
+    .search-box-container {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+    .search-input {
+      flex: 1;
+      padding: 12px 14px;
+      border-radius: 10px;
+      border: 1px solid #334155;
+      background-color: #080d1a;
+      color: #fff;
+      font-size: 14px;
+    }
+    .search-input:focus {
+      border-color: var(--cyan-neon);
+      box-shadow: 0 0 10px rgba(56, 189, 248, 0.3);
+    }
+    .btn-clear-search {
+      width: auto;
+      padding: 0 16px;
+      background: #1e293b;
+      color: #94a3b8;
+      font-size: 14px;
+      border: 1px solid #334155;
+    }
+
     .btn-copy-all {
       background: #1e293b;
       color: #38bdf8;
@@ -255,8 +282,14 @@
       <div id="tab-btn-security" class="nav-tab" onclick="cambiarTab('security')">🔒 MI CLAVE</div>
     </div>
 
-    <!-- LISTA DE USUARIOS -->
+    <!-- LISTA DE USUARIOS CON BUSCADOR -->
     <div id="tab-users">
+      <!-- BUSCADOR MULTICAMPO -->
+      <div class="search-box-container">
+        <input type="text" id="input-busqueda" class="search-input" placeholder="🔍 Buscar por nombre, WhatsApp, correo o slug..." oninput="filtrarRevendedores()">
+        <button class="btn-clear-search" onclick="limpiarBusqueda()">Limpiar</button>
+      </div>
+
       <div id="lista-revendedores"></div>
     </div>
 
@@ -279,6 +312,10 @@
         <div class="form-group">
           <label>Identificador Único (Slug de su catálogo)</label>
           <input type="text" id="reg-slug" placeholder="Ej: loja">
+        </div>
+        <div class="form-group">
+          <label>Número de WhatsApp (Opcional, ej: 593999999999)</label>
+          <input type="text" id="reg-whatsapp" placeholder="593999999999">
         </div>
         <div class="form-group">
           <label>Correo Electrónico (Usuario de Acceso)</label>
@@ -327,6 +364,10 @@
           <input type="text" id="edit-nombre">
         </div>
         <div class="form-group">
+          <label>Número de WhatsApp</label>
+          <input type="text" id="edit-whatsapp" placeholder="593999999999">
+        </div>
+        <div class="form-group">
           <label>Correo de Acceso</label>
           <input type="email" id="edit-email">
         </div>
@@ -356,6 +397,7 @@
 
   <script>
     let dbData = null;
+    let listaRevendedoresCache = [];
     const PIN_DEFAULT = "5930";
 
     async function cargarBD() {
@@ -385,7 +427,7 @@
         document.getElementById('cfg-email').value = sa.email || 'admin@fullmovies.ec';
         document.getElementById('cfg-pass').value = sa.password || 'admin123';
         document.getElementById('cfg-pin').value = sa.pin || PIN_DEFAULT;
-        renderRevendedores();
+        prepararYRenderizarRevendedores();
       } else {
         alert('Contraseña o correo incorrectos.');
       }
@@ -436,7 +478,7 @@
       if (tab === 'users') {
         document.getElementById('tab-users').classList.remove('hidden');
         document.getElementById('tab-btn-users').classList.add('active');
-        renderRevendedores();
+        prepararYRenderizarRevendedores();
       } else if (tab === 'create') {
         document.getElementById('tab-create').classList.remove('hidden');
         document.getElementById('tab-btn-create').classList.add('active');
@@ -457,7 +499,6 @@
       }
     }
 
-    // Calcula los días restantes exactos
     function calcularDiasRestantes(fechaVencimiento) {
       if (!fechaVencimiento) return 999;
       const ahora = new Date();
@@ -469,30 +510,63 @@
     function formatearFecha(fechaStr) {
       if (!fechaStr) return 'N/A';
       const f = new Date(fechaStr);
-      const opciones = { day: '2-digit', month: '2-digit', year: 'numeric' };
-      return f.toLocaleDateString('es-EC', opciones);
+      return f.toLocaleDateString('es-EC', { day: '2-digit', month: '2-digit', year: 'numeric' });
     }
 
-    function renderRevendedores() {
-      const lista = document.getElementById('lista-revendedores');
-      lista.innerHTML = '';
-
+    function prepararYRenderizarRevendedores() {
       const revendedores = dbData.revendedores || {};
       const slugs = Object.keys(revendedores);
 
-      if (slugs.length === 0) {
-        lista.innerHTML = '<p style="color:#64748b; font-size:15px; text-align:center; padding:20px;">No hay revendedores registrados todavía.</p>';
+      listaRevendedoresCache = slugs.map(slug => {
+        const r = revendedores[slug];
+        const tienda = (dbData.tiendas && dbData.tiendas[slug]) ? dbData.tiendas[slug] : {};
+        const dias = calcularDiasRestantes(r.vencimiento);
+        return {
+          slug,
+          ...r,
+          whatsapp: tienda.whatsapp || r.whatsapp || '',
+          diasRestantes: dias
+        };
+      }).sort((a, b) => a.diasRestantes - b.diasRestantes);
+
+      filtrarRevendedores();
+    }
+
+    // BUSCADOR EN TIEMPO REAL
+    function filtrarRevendedores() {
+      const query = (document.getElementById('input-busqueda').value || '').trim().toLowerCase();
+      
+      const filtrados = listaRevendedoresCache.filter(item => {
+        const nombre = (item.nombre || '').toLowerCase();
+        const email = (item.email || '').toLowerCase();
+        const slug = (item.slug || '').toLowerCase();
+        const whatsapp = (item.whatsapp || '').toLowerCase().replace(/\D/g, '');
+        const queryClean = query.replace(/\D/g, '');
+
+        const coincideTexto = nombre.includes(query) || email.includes(query) || slug.includes(query);
+        const coincideNum = queryClean && whatsapp.includes(queryClean);
+
+        return coincideTexto || coincideNum;
+      });
+
+      dibujarListaRevendedores(filtrados);
+    }
+
+    function limpiarBusqueda() {
+      document.getElementById('input-busqueda').value = '';
+      filtrarRevendedores();
+    }
+
+    function dibujarListaRevendedores(items) {
+      const lista = document.getElementById('lista-revendedores');
+      lista.innerHTML = '';
+
+      if (items.length === 0) {
+        lista.innerHTML = '<p style="color:#64748b; font-size:15px; text-align:center; padding:20px;">No se encontraron revendedores con ese criterio de búsqueda.</p>';
         return;
       }
 
-      // Ordenar por días restantes (los más próximos a vencer o vencidos van primero)
-      const listaOrdenada = slugs.map(slug => {
-        const r = revendedores[slug];
-        const dias = calcularDiasRestantes(r.vencimiento);
-        return { slug, ...r, diasRestantes: dias };
-      }).sort((a, b) => a.diasRestantes - b.diasRestantes);
-
-      listaOrdenada.forEach(item => {
+      items.forEach(item => {
         const isDemo = item.isDemo || false;
         const isActive = item.activo !== false;
         const dias = item.diasRestantes;
@@ -530,17 +604,16 @@
               <strong style="font-size:17px; color:#fff; font-family:'Orbitron';">${item.nombre || item.slug}</strong>
               ${isDemo ? '<span style="font-size:11px; background:#a855f7; color:#fff; padding:2px 6px; border-radius:4px; margin-left:6px; font-weight:bold;">DEMO</span>' : ''}
             </div>
-            <!-- INDICADOR DE DÍAS RESTANTES -->
             <span class="tag-countdown ${claseBadge}">${textoDias}</span>
           </div>
 
           <div style="margin:10px 0; font-size:14px; color:#94a3b8; line-height:1.5;">
             <div>👤 <b>Usuario/Correo:</b> <span style="color:#fff;">${item.email}</span></div>
+            <div>📱 <b>WhatsApp:</b> <span style="color:#38bdf8;">${item.whatsapp || 'No registrado'}</span></div>
             <div>🔑 <b>Contraseña:</b> <span style="color:var(--neon-green); font-weight:bold;">${item.password}</span></div>
             <div>📅 <b>Inicio:</b> ${fechaInicio} | ⏳ <b>Vence:</b> <span style="color:#f8fafc; font-weight:bold;">${fechaVence}</span></div>
           </div>
 
-          <!-- BOTÓN ÚNICO COPIAR FICHA WHATSAPP -->
           <button class="btn-copy-all" onclick="copiarFichaRevendedor('${item.slug}')">
             📋 COPIAR DATOS DE ACCESO PARA WHATSAPP
           </button>
@@ -595,12 +668,13 @@ _Ingresa a tu panel para configurar tu número de WhatsApp y tus precios. ¡Éxi
       const tipo = document.getElementById('reg-tipo').value;
       const nombre = document.getElementById('reg-nombre').value.trim();
       const slug = document.getElementById('reg-slug').value.trim().toLowerCase().replace(/[^a-z0-9]/g, '');
+      const whatsapp = document.getElementById('reg-whatsapp').value.trim();
       const email = document.getElementById('reg-email').value.trim();
       const password = document.getElementById('reg-pass').value.trim();
       const dias = parseInt(document.getElementById('reg-dias').value) || (tipo === 'demo' ? 2 : 30);
 
       if (!nombre || !slug || !email || !password) {
-        alert('Por favor completa todos los campos.');
+        alert('Por favor completa los campos requeridos.');
         return;
       }
 
@@ -614,6 +688,7 @@ _Ingresa a tu panel para configurar tu número de WhatsApp y tus precios. ¡Éxi
       dbData.revendedores[slug] = {
         nombre,
         email,
+        whatsapp,
         password,
         fechaCreacion: ahora.toISOString(),
         vencimiento: vencimiento.toISOString(),
@@ -624,15 +699,18 @@ _Ingresa a tu panel para configurar tu número de WhatsApp y tus precios. ¡Éxi
       if (!dbData.tiendas[slug]) {
         dbData.tiendas[slug] = {
           nombre: nombre,
-          whatsapp: "593999999999",
+          whatsapp: whatsapp || "593999999999",
           productos: []
         };
+      } else {
+        if (whatsapp) dbData.tiendas[slug].whatsapp = whatsapp;
       }
 
       await persistir();
       alert('¡Cuenta registrada exitosamente!');
       document.getElementById('reg-nombre').value = '';
       document.getElementById('reg-slug').value = '';
+      document.getElementById('reg-whatsapp').value = '';
       document.getElementById('reg-email').value = '';
       document.getElementById('reg-pass').value = '';
       cambiarTab('users');
@@ -640,8 +718,11 @@ _Ingresa a tu panel para configurar tu número de WhatsApp y tus precios. ¡Éxi
 
     function abrirModalEdit(slug) {
       const r = dbData.revendedores[slug];
+      const tienda = (dbData.tiendas && dbData.tiendas[slug]) ? dbData.tiendas[slug] : {};
+
       document.getElementById('edit-slug').value = slug;
       document.getElementById('edit-nombre').value = r.nombre || '';
+      document.getElementById('edit-whatsapp').value = tienda.whatsapp || r.whatsapp || '';
       document.getElementById('edit-email').value = r.email || '';
       document.getElementById('edit-pass').value = r.password || '';
       document.getElementById('edit-estado').value = (r.activo !== false) ? 'true' : 'false';
@@ -656,13 +737,14 @@ _Ingresa a tu panel para configurar tu número de WhatsApp y tus precios. ¡Éxi
     async function guardarEdicion() {
       const slug = document.getElementById('edit-slug').value;
       const nombre = document.getElementById('edit-nombre').value.trim();
+      const whatsapp = document.getElementById('edit-whatsapp').value.trim();
       const email = document.getElementById('edit-email').value.trim();
       const pass = document.getElementById('edit-pass').value.trim();
       const activo = document.getElementById('edit-estado').value === 'true';
       const dias = parseInt(document.getElementById('edit-dias').value) || 0;
 
       if (!nombre || !email || !pass) {
-        alert('Completa los campos.');
+        alert('Completa los campos obligatorios.');
         return;
       }
 
@@ -670,6 +752,7 @@ _Ingresa a tu panel para configurar tu número de WhatsApp y tus precios. ¡Éxi
       dbData.revendedores[slug].email = email;
       dbData.revendedores[slug].password = pass;
       dbData.revendedores[slug].activo = activo;
+      dbData.revendedores[slug].whatsapp = whatsapp;
 
       if (dias > 0) {
         const hoy = new Date();
@@ -679,12 +762,13 @@ _Ingresa a tu panel para configurar tu número de WhatsApp y tus precios. ¡Éxi
 
       if (dbData.tiendas && dbData.tiendas[slug]) {
         dbData.tiendas[slug].nombre = nombre;
+        dbData.tiendas[slug].whatsapp = whatsapp;
       }
 
       await persistir();
       alert('¡Datos y vigencia actualizados!');
       cerrarModalEdit();
-      renderRevendedores();
+      prepararYRenderizarRevendedores();
     }
 
     async function eliminarRevendedor(slug) {
@@ -692,7 +776,7 @@ _Ingresa a tu panel para configurar tu número de WhatsApp y tus precios. ¡Éxi
         delete dbData.revendedores[slug];
         if (dbData.tiendas) delete dbData.tiendas[slug];
         await persistir();
-        renderRevendedores();
+        prepararYRenderizarRevendedores();
       }
     }
 
