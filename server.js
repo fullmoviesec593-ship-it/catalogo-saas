@@ -9,6 +9,8 @@ const DB_FILE = path.join(__dirname, 'database.json');
 
 app.use(cors());
 app.use(express.json());
+
+// Servir todos los archivos estáticos de la carpeta actual
 app.use(express.static(__dirname));
 
 function readDB() {
@@ -26,7 +28,7 @@ function writeDB(data) {
   fs.writeFileSync(DB_FILE, JSON.stringify(data, null, 2), 'utf-8');
 }
 
-// Rutas API
+// Rutas de API
 app.get('/api/db', (req, res) => {
   res.json(readDB());
 });
@@ -34,15 +36,25 @@ app.get('/api/db', (req, res) => {
 app.post('/api/save', (req, res) => {
   try {
     writeDB(req.body);
-    res.json({ success: true, message: 'Datos guardados correctamente' });
+    res.json({ success: true });
   } catch (err) {
-    res.status(500).json({ success: false, error: err.message });
+    res.status(500).json({ error: err.message });
   }
 });
 
-// Ruta principal para manejar tiendas
+// Ruta principal explícita
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'index.html'));
+});
+
+// Ruta comodín para capturar cualquier archivo html
+app.get('/:page', (req, res) => {
+  const filePath = path.join(__dirname, req.params.page);
+  if (fs.existsSync(filePath)) {
+    res.sendFile(filePath);
+  } else {
+    res.sendFile(path.join(__dirname, 'index.html'));
+  }
 });
 
 app.listen(PORT, '0.0.0.0', () => {
