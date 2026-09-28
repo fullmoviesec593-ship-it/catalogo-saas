@@ -2,10 +2,10 @@ const express = require('express');
 const cors = require('cors');
 const fs = require('fs');
 const path = require('path');
-const firebaseAdmin = require('firebase-admin');
 
-// Soporte robusto de importacion CJS / ESM
-const admin = firebaseAdmin.default || firebaseAdmin;
+// Importaciones oficiales y modulares de Firebase Admin SDK
+const { initializeApp, getApps, cert } = require('firebase-admin/app');
+const { getFirestore } = require('firebase-admin/firestore');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -16,9 +16,9 @@ app.use(express.json({ limit: '15mb' }));
 app.use(express.static(__dirname));
 
 let dbFirestore = null;
-let firebaseStatus = "No configurado";
+let firebaseStatus = "Variable no configurada";
 
-// Inicializacion blindada
+// Inicialización blindada y directa
 if (process.env.FIREBASE_SERVICE_ACCOUNT) {
   try {
     let raw = process.env.FIREBASE_SERVICE_ACCOUNT.trim();
@@ -27,30 +27,27 @@ if (process.env.FIREBASE_SERVICE_ACCOUNT) {
     }
     const serviceAccount = JSON.parse(raw);
 
+    // Ajuste de los saltos de línea de la clave RSA de Google
     if (serviceAccount.private_key) {
       serviceAccount.private_key = serviceAccount.private_key.replace(/\\n/g, '\n');
     }
 
-    const certFn = (admin.credential && admin.credential.cert) 
-      ? admin.credential.cert 
-      : firebaseAdmin.credential.cert;
-
-    if (!admin.apps || admin.apps.length === 0) {
-      admin.initializeApp({
-        credential: certFn(serviceAccount)
+    if (getApps().length === 0) {
+      initializeApp({
+        credential: cert(serviceAccount)
       });
     }
 
-    dbFirestore = admin.firestore();
+    dbFirestore = getFirestore();
     firebaseStatus = "Conectado exitosamente";
-    console.log(">>> FIREBASE FIRESTORE CONECTADO EXITOSAMENTE <<<");
+    console.log(">>> FIREBASE FIRESTORE CONECTADO AL 100% <<<");
   } catch (err) {
     firebaseStatus = "Error de conexion: " + err.message;
-    console.error("Error al conectar Firebase:", err.message);
+    console.error("Error al inicializar Firebase:", err.message);
   }
 }
 
-// Ruta de estado en vivo
+// Ruta para ver el estado de la conexión en vivo
 app.get('/api/status', (req, res) => {
   res.json({
     firebase_conectado: !!dbFirestore,
