@@ -15,13 +15,12 @@ app.use(express.static(__dirname));
 let dbFirestore = null;
 let firebaseStatus = "No configurado";
 
-// Inicializar Firebase Firestore de forma blindada contra saltos de línea
+// Inicializar Firebase Firestore de forma blindada contra saltos de linea
 if (process.env.FIREBASE_SERVICE_ACCOUNT) {
   try {
     let raw = process.env.FIREBASE_SERVICE_ACCOUNT.trim();
     let serviceAccount = JSON.parse(raw);
 
-    // Corregir el formato de los saltos de línea en la clave privada
     if (serviceAccount.private_key) {
       serviceAccount.private_key = serviceAccount.private_key.replace(/\\n/g, '\n');
     }
@@ -41,7 +40,7 @@ if (process.env.FIREBASE_SERVICE_ACCOUNT) {
   }
 }
 
-// Ruta para verificar el estado de la conexión en vivo
+// Ruta para verificar conexion en vivo
 app.get('/api/status', (req, res) => {
   res.json({
     firebase_conectado: !!dbFirestore,
@@ -67,7 +66,6 @@ function writeLocalDB(data) {
   } catch (e) {}
 }
 
-// Rutas de datos
 app.get('/api/db', async (req, res) => {
   if (dbFirestore) {
     try {
@@ -103,7 +101,6 @@ app.post('/api/save', async (req, res) => {
   }
 });
 
-// Navegación
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'index.html'));
 });
