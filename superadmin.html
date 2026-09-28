@@ -3,165 +3,304 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Súper Admin | Panel Dueño Full Movies Ec</title>
+  <title>Súper Admin | FULL MOVIES EC</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;800;900&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
   <style>
-    * { box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
-    body { background-color: #0b0f19; color: #f8fafc; margin: 0; padding: 16px; display: flex; justify-content: center; }
-    .card { background-color: #1e293b; border-radius: 14px; padding: 22px; width: 100%; max-width: 680px; box-shadow: 0 10px 30px rgba(0,0,0,0.6); border: 1px solid #334155; }
-    h2, h3, h4 { color: #f59e0b; margin-top: 0; text-align: center; }
-    .logo-container { text-align: center; margin-bottom: 16px; }
-    .logo-badge { display: inline-flex; align-items: center; gap: 8px; background: #0f172a; padding: 8px 16px; border-radius: 30px; border: 1px solid #3b82f6; font-weight: bold; color: #38bdf8; font-size: 15px; }
+    :root {
+      --neon-green: #22c55e;
+      --neon-glow: rgba(34, 197, 94, 0.4);
+      --bg-dark: #07090e;
+      --card-bg: #0f1626;
+      --border-color: #1e293b;
+      --cyan-neon: #38bdf8;
+    }
+    * { box-sizing: border-box; font-family: 'Rajdhani', sans-serif; }
+    body {
+      background-color: var(--bg-dark);
+      background-image: radial-gradient(circle at 50% 10%, rgba(34, 197, 94, 0.08) 0%, transparent 60%);
+      color: #f1f5f9;
+      margin: 0;
+      padding: 16px;
+      display: flex;
+      justify-content: center;
+      min-height: 100vh;
+    }
+    .card {
+      background: var(--card-bg);
+      border-radius: 18px;
+      padding: 24px;
+      width: 100%;
+      max-width: 680px;
+      border: 1px solid var(--border-color);
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.8), 0 0 15px rgba(34, 197, 94, 0.12);
+    }
+    .brand-title {
+      font-family: 'Orbitron', sans-serif;
+      color: var(--neon-green);
+      text-shadow: 0 0 12px var(--neon-glow);
+      text-align: center;
+      margin: 10px 0 6px 0;
+      letter-spacing: 1px;
+      font-size: 22px;
+    }
+    .brand-sub {
+      text-align: center;
+      color: #94a3b8;
+      font-size: 14px;
+      letter-spacing: 0.5px;
+      margin-bottom: 20px;
+    }
+    .logo-img {
+      width: 90px;
+      height: 90px;
+      border-radius: 50%;
+      object-fit: cover;
+      display: block;
+      margin: 0 auto 10px auto;
+      border: 2px solid var(--neon-green);
+      box-shadow: 0 0 16px var(--neon-glow);
+    }
     .form-group { margin-bottom: 14px; }
-    label { display: block; margin-bottom: 5px; font-size: 13px; color: #94a3b8; font-weight: 500; }
-    input, select { width: 100%; padding: 11px 14px; border-radius: 8px; border: 1px solid #334155; background-color: #0f172a; color: #fff; font-size: 14px; outline: none; }
-    input:focus, select:focus { border-color: #22c55e; }
-    button { width: 100%; padding: 12px; border: none; border-radius: 8px; font-size: 15px; font-weight: bold; cursor: pointer; transition: 0.2s; }
-    .btn-primary { background-color: #22c55e; color: #052e16; margin-top: 6px; }
-    .btn-secondary { background-color: #3b82f6; color: #fff; margin-top: 6px; }
-    .btn-danger { background-color: #ef4444; color: #fff; }
-    .btn-copy { background-color: #334155; color: #38bdf8; padding: 6px 12px; font-size: 12px; width: auto; border-radius: 6px; }
-    .btn-copy:active { background-color: #22c55e; color: #000; }
-    .btn-demo { background-color: #8b5cf6; color: #fff; margin-top: 6px; }
+    label {
+      display: block;
+      margin-bottom: 6px;
+      font-size: 14px;
+      color: #94a3b8;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+    }
+    input, select {
+      width: 100%;
+      padding: 12px 14px;
+      border-radius: 10px;
+      border: 1px solid #1e293b;
+      background-color: #080d1a;
+      color: #fff;
+      font-size: 15px;
+      outline: none;
+      transition: all 0.2s;
+    }
+    input:focus, select:focus {
+      border-color: var(--neon-green);
+      box-shadow: 0 0 10px var(--neon-glow);
+    }
+    button {
+      width: 100%;
+      padding: 13px;
+      border: none;
+      border-radius: 10px;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+      font-family: 'Orbitron', sans-serif;
+      letter-spacing: 0.5px;
+      transition: 0.2s;
+    }
+    .btn-neon {
+      background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+      color: #031e0c;
+      box-shadow: 0 0 15px var(--neon-glow);
+    }
+    .btn-neon:active { transform: scale(0.98); }
+    .btn-cyan { background: #0284c7; color: #fff; }
+    .btn-danger { background: #dc2626; color: #fff; }
     .hidden { display: none !important; }
-    .nav-tabs { display: flex; gap: 8px; margin-bottom: 18px; border-bottom: 1px solid #334155; padding-bottom: 10px; }
-    .nav-tab { flex: 1; padding: 10px; text-align: center; background: #0f172a; border-radius: 8px; cursor: pointer; font-size: 13px; font-weight: bold; color: #94a3b8; }
-    .nav-tab.active { background: #3b82f6; color: #fff; }
-    .user-card { background: #0f172a; border: 1px solid #334155; border-radius: 10px; padding: 14px; margin-bottom: 14px; border-left: 5px solid #22c55e; }
-    .user-card.demo { border-left-color: #8b5cf6; }
+    .nav-tabs {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 20px;
+      border-bottom: 1px solid #1e293b;
+      padding-bottom: 12px;
+    }
+    .nav-tab {
+      flex: 1;
+      padding: 10px 6px;
+      text-align: center;
+      background: #080d1a;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: bold;
+      color: #94a3b8;
+      border: 1px solid transparent;
+    }
+    .nav-tab.active {
+      background: #111d33;
+      color: var(--neon-green);
+      border-color: var(--neon-green);
+      box-shadow: 0 0 8px rgba(34, 197, 94, 0.2);
+    }
+    .user-card {
+      background: #080d1a;
+      border: 1px solid #1e293b;
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 14px;
+      border-left: 5px solid var(--neon-green);
+      box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+    }
+    .user-card.demo { border-left-color: #a855f7; }
     .user-card.suspendido { border-left-color: #ef4444; }
-    .badge { padding: 3px 8px; border-radius: 4px; font-size: 11px; font-weight: bold; }
-    .badge-active { background: rgba(34, 197, 94, 0.2); color: #4ade80; border: 1px solid #22c55e; }
-    .badge-demo { background: rgba(139, 92, 246, 0.2); color: #c084fc; border: 1px solid #8b5cf6; }
-    .badge-off { background: rgba(239, 68, 68, 0.2); color: #f87171; border: 1px solid #ef4444; }
-    .link-row { display: flex; align-items: center; justify-content: space-between; background: #1e293b; padding: 8px 12px; border-radius: 6px; margin-top: 6px; font-size: 12px; }
+    .badge {
+      padding: 4px 8px;
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 700;
+      font-family: 'Orbitron', sans-serif;
+    }
+    .badge-active { background: rgba(34, 197, 94, 0.15); color: #4ade80; border: 1px solid #22c55e; }
+    .badge-demo { background: rgba(168, 85, 247, 0.15); color: #c084fc; border: 1px solid #a855f7; }
+    .badge-off { background: rgba(239, 68, 68, 0.15); color: #f87171; border: 1px solid #ef4444; }
+    .btn-copy-all {
+      background: #1e293b;
+      color: #38bdf8;
+      border: 1px solid #334155;
+      padding: 10px;
+      font-size: 13px;
+      font-family: 'Rajdhani', sans-serif;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      margin-top: 10px;
+    }
+    .btn-copy-all:active {
+      background: var(--neon-green);
+      color: #000;
+      border-color: var(--neon-green);
+    }
   </style>
 </head>
 <body>
 
-  <!-- PANTALLA 1: LOGIN DUEÑO -->
+  <!-- PANTALLA: LOGIN DUEÑO -->
   <div id="login-section" class="card">
-    <div class="logo-container">
-      <div class="logo-badge">🎬 FULL MOVIES EC 👑</div>
-    </div>
-    <h2>Acceso Súper Dueño</h2>
+    <img src="https://i.ibb.co/3k5fH4P/logo-fullmovies.jpg" onerror="this.src='https://via.placeholder.com/100/0f1626/22c55e?text=FM'" class="logo-img" alt="Full Movies Ec">
+    <h2 class="brand-title">👑 FULL MOVIES EC</h2>
+    <div class="brand-sub">SISTEMA DE CONTROL MAESTRO</div>
+
     <div class="form-group">
-      <label>Correo de Administrador</label>
+      <label>Correo Maestro</label>
       <input type="email" id="email" value="admin@fullmovies.ec">
     </div>
     <div class="form-group">
       <label>Contraseña Maestra</label>
-      <input type="password" id="password" placeholder="Tu contraseña">
+      <input type="password" id="password" placeholder="Ingresa tu clave">
     </div>
-    <button class="btn-primary" onclick="iniciarSesion()">Acceder al Panel</button>
-    <button style="background:transparent; color:#94a3b8; font-size:13px; margin-top:10px;" onclick="mostrarRecuperacion()">¿Olvidaste tu contraseña?</button>
+    <button class="btn-neon" onclick="iniciarSesion()">ACCEDER AL CONTROL</button>
+    <button style="background:transparent; color:#64748b; font-size:14px; margin-top:10px;" onclick="mostrarRecuperacion()">¿Olvidaste tu contraseña?</button>
   </div>
 
-  <!-- PANTALLA 1.1: RECUPERAR CONTRASEÑA -->
+  <!-- PANTALLA: RECUPERAR CONTRASEÑA -->
   <div id="recover-section" class="card hidden">
-    <h2>🔑 Recuperar Acceso</h2>
-    <p style="font-size:13px; color:#94a3b8; text-align:center;">Ingresa tu código PIN maestro de seguridad (por defecto: <b>5930</b>) para restablecer la contraseña.</p>
+    <h2 class="brand-title" style="color:#38bdf8;">🔑 RESTABLECER ACCESO</h2>
+    <p style="font-size:14px; color:#94a3b8; text-align:center;">Ingresa tu código PIN maestro (por defecto: <b>5930</b>) para cambiar tu clave.</p>
     <div class="form-group">
-      <label>PIN Maestro de Recuperación</label>
-      <input type="password" id="rec-pin" placeholder="Ingresa PIN (5930)">
+      <label>PIN Maestro de Seguridad</label>
+      <input type="password" id="rec-pin" placeholder="PIN de seguridad">
     </div>
     <div class="form-group">
-      <label>Nueva Contraseña</label>
+      <label>Nueva Contraseña Maestra</label>
       <input type="text" id="rec-new-pass" placeholder="Escribe tu nueva clave">
     </div>
-    <button class="btn-primary" onclick="reestablecerClave()">Restablecer Contraseña Ahora</button>
-    <button style="background:#334155; color:#fff; margin-top:8px;" onclick="volverAlLogin()">Volver</button>
+    <button class="btn-neon" onclick="reestablecerClave()">RESTABLECER CONTRASEÑA</button>
+    <button style="background:#1e293b; color:#fff; margin-top:8px;" onclick="volverAlLogin()">Volver</button>
   </div>
 
-  <!-- PANTALLA 2: DASHBOARD DUEÑO -->
+  <!-- PANTALLA: DASHBOARD DUEÑO -->
   <div id="dashboard-section" class="card hidden">
-    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px; border-bottom:1px solid #334155; padding-bottom:12px;">
-      <div style="font-weight:bold; color:#38bdf8; display:flex; align-items:center; gap:8px;">
-        <span style="font-size:20px;">🎬</span> FULL MOVIES EC (Súper Admin)
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px; border-bottom:1px solid #1e293b; padding-bottom:12px;">
+      <div style="display:flex; align-items:center; gap:10px;">
+        <img src="https://i.ibb.co/3k5fH4P/logo-fullmovies.jpg" onerror="this.src='https://via.placeholder.com/50/0f1626/22c55e?text=FM'" style="width:40px; height:40px; border-radius:50%; border:1px solid var(--neon-green);" alt="Logo">
+        <div>
+          <span style="font-family:'Orbitron',sans-serif; color:var(--neon-green); font-size:15px; font-weight:bold;">FULL MOVIES EC</span>
+          <div style="font-size:11px; color:#64748b;">Panel Súper Administrador</div>
+        </div>
       </div>
-      <button onclick="location.reload()" style="width:auto; padding:6px 12px; background:#ef4444; color:#fff; font-size:12px;">Cerrar Sesión</button>
+      <button onclick="location.reload()" style="width:auto; padding:6px 12px; background:#dc2626; color:#fff; font-size:12px;">Cerrar</button>
     </div>
 
-    <!-- Pestañas de navegación -->
+    <!-- Pestañas -->
     <div class="nav-tabs">
-      <div id="tab-btn-users" class="nav-tab active" onclick="cambiarTab('users')">👥 Revendedores</div>
-      <div id="tab-btn-create" class="nav-tab" onclick="cambiarTab('create')">➕ Registrar Nuevo</div>
-      <div id="tab-btn-security" class="nav-tab" onclick="cambiarTab('security')">🔒 Seguridad & Clave</div>
+      <div id="tab-btn-users" class="nav-tab active" onclick="cambiarTab('users')">👥 REVENDEDORES</div>
+      <div id="tab-btn-create" class="nav-tab" onclick="cambiarTab('create')">➕ REGISTRAR</div>
+      <div id="tab-btn-security" class="nav-tab" onclick="cambiarTab('security')">🔒 MI CLAVE</div>
     </div>
 
-    <!-- PESTAÑA: LISTA DE USUARIOS -->
+    <!-- LISTA DE USUARIOS -->
     <div id="tab-users">
-      <h4 style="text-align:left; color:#cbd5e1; margin-bottom:12px;">Revendedores y Demos en el Sistema</h4>
       <div id="lista-revendedores"></div>
     </div>
 
-    <!-- PESTAÑA: CREAR / REGISTRAR MANUALMENTE -->
+    <!-- REGISTRO MANUAL DE USUARIOS -->
     <div id="tab-create" class="hidden">
-      <div style="background:#0f172a; padding:16px; border-radius:10px; border:1px solid #334155;">
-        <h4 style="color:#22c55e; margin-bottom:14px;">Alta Manual de Revendedor / Demo</h4>
+      <div style="background:#080d1a; padding:16px; border-radius:12px; border:1px solid #1e293b;">
+        <h4 style="color:var(--neon-green); font-family:'Orbitron'; margin-top:0; font-size:16px;">Alta Manual de Cuenta</h4>
         
         <div class="form-group">
-          <label>Tipo de Cuenta</label>
+          <label>Modalidad de Cuenta</label>
           <select id="reg-tipo" onchange="ajustarTipoRegistro()">
-            <option value="oficial">Revendedor Oficial (Mensual)</option>
-            <option value="demo">Demo de Prueba (Gratis / 2 Días)</option>
+            <option value="oficial">Revendedor Oficial (Mensual 30 Días)</option>
+            <option value="demo">Demo de Prueba (Gratuito 2 Días)</option>
           </select>
         </div>
         <div class="form-group">
-          <label>Nombre de la Tienda o Cliente</label>
-          <input type="text" id="reg-nombre" placeholder="Ej: Streaming Guayaquil">
+          <label>Nombre del Revendedor / Negocio</label>
+          <input type="text" id="reg-nombre" placeholder="Ej: Streaming Loja">
         </div>
         <div class="form-group">
-          <label>Identificador Único (Slug - sin espacios ni caracteres especiales)</label>
-          <input type="text" id="reg-slug" placeholder="Ej: guayaquil">
+          <label>Identificador Único (Slug de su catálogo)</label>
+          <input type="text" id="reg-slug" placeholder="Ej: loja">
         </div>
         <div class="form-group">
-          <label>Correo Electrónico (Para que inicie sesión)</label>
+          <label>Correo Electrónico (Usuario de Acceso)</label>
           <input type="email" id="reg-email" placeholder="cliente@gmail.com">
         </div>
         <div class="form-group">
           <label>Contraseña Asignada</label>
-          <input type="text" id="reg-pass" placeholder="Ej: clave123">
+          <input type="text" id="reg-pass" placeholder="Ej: acceso123">
         </div>
         <div class="form-group">
-          <label id="lbl-dias">Días de Acceso (Vigencia)</label>
+          <label id="lbl-dias">Días de Acceso</label>
           <input type="number" id="reg-dias" value="30">
         </div>
 
-        <button class="btn-primary" onclick="guardarNuevoUsuario()">Registrar y Activar Cuenta</button>
+        <button class="btn-neon" onclick="guardarNuevoUsuario()">REGISTRAR Y GENERAR ACCESOS</button>
       </div>
     </div>
 
-    <!-- PESTAÑA: SEGURIDAD (CAMBIO DE CLAVE DUEÑO) -->
+    <!-- CAMBIO DE CLAVE DUEÑO -->
     <div id="tab-security" class="hidden">
-      <div style="background:#0f172a; padding:16px; border-radius:10px; border:1px solid #334155;">
-        <h4 style="color:#38bdf8;">Cambiar mi Contraseña de Súper Dueño</h4>
+      <div style="background:#080d1a; padding:16px; border-radius:12px; border:1px solid #1e293b;">
+        <h4 style="color:var(--cyan-neon); font-family:'Orbitron'; margin-top:0;">Seguridad del Súper Dueño</h4>
         <div class="form-group">
-          <label>Nuevo Correo Maestro</label>
+          <label>Correo Electrónico Maestro</label>
           <input type="email" id="cfg-email" value="admin@fullmovies.ec">
         </div>
         <div class="form-group">
           <label>Nueva Contraseña Maestra</label>
-          <input type="text" id="cfg-pass" placeholder="Ingresa tu nueva clave maestra">
+          <input type="text" id="cfg-pass" placeholder="Ingresa tu nueva contraseña">
         </div>
         <div class="form-group">
-          <label>PIN Maestro de Recuperación (Por si la olvidas)</label>
+          <label>PIN Maestro de Emergencia</label>
           <input type="text" id="cfg-pin" placeholder="5930">
         </div>
-        <button class="btn-secondary" onclick="actualizarCredencialesMaster()">Guardar Nuevas Credenciales</button>
+        <button class="btn-cyan" onclick="actualizarCredencialesMaster()">GUARDAR NUEVAS CREDENCIALES</button>
       </div>
     </div>
 
     <!-- MODAL EDITAR USUARIO -->
-    <div id="modal-edit" class="hidden" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); display:flex; align-items:center; justify-content:center; padding:15px; z-index:9999;">
-      <div class="card" style="max-width:500px; background:#1e293b;">
-        <h3 style="color:#38bdf8;">Editar Revendedor</h3>
+    <div id="modal-edit" class="hidden" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); display:flex; align-items:center; justify-content:center; padding:16px; z-index:9999;">
+      <div class="card" style="max-width:480px; background:#0f1626;">
+        <h3 style="color:var(--neon-green); font-family:'Orbitron'; margin-top:0;">Editar Revendedor</h3>
         <input type="hidden" id="edit-slug">
         <div class="form-group">
           <label>Nombre de Tienda</label>
           <input type="text" id="edit-nombre">
         </div>
         <div class="form-group">
-          <label>Correo Electrónico</label>
+          <label>Correo de Acceso</label>
           <input type="email" id="edit-email">
         </div>
         <div class="form-group">
@@ -169,19 +308,19 @@
           <input type="text" id="edit-pass">
         </div>
         <div class="form-group">
-          <label>Estado del Acceso</label>
+          <label>Estado</label>
           <select id="edit-estado">
             <option value="true">Activo (Habilitado)</option>
             <option value="false">Suspendido (Bloqueado)</option>
           </select>
         </div>
         <div class="form-group">
-          <label>Sumar más días de vigencia a partir de hoy</label>
+          <label>Renovar días de vigencia (desde hoy)</label>
           <input type="number" id="edit-dias" value="30">
         </div>
         <div style="display:flex; gap:10px;">
-          <button class="btn-primary" onclick="guardarEdicion()">Guardar Cambios</button>
-          <button class="btn-danger" style="width:120px;" onclick="cerrarModalEdit()">Cancelar</button>
+          <button class="btn-neon" onclick="guardarEdicion()">Guardar</button>
+          <button class="btn-danger" style="width:110px;" onclick="cerrarModalEdit()">Cancelar</button>
         </div>
       </div>
     </div>
@@ -199,7 +338,7 @@
         if (!dbData.superadmin) dbData.superadmin = {};
         if (!dbData.superadmin.pin) dbData.superadmin.pin = PIN_DEFAULT;
       } catch (e) {
-        alert('Error conectando al servidor: ' + e.message);
+        alert('Error conectando a la API: ' + e.message);
       }
     }
 
@@ -240,7 +379,7 @@
       const nuevaClave = document.getElementById('rec-new-pass').value.trim();
 
       if (!pin || !nuevaClave) {
-        alert('Por favor llena todos los campos.');
+        alert('Por favor completa todos los campos.');
         return;
       }
 
@@ -250,11 +389,11 @@
       if (pin === pinValido) {
         dbData.superadmin.password = nuevaClave;
         await persistir();
-        alert('¡Contraseña restablecida exitosamente! Ya puedes iniciar sesión.');
+        alert('¡Contraseña reestablecida correctamente! Ya puedes ingresar.');
         document.getElementById('password').value = nuevaClave;
         volverAlLogin();
       } else {
-        alert('El PIN de seguridad no es correcto.');
+        alert('El PIN maestro ingresado es incorrecto.');
       }
     }
 
@@ -299,7 +438,7 @@
       const slugs = Object.keys(revendedores);
 
       if (slugs.length === 0) {
-        lista.innerHTML = '<p style="color:#64748b; font-size:14px; text-align:center;">No hay revendedores registrados todavía.</p>';
+        lista.innerHTML = '<p style="color:#64748b; font-size:15px; text-align:center; padding:20px;">No hay revendedores registrados todavía.</p>';
         return;
       }
 
@@ -317,51 +456,73 @@
           badgeText = 'SUSPENDIDO';
         } else if (isDemo) {
           badgeClass = 'badge-demo';
-          badgeText = 'DEMO PRUEBA';
+          badgeText = 'DEMO';
         }
 
-        const linkAdmin = `${host}/admin.html`;
-        const linkCatalogo = `${host}/?tienda=${slug}`;
+        const fechaInicio = r.fechaCreacion ? new Date(r.fechaCreacion).toLocaleDateString() : 'Activa';
+        const fechaVence = r.vencimiento ? new Date(r.vencimiento).toLocaleDateString() : 'Ilimitada';
 
         const card = document.createElement('div');
         card.className = `user-card ${isDemo ? 'demo' : ''} ${!isActive ? 'suspendido' : ''}`;
         card.innerHTML = `
           <div style="display:flex; justify-content:space-between; align-items:center;">
-            <strong style="font-size:16px; color:#fff;">${r.nombre || slug}</strong>
+            <strong style="font-size:17px; color:#fff; font-family:'Orbitron';">${r.nombre || slug}</strong>
             <span class="badge ${badgeClass}">${badgeText}</span>
           </div>
 
-          <div style="margin:8px 0; font-size:13px; color:#94a3b8; line-height:1.5;">
-            <div><b>Slug / Tienda:</b> <span style="color:#38bdf8;">${slug}</span></div>
-            <div><b>Correo:</b> ${r.email} | <b>Contraseña:</b> <span style="color:#22c55e;">${r.password}</span></div>
-            <div><b>Vence:</b> ${r.vencimiento ? new Date(r.vencimiento).toLocaleDateString() : 'Ilimitado'}</div>
+          <div style="margin:10px 0; font-size:14px; color:#94a3b8; line-height:1.5;">
+            <div>👤 <b>Usuario/Correo:</b> <span style="color:#fff;">${r.email}</span></div>
+            <div>🔑 <b>Contraseña:</b> <span style="color:var(--neon-green); font-weight:bold;">${r.password}</span></div>
+            <div>📅 <b>Inicio:</b> ${fechaInicio} | ⏳ <b>Vence:</b> ${fechaVence}</div>
           </div>
 
-          <!-- ENLACES CON BOTONES DE COPIAR -->
-          <div class="link-row">
-            <span><b>Panel Revendedor:</b> /admin.html</span>
-            <button class="btn-copy" onclick="copiarAlPortapapeles('${linkAdmin}')">Copiar Link Admin</button>
-          </div>
+          <!-- BOTÓN ÚNICO QUE COPIA TODA LA INFORMACIÓN -->
+          <button class="btn-copy-all" onclick="copiarFichaRevendedor('${slug}')">
+            📋 COPIAR DATOS DE ACCESO PARA WHATSAPP
+          </button>
 
-          <div class="link-row">
-            <span><b>Catálogo Tienda:</b> /?tienda=${slug}</span>
-            <button class="btn-copy" onclick="copiarAlPortapapeles('${linkCatalogo}')">Copiar Link Catálogo</button>
-          </div>
-
-          <div style="display:flex; gap:8px; margin-top:12px;">
-            <button style="background:#3b82f6; color:#fff; padding:8px; font-size:13px;" onclick="abrirModalEdit('${slug}')">✏️ Editar Datos</button>
-            <button style="background:#ef4444; color:#fff; padding:8px; font-size:13px; width:110px;" onclick="eliminarRevendedor('${slug}')">🗑️ Eliminar</button>
+          <div style="display:flex; gap:8px; margin-top:10px;">
+            <button style="background:#1e293b; color:#38bdf8; padding:8px; font-size:13px; border:1px solid #334155;" onclick="abrirModalEdit('${slug}')">✏️ Editar</button>
+            <button style="background:#dc2626; color:#fff; padding:8px; font-size:13px; width:110px;" onclick="eliminarRevendedor('${slug}')">🗑️ Eliminar</button>
           </div>
         `;
         lista.appendChild(card);
       });
     }
 
-    function copiarAlPortapapeles(texto) {
-      navigator.clipboard.writeText(texto).then(() => {
-        alert('¡Enlace copiado al portapapeles!\n' + texto);
+    // COPIA DE FORMA IMPECABLE TODA LA FICHA EN UN SOLO CLIC
+    function copiarFichaRevendedor(slug) {
+      const r = dbData.revendedores[slug];
+      const host = window.location.origin;
+      const linkAdmin = `${host}/admin.html`;
+      const linkCatalogo = `${host}/?tienda=${slug}`;
+      const fInicio = r.fechaCreacion ? new Date(r.fechaCreacion).toLocaleDateString() : 'Inmediata';
+      const fVence = r.vencimiento ? new Date(r.vencimiento).toLocaleDateString() : '30 Días';
+
+      const textoWhatsapp = 
+`🎬 *¡BIENVENIDO A TU PANEL DE CATÁLOGO VIRTUAL!* 🎬
+*FULL MOVIES EC*
+
+Hola *${r.nombre || slug}*, tus datos de acceso son los siguientes:
+
+🔐 *PANEL DE ADMINISTRACIÓN (Tus productos y precios):*
+👉 ${linkAdmin}
+
+👤 *Usuario/Correo:* ${r.email}
+🔑 *Contraseña:* ${r.password}
+
+📅 *Fecha de Activación:* ${fInicio}
+⏳ *Fecha de Vencimiento:* ${fVence}
+
+🌐 *TU CATÁLOGO PÚBLICO (Para tus clientes):*
+👉 ${linkCatalogo}
+
+_Ingresa a tu panel para configurar tu número de WhatsApp y tus precios. ¡Buenas ventas!_`;
+
+      navigator.clipboard.writeText(textoWhatsapp).then(() => {
+        alert('¡Datos completos de ' + (r.nombre || slug) + ' copiados!\nListo para pegar en WhatsApp.');
       }).catch(() => {
-        prompt('Copia manualmente este enlace:', texto);
+        prompt('Copia manualmente los datos de acceso:', textoWhatsapp);
       });
     }
 
@@ -374,13 +535,14 @@
       const dias = parseInt(document.getElementById('reg-dias').value) || (tipo === 'demo' ? 2 : 30);
 
       if (!nombre || !slug || !email || !password) {
-        alert('Por favor llena todos los datos obligatorios.');
+        alert('Por favor completa todos los campos.');
         return;
       }
 
       if (!dbData.revendedores) dbData.revendedores = {};
       if (!dbData.tiendas) dbData.tiendas = {};
 
+      const ahora = new Date();
       const vencimiento = new Date();
       vencimiento.setDate(vencimiento.getDate() + dias);
 
@@ -388,6 +550,7 @@
         nombre,
         email,
         password,
+        fechaCreacion: ahora.toISOString(),
         vencimiento: vencimiento.toISOString(),
         activo: true,
         isDemo: (tipo === 'demo')
@@ -402,7 +565,7 @@
       }
 
       await persistir();
-      alert('¡Cuenta creada y activada con éxito!');
+      alert('¡Cuenta registrada exitosamente!');
       document.getElementById('reg-nombre').value = '';
       document.getElementById('reg-slug').value = '';
       document.getElementById('reg-email').value = '';
@@ -453,13 +616,13 @@
       }
 
       await persistir();
-      alert('¡Datos actualizados correctamente!');
+      alert('¡Datos actualizados!');
       cerrarModalEdit();
       renderRevendedores();
     }
 
     async function eliminarRevendedor(slug) {
-      if (confirm(`¿Seguro que deseas eliminar al revendedor "${slug}" y toda su tienda?`)) {
+      if (confirm(`¿Seguro que deseas eliminar definitivamente a "${slug}"?`)) {
         delete dbData.revendedores[slug];
         if (dbData.tiendas) delete dbData.tiendas[slug];
         await persistir();
@@ -483,7 +646,7 @@
       dbData.superadmin.pin = nuevoPin || PIN_DEFAULT;
 
       await persistir();
-      alert('¡Tus credenciales de Súper Dueño han sido actualizadas con éxito!');
+      alert('¡Credenciales actualizadas exitosamente!');
     }
 
     async function persistir() {
