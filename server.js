@@ -9,23 +9,46 @@ const PORT = process.env.PORT || 3000;
 const DB_FILE = path.join(__dirname, 'database.json');
 
 app.use(cors());
-app.use(express.json({ limit: '10mb' }));
+app.use(express.json({ limit: '15mb' }));
 app.use(express.static(__dirname));
 
-// Inicializar Firebase Firestore con la variable de Render
 let dbFirestore = null;
+let firebaseStatus = "No configurado";
+
+// Inicializar Firebase Firestore de forma blindada contra saltos de línea
 if (process.env.FIREBASE_SERVICE_ACCOUNT) {
   try {
-    const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
-    admin.initializeApp({
-      credential: admin.credential.cert(serviceAccount)
-    });
+    let raw = process.env.FIREBASE_SERVICE_ACCOUNT.trim();
+    let serviceAccount = JSON.parse(raw);
+
+    // Corregir el formato de los saltos de línea en la clave privada
+    if (serviceAccount.private_key) {
+      serviceAccount.private_key = serviceAccount.private_key.replace(/\\n/g, '\n');
+    }
+
+    if (!admin.apps.length) {
+      admin.initializeApp({
+        credential: admin.credential.cert(serviceAccount)
+      });
+    }
+
     dbFirestore = admin.firestore();
-    console.log("Conectado exitosamente a Firebase Firestore.");
+    firebaseStatus = "Conectado exitosamente";
+    console.log(">>> Firebase Firestore CONECTADO PERMANENTEMENTE <<<");
   } catch (err) {
-    console.error("Error al iniciar Firebase:", err.message);
+    firebaseStatus = "Error de conexion: " + err.message;
+    console.error("Error al inicializar Firebase:", err.message);
   }
 }
+
+// Ruta para verificar el estado de la conexión en vivo
+app.get('/api/status', (req, res) => {
+  res.json({
+    firebase_conectado: !!dbFirestore,
+    detalle: firebaseStatus,
+    tiempo: new Date().toISOString()
+  });
+});
 
 function readLocalDB() {
   try {
@@ -44,7 +67,7 @@ function writeLocalDB(data) {
   } catch (e) {}
 }
 
-// Rutas de API para lectura y escritura perpetua
+// Rutas de datos
 app.get('/api/db', async (req, res) => {
   if (dbFirestore) {
     try {
@@ -70,15 +93,17 @@ app.post('/api/save', async (req, res) => {
     writeLocalDB(data);
 
     if (dbFirestore) {
-      await dbFirestore.collection('saas_data').doc('principal').set(data, { merge: true });
+      await dbFirestore.collection('saas_data').doc('principal').set(data);
+      console.log("Datos guardados en Firestore correctamente.");
     }
-    res.json({ success: true });
+    res.json({ success: true, firestore: !!dbFirestore });
   } catch (err) {
+    console.error("Error guardando en Firestore:", err.message);
     res.status(500).json({ error: err.message });
   }
 });
 
-// Rutas para servir páginas
+// Navegación
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'index.html'));
 });
@@ -93,5 +118,5 @@ app.get('/:page', (req, res) => {
 });
 
 app.listen(PORT, '0.0.0.0', () => {
-  console.log(`Servidor SaaS activo en el puerto ${PORT}`);
+  console.log(`Servidor activo en el puerto ${PORT}`);
 });
