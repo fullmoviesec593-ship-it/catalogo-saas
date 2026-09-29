@@ -4,6 +4,15 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Catálogo Oficial | Streaming & Software</title>
+
+  <!-- SOPORTE PWA / APP INSTALABLE -->
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#ff6a00">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Catálogo">
+  <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/3074/3074767.png">
+
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
@@ -82,6 +91,7 @@
     .nav-actions {
       display: flex;
       align-items: center;
+      gap: 8px;
     }
 
     .btn-pedir {
@@ -96,6 +106,21 @@
       align-items: center;
       gap: 6px;
       box-shadow: 0 2px 10px rgba(0, 210, 106, 0.35);
+    }
+
+    /* BOTÓN INSTALAR APP EN BARRA */
+    .btn-install-pwa {
+      background: #171b26;
+      border: 1px solid #ff6a00;
+      color: #ff8c3b;
+      padding: 7px 11px;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 800;
+      display: none;
+      align-items: center;
+      gap: 5px;
+      cursor: pointer;
     }
 
     /* HERO SECTION */
@@ -209,7 +234,7 @@
       text-transform: capitalize;
     }
 
-    /* CATEGORIES & SECTION HEADER */
+    /* SECTION HEADER */
     .section-header {
       display: flex;
       justify-content: space-between;
@@ -394,14 +419,13 @@
       font-size: 10px;
     }
 
-    /* BOTÓN COMPRAR AHORA */
     .btn-buy-ws {
       background: #00d26a;
       color: #032412;
       border: none;
       border-radius: 9px;
-      padding: 10px 8px;
-      font-size: 12px;
+      padding: 11px 8px;
+      font-size: 13px;
       font-weight: 800;
       cursor: pointer;
       display: flex;
@@ -410,10 +434,10 @@
       gap: 6px;
       text-decoration: none;
       width: 100%;
-      box-shadow: 0 2px 8px rgba(0, 210, 106, 0.25);
+      box-shadow: 0 2px 10px rgba(0, 210, 106, 0.3);
     }
 
-    /* MODAL DE COMPRA Y MÉTODOS DE PAGO */
+    /* MODAL DE COMPRA */
     .modal-overlay {
       position: fixed;
       top: 0; left: 0; width: 100%; height: 100%;
@@ -495,7 +519,6 @@
       color: #38bdf8;
     }
 
-    /* BOTÓN FLOTANTE INFERIOR DERECHO */
     .floating-ws {
       position: fixed;
       bottom: 20px;
@@ -527,6 +550,11 @@
       <span id="nav-store-name" class="brand-name">Mi Tienda</span>
     </a>
     <div class="nav-actions">
+      <!-- BOTÓN INSTALAR APP -->
+      <button id="btn-pwa-install" class="btn-install-pwa" onclick="instalarApp()">
+        📲 Instalar App
+      </button>
+
       <a id="nav-btn-pedir" href="#" target="_blank" class="btn-pedir">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12.04 2c-5.46 0-9.91 4.45-9.91 9.91 0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38c1.45.79 3.08 1.21 4.74 1.21 5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.14-2.9-7.01A9.816 9.816 0 0 0 12.04 2z"/></svg>
         Pedir ahora
@@ -617,6 +645,36 @@
     let tiendaActiva = null;
     let todosLosProductos = [];
     let textosTienda = {};
+    let deferredPrompt = null;
+
+    // REGISTRO DE SERVICE WORKER PARA PWA
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/sw.js').catch(err => console.log('SW error:', err));
+      });
+    }
+
+    // CAPTURAR EL EVENTO DE INSTALACIÓN
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      deferredPrompt = e;
+      const btnInstall = document.getElementById('btn-pwa-install');
+      if (btnInstall) btnInstall.style.display = 'inline-flex';
+    });
+
+    function instalarApp() {
+      if (deferredPrompt) {
+        deferredPrompt.prompt();
+        deferredPrompt.userChoice.then((choiceResult) => {
+          if (choiceResult.outcome === 'accepted') {
+            document.getElementById('btn-pwa-install').style.display = 'none';
+          }
+          deferredPrompt = null;
+        });
+      } else {
+        alert('Para instalar en tu teléfono o PC:\n1. Toca los tres puntos (⋮) del navegador.\n2. Selecciona "Instalar aplicación" o "Agregar a pantalla principal".');
+      }
+    }
 
     const SERVICIOS_DEFAULT = [
       {
@@ -731,9 +789,11 @@
       const grid = document.getElementById('products-grid');
       grid.innerHTML = '';
       const moneda = textosTienda.currency || '$';
-      const textoBoton = (textosTienda.btnBuy && textosTienda.btnBuy !== 'Comprar por WhatsApp') 
-        ? textosTienda.btnBuy 
-        : 'Comprar ahora!';
+
+      let textoBoton = "Comprar ahora!";
+      if (textosTienda.btnBuy && !textosTienda.btnBuy.toLowerCase().includes('whatsapp')) {
+        textoBoton = textosTienda.btnBuy;
+      }
 
       productos.forEach((p, idx) => {
         const sub = p.sub || (p.categoria === 'musica' ? '1 mes · Música' : '1 mes · Video');
@@ -770,7 +830,7 @@
               <span class="price-sub">/ 1 mes</span>
             </div>
             <button class="btn-buy-ws" onclick="abrirModal(${idx})">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12.04 2c-5.46 0-9.91 4.45-9.91 9.91 0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38c1.45.79 3.08 1.21 4.74 1.21 5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.14-2.9-7.01A9.816 9.816 0 0 0 12.04 2z"/></svg>
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49c.08-.14.12-.31.12-.48 0-.55-.45-1-1-1H5.21l-.94-2H1zm16 16c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2z"/></svg>
               ${textoBoton}
             </button>
           </div>
