@@ -3,97 +3,270 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Panel Revendedor | Catálogo</title>
+  <title>Panel Revendedor | Control Total</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;800&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
   <style>
-    * { box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
-    body { background-color: #0f172a; color: #f8fafc; margin: 0; padding: 20px; display: flex; justify-content: center; }
-    .card { background-color: #1e293b; border-radius: 12px; padding: 24px; width: 100%; max-width: 500px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); }
-    h2, h3 { text-align: center; color: #38bdf8; margin-top: 0; }
-    .form-group { margin-bottom: 16px; }
-    label { display: block; margin-bottom: 6px; font-size: 14px; color: #94a3b8; }
-    input, textarea { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #334155; background-color: #0f172a; color: #fff; font-size: 15px; outline: none; }
-    input:focus { border-color: #38bdf8; }
-    button { width: 100%; padding: 12px; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; transition: 0.2s; }
-    .btn-primary { background-color: #38bdf8; color: #000; margin-top: 10px; }
-    .btn-success { background-color: #22c55e; color: #000; margin-top: 10px; }
+    :root {
+      --primary: #38bdf8;
+      --accent: #22c55e;
+      --bg: #070a12;
+      --card-bg: #0f172a;
+      --border: #1e293b;
+    }
+    * { box-sizing: border-box; font-family: 'Rajdhani', sans-serif; }
+    body {
+      background-color: var(--bg);
+      color: #f8fafc;
+      margin: 0;
+      padding: 16px;
+      display: flex;
+      justify-content: center;
+      min-height: 100vh;
+    }
+    .card {
+      background: var(--card-bg);
+      border-radius: 16px;
+      padding: 22px;
+      width: 100%;
+      max-width: 680px;
+      border: 1px solid var(--border);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.7);
+    }
+    h2, h3, h4 { color: var(--primary); margin-top: 0; font-family: 'Orbitron', sans-serif; }
+    .form-group { margin-bottom: 14px; }
+    label { display: block; margin-bottom: 5px; font-size: 14px; color: #94a3b8; font-weight: 600; }
+    input, textarea, select {
+      width: 100%;
+      padding: 12px 14px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background-color: #080d1a;
+      color: #fff;
+      font-size: 15px;
+      outline: none;
+    }
+    input:focus, textarea:focus { border-color: var(--primary); }
+    button {
+      width: 100%;
+      padding: 12px;
+      border: none;
+      border-radius: 8px;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      font-family: 'Orbitron', sans-serif;
+      transition: 0.2s;
+    }
+    .btn-primary { background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%); color: #fff; }
+    .btn-success { background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%); color: #042f1a; }
+    .btn-danger { background: #dc2626; color: #fff; }
     .hidden { display: none !important; }
-    .producto-item { background: #0f172a; padding: 12px; border-radius: 8px; margin-bottom: 10px; border-left: 4px solid #22c55e; display: flex; justify-content: space-between; align-items: center; }
+    .nav-tabs { display: flex; gap: 6px; margin-bottom: 20px; border-bottom: 1px solid var(--border); padding-bottom: 10px; overflow-x: auto; }
+    .nav-tab {
+      flex: 1;
+      padding: 10px 8px;
+      text-align: center;
+      background: #080d1a;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: bold;
+      color: #94a3b8;
+      white-space: nowrap;
+    }
+    .nav-tab.active { background: #1e293b; color: var(--primary); border: 1px solid var(--primary); }
+    .product-card {
+      background: #080d1a;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 14px;
+      margin-bottom: 12px;
+      display: flex;
+      gap: 14px;
+      align-items: center;
+    }
+    .product-img { width: 65px; height: 65px; border-radius: 8px; object-fit: cover; border: 1px solid #334155; }
+    .preview-logo { width: 70px; height: 70px; border-radius: 50%; object-fit: cover; border: 2px solid var(--primary); margin: 8px 0; }
   </style>
 </head>
 <body>
 
   <!-- LOGIN REVENDEDOR -->
-  <div id="login-section" class="card">
-    <h2>💼 Acceso Revendedor</h2>
+  <div id="login-section" class="card" style="max-width:440px;">
+    <h2 style="text-align:center;">💼 PANEL REVENDEDOR</h2>
+    <p style="text-align:center; color:#94a3b8; font-size:14px; margin-bottom:20px;">Ingresa tus credenciales para gestionar tu catálogo</p>
+    
     <div class="form-group">
       <label>Correo Electrónico</label>
-      <input type="email" id="email" placeholder="admin@fullmovies.ec" value="admin@fullmovies.ec">
+      <input type="email" id="email" placeholder="tu-correo@gmail.com">
     </div>
     <div class="form-group">
       <label>Contraseña</label>
-      <input type="password" id="password" placeholder="Tu contraseña">
+      <input type="password" id="password" placeholder="Tu clave de acceso">
     </div>
-    <button class="btn-primary" onclick="iniciarSesion()">Ingresar a mi Panel</button>
+    <button class="btn-primary" onclick="iniciarSesion()">INGRESAR A MI PANEL</button>
   </div>
 
-  <!-- PANEL DASHBOARD REVENDEDOR -->
-  <div id="dashboard-section" class="card hidden" style="max-width: 650px;">
-    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
-      <h3 style="margin:0;" id="titulo-tienda">Mi Tienda</h3>
-      <button onclick="location.reload()" style="width:auto; padding:6px 12px; background:#ef4444; color:#fff;">Salir</button>
+  <!-- DASHBOARD REVENDEDOR -->
+  <div id="dashboard-section" class="card hidden">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px; border-bottom:1px solid var(--border); padding-bottom:12px;">
+      <div style="display:flex; align-items:center; gap:10px;">
+        <img id="dash-logo" src="https://via.placeholder.com/40" style="width:40px; height:40px; border-radius:50%; object-fit:cover; border:1px solid var(--primary);" alt="Logo">
+        <div>
+          <span id="dash-title" style="font-family:'Orbitron'; font-weight:bold; font-size:16px; color:#fff;">Mi Tienda</span>
+          <div style="font-size:12px; color:var(--accent);">● Panel Activo</div>
+        </div>
+      </div>
+      <button onclick="location.reload()" style="width:auto; padding:6px 12px; background:#dc2626; color:#fff; font-size:12px;">Salir</button>
     </div>
 
-    <!-- Ajustes Tienda -->
-    <div style="background:#0f172a; padding:16px; border-radius:8px; margin-bottom:20px;">
-      <h4 style="margin-top:0; color:#38bdf8;">Configuración de Tienda</h4>
-      <div class="form-group">
-        <label>Nombre Comercial</label>
-        <input type="text" id="conf-nombre">
-      </div>
-      <div class="form-group">
-        <label>WhatsApp de Ventas (con código país, ej: 593999999999)</label>
-        <input type="text" id="conf-whatsapp">
-      </div>
-      <button class="btn-primary" onclick="guardarAjustes()">Guardar Datos de Tienda</button>
-      <p style="margin-top:12px; font-size:14px;">
-        <b>Enlace público para tus clientes:</b><br>
-        <a id="link-publico" href="#" target="_blank" style="color:#22c55e; word-break:break-all;"></a>
-      </p>
+    <!-- Pestañas -->
+    <div class="nav-tabs">
+      <div id="tab-btn-prods" class="nav-tab active" onclick="cambiarTab('prods')">📦 SERVICIOS</div>
+      <div id="tab-btn-shop" class="nav-tab" onclick="cambiarTab('shop')">⚙️ MI TIENDA & LOGO</div>
+      <div id="tab-btn-design" class="nav-tab" onclick="cambiarTab('design')">🎨 COLORES</div>
+      <div id="tab-btn-payments" class="nav-tab" onclick="cambiarTab('payments')">💳 PAGOS</div>
     </div>
 
-    <!-- Gestión Productos -->
-    <div style="background:#0f172a; padding:16px; border-radius:8px;">
-      <h4 style="margin-top:0; color:#22c55e;">Agregar Producto / Servicio</h4>
-      <div class="form-group">
-        <label>Nombre del Producto</label>
-        <input type="text" id="prod-nombre" placeholder="Ej: Netflix 1 Pantalla">
+    <!-- PESTAÑA 1: SERVICIOS Y PRODUCTOS -->
+    <div id="tab-prods">
+      <div style="background:#080d1a; padding:16px; border-radius:12px; border:1px solid var(--border); margin-bottom:20px;">
+        <h4 style="color:var(--accent); margin-top:0;">➕ Agregar / Editar Servicio</h4>
+        <input type="hidden" id="prod-edit-idx" value="-1">
+        <div class="form-group">
+          <label>Nombre del Servicio</label>
+          <input type="text" id="prod-nombre" placeholder="Ej: Netflix Ultra HD 1 Pantalla">
+        </div>
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+          <div class="form-group">
+            <label>Precio ($)</label>
+            <input type="text" id="prod-precio" placeholder="3.50">
+          </div>
+          <div class="form-group">
+            <label>Subir Imagen (Afiche)</label>
+            <input type="file" id="prod-file" accept="image/*" onchange="convertirImagenABase64(this, 'prod-preview-img')">
+          </div>
+        </div>
+        <img id="prod-preview-img" src="" style="max-height:80px; border-radius:6px; margin-bottom:10px; display:none;">
+        <div class="form-group">
+          <label>Descripción / Garantía</label>
+          <input type="text" id="prod-desc" placeholder="30 días de garantía, entrega inmediata">
+        </div>
+        <button id="btn-guardar-prod" class="btn-success" onclick="guardarProducto()">AGREGAR SERVICIO AL CATÁLOGO</button>
       </div>
-      <div class="form-group">
-        <label>Precio</label>
-        <input type="text" id="prod-precio" placeholder="Ej: 3.50">
-      </div>
-      <div class="form-group">
-        <label>Descripción corta</label>
-        <input type="text" id="prod-desc" placeholder="Ej: Cuenta completa garantizada">
-      </div>
-      <button class="btn-success" onclick="agregarProducto()">Agregar Producto al Catálogo</button>
 
-      <h4 style="margin-top:20px;">Productos en Catálogo</h4>
+      <h4 style="color:#fff;">Mis Servicios Activos</h4>
       <div id="lista-productos"></div>
     </div>
+
+    <!-- PESTAÑA 2: AJUSTES TIENDA & LOGO -->
+    <div id="tab-shop" class="hidden">
+      <div style="background:#080d1a; padding:16px; border-radius:12px; border:1px solid var(--border);">
+        <h4 style="color:var(--primary); margin-top:0;">Datos de la Tienda</h4>
+        <div class="form-group">
+          <label>Nombre Comercial de la Tienda</label>
+          <input type="text" id="shop-nombre">
+        </div>
+        <div class="form-group">
+          <label>Número de WhatsApp para Pedidos (con código país, ej: 593999999999)</label>
+          <input type="text" id="shop-whatsapp">
+        </div>
+        
+        <div class="form-group">
+          <label>Logo de tu Tienda</label>
+          <input type="file" id="shop-logo-file" accept="image/*" onchange="convertirImagenABase64(this, 'shop-logo-preview')">
+          <div style="text-align:center;">
+            <img id="shop-logo-preview" class="preview-logo" src="https://via.placeholder.com/80" alt="Logo">
+          </div>
+        </div>
+
+        <button class="btn-primary" onclick="guardarAjustesTienda()">GUARDAR AJUSTES DE TIENDA</button>
+
+        <div style="margin-top:16px; background:#111d33; padding:12px; border-radius:8px;">
+          <label style="color:#38bdf8;">Enlace de tu Catálogo Público:</label>
+          <a id="shop-public-link" href="#" target="_blank" style="color:var(--accent); font-weight:bold; word-break:break-all;"></a>
+        </div>
+      </div>
+    </div>
+
+    <!-- PESTAÑA 3: PERSONALIZAR COLORES -->
+    <div id="tab-design" class="hidden">
+      <div style="background:#080d1a; padding:16px; border-radius:12px; border:1px solid var(--border);">
+        <h4 style="color:var(--primary); margin-top:0;">Personalizar Apariencia del Catálogo</h4>
+        
+        <div class="form-group">
+          <label>Color Principal de Botones y Acentos</label>
+          <input type="color" id="theme-primary" value="#22c55e" style="height:45px; padding:4px; cursor:pointer;">
+        </div>
+
+        <div class="form-group">
+          <label>Color Secundario / Títulos</label>
+          <input type="color" id="theme-secondary" value="#38bdf8" style="height:45px; padding:4px; cursor:pointer;">
+        </div>
+
+        <div class="form-group">
+          <label>Tono del Fondo</label>
+          <select id="theme-bg">
+            <option value="#07090e">Negro Espacial Cyberpunk</option>
+            <option value="#0b1329">Azul Noche Premium</option>
+            <option value="#180b29">Púrpura Neón Elegante</option>
+            <option value="#0e1713">Verde Esmeralda Oscuro</option>
+          </select>
+        </div>
+
+        <button class="btn-primary" onclick="guardarTema()">APLICAR COLORES A MI CATÁLOGO</button>
+      </div>
+    </div>
+
+    <!-- PESTAÑA 4: MÉTODOS DE PAGO -->
+    <div id="tab-payments" class="hidden">
+      <div style="background:#080d1a; padding:16px; border-radius:12px; border:1px solid var(--border);">
+        <h4 style="color:var(--accent); margin-top:0;">Tus Cuentas Bancarias y Métodos de Pago</h4>
+        <p style="font-size:13px; color:#94a3b8;">Esta información se le mostrará a tu cliente cuando presione <b>"Comprar Ahora"</b> en el catálogo.</p>
+
+        <div class="form-group">
+          <label>Detalle de tus Métodos de Pago (Bancos, Transferencias, DeUna, Binance, Cédula, etc.):</label>
+          <textarea id="shop-payments" rows="8" placeholder="Ejemplo:
+🏦 BANCO PICHINCHA
+• Ahorros: 2200000000
+• Titular: Tu Nombre
+• CI: 1300000000
+
+📱 DEUNA / PAGO DIRECTO
+• 0999999999
+
+🟡 BINANCE PAY (USDT)
+• Pay ID: 123456789"></textarea>
+        </div>
+
+        <button class="btn-success" onclick="guardarMetodosPago()">GUARDAR MÉTODOS DE PAGO</button>
+      </div>
+    </div>
+
   </div>
 
   <script>
     let dbData = null;
     let revendedorActual = null;
     let slugActual = null;
+    let tempImgBase64 = null;
+    let tempLogoBase64 = null;
+
+    const SERVICIOS_DEFAULT = [
+      { nombre: "Netflix Ultra HD (1 Pantalla)", precio: "3.50", descripcion: "Calidad 4K UHD, cuenta estable y garantía total.", img: "https://images.unsplash.com/photo-1574375927938-d5a98e8ffe85?w=200" },
+      { nombre: "Disney+ & Star+ Combo", precio: "4.00", descripcion: "Acceso ilimitado a todo el catálogo de películas y deportes ESPN.", img: "https://images.unsplash.com/photo-1607604276583-eef5d076aa5f?w=200" },
+      { nombre: "Flujo TV Premium", precio: "6.00", descripcion: "Canales en vivo HD, eventos deportivos PPV, películas y series.", img: "https://images.unsplash.com/photo-1593784991095-a205069470b6?w=200" },
+      { nombre: "Amazon Prime Video", precio: "3.00", descripcion: "Envíos prime, películas exclusivas y series completas.", img: "https://images.unsplash.com/photo-1522869635100-9f4c5e86aa37?w=200" },
+      { nombre: "HBO Max (Max)", precio: "3.50", descripcion: "Series premium, estrenos de cine y transmisiones Champions League.", img: "https://images.unsplash.com/photo-1585951237318-9ea5e175b891?w=200" },
+      { nombre: "Spotify Premium", precio: "2.50", descripcion: "Música sin anuncios, descargas ilimitadas y máxima fidelidad.", img: "https://images.unsplash.com/photo-1614680376593-902f749f7ffc?w=200" }
+    ];
 
     async function cargarBD() {
       try {
         const res = await fetch('/api/db');
         dbData = await res.json();
       } catch (e) {
-        alert('Error conectando al servidor: ' + e.message);
+        alert('Error conectando a la API: ' + e.message);
       }
     }
 
@@ -103,13 +276,7 @@
 
       if (!dbData) await cargarBD();
 
-      if (!dbData || !dbData.revendedores) {
-        alert('No se pudo leer la base de datos.');
-        return;
-      }
-
-      // Buscar revendedor por email y clave
-      const revendedores = dbData.revendedores;
+      const revendedores = dbData.revendedores || {};
       slugActual = Object.keys(revendedores).find(slug => {
         const r = revendedores[slug];
         return r.email === email && r.password === pass;
@@ -117,42 +284,70 @@
 
       if (slugActual) {
         revendedorActual = revendedores[slugActual];
-
         if (revendedorActual.activo === false) {
-          alert('Tu suscripción está inactiva o suspendida. Contacta al administrador.');
+          alert('Tu cuenta está suspendida. Contacta al Súper Administrador.');
           return;
         }
 
         document.getElementById('login-section').classList.add('hidden');
         document.getElementById('dashboard-section').classList.remove('hidden');
-
-        cargarDatosDashboard();
+        cargarTienda();
       } else {
         alert('Correo o contraseña incorrectos.');
       }
     }
 
-    function cargarDatosDashboard() {
+    function cargarTienda() {
       if (!dbData.tiendas) dbData.tiendas = {};
       if (!dbData.tiendas[slugActual]) {
         dbData.tiendas[slugActual] = {
           nombre: revendedorActual.nombre || slugActual,
-          whatsapp: "593999999999",
-          productos: []
+          whatsapp: revendedorActual.whatsapp || "593999999999",
+          productos: JSON.parse(JSON.stringify(SERVICIOS_DEFAULT)),
+          logo: "",
+          metodosPago: "",
+          tema: { primary: "#22c55e", secondary: "#38bdf8", bg: "#07090e" }
         };
       }
 
       const tienda = dbData.tiendas[slugActual];
-      document.getElementById('titulo-tienda').innerText = tienda.nombre || slugActual;
-      document.getElementById('conf-nombre').value = tienda.nombre || '';
-      document.getElementById('conf-whatsapp').value = tienda.whatsapp || '';
 
-      const link = window.location.origin + '/?tienda=' + slugActual;
-      const elLink = document.getElementById('link-publico');
-      elLink.href = link;
-      elLink.innerText = link;
+      if (!tienda.productos || tienda.productos.length === 0) {
+        tienda.productos = JSON.parse(JSON.stringify(SERVICIOS_DEFAULT));
+        persistir();
+      }
+
+      document.getElementById('dash-title').innerText = tienda.nombre || slugActual;
+      document.getElementById('shop-nombre').value = tienda.nombre || '';
+      document.getElementById('shop-whatsapp').value = tienda.whatsapp || '';
+      document.getElementById('shop-payments').value = tienda.metodosPago || '';
+
+      if (tienda.logo) {
+        document.getElementById('dash-logo').src = tienda.logo;
+        document.getElementById('shop-logo-preview').src = tienda.logo;
+      }
+
+      if (tienda.tema) {
+        document.getElementById('theme-primary').value = tienda.tema.primary || '#22c55e';
+        document.getElementById('theme-secondary').value = tienda.tema.secondary || '#38bdf8';
+        document.getElementById('theme-bg').value = tienda.tema.bg || '#07090e';
+      }
+
+      const publicLink = window.location.origin + '/?tienda=' + slugActual;
+      const elLink = document.getElementById('shop-public-link');
+      elLink.href = publicLink;
+      elLink.innerText = publicLink;
 
       renderProductos();
+    }
+
+    function cambiarTab(tab) {
+      ['prods', 'shop', 'design', 'payments'].forEach(t => {
+        document.getElementById('tab-' + t).classList.add('hidden');
+        document.getElementById('tab-btn-' + t).classList.remove('active');
+      });
+      document.getElementById('tab-' + tab).classList.remove('hidden');
+      document.getElementById('tab-btn-' + tab).classList.add('active');
     }
 
     function renderProductos() {
@@ -160,39 +355,44 @@
       lista.innerHTML = '';
       const productos = dbData.tiendas[slugActual].productos || [];
 
-      if (productos.length === 0) {
-        lista.innerHTML = '<p style="color:#64748b; font-size:14px;">No tienes productos cargados aún.</p>';
-        return;
-      }
-
       productos.forEach((p, idx) => {
         const item = document.createElement('div');
-        item.className = 'producto-item';
+        item.className = 'product-card';
         item.innerHTML = `
-          <div>
-            <strong>${p.nombre}</strong> - $${p.precio}<br>
-            <small style="color:#94a3b8;">${p.descripcion || ''}</small>
+          <img src="${p.img || 'https://via.placeholder.com/65'}" class="product-img" onerror="this.src='https://via.placeholder.com/65'">
+          <div style="flex:1;">
+            <strong style="color:#fff; font-size:16px;">${p.nombre}</strong>
+            <div style="color:var(--accent); font-weight:bold; font-size:15px;">$${p.precio}</div>
+            <small style="color:#94a3b8; font-size:12px;">${p.descripcion || ''}</small>
           </div>
-          <button onclick="eliminarProducto(${idx})" style="width:auto; padding:6px 10px; background:#ef4444; color:#fff; font-size:12px;">X</button>
+          <div style="display:flex; flex-direction:column; gap:6px;">
+            <button style="background:#0284c7; color:#fff; padding:6px 10px; font-size:12px;" onclick="cargarEdicionProducto(${idx})">✏️</button>
+            <button style="background:#dc2626; color:#fff; padding:6px 10px; font-size:12px;" onclick="eliminarProducto(${idx})">🗑️</button>
+          </div>
         `;
         lista.appendChild(item);
       });
     }
 
-    async function guardarAjustes() {
-      const nuevoNombre = document.getElementById('conf-nombre').value.trim();
-      const nuevoWhatsapp = document.getElementById('conf-whatsapp').value.trim();
-
-      dbData.tiendas[slugActual].nombre = nuevoNombre;
-      dbData.tiendas[slugActual].whatsapp = nuevoWhatsapp;
-      dbData.revendedores[slugActual].nombre = nuevoNombre;
-
-      await persistir();
-      alert('¡Configuración guardada!');
-      document.getElementById('titulo-tienda').innerText = nuevoNombre;
+    function cargarEdicionProducto(idx) {
+      const p = dbData.tiendas[slugActual].productos[idx];
+      document.getElementById('prod-edit-idx').value = idx;
+      document.getElementById('prod-nombre').value = p.nombre;
+      document.getElementById('prod-precio').value = p.precio;
+      document.getElementById('prod-desc').value = p.descripcion || '';
+      
+      const imgPrev = document.getElementById('prod-preview-img');
+      if (p.img) {
+        imgPrev.src = p.img;
+        imgPrev.style.display = 'block';
+        tempImgBase64 = p.img;
+      }
+      document.getElementById('btn-guardar-prod').innerText = "ACTUALIZAR SERVICIO";
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
-    async function agregarProducto() {
+    async function guardarProducto() {
+      const idx = parseInt(document.getElementById('prod-edit-idx').value);
       const nombre = document.getElementById('prod-nombre').value.trim();
       const precio = document.getElementById('prod-precio').value.trim();
       const descripcion = document.getElementById('prod-desc').value.trim();
@@ -202,23 +402,84 @@
         return;
       }
 
-      if (!dbData.tiendas[slugActual].productos) {
-        dbData.tiendas[slugActual].productos = [];
+      const img = tempImgBase64 || 'https://images.unsplash.com/photo-1522869635100-9f4c5e86aa37?w=200';
+
+      if (!dbData.tiendas[slugActual].productos) dbData.tiendas[slugActual].productos = [];
+
+      if (idx >= 0) {
+        dbData.tiendas[slugActual].productos[idx] = { nombre, precio, descripcion, img };
+      } else {
+        dbData.tiendas[slugActual].productos.push({ nombre, precio, descripcion, img });
       }
 
-      dbData.tiendas[slugActual].productos.push({ nombre, precio, descripcion });
       await persistir();
-
+      alert('¡Servicio guardado exitosamente!');
+      
+      document.getElementById('prod-edit-idx').value = "-1";
       document.getElementById('prod-nombre').value = '';
       document.getElementById('prod-precio').value = '';
       document.getElementById('prod-desc').value = '';
+      document.getElementById('prod-file').value = '';
+      document.getElementById('prod-preview-img').style.display = 'none';
+      document.getElementById('btn-guardar-prod').innerText = "AGREGAR SERVICIO AL CATÁLOGO";
+      tempImgBase64 = null;
       renderProductos();
     }
 
     async function eliminarProducto(idx) {
-      dbData.tiendas[slugActual].productos.splice(idx, 1);
+      if (confirm('¿Deseas eliminar este servicio de tu catálogo?')) {
+        dbData.tiendas[slugActual].productos.splice(idx, 1);
+        await persistir();
+        renderProductos();
+      }
+    }
+
+    async function guardarAjustesTienda() {
+      const nombre = document.getElementById('shop-nombre').value.trim();
+      const whatsapp = document.getElementById('shop-whatsapp').value.trim();
+
+      dbData.tiendas[slugActual].nombre = nombre;
+      dbData.tiendas[slugActual].whatsapp = whatsapp;
+      if (tempLogoBase64) {
+        dbData.tiendas[slugActual].logo = tempLogoBase64;
+      }
+
       await persistir();
-      renderProductos();
+      alert('¡Ajustes de tienda y logo actualizados!');
+      document.getElementById('dash-title').innerText = nombre;
+      if (tempLogoBase64) document.getElementById('dash-logo').src = tempLogoBase64;
+    }
+
+    async function guardarTema() {
+      const primary = document.getElementById('theme-primary').value;
+      const secondary = document.getElementById('theme-secondary').value;
+      const bg = document.getElementById('theme-bg').value;
+
+      dbData.tiendas[slugActual].tema = { primary, secondary, bg };
+      await persistir();
+      alert('¡Colores del catálogo personalizados con éxito!');
+    }
+
+    async function guardarMetodosPago() {
+      const metodos = document.getElementById('shop-payments').value.trim();
+      dbData.tiendas[slugActual].metodosPago = metodos;
+      await persistir();
+      alert('¡Métodos de pago guardados correctamente!');
+    }
+
+    function convertirImagenABase64(input, previewId) {
+      if (input.files && input.files[0]) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          const b64 = e.target.result;
+          const prev = document.getElementById(previewId);
+          prev.src = b64;
+          prev.style.display = 'block';
+          if (previewId === 'prod-preview-img') tempImgBase64 = b64;
+          if (previewId === 'shop-logo-preview') tempLogoBase64 = b64;
+        };
+        reader.readAsDataURL(input.files[0]);
+      }
     }
 
     async function persistir() {
