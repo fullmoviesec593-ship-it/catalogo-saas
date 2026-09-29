@@ -71,7 +71,7 @@
       background: #080d1a;
       border-radius: 8px;
       cursor: pointer;
-      font-size: 13px;
+      font-size: 12px;
       font-weight: bold;
       color: #94a3b8;
       white-space: nowrap;
@@ -90,7 +90,6 @@
     .product-img { width: 65px; height: 65px; border-radius: 8px; object-fit: cover; border: 1px solid #334155; }
     .preview-logo { width: 70px; height: 70px; border-radius: 50%; object-fit: cover; border: 2px solid var(--primary); margin: 8px 0; }
 
-    /* ESTILOS DEL CONTADOR DE DÍAS */
     .badge-dias {
       display: inline-flex;
       align-items: center;
@@ -103,28 +102,10 @@
       letter-spacing: 0.5px;
       margin-top: 4px;
     }
-    .badge-dias.green {
-      background: rgba(34, 197, 94, 0.15);
-      color: #4ade80;
-      border: 1px solid #22c55e;
-    }
-    .badge-dias.yellow {
-      background: rgba(234, 179, 8, 0.18);
-      color: #facc15;
-      border: 1px solid #eab308;
-    }
-    .badge-dias.red {
-      background: rgba(239, 68, 68, 0.2);
-      color: #f87171;
-      border: 1px solid #ef4444;
-      animation: pulseAlert 1.6s infinite;
-    }
-    @keyframes pulseAlert {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.55; }
-    }
+    .badge-dias.green { background: rgba(34, 197, 94, 0.15); color: #4ade80; border: 1px solid #22c55e; }
+    .badge-dias.yellow { background: rgba(234, 179, 8, 0.18); color: #facc15; border: 1px solid #eab308; }
+    .badge-dias.red { background: rgba(239, 68, 68, 0.2); color: #f87171; border: 1px solid #ef4444; }
 
-    /* CASILLA DE RECORDAR SESIÓN */
     .checkbox-container {
       display: flex;
       align-items: center;
@@ -139,16 +120,11 @@
       accent-color: #38bdf8;
       cursor: pointer;
     }
-    .checkbox-label {
-      font-size: 14px;
-      color: #cbd5e1;
-      font-weight: 600;
-    }
   </style>
 </head>
 <body>
 
-  <!-- PANTALLA 1: LOGIN -->
+  <!-- LOGIN -->
   <div id="login-section" class="card" style="max-width:440px;">
     <h2 style="text-align:center;">💼 PANEL REVENDEDOR</h2>
     <p style="text-align:center; color:#94a3b8; font-size:14px; margin-bottom:20px;">Ingresa tus credenciales para gestionar tu catálogo</p>
@@ -162,18 +138,16 @@
       <input type="password" id="password" placeholder="Tu clave de acceso">
     </div>
 
-    <!-- CASILLA PARA MANTENER SESIÓN -->
     <div class="checkbox-container" onclick="toggleCheckbox()">
       <input type="checkbox" id="remember-session" checked onclick="event.stopPropagation()">
-      <span class="checkbox-label">Mantener la sesión iniciada en este dispositivo</span>
+      <span style="font-size:14px; color:#cbd5e1; font-weight:600;">Mantener la sesión iniciada en este dispositivo</span>
     </div>
 
     <button class="btn-primary" onclick="iniciarSesion()">INGRESAR A MI PANEL</button>
   </div>
 
-  <!-- PANTALLA 2: DASHBOARD -->
+  <!-- DASHBOARD -->
   <div id="dashboard-section" class="card hidden">
-    <!-- CABECERA CON NOMBRE, LOGO Y CONTADOR DE DÍAS -->
     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px; border-bottom:1px solid var(--border); padding-bottom:12px; gap:8px;">
       <div style="display:flex; align-items:center; gap:10px;">
         <img id="dash-logo" src="https://via.placeholder.com/40" style="width:42px; height:42px; border-radius:50%; object-fit:cover; border:1px solid var(--primary);" alt="Logo">
@@ -190,34 +164,47 @@
     <!-- Pestañas -->
     <div class="nav-tabs">
       <div id="tab-btn-prods" class="nav-tab active" onclick="cambiarTab('prods')">📦 SERVICIOS</div>
-      <div id="tab-btn-shop" class="nav-tab" onclick="cambiarTab('shop')">⚙️ MI TIENDA & LOGO</div>
-      <div id="tab-btn-design" class="nav-tab" onclick="cambiarTab('design')">🎨 COLORES</div>
+      <div id="tab-btn-texts" class="nav-tab" onclick="cambiarTab('texts')">📝 TEXTOS Y FRASES</div>
+      <div id="tab-btn-shop" class="nav-tab" onclick="cambiarTab('shop')">⚙️ TIENDA & LOGO</div>
       <div id="tab-btn-payments" class="nav-tab" onclick="cambiarTab('payments')">💳 PAGOS</div>
     </div>
 
-    <!-- PESTAÑA 1: SERVICIOS Y PRODUCTOS -->
+    <!-- PESTAÑA 1: SERVICIOS -->
     <div id="tab-prods">
       <div style="background:#080d1a; padding:16px; border-radius:12px; border:1px solid var(--border); margin-bottom:20px;">
         <h4 style="color:var(--accent); margin-top:0;">➕ Agregar / Editar Servicio</h4>
         <input type="hidden" id="prod-edit-idx" value="-1">
         <div class="form-group">
           <label>Nombre del Servicio</label>
-          <input type="text" id="prod-nombre" placeholder="Ej: Netflix Ultra HD 1 Pantalla">
+          <input type="text" id="prod-nombre" placeholder="Ej: Netflix Ultra HD">
         </div>
         <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
           <div class="form-group">
-            <label>Precio ($)</label>
+            <label>Precio</label>
             <input type="text" id="prod-precio" placeholder="3.50">
           </div>
           <div class="form-group">
-            <label>Subir Imagen (Afiche)</label>
+            <label>Subir Imagen</label>
             <input type="file" id="prod-file" accept="image/*" onchange="convertirImagenABase64(this, 'prod-preview-img')">
           </div>
         </div>
         <img id="prod-preview-img" src="" style="max-height:80px; border-radius:6px; margin-bottom:10px; display:none;">
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+          <div class="form-group">
+            <label>Categoría</label>
+            <select id="prod-cat">
+              <option value="video">Video</option>
+              <option value="musica">Música</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Insignia / Etiqueta (Opcional)</label>
+            <input type="text" id="prod-tag" placeholder="POPULAR o TOP">
+          </div>
+        </div>
         <div class="form-group">
-          <label>Descripción / Garantía</label>
-          <input type="text" id="prod-desc" placeholder="30 días de garantía, entrega inmediata">
+          <label>Beneficios / Características (separados por comas)</label>
+          <input type="text" id="prod-features" placeholder="1 perfil dedicado, Calidad 4K, Entrega inmediata">
         </div>
         <button id="btn-guardar-prod" class="btn-success" onclick="guardarProducto()">AGREGAR SERVICIO AL CATÁLOGO</button>
       </div>
@@ -226,7 +213,60 @@
       <div id="lista-productos"></div>
     </div>
 
-    <!-- PESTAÑA 2: AJUSTES TIENDA & LOGO -->
+    <!-- PESTAÑA 2: TEXTOS DEL CATÁLOGO -->
+    <div id="tab-texts" class="hidden">
+      <div style="background:#080d1a; padding:16px; border-radius:12px; border:1px solid var(--border);">
+        <h4 style="color:var(--primary); margin-top:0;">Personalizar Palabras y Textos del Catálogo</h4>
+        <p style="font-size:13px; color:#94a3b8; margin-bottom:16px;">Edita cualquier frase de tu catálogo para adaptarlo a tu marca o nicho.</p>
+
+        <div class="form-group">
+          <label>Insignia Superior (Pequeña Píldora)</label>
+          <input type="text" id="txt-pill" placeholder="✦ ATENCIÓN 24/7 ✦">
+        </div>
+
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+          <div class="form-group">
+            <label>Título Línea 1</label>
+            <input type="text" id="txt-title-1" placeholder="TU TIENDA DE">
+          </div>
+          <div class="form-group">
+            <label>Palabra Destacada Naranja</label>
+            <input type="text" id="txt-title-2" placeholder="SOFTWARE o STREAMING">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Subtítulo de Garantía / Entrega</label>
+          <input type="text" id="txt-sub" placeholder="Proveedor garantizado · Activación inmediata · Los mejores precios">
+        </div>
+
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+          <div class="form-group">
+            <label>Símbolo de Moneda</label>
+            <input type="text" id="txt-currency" placeholder="$ o BOB o USD">
+          </div>
+          <div class="form-group">
+            <label>Texto Botón Comprar</label>
+            <input type="text" id="txt-btn-buy" placeholder="Comprar por WhatsApp">
+          </div>
+        </div>
+
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+          <div class="form-group">
+            <label>Texto Estadística 2</label>
+            <input type="text" id="txt-stat-2" placeholder="24/7 Soporte">
+          </div>
+          <div class="form-group">
+            <label>Texto Estadística 3</label>
+            <input type="text" id="txt-stat-3" placeholder="⚡ Inmediato">
+          </div>
+        </div>
+
+        <button class="btn-primary" onclick="guardarTextos()">GUARDAR TEXTOS DEL CATÁLOGO</button>
+      </div>
+    </div>
+
+    <!-- PESTAÑA 3: TIENDA & LOGO -->
     <div id="tab-shop" class="hidden">
       <div style="background:#080d1a; padding:16px; border-radius:12px; border:1px solid var(--border);">
         <h4 style="color:var(--primary); margin-top:0;">Datos de la Tienda</h4>
@@ -256,40 +296,11 @@
       </div>
     </div>
 
-    <!-- PESTAÑA 3: PERSONALIZAR COLORES -->
-    <div id="tab-design" class="hidden">
-      <div style="background:#080d1a; padding:16px; border-radius:12px; border:1px solid var(--border);">
-        <h4 style="color:var(--primary); margin-top:0;">Personalizar Apariencia del Catálogo</h4>
-        
-        <div class="form-group">
-          <label>Color Principal de Botones y Acentos</label>
-          <input type="color" id="theme-primary" value="#22c55e" style="height:45px; padding:4px; cursor:pointer;">
-        </div>
-
-        <div class="form-group">
-          <label>Color Secundario / Títulos</label>
-          <input type="color" id="theme-secondary" value="#38bdf8" style="height:45px; padding:4px; cursor:pointer;">
-        </div>
-
-        <div class="form-group">
-          <label>Tono del Fondo</label>
-          <select id="theme-bg">
-            <option value="#07090e">Negro Espacial Cyberpunk</option>
-            <option value="#0b1329">Azul Noche Premium</option>
-            <option value="#180b29">Púrpura Neón Elegante</option>
-            <option value="#0e1713">Verde Esmeralda Oscuro</option>
-          </select>
-        </div>
-
-        <button class="btn-primary" onclick="guardarTema()">APLICAR COLORES A MI CATÁLOGO</button>
-      </div>
-    </div>
-
     <!-- PESTAÑA 4: MÉTODOS DE PAGO -->
     <div id="tab-payments" class="hidden">
       <div style="background:#080d1a; padding:16px; border-radius:12px; border:1px solid var(--border);">
         <h4 style="color:var(--accent); margin-top:0;">Tus Cuentas Bancarias y Métodos de Pago</h4>
-        <p style="font-size:13px; color:#94a3b8;">Esta información se le mostrará a tu cliente cuando presione <b>"Comprar Ahora"</b> en el catálogo.</p>
+        <p style="font-size:13px; color:#94a3b8;">Esta información se le mostrará a tu cliente al presionar <b>"Comprar por WhatsApp"</b>.</p>
 
         <div class="form-group">
           <label>Detalle de tus Métodos de Pago (Bancos, Transferencias, DeUna, Binance, Cédula, etc.):</label>
@@ -320,12 +331,42 @@
     let tempLogoBase64 = null;
 
     const SERVICIOS_DEFAULT = [
-      { nombre: "Netflix Ultra HD (1 Pantalla)", precio: "3.50", descripcion: "Calidad 4K UHD, cuenta estable y garantía total.", img: "https://images.unsplash.com/photo-1574375927938-d5a98e8ffe85?w=200" },
-      { nombre: "Disney+ & Star+ Combo", precio: "4.00", descripcion: "Acceso ilimitado a todo el catálogo de películas y deportes ESPN.", img: "https://images.unsplash.com/photo-1607604276583-eef5d076aa5f?w=200" },
-      { nombre: "Flujo TV Premium", precio: "6.00", descripcion: "Canales en vivo HD, eventos deportivos PPV, películas y series.", img: "https://images.unsplash.com/photo-1593784991095-a205069470b6?w=200" },
-      { nombre: "Amazon Prime Video", precio: "3.00", descripcion: "Envíos prime, películas exclusivas y series completas.", img: "https://images.unsplash.com/photo-1522869635100-9f4c5e86aa37?w=200" },
-      { nombre: "HBO Max (Max)", precio: "3.50", descripcion: "Series premium, estrenos de cine y transmisiones Champions League.", img: "https://images.unsplash.com/photo-1585951237318-9ea5e175b891?w=200" },
-      { nombre: "Spotify Premium", precio: "2.50", descripcion: "Música sin anuncios, descargas ilimitadas y máxima fidelidad.", img: "https://images.unsplash.com/photo-1614680376593-902f749f7ffc?w=200" }
+      {
+        nombre: "Netflix",
+        sub: "1 mes · Video",
+        categoria: "video",
+        tag: "POPULAR",
+        precio: "3.50",
+        features: ["1 perfil dedicado", "Calidad HD / 4K", "Activación el mismo día", "Sin compartir cuenta"],
+        img: "https://images.unsplash.com/photo-1574375927938-d5a98e8ffe85?w=500"
+      },
+      {
+        nombre: "Disney+",
+        sub: "1 mes · Video",
+        categoria: "video",
+        tag: "",
+        precio: "4.00",
+        features: ["Disney Marvel Star Wars", "Series exclusivas", "Perfil personal", "Activación inmediata"],
+        img: "https://images.unsplash.com/photo-1607604276583-eef5d076aa5f?w=500"
+      },
+      {
+        nombre: "Spotify",
+        sub: "1 mes · Música",
+        categoria: "musica",
+        tag: "TOP",
+        precio: "2.50",
+        features: ["Música sin anuncios", "Modo offline disponible", "A tu propio correo", "Calidad Extreme Audio"],
+        img: "https://images.unsplash.com/photo-1614680376593-902f749f7ffc?w=500"
+      },
+      {
+        nombre: "HBO Max",
+        sub: "1 mes · Video",
+        categoria: "video",
+        tag: "",
+        precio: "3.50",
+        features: ["Estrenos exclusivos", "Champions League en vivo", "Reproducción en 4K UHD", "Garantía mensual"],
+        img: "https://images.unsplash.com/photo-1585951237318-9ea5e175b891?w=500"
+      }
     ];
 
     async function cargarBD() {
@@ -357,9 +398,7 @@
         tag.innerText = '● SERVICIO ACTIVO';
         return;
       }
-
       const dias = calcularDiasRestantes(revendedorActual.vencimiento);
-
       if (revendedorActual.activo === false) {
         tag.className = 'badge-dias red';
         tag.innerText = '⛔ CUENTA SUSPENDIDA';
@@ -385,10 +424,10 @@
 
       if (!dbData) await cargarBD();
 
-      const revendedores = dbData.revendedores || {};
+      const revendedores = dbData.revendedores || dbData.usuarios || {};
       slugActual = Object.keys(revendedores).find(slug => {
         const r = revendedores[slug];
-        return r.email === email && r.password === pass;
+        return (r.email === email || r.correo === email) && (r.password === pass || r.clave === pass);
       });
 
       if (slugActual) {
@@ -398,7 +437,6 @@
           return;
         }
 
-        // Guardar sesión si marcó recordar
         if (recordar || autoEmail) {
           localStorage.setItem('revendedor_session', JSON.stringify({ email, pass }));
         }
@@ -416,16 +454,13 @@
       location.reload();
     }
 
-    // Auto-login al abrir la página si existe sesión guardada
     async function verificarSesionGuardada() {
       await cargarBD();
       const saved = localStorage.getItem('revendedor_session');
       if (saved) {
         try {
           const { email, pass } = JSON.parse(saved);
-          if (email && pass) {
-            iniciarSesion(email, pass);
-          }
+          if (email && pass) iniciarSesion(email, pass);
         } catch (e) {}
       }
     }
@@ -434,12 +469,21 @@
       if (!dbData.tiendas) dbData.tiendas = {};
       if (!dbData.tiendas[slugActual]) {
         dbData.tiendas[slugActual] = {
-          nombre: revendedorActual.nombre || slugActual,
+          nombre: revendedorActual.nombre || revendedorActual.nombreTienda || slugActual,
           whatsapp: revendedorActual.whatsapp || "593999999999",
           productos: JSON.parse(JSON.stringify(SERVICIOS_DEFAULT)),
           logo: "",
           metodosPago: "",
-          tema: { primary: "#22c55e", secondary: "#38bdf8", bg: "#07090e" }
+          textos: {
+            pill: "✦ ATENCIÓN 24/7 ✦",
+            title1: "TU TIENDA DE",
+            title2: "SOFTWARE",
+            sub: "Proveedor garantizado · Activación inmediata · Los mejores precios",
+            currency: "$",
+            btnBuy: "Comprar por WhatsApp",
+            stat2: "24/7 Soporte",
+            stat3: "⚡ Inmediato"
+          }
         };
       }
 
@@ -460,11 +504,16 @@
         document.getElementById('shop-logo-preview').src = tienda.logo;
       }
 
-      if (tienda.tema) {
-        document.getElementById('theme-primary').value = tienda.tema.primary || '#22c55e';
-        document.getElementById('theme-secondary').value = tienda.tema.secondary || '#38bdf8';
-        document.getElementById('theme-bg').value = tienda.tema.bg || '#07090e';
-      }
+      // Cargar Textos Editables
+      const txt = tienda.textos || {};
+      document.getElementById('txt-pill').value = txt.pill || "✦ ATENCIÓN 24/7 ✦";
+      document.getElementById('txt-title-1').value = txt.title1 || "TU TIENDA DE";
+      document.getElementById('txt-title-2').value = txt.title2 || "SOFTWARE";
+      document.getElementById('txt-sub').value = txt.sub || "Proveedor garantizado · Activación inmediata · Los mejores precios";
+      document.getElementById('txt-currency').value = txt.currency || "$";
+      document.getElementById('txt-btn-buy').value = txt.btnBuy || "Comprar por WhatsApp";
+      document.getElementById('txt-stat-2').value = txt.stat2 || "24/7 Soporte";
+      document.getElementById('txt-stat-3').value = txt.stat3 || "⚡ Inmediato";
 
       const publicLink = window.location.origin + '/?tienda=' + slugActual;
       const elLink = document.getElementById('shop-public-link');
@@ -476,7 +525,7 @@
     }
 
     function cambiarTab(tab) {
-      ['prods', 'shop', 'design', 'payments'].forEach(t => {
+      ['prods', 'texts', 'shop', 'payments'].forEach(t => {
         document.getElementById('tab-' + t).classList.add('hidden');
         document.getElementById('tab-btn-' + t).classList.remove('active');
       });
@@ -496,8 +545,8 @@
           <img src="${p.img || 'https://via.placeholder.com/65'}" class="product-img" onerror="this.src='https://via.placeholder.com/65'">
           <div style="flex:1;">
             <strong style="color:#fff; font-size:16px;">${p.nombre}</strong>
-            <div style="color:var(--accent); font-weight:bold; font-size:15px;">$${p.precio}</div>
-            <small style="color:#94a3b8; font-size:12px;">${p.descripcion || ''}</small>
+            <div style="color:var(--accent); font-weight:bold; font-size:15px;">${dbData.tiendas[slugActual]?.textos?.currency || '$'}${p.precio}</div>
+            <small style="color:#94a3b8; font-size:12px;">${p.sub || p.descripcion || ''}</small>
           </div>
           <div style="display:flex; flex-direction:column; gap:6px;">
             <button style="background:#0284c7; color:#fff; padding:6px 10px; font-size:12px;" onclick="cargarEdicionProducto(${idx})">✏️</button>
@@ -513,7 +562,9 @@
       document.getElementById('prod-edit-idx').value = idx;
       document.getElementById('prod-nombre').value = p.nombre;
       document.getElementById('prod-precio').value = p.precio;
-      document.getElementById('prod-desc').value = p.descripcion || '';
+      document.getElementById('prod-cat').value = p.categoria || 'video';
+      document.getElementById('prod-tag').value = p.tag || '';
+      document.getElementById('prod-features').value = (p.features && p.features.length) ? p.features.join(', ') : (p.descripcion || '');
       
       const imgPrev = document.getElementById('prod-preview-img');
       if (p.img) {
@@ -529,21 +580,27 @@
       const idx = parseInt(document.getElementById('prod-edit-idx').value);
       const nombre = document.getElementById('prod-nombre').value.trim();
       const precio = document.getElementById('prod-precio').value.trim();
-      const descripcion = document.getElementById('prod-desc').value.trim();
+      const categoria = document.getElementById('prod-cat').value;
+      const tag = document.getElementById('prod-tag').value.trim();
+      const rawFeatures = document.getElementById('prod-features').value.trim();
 
       if (!nombre || !precio) {
         alert('Nombre y precio son obligatorios.');
         return;
       }
 
-      const img = tempImgBase64 || 'https://images.unsplash.com/photo-1522869635100-9f4c5e86aa37?w=200';
+      const features = rawFeatures ? rawFeatures.split(',').map(s => s.trim()).filter(Boolean) : [];
+      const sub = categoria === 'musica' ? '1 mes · Música' : '1 mes · Video';
+      const img = tempImgBase64 || 'https://images.unsplash.com/photo-1522869635100-9f4c5e86aa37?w=500';
 
       if (!dbData.tiendas[slugActual].productos) dbData.tiendas[slugActual].productos = [];
 
+      const nuevoObj = { nombre, sub, categoria, tag, precio, features, img };
+
       if (idx >= 0) {
-        dbData.tiendas[slugActual].productos[idx] = { nombre, precio, descripcion, img };
+        dbData.tiendas[slugActual].productos[idx] = nuevoObj;
       } else {
-        dbData.tiendas[slugActual].productos.push({ nombre, precio, descripcion, img });
+        dbData.tiendas[slugActual].productos.push(nuevoObj);
       }
 
       await persistir();
@@ -552,7 +609,8 @@
       document.getElementById('prod-edit-idx').value = "-1";
       document.getElementById('prod-nombre').value = '';
       document.getElementById('prod-precio').value = '';
-      document.getElementById('prod-desc').value = '';
+      document.getElementById('prod-tag').value = '';
+      document.getElementById('prod-features').value = '';
       document.getElementById('prod-file').value = '';
       document.getElementById('prod-preview-img').style.display = 'none';
       document.getElementById('btn-guardar-prod').innerText = "AGREGAR SERVICIO AL CATÁLOGO";
@@ -566,6 +624,23 @@
         await persistir();
         renderProductos();
       }
+    }
+
+    async function guardarTextos() {
+      dbData.tiendas[slugActual].textos = {
+        pill: document.getElementById('txt-pill').value.trim() || "✦ ATENCIÓN 24/7 ✦",
+        title1: document.getElementById('txt-title-1').value.trim() || "TU TIENDA DE",
+        title2: document.getElementById('txt-title-2').value.trim() || "SOFTWARE",
+        sub: document.getElementById('txt-sub').value.trim() || "Proveedor garantizado · Activación inmediata · Los mejores precios",
+        currency: document.getElementById('txt-currency').value.trim() || "$",
+        btnBuy: document.getElementById('txt-btn-buy').value.trim() || "Comprar por WhatsApp",
+        stat2: document.getElementById('txt-stat-2').value.trim() || "24/7 Soporte",
+        stat3: document.getElementById('txt-stat-3').value.trim() || "⚡ Inmediato"
+      };
+
+      await persistir();
+      alert('¡Textos y frases del catálogo actualizados con éxito!');
+      renderProductos();
     }
 
     async function guardarAjustesTienda() {
@@ -582,16 +657,6 @@
       alert('¡Ajustes de tienda y logo actualizados!');
       document.getElementById('dash-title').innerText = nombre;
       if (tempLogoBase64) document.getElementById('dash-logo').src = tempLogoBase64;
-    }
-
-    async function guardarTema() {
-      const primary = document.getElementById('theme-primary').value;
-      const secondary = document.getElementById('theme-secondary').value;
-      const bg = document.getElementById('theme-bg').value;
-
-      dbData.tiendas[slugActual].tema = { primary, secondary, bg };
-      await persistir();
-      alert('¡Colores del catálogo personalizados con éxito!');
     }
 
     async function guardarMetodosPago() {
