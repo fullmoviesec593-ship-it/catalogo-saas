@@ -11,7 +11,8 @@ const PORT = process.env.PORT || 3000;
 const DB_FILE = path.join(__dirname, 'database.json');
 
 app.use(cors());
-app.use(express.json({ limit: '25mb' }));
+app.use(express.json({ limit: '50mb' }));
+app.use(express.urlencoded({ limit: '50mb', extended: true }));
 app.use(express.static(__dirname));
 
 let dbFirestore = null;
@@ -69,7 +70,7 @@ function writeLocalDB(data) {
   } catch (e) {}
 }
 
-// OBTENER BASE DE DATOS COMPLETA
+// OBTENER BASE DE DATOS
 app.get('/api/db', async (req, res) => {
   if (dbFirestore) {
     try {
@@ -91,11 +92,11 @@ app.get('/api/db', async (req, res) => {
       return res.json({
         superadmin,
         revendedores,
-        usuarios: revendedores, // compatibilidad total
+        usuarios: revendedores,
         tiendas
       });
     } catch (err) {
-      console.error("Error leyendo colecciones Firestore:", err.message);
+      console.error("Error leyendo Firestore:", err.message);
     }
   }
   const local = readLocalDB();
@@ -103,13 +104,53 @@ app.get('/api/db', async (req, res) => {
   res.json(local);
 });
 
-// GUARDAR / CREAR REVENDEDOR INDIVIDUAL
+// GUARDAR DATOS DE LA TIENDA DEL REVENDEDOR (ATÓMICO Y DIRECTO)
+app.post('/api/tienda/guardar', async (req, res) => {
+  try {
+    const { slug, tienda } = req.body;
+    if (!slug || !tienda) {
+      return res.status(400).json({ error: "Faltan parámetros requeridos (slug o tienda)" });
+    }
+
+    // Respaldo local
+    const local = readLocalDB();
+    if (!local.tiendas) local.tiendas = {};
+    local.tiendas[slug] = Object.assign(local.tiendas[slug] || {}, tienda);
+    
+    // Si viene nombre o whatsapp, sincronizar con el revendedor también
+    if (!local.revendedores) local.revendedores = {};
+    if (local.revendedores[slug]) {
+      if (tienda.nombre) local.revendedores[slug].nombre = tienda.nombre;
+      if (tienda.whatsapp) local.revendedores[slug].whatsapp = tienda.whatsapp;
+    }
+    writeLocalDB(local);
+
+    // Guardado persistente individual en Firestore
+    if (dbFirestore) {
+      await dbFirestore.collection('saas_tiendas').doc(slug).set(tienda, { merge: true });
+      
+      const updateRev = {};
+      if (tienda.nombre) updateRev.nombre = tienda.nombre;
+      if (tienda.whatsapp) updateRev.whatsapp = tienda.whatsapp;
+      if (Object.keys(updateRev).length > 0) {
+        await dbFirestore.collection('saas_revendedores').doc(slug).set(updateRev, { merge: true });
+      }
+      console.log(`[Firestore] Tienda guardada exitosamente: ${slug}`);
+    }
+
+    res.json({ success: true, slug });
+  } catch (err) {
+    console.error("Error guardando tienda:", err.message);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// GUARDAR REVENDEDOR (SUPERADMIN)
 app.post('/api/revendedor/guardar', async (req, res) => {
   try {
     const { slug, revendedor, tienda } = req.body;
     if (!slug) return res.status(400).json({ error: "Falta slug" });
 
-    // Guardar en copia local
     const local = readLocalDB();
     if (!local.revendedores) local.revendedores = {};
     if (!local.tiendas) local.tiendas = {};
@@ -117,13 +158,11 @@ app.post('/api/revendedor/guardar', async (req, res) => {
     if (tienda) local.tiendas[slug] = tienda;
     writeLocalDB(local);
 
-    // Guardar en Firestore como documentos individuales
     if (dbFirestore) {
       await dbFirestore.collection('saas_revendedores').doc(slug).set(revendedor, { merge: true });
       if (tienda) {
         await dbFirestore.collection('saas_tiendas').doc(slug).set(tienda, { merge: true });
       }
-      console.log(`[Firestore] Revendedor guardado con éxito: ${slug}`);
     }
 
     res.json({ success: true, slug });
@@ -133,7 +172,7 @@ app.post('/api/revendedor/guardar', async (req, res) => {
   }
 });
 
-// ELIMINAR REVENDEDOR INDIVIDUAL
+// ELIMINAR REVENDEDOR (SUPERADMIN)
 app.post('/api/revendedor/eliminar', async (req, res) => {
   try {
     const { slug } = req.body;
@@ -147,7 +186,6 @@ app.post('/api/revendedor/eliminar', async (req, res) => {
     if (dbFirestore) {
       await dbFirestore.collection('saas_revendedores').doc(slug).delete();
       await dbFirestore.collection('saas_tiendas').doc(slug).delete();
-      console.log(`[Firestore] Revendedor eliminado con éxito: ${slug}`);
     }
 
     res.json({ success: true, slug });
@@ -157,7 +195,7 @@ app.post('/api/revendedor/eliminar', async (req, res) => {
   }
 });
 
-// RUTA GENERAL DE GUARDADO (COMPATIBILIDAD)
+// RUTA GENERAL DE GUARDADO
 app.post('/api/save', async (req, res) => {
   try {
     const data = req.body;
@@ -165,23 +203,16 @@ app.post('/api/save', async (req, res) => {
 
     if (dbFirestore) {
       const batch = dbFirestore.batch();
-      
       const revs = data.revendedores || data.usuarios || {};
       for (const slug of Object.keys(revs)) {
-        const ref = dbFirestore.collection('saas_revendedores').doc(slug);
-        batch.set(ref, revs[slug], { merge: true });
+        batch.set(dbFirestore.collection('saas_revendedores').doc(slug), revs[slug], { merge: true });
       }
-
       const tiendas = data.tiendas || {};
       for (const slug of Object.keys(tiendas)) {
-        const ref = dbFirestore.collection('saas_tiendas').doc(slug);
-        batch.set(ref, tiendas[slug], { merge: true });
+        batch.set(dbFirestore.collection('saas_tiendas').doc(slug), tiendas[slug], { merge: true });
       }
-
       await batch.commit();
-      console.log("[Firestore] Batch completado.");
     }
-
     res.json({ success: true });
   } catch (err) {
     console.error("Error en /api/save:", err.message);

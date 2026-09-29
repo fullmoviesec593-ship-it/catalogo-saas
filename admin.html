@@ -88,7 +88,7 @@
       align-items: center;
     }
     .product-img { width: 65px; height: 65px; border-radius: 8px; object-fit: cover; border: 1px solid #334155; }
-    .preview-logo { width: 70px; height: 70px; border-radius: 50%; object-fit: cover; border: 2px solid var(--primary); margin: 8px 0; }
+    .preview-logo { width: 75px; height: 75px; border-radius: 50%; object-fit: cover; border: 2px solid var(--primary); margin: 8px 0; }
 
     .badge-dias {
       display: inline-flex;
@@ -163,14 +163,44 @@
 
     <!-- Pestañas -->
     <div class="nav-tabs">
-      <div id="tab-btn-prods" class="nav-tab active" onclick="cambiarTab('prods')">📦 SERVICIOS</div>
+      <div id="tab-btn-shop" class="nav-tab active" onclick="cambiarTab('shop')">⚙️ TIENDA & LOGO</div>
+      <div id="tab-btn-prods" class="nav-tab" onclick="cambiarTab('prods')">📦 SERVICIOS</div>
       <div id="tab-btn-texts" class="nav-tab" onclick="cambiarTab('texts')">📝 TEXTOS Y FRASES</div>
-      <div id="tab-btn-shop" class="nav-tab" onclick="cambiarTab('shop')">⚙️ TIENDA & LOGO</div>
       <div id="tab-btn-payments" class="nav-tab" onclick="cambiarTab('payments')">💳 PAGOS</div>
     </div>
 
-    <!-- PESTAÑA 1: SERVICIOS -->
-    <div id="tab-prods">
+    <!-- PESTAÑA: TIENDA & LOGO -->
+    <div id="tab-shop">
+      <div style="background:#080d1a; padding:16px; border-radius:12px; border:1px solid var(--border);">
+        <h4 style="color:var(--primary); margin-top:0;">Datos Personales y Logo de la Tienda</h4>
+        <div class="form-group">
+          <label>Nombre Comercial de la Tienda</label>
+          <input type="text" id="shop-nombre" placeholder="Ej: Full Movies Ec">
+        </div>
+        <div class="form-group">
+          <label>Número de WhatsApp para Pedidos (con código de país, ej: 593982766054)</label>
+          <input type="text" id="shop-whatsapp" placeholder="593982766054">
+        </div>
+        
+        <div class="form-group">
+          <label>Subir Logo de tu Tienda (desde galería)</label>
+          <input type="file" id="shop-logo-file" accept="image/*" onchange="convertirImagenABase64(this, 'shop-logo-preview')">
+          <div style="text-align:center; margin-top:8px;">
+            <img id="shop-logo-preview" class="preview-logo" src="https://via.placeholder.com/80" alt="Logo Tienda">
+          </div>
+        </div>
+
+        <button id="btn-save-shop" class="btn-primary" onclick="guardarAjustesTienda()">GUARDAR AJUSTES DE TIENDA</button>
+
+        <div style="margin-top:16px; background:#111d33; padding:12px; border-radius:8px;">
+          <label style="color:#38bdf8;">Enlace de tu Catálogo Público:</label>
+          <a id="shop-public-link" href="#" target="_blank" style="color:var(--accent); font-weight:bold; word-break:break-all;"></a>
+        </div>
+      </div>
+    </div>
+
+    <!-- PESTAÑA: SERVICIOS -->
+    <div id="tab-prods" class="hidden">
       <div style="background:#080d1a; padding:16px; border-radius:12px; border:1px solid var(--border); margin-bottom:20px;">
         <h4 style="color:var(--accent); margin-top:0;">➕ Agregar / Editar Servicio</h4>
         <input type="hidden" id="prod-edit-idx" value="-1">
@@ -213,17 +243,14 @@
       <div id="lista-productos"></div>
     </div>
 
-    <!-- PESTAÑA 2: TEXTOS DEL CATÁLOGO -->
+    <!-- PESTAÑA: TEXTOS -->
     <div id="tab-texts" class="hidden">
       <div style="background:#080d1a; padding:16px; border-radius:12px; border:1px solid var(--border);">
         <h4 style="color:var(--primary); margin-top:0;">Personalizar Palabras y Textos del Catálogo</h4>
-        <p style="font-size:13px; color:#94a3b8; margin-bottom:16px;">Edita cualquier frase de tu catálogo para adaptarlo a tu marca o nicho.</p>
-
         <div class="form-group">
-          <label>Insignia Superior (Pequeña Píldora)</label>
+          <label>Insignia Superior</label>
           <input type="text" id="txt-pill" placeholder="✦ ATENCIÓN 24/7 ✦">
         </div>
-
         <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
           <div class="form-group">
             <label>Título Línea 1</label>
@@ -234,90 +261,39 @@
             <input type="text" id="txt-title-2" placeholder="SOFTWARE o STREAMING">
           </div>
         </div>
-
         <div class="form-group">
           <label>Subtítulo de Garantía / Entrega</label>
           <input type="text" id="txt-sub" placeholder="Proveedor garantizado · Activación inmediata · Los mejores precios">
         </div>
-
         <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
           <div class="form-group">
             <label>Símbolo de Moneda</label>
-            <input type="text" id="txt-currency" placeholder="$ o BOB o USD">
+            <input type="text" id="txt-currency" placeholder="$">
           </div>
           <div class="form-group">
             <label>Texto Botón Comprar</label>
             <input type="text" id="txt-btn-buy" placeholder="Comprar por WhatsApp">
           </div>
         </div>
-
-        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
-          <div class="form-group">
-            <label>Texto Estadística 2</label>
-            <input type="text" id="txt-stat-2" placeholder="24/7 Soporte">
-          </div>
-          <div class="form-group">
-            <label>Texto Estadística 3</label>
-            <input type="text" id="txt-stat-3" placeholder="⚡ Inmediato">
-          </div>
-        </div>
-
-        <button class="btn-primary" onclick="guardarTextos()">GUARDAR TEXTOS DEL CATÁLOGO</button>
+        <button id="btn-save-texts" class="btn-primary" onclick="guardarTextos()">GUARDAR TEXTOS DEL CATÁLOGO</button>
       </div>
     </div>
 
-    <!-- PESTAÑA 3: TIENDA & LOGO -->
-    <div id="tab-shop" class="hidden">
-      <div style="background:#080d1a; padding:16px; border-radius:12px; border:1px solid var(--border);">
-        <h4 style="color:var(--primary); margin-top:0;">Datos de la Tienda</h4>
-        <div class="form-group">
-          <label>Nombre Comercial de la Tienda</label>
-          <input type="text" id="shop-nombre">
-        </div>
-        <div class="form-group">
-          <label>Número de WhatsApp para Pedidos (con código país, ej: 593999999999)</label>
-          <input type="text" id="shop-whatsapp">
-        </div>
-        
-        <div class="form-group">
-          <label>Logo de tu Tienda</label>
-          <input type="file" id="shop-logo-file" accept="image/*" onchange="convertirImagenABase64(this, 'shop-logo-preview')">
-          <div style="text-align:center;">
-            <img id="shop-logo-preview" class="preview-logo" src="https://via.placeholder.com/80" alt="Logo">
-          </div>
-        </div>
-
-        <button class="btn-primary" onclick="guardarAjustesTienda()">GUARDAR AJUSTES DE TIENDA</button>
-
-        <div style="margin-top:16px; background:#111d33; padding:12px; border-radius:8px;">
-          <label style="color:#38bdf8;">Enlace de tu Catálogo Público:</label>
-          <a id="shop-public-link" href="#" target="_blank" style="color:var(--accent); font-weight:bold; word-break:break-all;"></a>
-        </div>
-      </div>
-    </div>
-
-    <!-- PESTAÑA 4: MÉTODOS DE PAGO -->
+    <!-- PESTAÑA: PAGOS -->
     <div id="tab-payments" class="hidden">
       <div style="background:#080d1a; padding:16px; border-radius:12px; border:1px solid var(--border);">
         <h4 style="color:var(--accent); margin-top:0;">Tus Cuentas Bancarias y Métodos de Pago</h4>
-        <p style="font-size:13px; color:#94a3b8;">Esta información se le mostrará a tu cliente al presionar <b>"Comprar por WhatsApp"</b>.</p>
-
         <div class="form-group">
-          <label>Detalle de tus Métodos de Pago (Bancos, Transferencias, DeUna, Binance, Cédula, etc.):</label>
+          <label>Detalle de tus Métodos de Pago:</label>
           <textarea id="shop-payments" rows="8" placeholder="Ejemplo:
 🏦 BANCO PICHINCHA
 • Ahorros: 2200000000
 • Titular: Tu Nombre
 • CI: 1300000000
 
-📱 DEUNA / PAGO DIRECTO
-• 0999999999
-
-🟡 BINANCE PAY (USDT)
-• Pay ID: 123456789"></textarea>
+📱 DEUNA: 0999999999"></textarea>
         </div>
-
-        <button class="btn-success" onclick="guardarMetodosPago()">GUARDAR MÉTODOS DE PAGO</button>
+        <button id="btn-save-payments" class="btn-success" onclick="guardarMetodosPago()">GUARDAR MÉTODOS DE PAGO</button>
       </div>
     </div>
 
@@ -405,10 +381,7 @@
       } else if (dias <= 0) {
         tag.className = 'badge-dias red';
         tag.innerText = dias === 0 ? '⚠️ TU SERVICIO VENCE HOY' : `⛔ SERVICIO VENCIDO (${Math.abs(dias)}d)`;
-      } else if (dias === 1) {
-        tag.className = 'badge-dias red';
-        tag.innerText = '⚠️ TE QUEDA 1 DÍA RESTANTE';
-      } else if (dias <= 7) {
+      } else if (dias <= 5) {
         tag.className = 'badge-dias yellow';
         tag.innerText = `⏳ TE QUEDAN ${dias} DÍAS RESTANTES`;
       } else {
@@ -480,9 +453,7 @@
             title2: "SOFTWARE",
             sub: "Proveedor garantizado · Activación inmediata · Los mejores precios",
             currency: "$",
-            btnBuy: "Comprar por WhatsApp",
-            stat2: "24/7 Soporte",
-            stat3: "⚡ Inmediato"
+            btnBuy: "Comprar por WhatsApp"
           }
         };
       }
@@ -491,7 +462,7 @@
 
       if (!tienda.productos || tienda.productos.length === 0) {
         tienda.productos = JSON.parse(JSON.stringify(SERVICIOS_DEFAULT));
-        persistir();
+        persistirTienda();
       }
 
       document.getElementById('dash-title').innerText = tienda.nombre || slugActual;
@@ -504,7 +475,6 @@
         document.getElementById('shop-logo-preview').src = tienda.logo;
       }
 
-      // Cargar Textos Editables
       const txt = tienda.textos || {};
       document.getElementById('txt-pill').value = txt.pill || "✦ ATENCIÓN 24/7 ✦";
       document.getElementById('txt-title-1').value = txt.title1 || "TU TIENDA DE";
@@ -512,8 +482,6 @@
       document.getElementById('txt-sub').value = txt.sub || "Proveedor garantizado · Activación inmediata · Los mejores precios";
       document.getElementById('txt-currency').value = txt.currency || "$";
       document.getElementById('txt-btn-buy').value = txt.btnBuy || "Comprar por WhatsApp";
-      document.getElementById('txt-stat-2').value = txt.stat2 || "24/7 Soporte";
-      document.getElementById('txt-stat-3').value = txt.stat3 || "⚡ Inmediato";
 
       const publicLink = window.location.origin + '/?tienda=' + slugActual;
       const elLink = document.getElementById('shop-public-link');
@@ -525,7 +493,7 @@
     }
 
     function cambiarTab(tab) {
-      ['prods', 'texts', 'shop', 'payments'].forEach(t => {
+      ['shop', 'prods', 'texts', 'payments'].forEach(t => {
         document.getElementById('tab-' + t).classList.add('hidden');
         document.getElementById('tab-btn-' + t).classList.remove('active');
       });
@@ -546,7 +514,7 @@
           <div style="flex:1;">
             <strong style="color:#fff; font-size:16px;">${p.nombre}</strong>
             <div style="color:var(--accent); font-weight:bold; font-size:15px;">${dbData.tiendas[slugActual]?.textos?.currency || '$'}${p.precio}</div>
-            <small style="color:#94a3b8; font-size:12px;">${p.sub || p.descripcion || ''}</small>
+            <small style="color:#94a3b8; font-size:12px;">${p.sub || ''}</small>
           </div>
           <div style="display:flex; flex-direction:column; gap:6px;">
             <button style="background:#0284c7; color:#fff; padding:6px 10px; font-size:12px;" onclick="cargarEdicionProducto(${idx})">✏️</button>
@@ -564,7 +532,7 @@
       document.getElementById('prod-precio').value = p.precio;
       document.getElementById('prod-cat').value = p.categoria || 'video';
       document.getElementById('prod-tag').value = p.tag || '';
-      document.getElementById('prod-features').value = (p.features && p.features.length) ? p.features.join(', ') : (p.descripcion || '');
+      document.getElementById('prod-features').value = (p.features && p.features.length) ? p.features.join(', ') : '';
       
       const imgPrev = document.getElementById('prod-preview-img');
       if (p.img) {
@@ -573,10 +541,12 @@
         tempImgBase64 = p.img;
       }
       document.getElementById('btn-guardar-prod').innerText = "ACTUALIZAR SERVICIO";
+      cambiarTab('prods');
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
     async function guardarProducto() {
+      const btn = document.getElementById('btn-guardar-prod');
       const idx = parseInt(document.getElementById('prod-edit-idx').value);
       const nombre = document.getElementById('prod-nombre').value.trim();
       const precio = document.getElementById('prod-precio').value.trim();
@@ -588,6 +558,9 @@
         alert('Nombre y precio son obligatorios.');
         return;
       }
+
+      btn.disabled = true;
+      btn.innerText = "⏳ GUARDANDO SERVICIO...";
 
       const features = rawFeatures ? rawFeatures.split(',').map(s => s.trim()).filter(Boolean) : [];
       const sub = categoria === 'musica' ? '1 mes · Música' : '1 mes · Video';
@@ -603,49 +576,44 @@
         dbData.tiendas[slugActual].productos.push(nuevoObj);
       }
 
-      await persistir();
-      alert('¡Servicio guardado exitosamente!');
-      
-      document.getElementById('prod-edit-idx').value = "-1";
-      document.getElementById('prod-nombre').value = '';
-      document.getElementById('prod-precio').value = '';
-      document.getElementById('prod-tag').value = '';
-      document.getElementById('prod-features').value = '';
-      document.getElementById('prod-file').value = '';
-      document.getElementById('prod-preview-img').style.display = 'none';
-      document.getElementById('btn-guardar-prod').innerText = "AGREGAR SERVICIO AL CATÁLOGO";
-      tempImgBase64 = null;
-      renderProductos();
+      const guardado = await persistirTienda();
+      btn.disabled = false;
+      btn.innerText = "AGREGAR SERVICIO AL CATÁLOGO";
+
+      if (guardado) {
+        alert('¡Servicio guardado exitosamente en la nube!');
+        document.getElementById('prod-edit-idx').value = "-1";
+        document.getElementById('prod-nombre').value = '';
+        document.getElementById('prod-precio').value = '';
+        document.getElementById('prod-tag').value = '';
+        document.getElementById('prod-features').value = '';
+        document.getElementById('prod-file').value = '';
+        document.getElementById('prod-preview-img').style.display = 'none';
+        tempImgBase64 = null;
+        renderProductos();
+      }
     }
 
     async function eliminarProducto(idx) {
       if (confirm('¿Deseas eliminar este servicio de tu catálogo?')) {
         dbData.tiendas[slugActual].productos.splice(idx, 1);
-        await persistir();
+        await persistirTienda();
         renderProductos();
       }
     }
 
-    async function guardarTextos() {
-      dbData.tiendas[slugActual].textos = {
-        pill: document.getElementById('txt-pill').value.trim() || "✦ ATENCIÓN 24/7 ✦",
-        title1: document.getElementById('txt-title-1').value.trim() || "TU TIENDA DE",
-        title2: document.getElementById('txt-title-2').value.trim() || "SOFTWARE",
-        sub: document.getElementById('txt-sub').value.trim() || "Proveedor garantizado · Activación inmediata · Los mejores precios",
-        currency: document.getElementById('txt-currency').value.trim() || "$",
-        btnBuy: document.getElementById('txt-btn-buy').value.trim() || "Comprar por WhatsApp",
-        stat2: document.getElementById('txt-stat-2').value.trim() || "24/7 Soporte",
-        stat3: document.getElementById('txt-stat-3').value.trim() || "⚡ Inmediato"
-      };
-
-      await persistir();
-      alert('¡Textos y frases del catálogo actualizados con éxito!');
-      renderProductos();
-    }
-
     async function guardarAjustesTienda() {
+      const btn = document.getElementById('btn-save-shop');
       const nombre = document.getElementById('shop-nombre').value.trim();
       const whatsapp = document.getElementById('shop-whatsapp').value.trim();
+
+      if (!nombre || !whatsapp) {
+        alert('Nombre y número de WhatsApp son obligatorios.');
+        return;
+      }
+
+      btn.disabled = true;
+      btn.innerText = "⏳ GUARDANDO EN LA NUBE...";
 
       dbData.tiendas[slugActual].nombre = nombre;
       dbData.tiendas[slugActual].whatsapp = whatsapp;
@@ -653,40 +621,112 @@
         dbData.tiendas[slugActual].logo = tempLogoBase64;
       }
 
-      await persistir();
-      alert('¡Ajustes de tienda y logo actualizados!');
-      document.getElementById('dash-title').innerText = nombre;
-      if (tempLogoBase64) document.getElementById('dash-logo').src = tempLogoBase64;
+      const guardado = await persistirTienda();
+      btn.disabled = false;
+      btn.innerText = "GUARDAR AJUSTES DE TIENDA";
+
+      if (guardado) {
+        alert('¡Ajustes personales y Logo guardados con éxito!');
+        document.getElementById('dash-title').innerText = nombre;
+        if (tempLogoBase64) document.getElementById('dash-logo').src = tempLogoBase64;
+      }
+    }
+
+    async function guardarTextos() {
+      const btn = document.getElementById('btn-save-texts');
+      btn.disabled = true;
+      btn.innerText = "⏳ GUARDANDO...";
+
+      dbData.tiendas[slugActual].textos = {
+        pill: document.getElementById('txt-pill').value.trim() || "✦ ATENCIÓN 24/7 ✦",
+        title1: document.getElementById('txt-title-1').value.trim() || "TU TIENDA DE",
+        title2: document.getElementById('txt-title-2').value.trim() || "SOFTWARE",
+        sub: document.getElementById('txt-sub').value.trim() || "Proveedor garantizado · Activación inmediata · Los mejores precios",
+        currency: document.getElementById('txt-currency').value.trim() || "$",
+        btnBuy: document.getElementById('txt-btn-buy').value.trim() || "Comprar por WhatsApp"
+      };
+
+      const guardado = await persistirTienda();
+      btn.disabled = false;
+      btn.innerText = "GUARDAR TEXTOS DEL CATÁLOGO";
+
+      if (guardado) {
+        alert('¡Textos y frases guardados con éxito!');
+      }
     }
 
     async function guardarMetodosPago() {
+      const btn = document.getElementById('btn-save-payments');
+      btn.disabled = true;
+      btn.innerText = "⏳ GUARDANDO...";
+
       const metodos = document.getElementById('shop-payments').value.trim();
       dbData.tiendas[slugActual].metodosPago = metodos;
-      await persistir();
-      alert('¡Métodos de pago guardados correctamente!');
+
+      const guardado = await persistirTienda();
+      btn.disabled = false;
+      btn.innerText = "GUARDAR MÉTODOS DE PAGO";
+
+      if (guardado) {
+        alert('¡Métodos de pago guardados correctamente!');
+      }
     }
 
     function convertirImagenABase64(input, previewId) {
       if (input.files && input.files[0]) {
+        const file = input.files[0];
         const reader = new FileReader();
         reader.onload = function(e) {
-          const b64 = e.target.result;
-          const prev = document.getElementById(previewId);
-          prev.src = b64;
-          prev.style.display = 'block';
-          if (previewId === 'prod-preview-img') tempImgBase64 = b64;
-          if (previewId === 'shop-logo-preview') tempLogoBase64 = b64;
+          const img = new Image();
+          img.onload = function() {
+            // Comprimir imagen automáticamente para optimizar carga y Firestore
+            const canvas = document.createElement('canvas');
+            const MAX_WIDTH = 500;
+            const scaleSize = MAX_WIDTH / img.width;
+            canvas.width = (img.width > MAX_WIDTH) ? MAX_WIDTH : img.width;
+            canvas.height = (img.width > MAX_WIDTH) ? (img.height * scaleSize) : img.height;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+            const b64 = canvas.toDataURL('image/jpeg', 0.82);
+
+            const prev = document.getElementById(previewId);
+            prev.src = b64;
+            prev.style.display = 'block';
+
+            if (previewId === 'prod-preview-img') tempImgBase64 = b64;
+            if (previewId === 'shop-logo-preview') tempLogoBase64 = b64;
+          };
+          img.src = e.target.result;
         };
-        reader.readAsDataURL(input.files[0]);
+        reader.readAsDataURL(file);
       }
     }
 
-    async function persistir() {
-      await fetch('/api/save', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(dbData)
-      });
+    // PERSISTENCIA ATÓMICA DE TIENDA DIRECTA A FIRESTORE
+    async function persistirTienda() {
+      try {
+        const payload = {
+          slug: slugActual,
+          tienda: dbData.tiendas[slugActual]
+        };
+
+        const res = await fetch('/api/tienda/guardar', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+
+        const data = await res.json();
+        if (data.success) {
+          return true;
+        } else {
+          alert('Error al guardar: ' + (data.error || 'Respuesta inválida'));
+          return false;
+        }
+      } catch (err) {
+        alert('Error de conexión al guardar: ' + err.message);
+        return false;
+      }
     }
 
     verificarSesionGuardada();
