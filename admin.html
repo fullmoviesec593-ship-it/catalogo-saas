@@ -12,6 +12,8 @@
       --bg: #070a12;
       --card-bg: #0f172a;
       --border: #1e293b;
+      --alert-red: #ef4444;
+      --alert-yellow: #eab308;
     }
     * { box-sizing: border-box; font-family: 'Rajdhani', sans-serif; }
     body {
@@ -87,11 +89,45 @@
     }
     .product-img { width: 65px; height: 65px; border-radius: 8px; object-fit: cover; border: 1px solid #334155; }
     .preview-logo { width: 70px; height: 70px; border-radius: 50%; object-fit: cover; border: 2px solid var(--primary); margin: 8px 0; }
+
+    /* ESTILOS DEL CONTADOR DE DÍAS */
+    .badge-dias {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-family: 'Orbitron', sans-serif;
+      font-size: 11px;
+      font-weight: 800;
+      padding: 4px 9px;
+      border-radius: 6px;
+      letter-spacing: 0.5px;
+      margin-top: 4px;
+    }
+    .badge-dias.green {
+      background: rgba(34, 197, 94, 0.15);
+      color: #4ade80;
+      border: 1px solid #22c55e;
+    }
+    .badge-dias.yellow {
+      background: rgba(234, 179, 8, 0.18);
+      color: #facc15;
+      border: 1px solid #eab308;
+    }
+    .badge-dias.red {
+      background: rgba(239, 68, 68, 0.2);
+      color: #f87171;
+      border: 1px solid #ef4444;
+      animation: pulseAlert 1.6s infinite;
+    }
+    @keyframes pulseAlert {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.55; }
+    }
   </style>
 </head>
 <body>
 
-  <!-- LOGIN REVENDEDOR -->
+  <!-- PANTALLA 1: LOGIN -->
   <div id="login-section" class="card" style="max-width:440px;">
     <h2 style="text-align:center;">💼 PANEL REVENDEDOR</h2>
     <p style="text-align:center; color:#94a3b8; font-size:14px; margin-bottom:20px;">Ingresa tus credenciales para gestionar tu catálogo</p>
@@ -107,14 +143,17 @@
     <button class="btn-primary" onclick="iniciarSesion()">INGRESAR A MI PANEL</button>
   </div>
 
-  <!-- DASHBOARD REVENDEDOR -->
+  <!-- PANTALLA 2: DASHBOARD -->
   <div id="dashboard-section" class="card hidden">
-    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px; border-bottom:1px solid var(--border); padding-bottom:12px;">
+    <!-- CABECERA CON NOMBRE Y CONTADOR DE DÍAS RESTANTES -->
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px; border-bottom:1px solid var(--border); padding-bottom:12px; gap:8px;">
       <div style="display:flex; align-items:center; gap:10px;">
-        <img id="dash-logo" src="https://via.placeholder.com/40" style="width:40px; height:40px; border-radius:50%; object-fit:cover; border:1px solid var(--primary);" alt="Logo">
+        <img id="dash-logo" src="https://via.placeholder.com/40" style="width:42px; height:42px; border-radius:50%; object-fit:cover; border:1px solid var(--primary);" alt="Logo">
         <div>
           <span id="dash-title" style="font-family:'Orbitron'; font-weight:bold; font-size:16px; color:#fff;">Mi Tienda</span>
-          <div style="font-size:12px; color:var(--accent);">● Panel Activo</div>
+          <div>
+            <span id="dash-countdown" class="badge-dias green">⏳ Calculando días...</span>
+          </div>
         </div>
       </div>
       <button onclick="location.reload()" style="width:auto; padding:6px 12px; background:#dc2626; color:#fff; font-size:12px;">Salir</button>
@@ -270,6 +309,42 @@
       }
     }
 
+    function calcularDiasRestantes(fechaVencimiento) {
+      if (!fechaVencimiento) return 999;
+      const ahora = new Date();
+      const vence = new Date(fechaVencimiento);
+      const diffMs = vence.getTime() - ahora.getTime();
+      return Math.ceil(diffMs / (1000 * 60 * 60 * 24));
+    }
+
+    function actualizarContadorDias() {
+      const tag = document.getElementById('dash-countdown');
+      if (!revendedorActual || !revendedorActual.vencimiento) {
+        tag.className = 'badge-dias green';
+        tag.innerText = '● SERVICIO ACTIVO';
+        return;
+      }
+
+      const dias = calcularDiasRestantes(revendedorActual.vencimiento);
+
+      if (revendedorActual.activo === false) {
+        tag.className = 'badge-dias red';
+        tag.innerText = '⛔ CUENTA SUSPENDIDA';
+      } else if (dias <= 0) {
+        tag.className = 'badge-dias red';
+        tag.innerText = dias === 0 ? '⚠️ TU SERVICIO VENCE HOY' : `⛔ SERVICIO VENCIDO (${Math.abs(dias)}d)`;
+      } else if (dias === 1) {
+        tag.className = 'badge-dias red';
+        tag.innerText = '⚠️ TE QUEDA 1 DÍA RESTANTE';
+      } else if (dias <= 7) {
+        tag.className = 'badge-dias yellow';
+        tag.innerText = `⏳ TE QUEDAN ${dias} DÍAS RESTANTES`;
+      } else {
+        tag.className = 'badge-dias green';
+        tag.innerText = `✨ TE QUEDAN ${dias} DÍAS RESTANTES`;
+      }
+    }
+
     async function iniciarSesion() {
       const email = document.getElementById('email').value.trim();
       const pass = document.getElementById('password').value.trim();
@@ -338,6 +413,7 @@
       elLink.href = publicLink;
       elLink.innerText = publicLink;
 
+      actualizarContadorDias();
       renderProductos();
     }
 
