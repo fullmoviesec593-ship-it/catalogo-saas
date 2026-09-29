@@ -123,6 +123,27 @@
       0%, 100% { opacity: 1; }
       50% { opacity: 0.55; }
     }
+
+    /* CASILLA DE RECORDAR SESIÓN */
+    .checkbox-container {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin: 14px 0 18px 0;
+      cursor: pointer;
+      user-select: none;
+    }
+    .checkbox-container input {
+      width: 18px;
+      height: 18px;
+      accent-color: #38bdf8;
+      cursor: pointer;
+    }
+    .checkbox-label {
+      font-size: 14px;
+      color: #cbd5e1;
+      font-weight: 600;
+    }
   </style>
 </head>
 <body>
@@ -140,12 +161,19 @@
       <label>Contraseña</label>
       <input type="password" id="password" placeholder="Tu clave de acceso">
     </div>
+
+    <!-- CASILLA PARA MANTENER SESIÓN -->
+    <div class="checkbox-container" onclick="toggleCheckbox()">
+      <input type="checkbox" id="remember-session" checked onclick="event.stopPropagation()">
+      <span class="checkbox-label">Mantener la sesión iniciada en este dispositivo</span>
+    </div>
+
     <button class="btn-primary" onclick="iniciarSesion()">INGRESAR A MI PANEL</button>
   </div>
 
   <!-- PANTALLA 2: DASHBOARD -->
   <div id="dashboard-section" class="card hidden">
-    <!-- CABECERA CON NOMBRE Y CONTADOR DE DÍAS RESTANTES -->
+    <!-- CABECERA CON NOMBRE, LOGO Y CONTADOR DE DÍAS -->
     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px; border-bottom:1px solid var(--border); padding-bottom:12px; gap:8px;">
       <div style="display:flex; align-items:center; gap:10px;">
         <img id="dash-logo" src="https://via.placeholder.com/40" style="width:42px; height:42px; border-radius:50%; object-fit:cover; border:1px solid var(--primary);" alt="Logo">
@@ -156,7 +184,7 @@
           </div>
         </div>
       </div>
-      <button onclick="location.reload()" style="width:auto; padding:6px 12px; background:#dc2626; color:#fff; font-size:12px;">Salir</button>
+      <button onclick="cerrarSesion()" style="width:auto; padding:6px 12px; background:#dc2626; color:#fff; font-size:12px;">Salir</button>
     </div>
 
     <!-- Pestañas -->
@@ -309,6 +337,11 @@
       }
     }
 
+    function toggleCheckbox() {
+      const chk = document.getElementById('remember-session');
+      chk.checked = !chk.checked;
+    }
+
     function calcularDiasRestantes(fechaVencimiento) {
       if (!fechaVencimiento) return 999;
       const ahora = new Date();
@@ -345,9 +378,10 @@
       }
     }
 
-    async function iniciarSesion() {
-      const email = document.getElementById('email').value.trim();
-      const pass = document.getElementById('password').value.trim();
+    async function iniciarSesion(autoEmail = null, autoPass = null) {
+      const email = autoEmail || document.getElementById('email').value.trim();
+      const pass = autoPass || document.getElementById('password').value.trim();
+      const recordar = document.getElementById('remember-session').checked;
 
       if (!dbData) await cargarBD();
 
@@ -364,11 +398,35 @@
           return;
         }
 
+        // Guardar sesión si marcó recordar
+        if (recordar || autoEmail) {
+          localStorage.setItem('revendedor_session', JSON.stringify({ email, pass }));
+        }
+
         document.getElementById('login-section').classList.add('hidden');
         document.getElementById('dashboard-section').classList.remove('hidden');
         cargarTienda();
       } else {
-        alert('Correo o contraseña incorrectos.');
+        if (!autoEmail) alert('Correo o contraseña incorrectos.');
+      }
+    }
+
+    function cerrarSesion() {
+      localStorage.removeItem('revendedor_session');
+      location.reload();
+    }
+
+    // Auto-login al abrir la página si existe sesión guardada
+    async function verificarSesionGuardada() {
+      await cargarBD();
+      const saved = localStorage.getItem('revendedor_session');
+      if (saved) {
+        try {
+          const { email, pass } = JSON.parse(saved);
+          if (email && pass) {
+            iniciarSesion(email, pass);
+          }
+        } catch (e) {}
       }
     }
 
@@ -566,7 +624,7 @@
       });
     }
 
-    cargarBD();
+    verificarSesionGuardada();
   </script>
 </body>
 </html>
