@@ -120,7 +120,6 @@
       text-align: center;
     }
 
-    /* MODAL DE EDICIÓN */
     .modal-overlay {
       position: fixed;
       top: 0; left: 0; width: 100%; height: 100%;
@@ -146,7 +145,6 @@
 <body>
 
   <div class="container">
-    <!-- PANTALLA DE LOGIN -->
     <div id="login-sec" class="card" style="max-width:440px; margin:40px auto;">
       <h2 style="text-align:center;">👑 SÚPER ADMIN</h2>
       <p style="text-align:center; color:#94a3b8; font-size:14px; margin-bottom:20px;">Control Maestro de Revendedores SaaS</p>
@@ -161,7 +159,6 @@
       <button class="btn-primary" onclick="login()">INGRESAR AL SISTEMA</button>
     </div>
 
-    <!-- PANEL PRINCIPAL -->
     <div id="dash-sec" class="hidden">
       <div class="card" style="display:flex; justify-content:space-between; align-items:center;">
         <div>
@@ -176,7 +173,7 @@
         <div id="tab-btn-add" class="nav-tab" onclick="cambiarTab('add')">➕ REGISTRAR NUEVO CLIENTE</div>
       </div>
 
-      <!-- PESTAÑA: LISTA -->
+      <!-- LISTA -->
       <div id="tab-list">
         <div class="card">
           <input type="text" id="search-input" placeholder="🔍 Buscar por nombre, tienda o slug..." oninput="filtrarLista()" style="margin-bottom:16px;">
@@ -184,7 +181,7 @@
         </div>
       </div>
 
-      <!-- PESTAÑA: REGISTRAR -->
+      <!-- REGISTRAR -->
       <div id="tab-add" class="hidden">
         <div class="card">
           <h3>➕ Registrar Revendedor Directo a Firestore</h3>
@@ -227,7 +224,7 @@
     </div>
   </div>
 
-  <!-- MODAL EDITAR REVENDEDOR -->
+  <!-- MODAL EDITAR -->
   <div id="modal-edit" class="modal-overlay hidden">
     <div class="modal-box">
       <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
@@ -376,7 +373,7 @@
         }
 
         const catUrl = `${window.location.origin}/?tienda=${slug}`;
-        const panelUrl = `${window.location.origin}/admin.html`;
+        const panelUrl = `${window.location.origin}/admin.html?tienda=${slug}`;
 
         return `
           <div class="client-card">
@@ -467,7 +464,7 @@
           cerrarModalEdit();
           renderLista();
         } else {
-          alert('Error al guardar cambios: ' + (data.error || 'Respuesta inválida'));
+          alert('Error al guardar: ' + (data.error || 'Respuesta inválida'));
         }
       } catch (e) {
         alert('Error de conexión: ' + e.message);

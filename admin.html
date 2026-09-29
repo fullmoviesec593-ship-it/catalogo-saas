@@ -127,7 +127,7 @@
   <!-- LOGIN -->
   <div id="login-section" class="card" style="max-width:440px;">
     <h2 style="text-align:center;">💼 PANEL REVENDEDOR</h2>
-    <p style="text-align:center; color:#94a3b8; font-size:14px; margin-bottom:20px;">Ingresa tus credenciales para gestionar tu catálogo</p>
+    <p id="login-submsg" style="text-align:center; color:#94a3b8; font-size:14px; margin-bottom:20px;">Ingresa tus credenciales para gestionar tu catálogo</p>
     
     <div class="form-group">
       <label>Correo Electrónico</label>
@@ -175,7 +175,7 @@
         <h4 style="color:var(--primary); margin-top:0;">Datos Personales y Logo de la Tienda</h4>
         <div class="form-group">
           <label>Nombre Comercial de la Tienda</label>
-          <input type="text" id="shop-nombre" placeholder="Ej: Full Movies Ec">
+          <input type="text" id="shop-nombre" placeholder="Ej: Mi Tienda Online">
         </div>
         <div class="form-group">
           <label>Número de WhatsApp para Pedidos (con código de país, ej: 593982766054)</label>
@@ -398,12 +398,13 @@
       if (!dbData) await cargarBD();
 
       const revendedores = dbData.revendedores || dbData.usuarios || {};
-      slugActual = Object.keys(revendedores).find(slug => {
+      const foundSlug = Object.keys(revendedores).find(slug => {
         const r = revendedores[slug];
         return (r.email === email || r.correo === email) && (r.password === pass || r.clave === pass);
       });
 
-      if (slugActual) {
+      if (foundSlug) {
+        slugActual = foundSlug;
         revendedorActual = revendedores[slugActual];
         if (revendedorActual.activo === false) {
           alert('Tu cuenta está suspendida. Contacta al Súper Administrador.');
@@ -411,7 +412,7 @@
         }
 
         if (recordar || autoEmail) {
-          localStorage.setItem('revendedor_session', JSON.stringify({ email, pass }));
+          localStorage.setItem('revendedor_session', JSON.stringify({ slug: slugActual, email, pass }));
         }
 
         document.getElementById('login-section').classList.add('hidden');
@@ -424,11 +425,48 @@
 
     function cerrarSesion() {
       localStorage.removeItem('revendedor_session');
-      location.reload();
+      const urlParams = new URLSearchParams(window.location.search);
+      const urlTienda = urlParams.get('tienda');
+      if (urlTienda) {
+        window.location.href = `/admin.html?tienda=${urlTienda}`;
+      } else {
+        location.reload();
+      }
     }
 
     async function verificarSesionGuardada() {
       await cargarBD();
+
+      const urlParams = new URLSearchParams(window.location.search);
+      const urlTienda = urlParams.get('tienda'); // e.g. bellstream
+
+      const revendedores = dbData.revendedores || dbData.usuarios || {};
+
+      // Si la URL viene dirigida a una tienda específica
+      if (urlTienda && revendedores[urlTienda]) {
+        const revUrl = revendedores[urlTienda];
+        const saved = localStorage.getItem('revendedor_session');
+
+        if (saved) {
+          try {
+            const parsed = JSON.parse(saved);
+            // Si la sesión guardada NO corresponde a esta tienda, cerrar la anterior
+            if (parsed.slug && parsed.slug !== urlTienda) {
+              localStorage.removeItem('revendedor_session');
+            } else if (parsed.email && parsed.pass && parsed.slug === urlTienda) {
+              iniciarSesion(parsed.email, parsed.pass);
+              return;
+            }
+          } catch(e) {}
+        }
+
+        // Sugerir el correo del revendedor en el formulario
+        document.getElementById('email').value = revUrl.email || revUrl.correo || '';
+        document.getElementById('login-submsg').innerText = `Inicia sesión para administrar: ${revUrl.nombre || urlTienda}`;
+        return;
+      }
+
+      // Si no hay parámetro tienda en URL, verificar sesión guardada normalmente
       const saved = localStorage.getItem('revendedor_session');
       if (saved) {
         try {
@@ -473,6 +511,9 @@
       if (tienda.logo) {
         document.getElementById('dash-logo').src = tienda.logo;
         document.getElementById('shop-logo-preview').src = tienda.logo;
+      } else {
+        document.getElementById('dash-logo').src = 'https://via.placeholder.com/40';
+        document.getElementById('shop-logo-preview').src = 'https://via.placeholder.com/80';
       }
 
       const txt = tienda.textos || {};
@@ -517,7 +558,7 @@
             <small style="color:#94a3b8; font-size:12px;">${p.sub || ''}</small>
           </div>
           <div style="display:flex; flex-direction:column; gap:6px;">
-            <button style="background:#0284c7; color:#fff; padding:6px 10px; font-size:12px;" onclick="cargarEdicionProducto(${idx})">✏️</button>
+            <button style="background:#0284c7; color:#fff; padding:6px 10px; font-size:12px;" onclick="cargarEdicionProducto(${idx})">✏️️</button>
             <button style="background:#dc2626; color:#fff; padding:6px 10px; font-size:12px;" onclick="eliminarProducto(${idx})">🗑️</button>
           </div>
         `;
@@ -679,15 +720,14 @@
         reader.onload = function(e) {
           const img = new Image();
           img.onload = function() {
-            // Comprimir imagen automáticamente para optimizar carga y Firestore
             const canvas = document.createElement('canvas');
-            const MAX_WIDTH = 500;
+            const MAX_WIDTH = 480;
             const scaleSize = MAX_WIDTH / img.width;
             canvas.width = (img.width > MAX_WIDTH) ? MAX_WIDTH : img.width;
             canvas.height = (img.width > MAX_WIDTH) ? (img.height * scaleSize) : img.height;
             const ctx = canvas.getContext('2d');
             ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-            const b64 = canvas.toDataURL('image/jpeg', 0.82);
+            const b64 = canvas.toDataURL('image/jpeg', 0.80);
 
             const prev = document.getElementById(previewId);
             prev.src = b64;
@@ -702,7 +742,6 @@
       }
     }
 
-    // PERSISTENCIA ATÓMICA DE TIENDA DIRECTA A FIRESTORE
     async function persistirTienda() {
       try {
         const payload = {
@@ -717,12 +756,7 @@
         });
 
         const data = await res.json();
-        if (data.success) {
-          return true;
-        } else {
-          alert('Error al guardar: ' + (data.error || 'Respuesta inválida'));
-          return false;
-        }
+        return !!data.success;
       } catch (err) {
         alert('Error de conexión al guardar: ' + err.message);
         return false;
