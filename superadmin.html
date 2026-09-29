@@ -102,9 +102,14 @@
     .badge-yellow { background: rgba(245, 158, 11, 0.2); color: #fbbf24; border: 1px solid #f59e0b; }
     .actions-grid {
       display: grid;
-      grid-template-columns: 1fr 1fr;
+      grid-template-columns: repeat(3, 1fr);
       gap: 8px;
       margin-top: 6px;
+    }
+    @media (max-width: 600px) {
+      .actions-grid {
+        grid-template-columns: 1fr 1fr;
+      }
     }
     .btn-action {
       padding: 9px;
@@ -113,6 +118,28 @@
       font-weight: bold;
       font-family: 'Rajdhani', sans-serif;
       text-align: center;
+    }
+
+    /* MODAL DE EDICIÓN */
+    .modal-overlay {
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0,0,0,0.85);
+      backdrop-filter: blur(8px);
+      display: flex; align-items: center; justify-content: center;
+      padding: 16px;
+      z-index: 10000;
+    }
+    .modal-box {
+      background: #111420;
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 22px;
+      width: 100%;
+      max-width: 500px;
+      max-height: 90vh;
+      overflow-y: auto;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.9);
     }
   </style>
 </head>
@@ -197,6 +224,58 @@
         </div>
       </div>
 
+    </div>
+  </div>
+
+  <!-- MODAL EDITAR REVENDEDOR -->
+  <div id="modal-edit" class="modal-overlay hidden">
+    <div class="modal-box">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
+        <h3 style="color:var(--primary); margin:0;">✏️ Editar Revendedor</h3>
+        <button onclick="cerrarModalEdit()" style="width:32px; height:32px; background:#1e293b; color:#fff; border-radius:50%; padding:0;">✕</button>
+      </div>
+
+      <input type="hidden" id="edit-slug">
+      <div class="form-group">
+        <label>Identificador (Slug)</label>
+        <input type="text" id="edit-slug-disp" disabled style="opacity:0.6;">
+      </div>
+      <div class="form-group">
+        <label>Nombre del Revendedor / Tienda</label>
+        <input type="text" id="edit-nombre">
+      </div>
+      <div class="form-group">
+        <label>Número de WhatsApp</label>
+        <input type="text" id="edit-ws">
+      </div>
+      <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+        <div class="form-group">
+          <label>Correo Electrónico</label>
+          <input type="email" id="edit-email">
+        </div>
+        <div class="form-group">
+          <label>Contraseña</label>
+          <input type="text" id="edit-pass">
+        </div>
+      </div>
+      <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+        <div class="form-group">
+          <label>Fecha de Vencimiento</label>
+          <input type="date" id="edit-vence">
+        </div>
+        <div class="form-group">
+          <label>Estado de Cuenta</label>
+          <select id="edit-activo">
+            <option value="true">Activo</option>
+            <option value="false">Suspendido</option>
+          </select>
+        </div>
+      </div>
+
+      <div style="display:flex; gap:10px; margin-top:14px;">
+        <button class="btn-success" id="btn-save-edit" onclick="guardarEdicion()">GUARDAR CAMBIOS</button>
+        <button style="background:#475569; color:#fff;" onclick="cerrarModalEdit()">CANCELAR</button>
+      </div>
     </div>
   </div>
 
@@ -318,6 +397,7 @@
 
             <div class="actions-grid">
               <button class="btn-action" style="background:#0284c7; color:#fff;" onclick="copiarAcceso('${nombre}', '${email}', '${pass}', '${panelUrl}', '${catUrl}')">📋 COPIAR ACCESOS</button>
+              <button class="btn-action" style="background:#eab308; color:#000;" onclick="abrirModalEdit('${slug}')">✏️ EDITAR</button>
               <button class="btn-action" style="background:#10b981; color:#042f1a;" onclick="renovar30Dias('${slug}')">➕ SUMAR 30 DÍAS</button>
               <button class="btn-action" style="background:${r.activo === false ? '#16a34a' : '#f59e0b'}; color:#000;" onclick="toggleEstado('${slug}')">${r.activo === false ? 'ACTIVAR' : 'SUSPENDER'}</button>
               <button class="btn-action" style="background:#dc2626; color:#fff;" onclick="eliminarCliente('${slug}')">🗑️ ELIMINAR</button>
@@ -330,6 +410,71 @@
     function filtrarLista() {
       const q = document.getElementById('search-input').value;
       renderLista(q);
+    }
+
+    function abrirModalEdit(slug) {
+      const r = revendedores[slug];
+      document.getElementById('edit-slug').value = slug;
+      document.getElementById('edit-slug-disp').value = slug;
+      document.getElementById('edit-nombre').value = r.nombre || r.nombreTienda || '';
+      document.getElementById('edit-ws').value = r.whatsapp || '';
+      document.getElementById('edit-email').value = r.email || r.correo || '';
+      document.getElementById('edit-pass').value = r.password || r.clave || '';
+      document.getElementById('edit-vence').value = r.vencimiento ? r.vencimiento.split('T')[0] : '';
+      document.getElementById('edit-activo').value = r.activo !== false ? 'true' : 'false';
+
+      document.getElementById('modal-edit').classList.remove('hidden');
+    }
+
+    function cerrarModalEdit() {
+      document.getElementById('modal-edit').classList.add('hidden');
+    }
+
+    async function guardarEdicion() {
+      const slug = document.getElementById('edit-slug').value;
+      const nombre = document.getElementById('edit-nombre').value.trim();
+      const ws = document.getElementById('edit-ws').value.trim();
+      const email = document.getElementById('edit-email').value.trim();
+      const pass = document.getElementById('edit-pass').value.trim();
+      const vencimiento = document.getElementById('edit-vence').value;
+      const activo = document.getElementById('edit-activo').value === 'true';
+
+      const btn = document.getElementById('btn-save-edit');
+      btn.disabled = true;
+      btn.innerText = "⏳ GUARDANDO...";
+
+      const r = revendedores[slug] || {};
+      r.nombre = nombre;
+      r.nombreTienda = nombre;
+      r.whatsapp = ws;
+      r.email = email;
+      r.correo = email;
+      r.password = pass;
+      r.clave = pass;
+      r.vencimiento = vencimiento;
+      r.activo = activo;
+
+      try {
+        const res = await fetch('/api/revendedor/guardar', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ slug, revendedor: r })
+        });
+        const data = await res.json();
+        if (data.success) {
+          alert('¡Datos actualizados con éxito en Firestore!');
+          revendedores[slug] = r;
+          cerrarModalEdit();
+          renderLista();
+        } else {
+          alert('Error al guardar cambios: ' + (data.error || 'Respuesta inválida'));
+        }
+      } catch (e) {
+        alert('Error de conexión: ' + e.message);
+      } finally {
+        btn.disabled = false;
+        btn.innerText = "GUARDAR CAMBIOS";
+      }
     }
 
     async function registrarRevendedor() {
