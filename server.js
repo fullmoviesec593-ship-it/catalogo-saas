@@ -3,7 +3,6 @@ const cors = require('cors');
 const fs = require('fs');
 const path = require('path');
 
-// Importaciones oficiales y modulares de Firebase Admin SDK
 const { initializeApp, getApps, cert } = require('firebase-admin/app');
 const { getFirestore } = require('firebase-admin/firestore');
 
@@ -12,13 +11,12 @@ const PORT = process.env.PORT || 3000;
 const DB_FILE = path.join(__dirname, 'database.json');
 
 app.use(cors());
-app.use(express.json({ limit: '15mb' }));
+app.use(express.json({ limit: '20mb' }));
 app.use(express.static(__dirname));
 
 let dbFirestore = null;
 let firebaseStatus = "Variable no configurada";
 
-// Inicialización blindada y directa
 if (process.env.FIREBASE_SERVICE_ACCOUNT) {
   try {
     let raw = process.env.FIREBASE_SERVICE_ACCOUNT.trim();
@@ -27,7 +25,6 @@ if (process.env.FIREBASE_SERVICE_ACCOUNT) {
     }
     const serviceAccount = JSON.parse(raw);
 
-    // Ajuste de los saltos de línea de la clave RSA de Google
     if (serviceAccount.private_key) {
       serviceAccount.private_key = serviceAccount.private_key.replace(/\\n/g, '\n');
     }
@@ -47,7 +44,6 @@ if (process.env.FIREBASE_SERVICE_ACCOUNT) {
   }
 }
 
-// Ruta para ver el estado de la conexión en vivo
 app.get('/api/status', (req, res) => {
   res.json({
     firebase_conectado: !!dbFirestore,
@@ -59,11 +55,11 @@ app.get('/api/status', (req, res) => {
 function readLocalDB() {
   try {
     if (!fs.existsSync(DB_FILE)) {
-      return { superadmin: {}, revendedores: {}, tiendas: {} };
+      return { superadmin: {}, usuarios: {}, revendedores: {}, tiendas: {} };
     }
     return JSON.parse(fs.readFileSync(DB_FILE, 'utf-8'));
   } catch (e) {
-    return { superadmin: {}, revendedores: {}, tiendas: {} };
+    return { superadmin: {}, usuarios: {}, revendedores: {}, tiendas: {} };
   }
 }
 
@@ -73,36 +69,51 @@ function writeLocalDB(data) {
   } catch (e) {}
 }
 
+// OBTENER BASE DE DATOS
 app.get('/api/db', async (req, res) => {
+  let data = null;
   if (dbFirestore) {
     try {
       const doc = await dbFirestore.collection('saas_data').doc('principal').get();
       if (doc.exists) {
-        return res.json(doc.data());
+        data = doc.data();
       } else {
-        const initial = readLocalDB();
-        await dbFirestore.collection('saas_data').doc('principal').set(initial);
-        return res.json(initial);
+        data = readLocalDB();
+        await dbFirestore.collection('saas_data').doc('principal').set(data);
       }
     } catch (err) {
       console.error("Error leyendo Firestore:", err.message);
-      return res.json(readLocalDB());
+      data = readLocalDB();
     }
+  } else {
+    data = readLocalDB();
   }
-  res.json(readLocalDB());
+
+  // Homogeneizar usuarios y revendedores para que nada se pierda
+  if (!data.usuarios && data.revendedores) data.usuarios = data.revendedores;
+  if (!data.revendedores && data.usuarios) data.revendedores = data.usuarios;
+
+  res.json(data);
 });
 
+// GUARDAR BASE DE DATOS
 app.post('/api/save', async (req, res) => {
   try {
-    const data = req.body;
+    let data = req.body;
+
+    // Asegurar que siempre se guarden en ambos campos por compatibilidad
+    if (data.usuarios && !data.revendedores) data.revendedores = data.usuarios;
+    if (data.revendedores && !data.usuarios) data.usuarios = data.revendedores;
+
     writeLocalDB(data);
 
     if (dbFirestore) {
       await dbFirestore.collection('saas_data').doc('principal').set(data);
+      console.log("Guardado permanente en Firestore confirmado.");
     }
     res.json({ success: true, firestore: !!dbFirestore });
   } catch (err) {
-    console.error("Error guardando en Firestore:", err.message);
+    console.error("Error guardando:", err.message);
     res.status(500).json({ error: err.message });
   }
 });
