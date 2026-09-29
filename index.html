@@ -265,7 +265,7 @@
       color: #fff;
     }
 
-    /* GRID DE 2 COLUMNAS */
+    /* GRID DE PRODUCTOS EN 2 COLUMNAS */
     .products-grid {
       display: grid;
       grid-template-columns: repeat(2, 1fr);
@@ -394,6 +394,7 @@
       font-size: 10px;
     }
 
+    /* BOTÓN COMPRAR AHORA */
     .btn-buy-ws {
       background: #00d26a;
       color: #032412;
@@ -406,13 +407,13 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 5px;
+      gap: 6px;
       text-decoration: none;
       width: 100%;
       box-shadow: 0 2px 8px rgba(0, 210, 106, 0.25);
     }
 
-    /* MODAL DE COMPRA */
+    /* MODAL DE COMPRA Y MÉTODOS DE PAGO */
     .modal-overlay {
       position: fixed;
       top: 0; left: 0; width: 100%; height: 100%;
@@ -494,6 +495,7 @@
       color: #38bdf8;
     }
 
+    /* BOTÓN FLOTANTE INFERIOR DERECHO */
     .floating-ws {
       position: fixed;
       bottom: 20px;
@@ -522,7 +524,7 @@
     <a href="#" class="brand">
       <img id="nav-logo" class="brand-avatar hidden" src="" alt="L">
       <div id="nav-initial" class="brand-avatar">S</div>
-      <span id="nav-store-name" class="brand-name">Streaming C. B.</span>
+      <span id="nav-store-name" class="brand-name">Mi Tienda</span>
     </a>
     <div class="nav-actions">
       <a id="nav-btn-pedir" href="#" target="_blank" class="btn-pedir">
@@ -566,7 +568,7 @@
     </div>
   </section>
 
-  <!-- SECTION HEADER -->
+  <!-- CATÁLOGO HEADER -->
   <div id="catalogo" class="section-header">
     <div class="section-title">SERVICIOS DISPONIBLES</div>
     <div class="tabs">
@@ -579,13 +581,13 @@
   <!-- GRID DE PRODUCTOS -->
   <div id="products-grid" class="products-grid"></div>
 
-  <!-- BOTÓN FLOTANTE -->
+  <!-- BOTÓN FLOTANTE WHATSAPP -->
   <a id="floating-ws-btn" href="#" target="_blank" class="floating-ws">
     <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12.04 2c-5.46 0-9.91 4.45-9.91 9.91 0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38c1.45.79 3.08 1.21 4.74 1.21 5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.14-2.9-7.01A9.816 9.816 0 0 0 12.04 2z"/></svg>
     Consultar por WhatsApp
   </a>
 
-  <!-- MODAL DE COMPRA -->
+  <!-- MODAL DE PAGO Y CONFIRMACIÓN -->
   <div id="modal-compra" class="modal-overlay hidden">
     <div class="modal-box">
       <div class="modal-header">
@@ -666,11 +668,11 @@
         const tiendas = db.tiendas || {};
         if (!tiendaSlug || !tiendas[tiendaSlug]) {
           const keys = Object.keys(tiendas);
-          tiendaSlug = keys.length > 0 ? keys[0] : 'fullmovies';
+          tiendaSlug = keys.length > 0 ? keys[0] : 'bellstream';
         }
 
         tiendaActiva = tiendas[tiendaSlug] || {
-          nombre: "Full Movies Ec",
+          nombre: "BellStream",
           whatsapp: "593982766054",
           productos: SERVICIOS_DEFAULT,
           textos: {}
@@ -678,26 +680,24 @@
 
         textosTienda = tiendaActiva.textos || {};
 
-        // APLICAR TEXTOS DINÁMICOS PERSONALIZADOS
         document.getElementById('hero-pill').innerText = textosTienda.pill || "✦ ATENCIÓN 24/7 ✦";
         document.getElementById('hero-line1').innerText = textosTienda.title1 || "TU TIENDA DE";
         document.getElementById('hero-line2').innerText = textosTienda.title2 || "SOFTWARE";
         document.getElementById('hero-sub').innerText = textosTienda.sub || "Proveedor garantizado · Activación inmediata · Los mejores precios";
 
         if (textosTienda.stat2) {
-          const partes2 = textosTienda.stat2.split(' ');
-          document.getElementById('stat-val-2').innerText = partes2[0] || '24/7';
-          document.getElementById('stat-lbl-2').innerText = partes2.slice(1).join(' ') || 'Soporte';
+          const p2 = textosTienda.stat2.split(' ');
+          document.getElementById('stat-val-2').innerText = p2[0] || '24/7';
+          document.getElementById('stat-lbl-2').innerText = p2.slice(1).join(' ') || 'Soporte';
         }
 
         if (textosTienda.stat3) {
-          const partes3 = textosTienda.stat3.split(' ');
-          document.getElementById('stat-val-3').innerText = partes3[0] || '⚡';
-          document.getElementById('stat-lbl-3').innerText = partes3.slice(1).join(' ') || 'Inmediato';
+          const p3 = textosTienda.stat3.split(' ');
+          document.getElementById('stat-val-3').innerText = p3[0] || '⚡';
+          document.getElementById('stat-lbl-3').innerText = p3.slice(1).join(' ') || 'Inmediato';
         }
 
-        // Nombre y Logo
-        const nombreTienda = tiendaActiva.nombre || "Streaming C. B.";
+        const nombreTienda = tiendaActiva.nombre || "BellStream";
         document.getElementById('nav-store-name').innerText = nombreTienda;
         document.getElementById('nav-initial').innerText = nombreTienda.charAt(0).toUpperCase();
 
@@ -731,7 +731,9 @@
       const grid = document.getElementById('products-grid');
       grid.innerHTML = '';
       const moneda = textosTienda.currency || '$';
-      const textoBoton = textosTienda.btnBuy || 'Comprar por WhatsApp';
+      const textoBoton = (textosTienda.btnBuy && textosTienda.btnBuy !== 'Comprar por WhatsApp') 
+        ? textosTienda.btnBuy 
+        : 'Comprar ahora!';
 
       productos.forEach((p, idx) => {
         const sub = p.sub || (p.categoria === 'musica' ? '1 mes · Música' : '1 mes · Video');
@@ -740,9 +742,10 @@
         let features = p.features;
         if (!features || !features.length) {
           features = [
-            p.descripcion || "Activación inmediata",
-            "Soporte garantizado 24/7",
-            "Garantía de reposición"
+            p.descripcion || "1 perfil dedicado",
+            "Calidad HD / 4K",
+            "Activación inmediata",
+            "Sin compartir cuenta"
           ];
         }
 
@@ -801,7 +804,7 @@
       const msgPague = encodeURIComponent(`¡Hola! Ya realicé el pago de mi servicio: *${p.nombre}* (${moneda}${p.precio}). Adjunto mi comprobante para la entrega inmediata.`);
       document.getElementById('btn-confirm-paid').href = `https://wa.me/${ws}?text=${msgPague}`;
 
-      const msgInfo = encodeURIComponent(`¡Hola! Quisiera más información sobre: *${p.nombre}*. ¿Tienen entrega inmediata?`);
+      const msgInfo = encodeURIComponent(`¡Hola! Quisiera comprar: *${p.nombre}*. ¿Tienen entrega inmediata?`);
       document.getElementById('btn-confirm-info').href = `https://wa.me/${ws}?text=${msgInfo}`;
 
       document.getElementById('modal-compra').classList.remove('hidden');
