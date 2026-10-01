@@ -56,31 +56,15 @@
     }
     .password-wrapper input { padding-right: 44px; }
     .toggle-password-btn {
-      position: absolute;
-      right: 10px;
-      background: transparent;
-      border: none;
-      color: #94a3b8;
-      cursor: pointer;
-      font-size: 18px;
-      padding: 4px 6px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      width: auto;
-      user-select: none;
+      position: absolute; right: 10px; background: transparent; border: none;
+      color: #94a3b8; cursor: pointer; font-size: 18px; padding: 4px 6px;
+      width: auto; user-select: none;
     }
 
     button {
-      width: 100%;
-      padding: 12px;
-      border: none;
-      border-radius: 8px;
-      font-size: 15px;
-      font-weight: 700;
-      cursor: pointer;
-      font-family: 'Orbitron', sans-serif;
-      transition: 0.2s;
+      width: 100%; padding: 12px; border: none; border-radius: 8px;
+      font-size: 15px; font-weight: 700; cursor: pointer;
+      font-family: 'Orbitron', sans-serif; transition: 0.2s;
     }
     .btn-primary { background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%); color: #fff; }
     .btn-success { background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%); color: #042f1a; }
@@ -88,104 +72,47 @@
     .hidden { display: none !important; }
     .nav-tabs { display: flex; gap: 6px; margin-bottom: 20px; border-bottom: 1px solid var(--border); padding-bottom: 10px; overflow-x: auto; }
     .nav-tab {
-      flex: 1;
-      padding: 10px 8px;
-      text-align: center;
-      background: #080d1a;
-      border-radius: 8px;
-      cursor: pointer;
-      font-size: 12px;
-      font-weight: bold;
-      color: #94a3b8;
-      white-space: nowrap;
+      flex: 1; padding: 10px 8px; text-align: center; background: #080d1a;
+      border-radius: 8px; cursor: pointer; font-size: 12px; font-weight: bold;
+      color: #94a3b8; white-space: nowrap;
     }
     .nav-tab.active { background: #1e293b; color: var(--primary); border: 1px solid var(--primary); }
     .product-card {
-      background: #080d1a;
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 14px;
-      margin-bottom: 12px;
-      display: flex;
-      gap: 14px;
-      align-items: center;
+      background: #080d1a; border: 1px solid var(--border); border-radius: 12px;
+      padding: 14px; margin-bottom: 12px; display: flex; gap: 14px; align-items: center;
     }
     .product-img { width: 65px; height: 65px; border-radius: 8px; object-fit: cover; border: 1px solid #334155; }
     .preview-logo { width: 75px; height: 75px; border-radius: 50%; object-fit: cover; border: 2px solid var(--primary); margin: 8px 0; }
 
     .combo-edit-box {
-      background: #080d1a;
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 16px;
-      margin-bottom: 18px;
+      background: #080d1a; border: 1px solid var(--border); border-radius: 12px;
+      padding: 16px; margin-bottom: 18px;
     }
 
-    .theme-selector {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 10px;
-      margin-top: 6px;
-    }
-    @media (max-width: 480px) {
-      .theme-selector { grid-template-columns: repeat(2, 1fr); }
-    }
+    .theme-selector { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-top: 6px; }
+    @media (max-width: 480px) { .theme-selector { grid-template-columns: repeat(2, 1fr); } }
     .theme-opt {
-      border: 2px solid #1e293b;
-      border-radius: 10px;
-      padding: 10px 6px;
-      text-align: center;
-      cursor: pointer;
-      font-size: 12px;
-      font-weight: bold;
-      background: #080d1a;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 6px;
-      transition: all 0.2s;
+      border: 2px solid #1e293b; border-radius: 10px; padding: 10px 6px; text-align: center;
+      cursor: pointer; font-size: 12px; font-weight: bold; background: #080d1a;
+      display: flex; flex-direction: column; align-items: center; gap: 6px; transition: all 0.2s;
     }
-    .theme-circle {
-      width: 22px;
-      height: 22px;
-      border-radius: 50%;
-      border: 2px solid #fff;
-    }
-    .theme-opt.active {
-      border-color: #fff;
-      box-shadow: 0 0 12px rgba(255,255,255,0.3);
-    }
+    .theme-circle { width: 22px; height: 22px; border-radius: 50%; border: 2px solid #fff; }
+    .theme-opt.active { border-color: #fff; box-shadow: 0 0 12px rgba(255,255,255,0.3); }
 
     .badge-dias {
-      display: inline-flex;
-      align-items: center;
-      gap: 5px;
-      font-family: 'Orbitron', sans-serif;
-      font-size: 11px;
-      font-weight: 800;
-      padding: 4px 9px;
-      border-radius: 6px;
-      letter-spacing: 0.5px;
-      margin-top: 4px;
+      display: inline-flex; align-items: center; gap: 5px;
+      font-family: 'Orbitron', sans-serif; font-size: 11px; font-weight: 800;
+      padding: 4px 9px; border-radius: 6px; letter-spacing: 0.5px;
     }
     .badge-dias.green { background: rgba(34, 197, 94, 0.15); color: #4ade80; border: 1px solid #22c55e; }
     .badge-dias.yellow { background: rgba(234, 179, 8, 0.18); color: #facc15; border: 1px solid #eab308; }
     .badge-dias.red { background: rgba(239, 68, 68, 0.2); color: #f87171; border: 1px solid #ef4444; }
 
     .checkbox-container {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      margin: 14px 0 18px 0;
-      cursor: pointer;
-      user-select: none;
+      display: flex; align-items: center; gap: 10px; margin: 14px 0 18px 0;
+      cursor: pointer; user-select: none;
     }
-    .checkbox-container input {
-      width: 18px;
-      height: 18px;
-      accent-color: #38bdf8;
-      cursor: pointer;
-    }
+    .checkbox-container input { width: 18px; height: 18px; accent-color: #38bdf8; cursor: pointer; }
   </style>
 </head>
 <body>
@@ -249,7 +176,7 @@
         
         <div class="form-group">
           <label>Nombre Comercial de la Tienda</label>
-          <input type="text" id="shop-nombre" placeholder="Ej: Mi Tienda Online">
+          <input type="text" id="shop-nombre" placeholder="Ej: Full Movies EC">
         </div>
         <div class="form-group">
           <label>Número de WhatsApp para Pedidos (con código de país, ej: 593982766054)</label>
@@ -311,12 +238,12 @@
         <input type="hidden" id="prod-edit-idx" value="-1">
         <div class="form-group">
           <label>Nombre del Servicio</label>
-          <input type="text" id="prod-nombre" placeholder="Ej: Netflix Ultra HD">
+          <input type="text" id="prod-nombre" placeholder="Ej: Netflix">
         </div>
         <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
           <div class="form-group">
             <label>Precio</label>
-            <input type="text" id="prod-precio" placeholder="3.50">
+            <input type="text" id="prod-precio" placeholder="4.25">
           </div>
           <div class="form-group">
             <label>Subir Imagen</label>
@@ -332,6 +259,7 @@
               <option value="iptv">IPTV</option>
               <option value="musica">Música</option>
               <option value="software">Software</option>
+              <option value="gaming">Gaming</option>
             </select>
           </div>
           <div class="form-group">
@@ -343,10 +271,13 @@
           <label>Beneficios / Características (separados por comas)</label>
           <input type="text" id="prod-features" placeholder="1 perfil dedicado, Calidad 4K, Entrega inmediata">
         </div>
-        <button id="btn-guardar-prod" class="btn-success" onclick="guardarProducto()">AGREGAR SERVICIO AL CATÁLOGO</button>
+        <button id="btn-guardar-prod" class="btn-success" onclick="guardarProducto()">AGREGAR / ACTUALIZAR SERVICIO</button>
       </div>
 
-      <h4 style="color:#fff;">Mis Servicios Activos</h4>
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+        <h4 style="color:#fff; margin:0;">Mis Servicios Activos</h4>
+        <button style="width:auto; padding:6px 12px; background:#0284c7; color:#fff; font-size:12px;" onclick="cargarCatalogoPredeterminado()">🔄 Cargar Lista Oficial</button>
+      </div>
       <div id="lista-productos"></div>
     </div>
 
@@ -475,16 +406,16 @@
         <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
           <div class="form-group">
             <label>Título Línea 1</label>
-            <input type="text" id="txt-title-1" placeholder="TU TIENDA DE">
+            <input type="text" id="txt-title-1" placeholder="CATÁLOGO OFICIAL">
           </div>
           <div class="form-group">
             <label>Palabra Destacada</label>
-            <input type="text" id="txt-title-2" placeholder="SOFTWARE o STREAMING">
+            <input type="text" id="txt-title-2" placeholder="FULL MOVIES EC">
           </div>
         </div>
         <div class="form-group">
           <label>Subtítulo de Garantía</label>
-          <input type="text" id="txt-sub" placeholder="Proveedor garantizado · Activación inmediata">
+          <input type="text" id="txt-sub" placeholder="Calidad Garantizada y Entrega Inmediata · Los mejores precios">
         </div>
         <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
           <div class="form-group">
@@ -506,7 +437,7 @@
         <h4 style="color:var(--accent); margin-top:0;">Tus Cuentas Bancarias y Métodos de Pago</h4>
         <div class="form-group">
           <label>Detalle de tus Métodos de Pago:</label>
-          <textarea id="shop-payments" rows="8" placeholder="🏦 BANCO PICHINCHA&#10;• Ahorros: 2200000000&#10;• Titular: Tu Nombre&#10;&#10;📱 DEUNA: 0999999999"></textarea>
+          <textarea id="shop-payments" rows="8" placeholder="🏦 BANCO PICHINCHA&#10;• Ahorros: 2200000000&#10;• Titular: Tu Nombre&#10;• CI: 1300000000&#10;&#10;📱 DEUNA: 0999999999"></textarea>
         </div>
         <button id="btn-save-payments" class="btn-success" onclick="guardarMetodosPago()">GUARDAR MÉTODOS DE PAGO</button>
       </div>
@@ -538,6 +469,31 @@
         nombre: "Combo Cuádruple (4 Servicios)", sub: "A tu elección · 10% OFF",
         img: "https://images.unsplash.com/photo-1594909122845-11baa439b7bf?w=600"
       }
+    ];
+
+    const CATALOGO_PREDETERMINADO = [
+      { nombre: "Netflix", sub: "1 mes · Streaming", categoria: "streaming", tag: "POPULAR", precio: "4.25", features: ["1 perfil Ultra HD 4K", "Activación inmediata", "Garantía mensual"], img: "https://images.unsplash.com/photo-1574375927938-d5a98e8ffe85?w=500" },
+      { nombre: "Disney+ ESPN", sub: "1 mes · Streaming", categoria: "streaming", tag: "TOP", precio: "4.00", features: ["Disney, Marvel, Star Wars", "ESPN en vivo", "4K UHD"], img: "https://images.unsplash.com/photo-1607604276583-eef5d076aa5f?w=500" },
+      { nombre: "Disney Standard", sub: "1 mes · Streaming", categoria: "streaming", tag: "", precio: "3.50", features: ["Catálogo completo", "En HD", "Perfil personal"], img: "https://images.unsplash.com/photo-1607604276583-eef5d076aa5f?w=500" },
+      { nombre: "Prime Video", sub: "1 mes · Streaming", categoria: "streaming", tag: "", precio: "3.00", features: ["Películas y series Amazon", "Full HD y 4K", "Perfil propio"], img: "https://images.unsplash.com/photo-1522869635100-9f4c5e86aa37?w=500" },
+      { nombre: "Max (HBO)", sub: "1 mes · Streaming", categoria: "streaming", tag: "POPULAR", precio: "3.00", features: ["Estrenos Warner", "Champions League", "Calidad 4K"], img: "https://images.unsplash.com/photo-1585951237318-9ea5e175b891?w=500" },
+      { nombre: "Crunchyroll", sub: "1 mes · Streaming", categoria: "streaming", tag: "ANIME", precio: "2.50", features: ["Anime sin anuncios", "Simulcast con Japón", "Perfil personal"], img: "https://images.unsplash.com/photo-1563089145-599997674d42?w=500" },
+      { nombre: "ViX+", sub: "1 mes · Streaming", categoria: "streaming", tag: "", precio: "2.50", features: ["Liga mexicana y deportes", "Series y novelas", "En vivo"], img: "https://images.unsplash.com/photo-1517604931442-7e0c8ed2963c?w=500" },
+      { nombre: "Plex", sub: "1 mes · Streaming", categoria: "streaming", tag: "", precio: "2.75", features: ["Cine y estrenos", "Servidor privado 24/7", "Sin caídas"], img: "https://images.unsplash.com/photo-1518173946687-a4c8a383392e?w=500" },
+      { nombre: "Estella TV", sub: "1 mes · IPTV", categoria: "iptv", tag: "EN VIVO", precio: "3.50", features: ["Canales en vivo", "Películas y series", "Calidad HD"], img: "https://images.unsplash.com/photo-1593784991095-a205069470b6?w=500" },
+      { nombre: "IPTV", sub: "1 mes · IPTV", categoria: "iptv", tag: "FÚTBOL", precio: "3.00", features: ["Canales deportivos", "Cable prémium", "Guía EPG"], img: "https://images.unsplash.com/photo-1461151304267-38535e780c79?w=500" },
+      { nombre: "Flujo TV", sub: "1 mes · IPTV", categoria: "iptv", tag: "TOP", precio: "4.00", features: ["Más de 1200 canales", "Fútbol nacional e internacional", "Calidad estable"], img: "https://images.unsplash.com/photo-1593784991095-a205069470b6?w=500" },
+      { nombre: "OLEADA TV", sub: "1 mes · IPTV", categoria: "iptv", tag: "ESTABLE", precio: "3.50", features: ["Canales prémium en vivo", "Programación deportiva", "HD"], img: "https://images.unsplash.com/photo-1522869635100-9f4c5e86aa37?w=500" },
+      { nombre: "Vicky Rakuten", sub: "1 mes · Streaming", categoria: "streaming", tag: "DORAMAS", precio: "3.50", features: ["Doramas y dramas asiáticos", "Subtítulos en español", "HD"], img: "https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=500" },
+      { nombre: "Spotify", sub: "1 mes · Música", categoria: "musica", tag: "TOP", precio: "4.00", features: ["Música sin publicidad", "Descargas offline", "Extreme Audio"], img: "https://images.unsplash.com/photo-1614680376593-902f749f7ffc?w=500" },
+      { nombre: "Deezer", sub: "1 mes · Música", categoria: "musica", tag: "HIFI", precio: "3.00", features: ["Audio HiFi", "Sin anuncios", "Descargas"], img: "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=500" },
+      { nombre: "Windows", sub: "Licencia Permanente · Software", categoria: "software", tag: "OFICIAL", precio: "9.50", features: ["Windows 10 / 11 Pro", "Licencia original permanente", "Activación digital"], img: "https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=500" },
+      { nombre: "Microsoft (Office)", sub: "1 año · Software", categoria: "software", tag: "OFICINA", precio: "8.50", features: ["Word, Excel, PowerPoint", "1 TB OneDrive", "Hasta 5 equipos"], img: "https://images.unsplash.com/photo-1531403009284-440f080d1e12?w=500" },
+      { nombre: "Canva Pro", sub: "Suscripción · Software", categoria: "software", tag: "DISEÑO", precio: "3.99", features: ["Plantillas prémium", "Quitar fondos en 1 clic", "Herramientas IA"], img: "https://images.unsplash.com/photo-1626785774573-4b799315345d?w=500" },
+      { nombre: "CapCut Pro", sub: "1 mes · Software", categoria: "software", tag: "EDICIÓN", precio: "5.99", features: ["Efectos pro", "Subtítulos automáticos", "Exportación 4K 60fps"], img: "https://images.unsplash.com/photo-1574717024653-61fd2cf4d44d?w=500" },
+      { nombre: "ChatGPT Plus", sub: "1 mes · Software", categoria: "software", tag: "IA", precio: "5.75", features: ["GPT-4o sin límites", "DALL·E", "Análisis avanzado de datos"], img: "https://images.unsplash.com/photo-1677442136019-21780ecad995?w=500" },
+      { nombre: "Chatbot WhatsApp", sub: "1 mes · Software", categoria: "software", tag: "VENTAS", precio: "5.00", features: ["Respuestas automáticas 24/7", "Atención sin demora", "Fácil uso"], img: "https://images.unsplash.com/photo-1614680376573-df3480f0c6ff?w=500" },
+      { nombre: "Free Fire", sub: "Recargas · Gaming", categoria: "gaming", tag: "GAMING", precio: "2.00", features: ["Recargas directas por ID", "Entrega inmediata", "Precios mayoristas"], img: "https://images.unsplash.com/photo-1542751371-adc38448a05e?w=500" }
     ];
 
     function togglePasswordVisibility(inputId, btn) {
@@ -611,8 +567,12 @@
             localStorage.setItem('revendedor_session', JSON.stringify({ slug: slugActual, email, pass }));
           }
 
-          // Cargar datos reales de la tienda sin sobreescribir nada
           tiendaActual = (db.tiendas && db.tiendas[slugActual]) ? db.tiendas[slugActual] : {};
+
+          // Si la tienda aún no tiene productos propios, inicializar con el catálogo completo
+          if (!tiendaActual.productos || tiendaActual.productos.length === 0) {
+            tiendaActual.productos = JSON.parse(JSON.stringify(CATALOGO_PREDETERMINADO));
+          }
 
           document.getElementById('login-section').classList.add('hidden');
           document.getElementById('dashboard-section').classList.remove('hidden');
@@ -674,7 +634,6 @@
         document.getElementById('shop-logo-preview').src = tiendaActual.logo;
       }
 
-      // Combos
       const combos = (tiendaActual.combos && tiendaActual.combos.length > 0) ? tiendaActual.combos : COMBOS_DEFAULT;
       [0, 1, 2].forEach(i => {
         const c = combos[i] || COMBOS_DEFAULT[i];
@@ -686,12 +645,11 @@
         if (c.img) document.getElementById(`combo${i}-preview`).src = c.img;
       });
 
-      // Textos
       const txt = tiendaActual.textos || {};
       document.getElementById('txt-pill').value = txt.pill || "✦ ATENCIÓN 24/7 ✦";
-      document.getElementById('txt-title-1').value = txt.title1 || "TU TIENDA DE";
-      document.getElementById('txt-title-2').value = txt.title2 || "SOFTWARE";
-      document.getElementById('txt-sub').value = txt.sub || "Proveedor garantizado · Activación inmediata · Los mejores precios";
+      document.getElementById('txt-title-1').value = txt.title1 || "CATÁLOGO OFICIAL";
+      document.getElementById('txt-title-2').value = txt.title2 || "FULL MOVIES EC";
+      document.getElementById('txt-sub').value = txt.sub || "Calidad Garantizada y Entrega Inmediata · Los mejores precios";
       document.getElementById('txt-currency').value = txt.currency || "$";
       document.getElementById('txt-btn-buy').value = txt.btnBuy || "Comprar ahora!";
 
@@ -718,11 +676,6 @@
       lista.innerHTML = '';
       const productos = tiendaActual.productos || [];
 
-      if (productos.length === 0) {
-        lista.innerHTML = '<p style="color:#94a3b8; font-size:13px;">No has agregado servicios personalizados aún (tu catálogo muestra los servicios generales).</p>';
-        return;
-      }
-
       productos.forEach((p, idx) => {
         const item = document.createElement('div');
         item.className = 'product-card';
@@ -734,7 +687,7 @@
             <small style="color:#94a3b8; font-size:12px;">${p.sub || ''}</small>
           </div>
           <div style="display:flex; flex-direction:column; gap:6px;">
-            <button style="background:#0284c7; color:#fff; padding:6px 10px; font-size:12px;" onclick="cargarEdicionProducto(${idx})">✏️️</button>
+            <button style="background:#0284c7; color:#fff; padding:6px 10px; font-size:12px;" onclick="cargarEdicionProducto(${idx})">✏️</button>
             <button style="background:#dc2626; color:#fff; padding:6px 10px; font-size:12px;" onclick="eliminarProducto(${idx})">🗑️</button>
           </div>
         `;
@@ -779,9 +732,9 @@
       btn.disabled = true;
       btn.innerText = "⏳ GUARDANDO EN FIRESTORE...";
 
-      const features = rawFeatures ? rawFeatures.split(',').map(s => s.trim()).filter(Boolean) : ["1 perfil dedicado", "Activación inmediata"];
+      const features = rawFeatures ? rawFeatures.split(',').map(s => s.trim()).filter(Boolean) : ["Calidad garantizada", "Entrega inmediata"];
       const sub = `1 mes · ${categoria.charAt(0).toUpperCase() + categoria.slice(1)}`;
-      const img = tempImgBase64 || 'https://images.unsplash.com/photo-1522869635100-9f4c5e86aa37?w=500';
+      const img = tempImgBase64 || (idx >= 0 && tiendaActual.productos[idx].img) || 'https://images.unsplash.com/photo-1522869635100-9f4c5e86aa37?w=500';
 
       if (!tiendaActual.productos) tiendaActual.productos = [];
       const nuevoObj = { nombre, sub, categoria, tag, precio, features, img };
@@ -794,10 +747,10 @@
 
       const ok = await persistirEnNube({ productos: tiendaActual.productos });
       btn.disabled = false;
-      btn.innerText = "AGREGAR SERVICIO AL CATÁLOGO";
+      btn.innerText = "AGREGAR / ACTUALIZAR SERVICIO";
 
       if (ok) {
-        alert('¡Servicio guardado con éxito en la nube!');
+        alert('¡Servicio guardado exitosamente en la nube!');
         document.getElementById('prod-edit-idx').value = "-1";
         document.getElementById('prod-nombre').value = '';
         document.getElementById('prod-precio').value = '';
@@ -807,6 +760,15 @@
         document.getElementById('prod-preview-img').style.display = 'none';
         tempImgBase64 = null;
         renderProductos();
+      }
+    }
+
+    async function cargarCatalogoPredeterminado() {
+      if (confirm('¿Deseas restablecer todos los servicios a la lista oficial de Full Movies EC?')) {
+        tiendaActual.productos = JSON.parse(JSON.stringify(CATALOGO_PREDETERMINADO));
+        await persistirEnNube({ productos: tiendaActual.productos });
+        renderProductos();
+        alert('¡Catálogo oficial cargado con éxito!');
       }
     }
 
@@ -830,7 +792,7 @@
         const comboCantidad = parseInt(document.getElementById(`combo${i}-cant`).value) || (i + 2);
         const descuento = parseInt(document.getElementById(`combo${i}-desc`).value) || 10;
         const sub = document.getElementById(`combo${i}-sub`).value.trim();
-        const img = tempComboImgs[i] || document.getElementById(`combo${i}-preview`).src;
+        const img = tempComboImgs[i] || (tiendaActual.combos && tiendaActual.combos[i] && tiendaActual.combos[i].img) || COMBOS_DEFAULT[i].img;
 
         nuevosCombos.push({
           activo,
@@ -895,9 +857,9 @@
 
       const textos = {
         pill: document.getElementById('txt-pill').value.trim() || "✦ ATENCIÓN 24/7 ✦",
-        title1: document.getElementById('txt-title-1').value.trim() || "TU TIENDA DE",
-        title2: document.getElementById('txt-title-2').value.trim() || "SOFTWARE",
-        sub: document.getElementById('txt-sub').value.trim() || "Proveedor garantizado · Activación inmediata · Los mejores precios",
+        title1: document.getElementById('txt-title-1').value.trim() || "CATÁLOGO OFICIAL",
+        title2: document.getElementById('txt-title-2').value.trim() || "FULL MOVIES EC",
+        sub: document.getElementById('txt-sub').value.trim() || "Calidad Garantizada y Entrega Inmediata · Los mejores precios",
         currency: document.getElementById('txt-currency').value.trim() || "$",
         btnBuy: document.getElementById('txt-btn-buy').value.trim() || "Comprar ahora!"
       };
@@ -957,7 +919,6 @@
       }
     }
 
-    // PERSISTENCIA BLINDADA (MERGE ATÓMICO)
     async function persistirEnNube(datosParciales) {
       try {
         const res = await fetch('/api/tienda/guardar', {
