@@ -30,7 +30,7 @@
       border-radius: 16px;
       padding: 22px;
       width: 100%;
-      max-width: 760px;
+      max-width: 680px;
       border: 1px solid var(--border);
       box-shadow: 0 10px 30px rgba(0,0,0,0.7);
     }
@@ -49,58 +49,108 @@
     }
     input:focus, textarea:focus { border-color: var(--primary); }
 
-    .password-wrapper { position: relative; display: flex; align-items: center; }
+    .password-wrapper {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
     .password-wrapper input { padding-right: 44px; }
     .toggle-password-btn {
-      position: absolute; right: 10px; background: transparent; border: none;
-      color: #94a3b8; cursor: pointer; font-size: 18px; padding: 4px 6px;
-      width: auto; user-select: none;
+      position: absolute;
+      right: 10px;
+      background: transparent;
+      border: none;
+      color: #94a3b8;
+      cursor: pointer;
+      font-size: 18px;
+      padding: 4px 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: auto;
+      user-select: none;
     }
 
     button {
-      width: 100%; padding: 12px; border: none; border-radius: 8px;
-      font-size: 15px; font-weight: 700; cursor: pointer;
-      font-family: 'Orbitron', sans-serif; transition: 0.2s;
+      width: 100%;
+      padding: 12px;
+      border: none;
+      border-radius: 8px;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      font-family: 'Orbitron', sans-serif;
+      transition: 0.2s;
     }
     .btn-primary { background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%); color: #fff; }
     .btn-success { background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%); color: #042f1a; }
     .btn-danger { background: #dc2626; color: #fff; }
-    .btn-warning { background: #eab308; color: #000; }
     .hidden { display: none !important; }
-
     .nav-tabs { display: flex; gap: 6px; margin-bottom: 20px; border-bottom: 1px solid var(--border); padding-bottom: 10px; overflow-x: auto; }
     .nav-tab {
-      flex: 1; padding: 10px 8px; text-align: center; background: #080d1a;
-      border-radius: 8px; cursor: pointer; font-size: 11px; font-weight: bold;
-      color: #94a3b8; white-space: nowrap;
+      flex: 1;
+      padding: 10px 8px;
+      text-align: center;
+      background: #080d1a;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 12px;
+      font-weight: bold;
+      color: #94a3b8;
+      white-space: nowrap;
     }
     .nav-tab.active { background: #1e293b; color: var(--primary); border: 1px solid var(--primary); }
-
-    .item-card {
-      background: #080d1a; border: 1px solid var(--border);
-      border-radius: 12px; padding: 14px; margin-bottom: 12px;
+    .product-card {
+      background: #080d1a;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 14px;
+      margin-bottom: 12px;
+      display: flex;
+      gap: 14px;
+      align-items: center;
     }
+    .product-img { width: 65px; height: 65px; border-radius: 8px; object-fit: cover; border: 1px solid #334155; }
     .preview-logo { width: 75px; height: 75px; border-radius: 50%; object-fit: cover; border: 2px solid var(--primary); margin: 8px 0; }
 
+    .combo-edit-box {
+      background: #080d1a;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 18px;
+    }
+
     .badge-dias {
-      display: inline-flex; align-items: center; gap: 5px;
-      font-family: 'Orbitron', sans-serif; font-size: 11px; font-weight: 800;
-      padding: 4px 9px; border-radius: 6px; letter-spacing: 0.5px;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-family: 'Orbitron', sans-serif;
+      font-size: 11px;
+      font-weight: 800;
+      padding: 4px 9px;
+      border-radius: 6px;
+      letter-spacing: 0.5px;
+      margin-top: 4px;
     }
     .badge-dias.green { background: rgba(34, 197, 94, 0.15); color: #4ade80; border: 1px solid #22c55e; }
     .badge-dias.yellow { background: rgba(234, 179, 8, 0.18); color: #facc15; border: 1px solid #eab308; }
     .badge-dias.red { background: rgba(239, 68, 68, 0.2); color: #f87171; border: 1px solid #ef4444; }
 
-    .stats-grid {
-      display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 16px;
+    .checkbox-container {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin: 14px 0 18px 0;
+      cursor: pointer;
+      user-select: none;
     }
-    @media (max-width: 500px) { .stats-grid { grid-template-columns: 1fr; } }
-    .stat-metric {
-      background: #080d1a; border: 1px solid var(--border); border-radius: 10px;
-      padding: 12px; text-align: center;
+    .checkbox-container input {
+      width: 18px;
+      height: 18px;
+      accent-color: #38bdf8;
+      cursor: pointer;
     }
-    .stat-metric-val { font-size: 20px; font-weight: 900; color: #38bdf8; font-family: 'Orbitron'; }
-    .stat-metric-lbl { font-size: 11px; color: #94a3b8; font-weight: 700; text-transform: uppercase; }
   </style>
 </head>
 <body>
@@ -119,12 +169,14 @@
       <label>Contraseña</label>
       <div class="password-wrapper">
         <input type="password" id="password" placeholder="Tu clave de acceso">
-        <button type="button" class="toggle-password-btn" onclick="togglePasswordVisibility('password', this)">👁️</button>
+        <button type="button" class="toggle-password-btn" onclick="togglePasswordVisibility('password', this)" title="Ver contraseña">
+          👁️
+        </button>
       </div>
     </div>
 
-    <div style="display:flex; align-items:center; gap:10px; margin:14px 0 18px 0; cursor:pointer;" onclick="toggleCheckbox()">
-      <input type="checkbox" id="remember-session" checked onclick="event.stopPropagation()" style="width:18px; height:18px; accent-color:#38bdf8;">
+    <div class="checkbox-container" onclick="toggleCheckbox()">
+      <input type="checkbox" id="remember-session" checked onclick="event.stopPropagation()">
       <span style="font-size:14px; color:#cbd5e1; font-weight:600;">Mantener la sesión iniciada en este dispositivo</span>
     </div>
 
@@ -138,7 +190,9 @@
         <img id="dash-logo" src="https://via.placeholder.com/40" style="width:42px; height:42px; border-radius:50%; object-fit:cover; border:1px solid var(--primary);" alt="Logo">
         <div>
           <span id="dash-title" style="font-family:'Orbitron'; font-weight:bold; font-size:16px; color:#fff;">Mi Tienda</span>
-          <div><span id="dash-countdown" class="badge-dias green">⏳ Calculando días...</span></div>
+          <div>
+            <span id="dash-countdown" class="badge-dias green">⏳ Calculando días...</span>
+          </div>
         </div>
       </div>
       <button onclick="cerrarSesion()" style="width:auto; padding:6px 12px; background:#dc2626; color:#fff; font-size:12px;">Salir</button>
@@ -146,19 +200,17 @@
 
     <!-- Pestañas -->
     <div class="nav-tabs">
-      <div id="tab-btn-shop" class="nav-tab active" onclick="cambiarTab('shop')">⚙️ TIENDA</div>
+      <div id="tab-btn-shop" class="nav-tab active" onclick="cambiarTab('shop')">⚙️ TIENDA & LOGO</div>
       <div id="tab-btn-prods" class="nav-tab" onclick="cambiarTab('prods')">📦 SERVICIOS</div>
       <div id="tab-btn-combos" class="nav-tab" onclick="cambiarTab('combos')">🔥 COMBOS</div>
-      <div id="tab-btn-stock" class="nav-tab" onclick="cambiarTab('stock')">🔑 BÓVEDA STOCK</div>
-      <div id="tab-btn-clientes" class="nav-tab" onclick="cambiarTab('clientes')">👥 CLIENTES & COBROS</div>
-      <div id="tab-btn-texts" class="nav-tab" onclick="cambiarTab('texts')">📝 TEXTOS</div>
+      <div id="tab-btn-texts" class="nav-tab" onclick="cambiarTab('texts')">📝 TEXTOS Y FRASES</div>
       <div id="tab-btn-payments" class="nav-tab" onclick="cambiarTab('payments')">💳 PAGOS</div>
     </div>
 
     <!-- PESTAÑA: TIENDA & LOGO -->
     <div id="tab-shop">
       <div style="background:#080d1a; padding:16px; border-radius:12px; border:1px solid var(--border);">
-        <h4 style="color:var(--primary); margin-top:0;">Datos Personales y Logo</h4>
+        <h4 style="color:var(--primary); margin-top:0;">Datos Personales y Logo de la Tienda</h4>
         <div class="form-group">
           <label>Nombre Comercial de la Tienda</label>
           <input type="text" id="shop-nombre" placeholder="Ej: Mi Tienda Online">
@@ -167,14 +219,17 @@
           <label>Número de WhatsApp para Pedidos (con código de país, ej: 593982766054)</label>
           <input type="text" id="shop-whatsapp" placeholder="593982766054">
         </div>
+        
         <div class="form-group">
-          <label>Subir Logo de tu Tienda</label>
+          <label>Subir Logo de tu Tienda (desde galería)</label>
           <input type="file" id="shop-logo-file" accept="image/*" onchange="convertirImagenABase64(this, 'shop-logo-preview')">
           <div style="text-align:center; margin-top:8px;">
-            <img id="shop-logo-preview" class="preview-logo" src="https://via.placeholder.com/80" alt="Logo">
+            <img id="shop-logo-preview" class="preview-logo" src="https://via.placeholder.com/80" alt="Logo Tienda">
           </div>
         </div>
+
         <button id="btn-save-shop" class="btn-primary" onclick="guardarAjustesTienda()">GUARDAR AJUSTES DE TIENDA</button>
+
         <div style="margin-top:16px; background:#111d33; padding:12px; border-radius:8px;">
           <label style="color:#38bdf8;">Enlace de tu Catálogo Público:</label>
           <a id="shop-public-link" href="#" target="_blank" style="color:var(--accent); font-weight:bold; word-break:break-all;"></a>
@@ -189,12 +244,12 @@
         <input type="hidden" id="prod-edit-idx" value="-1">
         <div class="form-group">
           <label>Nombre del Servicio</label>
-          <input type="text" id="prod-nombre" placeholder="Ej: Netflix Premium">
+          <input type="text" id="prod-nombre" placeholder="Ej: Netflix Ultra HD">
         </div>
         <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
           <div class="form-group">
-            <label>Precio ($)</label>
-            <input type="text" id="prod-precio" placeholder="4.00">
+            <label>Precio</label>
+            <input type="text" id="prod-precio" placeholder="3.50">
           </div>
           <div class="form-group">
             <label>Subir Imagen</label>
@@ -213,118 +268,142 @@
             </select>
           </div>
           <div class="form-group">
-            <label>Insignia (Opcional)</label>
+            <label>Insignia / Etiqueta (Opcional)</label>
             <input type="text" id="prod-tag" placeholder="POPULAR o TOP">
           </div>
         </div>
         <div class="form-group">
-          <label>Beneficios (separados por comas)</label>
+          <label>Beneficios / Características (separados por comas)</label>
           <input type="text" id="prod-features" placeholder="1 perfil dedicado, Calidad 4K, Entrega inmediata">
         </div>
         <button id="btn-guardar-prod" class="btn-success" onclick="guardarProducto()">AGREGAR SERVICIO AL CATÁLOGO</button>
       </div>
+
       <h4 style="color:#fff;">Mis Servicios Activos</h4>
       <div id="lista-productos"></div>
     </div>
 
-    <!-- PESTAÑA: COMBOS -->
+    <!-- PESTAÑA: COMBOS EDITABLES -->
     <div id="tab-combos" class="hidden">
       <div style="background:#080d1a; padding:16px; border-radius:12px; border:1px solid var(--border); margin-bottom:16px;">
-        <h4 style="color:var(--primary); margin-top:0;">🔥 Personalizar Combos</h4>
-        <div id="combos-container"></div>
-        <button id="btn-save-combos" class="btn-success" onclick="guardarAjustesCombos()" style="margin-top:12px;">GUARDAR CONFIGURACIÓN DE COMBOS</button>
-      </div>
-    </div>
+        <h4 style="color:var(--primary); margin-top:0;">🔥 Personalizar Servicios de Combos</h4>
+        <p style="font-size:13px; color:#94a3b8; margin-bottom:16px;">
+          Aquí puedes cambiar los nombres, imágenes y porcentaje de descuento de los combos armables de tu catálogo.
+        </p>
 
-    <!-- PESTAÑA: BÓVEDA STOCK (NUEVO) -->
-    <div id="tab-stock" class="hidden">
-      <div style="background:#080d1a; padding:16px; border-radius:12px; border:1px solid var(--border); margin-bottom:20px;">
-        <h4 style="color:#38bdf8; margin-top:0;">🔑 Precargar Cuenta en Stock</h4>
-        <input type="hidden" id="stock-edit-idx" value="-1">
-        <div class="form-group">
-          <label>Servicio / Plataforma</label>
-          <input type="text" id="stock-servicio" placeholder="Ej: Netflix Premium 1 Pantalla">
-        </div>
-        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
-          <div class="form-group">
-            <label>Correo / Usuario</label>
-            <input type="text" id="stock-correo" placeholder="correo@cuenta.com">
+        <!-- COMBO 1: DÚO -->
+        <div class="combo-edit-box">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+            <strong style="color:#ff8c3b; font-size:16px;">Combo 1 (Dúo)</strong>
+            <label style="display:flex; align-items:center; gap:6px; cursor:pointer; color:#fff; font-size:13px;">
+              <input type="checkbox" id="combo0-activo" checked style="width:16px; height:16px;"> Activo
+            </label>
           </div>
           <div class="form-group">
-            <label>Contraseña</label>
-            <input type="text" id="stock-clave" placeholder="clave123">
+            <label>Nombre del Combo</label>
+            <input type="text" id="combo0-nombre" value="Combo Dúo (2 Servicios)">
+          </div>
+          <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+            <div class="form-group">
+              <label>Cantidad de Cuentas</label>
+              <input type="number" id="combo0-cant" value="2" min="2" max="10">
+            </div>
+            <div class="form-group">
+              <label>% Descuento (ej: 10)</label>
+              <input type="number" id="combo0-desc" value="10" min="1" max="90">
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Foto de Portada (Subir imagen o cambiar)</label>
+            <input type="file" accept="image/*" onchange="convertirImagenABase64(this, 'combo0-preview')">
+            <div style="text-align:center; margin-top:6px;">
+              <img id="combo0-preview" src="https://images.unsplash.com/photo-1578328819058-b69f3a3b0f6b?w=600" style="max-height:80px; border-radius:8px; object-fit:cover;">
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Descripción corta</label>
+            <input type="text" id="combo0-sub" value="A tu elección · 10% OFF">
           </div>
         </div>
-        <div class="form-group">
-          <label>Perfil / PIN / Instrucciones de Entrega</label>
-          <input type="text" id="stock-pin" placeholder="Perfil: 2 | PIN: 1234 | No cambiar contraseña">
-        </div>
-        <button id="btn-add-stock" class="btn-success" onclick="guardarStockItem()">GUARDAR EN BÓVEDA DE STOCK</button>
-      </div>
 
-      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-        <h4 style="color:#fff; margin:0;">Cuentas Disponibles en Stock</h4>
-        <span id="stock-count-badge" class="badge-dias green">0 en stock</span>
-      </div>
-      <div id="lista-stock"></div>
-    </div>
+        <!-- COMBO 2: TRÍO -->
+        <div class="combo-edit-box">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+            <strong style="color:#a855f7; font-size:16px;">Combo 2 (Trío)</strong>
+            <label style="display:flex; align-items:center; gap:6px; cursor:pointer; color:#fff; font-size:13px;">
+              <input type="checkbox" id="combo1-activo" checked style="width:16px; height:16px;"> Activo
+            </label>
+          </div>
+          <div class="form-group">
+            <label>Nombre del Combo</label>
+            <input type="text" id="combo1-nombre" value="Combo Trío (3 Servicios)">
+          </div>
+          <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+            <div class="form-group">
+              <label>Cantidad de Cuentas</label>
+              <input type="number" id="combo1-cant" value="3" min="2" max="10">
+            </div>
+            <div class="form-group">
+              <label>% Descuento (ej: 10)</label>
+              <input type="number" id="combo1-desc" value="10" min="1" max="90">
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Foto de Portada</label>
+            <input type="file" accept="image/*" onchange="convertirImagenABase64(this, 'combo1-preview')">
+            <div style="text-align:center; margin-top:6px;">
+              <img id="combo1-preview" src="https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=600" style="max-height:80px; border-radius:8px; object-fit:cover;">
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Descripción corta</label>
+            <input type="text" id="combo1-sub" value="A tu elección · 10% OFF">
+          </div>
+        </div>
 
-    <!-- PESTAÑA: CLIENTES & RECORDATORIOS DE COBRO (NUEVO) -->
-    <div id="tab-clientes" class="hidden">
-      <!-- RESUMEN FINANCIERO -->
-      <div class="stats-grid">
-        <div class="stat-metric">
-          <div id="stat-clientes-activos" class="stat-metric-val">0</div>
-          <div class="stat-metric-lbl">Clientes Activos</div>
+        <!-- COMBO 3: CUÁDRUPLE -->
+        <div class="combo-edit-box">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+            <strong style="color:#06b6d4; font-size:16px;">Combo 3 (Cuádruple)</strong>
+            <label style="display:flex; align-items:center; gap:6px; cursor:pointer; color:#fff; font-size:13px;">
+              <input type="checkbox" id="combo2-activo" checked style="width:16px; height:16px;"> Activo
+            </label>
+          </div>
+          <div class="form-group">
+            <label>Nombre del Combo</label>
+            <input type="text" id="combo2-nombre" value="Combo Cuádruple (4 Servicios)">
+          </div>
+          <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+            <div class="form-group">
+              <label>Cantidad de Cuentas</label>
+              <input type="number" id="combo2-cant" value="4" min="2" max="10">
+            </div>
+            <div class="form-group">
+              <label>% Descuento (ej: 10)</label>
+              <input type="number" id="combo2-desc" value="10" min="1" max="90">
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Foto de Portada</label>
+            <input type="file" accept="image/*" onchange="convertirImagenABase64(this, 'combo2-preview')">
+            <div style="text-align:center; margin-top:6px;">
+              <img id="combo2-preview" src="https://images.unsplash.com/photo-1594909122845-11baa439b7bf?w=600" style="max-height:80px; border-radius:8px; object-fit:cover;">
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Descripción corta</label>
+            <input type="text" id="combo2-sub" value="A tu elección · 10% OFF">
+          </div>
         </div>
-        <div class="stat-metric">
-          <div id="stat-por-vencer" class="stat-metric-val" style="color:#eab308;">0</div>
-          <div class="stat-metric-lbl">Cobros Próximos (≤3d)</div>
-        </div>
-        <div class="stat-metric">
-          <div id="stat-ingresos-estimados" class="stat-metric-val" style="color:#22c55e;">$0.00</div>
-          <div class="stat-metric-lbl">Ingresos Mensuales</div>
-        </div>
-      </div>
 
-      <div style="background:#080d1a; padding:16px; border-radius:12px; border:1px solid var(--border); margin-bottom:20px;">
-        <h4 style="color:#22c55e; margin-top:0;">➕ Registrar Venta / Cliente</h4>
-        <input type="hidden" id="cli-edit-idx" value="-1">
-        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
-          <div class="form-group">
-            <label>Nombre del Cliente</label>
-            <input type="text" id="cli-nombre" placeholder="Ej: Carlos Andrade">
-          </div>
-          <div class="form-group">
-            <label>WhatsApp del Cliente (con código país)</label>
-            <input type="text" id="cli-ws" placeholder="593982766054">
-          </div>
-        </div>
-        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
-          <div class="form-group">
-            <label>Servicio Vendido</label>
-            <input type="text" id="cli-servicio" placeholder="Ej: Netflix (1 Perfil)">
-          </div>
-          <div class="form-group">
-            <label>Precio Cobrado ($)</label>
-            <input type="text" id="cli-precio" placeholder="4.00">
-          </div>
-        </div>
-        <div class="form-group">
-          <label>Fecha de Vencimiento de su Mensualidad</label>
-          <input type="date" id="cli-vence">
-        </div>
-        <button id="btn-add-cliente" class="btn-success" onclick="guardarClienteItem()">REGISTRAR VENTA Y AGENDAR COBRO</button>
+        <button id="btn-save-combos" class="btn-success" onclick="guardarAjustesCombos()">GUARDAR CONFIGURACIÓN DE COMBOS</button>
       </div>
-
-      <h4 style="color:#fff;">Cartera de Clientes & Alertas de Cobro</h4>
-      <div id="lista-clientes"></div>
     </div>
 
     <!-- PESTAÑA: TEXTOS -->
     <div id="tab-texts" class="hidden">
       <div style="background:#080d1a; padding:16px; border-radius:12px; border:1px solid var(--border);">
-        <h4 style="color:var(--primary); margin-top:0;">Personalizar Palabras y Textos</h4>
+        <h4 style="color:var(--primary); margin-top:0;">Personalizar Palabras y Textos del Catálogo</h4>
         <div class="form-group">
           <label>Insignia Superior</label>
           <input type="text" id="txt-pill" placeholder="✦ ATENCIÓN 24/7 ✦">
@@ -335,17 +414,17 @@
             <input type="text" id="txt-title-1" placeholder="TU TIENDA DE">
           </div>
           <div class="form-group">
-            <label>Palabra Destacada</label>
+            <label>Palabra Destacada Naranja</label>
             <input type="text" id="txt-title-2" placeholder="SOFTWARE o STREAMING">
           </div>
         </div>
         <div class="form-group">
-          <label>Subtítulo de Garantía</label>
-          <input type="text" id="txt-sub" placeholder="Proveedor garantizado · Activación inmediata">
+          <label>Subtítulo de Garantía / Entrega</label>
+          <input type="text" id="txt-sub" placeholder="Proveedor garantizado · Activación inmediata · Los mejores precios">
         </div>
         <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
           <div class="form-group">
-            <label>Moneda</label>
+            <label>Símbolo de Moneda</label>
             <input type="text" id="txt-currency" placeholder="$">
           </div>
           <div class="form-group">
@@ -353,17 +432,23 @@
             <input type="text" id="txt-btn-buy" placeholder="Comprar ahora!">
           </div>
         </div>
-        <button id="btn-save-texts" class="btn-primary" onclick="guardarTextos()">GUARDAR TEXTOS</button>
+        <button id="btn-save-texts" class="btn-primary" onclick="guardarTextos()">GUARDAR TEXTOS DEL CATÁLOGO</button>
       </div>
     </div>
 
     <!-- PESTAÑA: PAGOS -->
     <div id="tab-payments" class="hidden">
       <div style="background:#080d1a; padding:16px; border-radius:12px; border:1px solid var(--border);">
-        <h4 style="color:var(--accent); margin-top:0;">Cuentas Bancarias</h4>
+        <h4 style="color:var(--accent); margin-top:0;">Tus Cuentas Bancarias y Métodos de Pago</h4>
         <div class="form-group">
           <label>Detalle de tus Métodos de Pago:</label>
-          <textarea id="shop-payments" rows="8" placeholder="🏦 BANCO PICHINCHA&#10;• Ahorros: 2204918291&#10;• Titular: Tu Nombre&#10;&#10;📱 DEUNA: 0999999999"></textarea>
+          <textarea id="shop-payments" rows="8" placeholder="Ejemplo:
+🏦 BANCO PICHINCHA
+• Ahorros: 2200000000
+• Titular: Tu Nombre
+• CI: 1300000000
+
+📱 DEUNA: 0999999999"></textarea>
         </div>
         <button id="btn-save-payments" class="btn-success" onclick="guardarMetodosPago()">GUARDAR MÉTODOS DE PAGO</button>
       </div>
@@ -377,37 +462,53 @@
     let slugActual = null;
     let tempImgBase64 = null;
     let tempLogoBase64 = null;
-    let stockItems = [];
-    let clientesItems = [];
-
-    const COMBOS_DEFAULT = [
-      {
-        activo: true, comboCantidad: 2, descuento: 10,
-        nombre: "Combo Dúo (2 Servicios)", sub: "A tu elección · 10% OFF",
-        img: "https://images.unsplash.com/photo-1578328819058-b69f3a3b0f6b?w=600"
-      },
-      {
-        activo: true, comboCantidad: 3, descuento: 10,
-        nombre: "Combo Trío (3 Servicios)", sub: "A tu elección · 10% OFF",
-        img: "https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=600"
-      },
-      {
-        activo: true, comboCantidad: 4, descuento: 10,
-        nombre: "Combo Cuádruple (4 Servicios)", sub: "A tu elección · 10% OFF",
-        img: "https://images.unsplash.com/photo-1594909122845-11baa439b7bf?w=600"
-      }
-    ];
+    let tempComboImgs = [null, null, null];
 
     function togglePasswordVisibility(inputId, btn) {
       const input = document.getElementById(inputId);
-      input.type = input.type === 'password' ? 'text' : 'password';
-      btn.innerText = input.type === 'password' ? '👁️' : '🙈';
+      if (input.type === 'password') {
+        input.type = 'text';
+        btn.innerText = '🙈';
+        btn.title = 'Ocultar contraseña';
+      } else {
+        input.type = 'password';
+        btn.innerText = '👁️';
+        btn.title = 'Ver contraseña';
+      }
     }
 
-    function toggleCheckbox() {
-      const chk = document.getElementById('remember-session');
-      chk.checked = !chk.checked;
-    }
+    const COMBOS_DEFAULT = [
+      {
+        activo: true,
+        comboCantidad: 2,
+        descuento: 10,
+        nombre: "Combo Dúo (2 Servicios)",
+        sub: "A tu elección · 10% OFF",
+        tag: "10% OFF",
+        img: "https://images.unsplash.com/photo-1578328819058-b69f3a3b0f6b?w=600",
+        features: ["Elige 2 servicios del catálogo", "Descuento automático del 10%", "Activación inmediata 24/7", "Garantía total en ambos"]
+      },
+      {
+        activo: true,
+        comboCantidad: 3,
+        descuento: 10,
+        nombre: "Combo Trío (3 Servicios)",
+        sub: "A tu elección · 10% OFF",
+        tag: "10% OFF",
+        img: "https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=600",
+        features: ["Elige 3 servicios del catálogo", "Descuento automático del 10%", "Cine, series o música a tu gusto", "Activación inmediata 24/7"]
+      },
+      {
+        activo: true,
+        comboCantidad: 4,
+        descuento: 10,
+        nombre: "Combo Cuádruple (4 Servicios)",
+        sub: "A tu elección · 10% OFF",
+        tag: "10% OFF",
+        img: "https://images.unsplash.com/photo-1594909122845-11baa439b7bf?w=600",
+        features: ["Elige 4 servicios completos", "Descuento automático del 10%", "Ideal para toda la familia", "Activación inmediata 24/7"]
+      }
+    ];
 
     async function cargarBD() {
       try {
@@ -418,10 +519,17 @@
       }
     }
 
-    function calcularDias(vence) {
-      if (!vence) return 0;
-      const diff = new Date(vence) - new Date();
-      return Math.ceil(diff / (1000 * 60 * 60 * 24));
+    function toggleCheckbox() {
+      const chk = document.getElementById('remember-session');
+      chk.checked = !chk.checked;
+    }
+
+    function calcularDiasRestantes(fechaVencimiento) {
+      if (!fechaVencimiento) return 999;
+      const ahora = new Date();
+      const vence = new Date(fechaVencimiento);
+      const diffMs = vence.getTime() - ahora.getTime();
+      return Math.ceil(diffMs / (1000 * 60 * 60 * 24));
     }
 
     function actualizarContadorDias() {
@@ -431,16 +539,19 @@
         tag.innerText = '● SERVICIO ACTIVO';
         return;
       }
-      const dias = calcularDias(revendedorActual.vencimiento);
-      if (revendedorActual.activo === false || dias <= 0) {
+      const dias = calcularDiasRestantes(revendedorActual.vencimiento);
+      if (revendedorActual.activo === false) {
         tag.className = 'badge-dias red';
-        tag.innerText = dias <= 0 ? `⛔ SERVICIO VENCIDO (${Math.abs(dias)}d)` : '⛔ CUENTA SUSPENDIDA';
+        tag.innerText = '⛔ CUENTA SUSPENDIDA';
+      } else if (dias <= 0) {
+        tag.className = 'badge-dias red';
+        tag.innerText = dias === 0 ? '⚠️ TU SERVICIO VENCE HOY' : `⛔ SERVICIO VENCIDO (${Math.abs(dias)}d)`;
       } else if (dias <= 5) {
         tag.className = 'badge-dias yellow';
-        tag.innerText = `⏳ TE QUEDAN ${dias} DÍAS`;
+        tag.innerText = `⏳ TE QUEDAN ${dias} DÍAS RESTANTES`;
       } else {
         tag.className = 'badge-dias green';
-        tag.innerText = `✨ TE QUEDAN ${dias} DÍAS`;
+        tag.innerText = `✨ TE QUEDAN ${dias} DÍAS RESTANTES`;
       }
     }
 
@@ -451,7 +562,7 @@
 
       if (!dbData) await cargarBD();
 
-      const revendedores = dbData.revendedores || {};
+      const revendedores = dbData.revendedores || dbData.usuarios || {};
       const foundSlug = Object.keys(revendedores).find(slug => {
         const r = revendedores[slug];
         return (r.email === email || r.correo === email) && (r.password === pass || r.clave === pass);
@@ -479,27 +590,39 @@
 
     function cerrarSesion() {
       localStorage.removeItem('revendedor_session');
-      location.reload();
+      const urlParams = new URLSearchParams(window.location.search);
+      const urlTienda = urlParams.get('tienda');
+      if (urlTienda) {
+        window.location.href = `/admin.html?tienda=${urlTienda}`;
+      } else {
+        location.reload();
+      }
     }
 
     async function verificarSesionGuardada() {
       await cargarBD();
+
       const urlParams = new URLSearchParams(window.location.search);
       const urlTienda = urlParams.get('tienda');
-      const revendedores = dbData.revendedores || {};
+
+      const revendedores = dbData.revendedores || dbData.usuarios || {};
 
       if (urlTienda && revendedores[urlTienda]) {
         const revUrl = revendedores[urlTienda];
         const saved = localStorage.getItem('revendedor_session');
+
         if (saved) {
           try {
             const parsed = JSON.parse(saved);
-            if (parsed.slug === urlTienda && parsed.email && parsed.pass) {
+            if (parsed.slug && parsed.slug !== urlTienda) {
+              localStorage.removeItem('revendedor_session');
+            } else if (parsed.email && parsed.pass && parsed.slug === urlTienda) {
               iniciarSesion(parsed.email, parsed.pass);
               return;
             }
           } catch(e) {}
         }
+
         document.getElementById('email').value = revUrl.email || revUrl.correo || '';
         document.getElementById('login-submsg').innerText = `Inicia sesión para administrar: ${revUrl.nombre || urlTienda}`;
         return;
@@ -516,7 +639,24 @@
 
     function cargarTienda() {
       if (!dbData.tiendas) dbData.tiendas = {};
-      const tienda = dbData.tiendas[slugActual] || {};
+      if (!dbData.tiendas[slugActual]) {
+        dbData.tiendas[slugActual] = {
+          nombre: revendedorActual.nombre || revendedorActual.nombreTienda || slugActual,
+          whatsapp: revendedorActual.whatsapp || "593982766054",
+          productos: [],
+          combos: JSON.parse(JSON.stringify(COMBOS_DEFAULT)),
+          logo: "",
+          metodosPago: "",
+          textos: {}
+        };
+      }
+
+      const tienda = dbData.tiendas[slugActual];
+
+      if (!tienda.combos || tienda.combos.length === 0) {
+        tienda.combos = JSON.parse(JSON.stringify(COMBOS_DEFAULT));
+        persistirTienda();
+      }
 
       document.getElementById('dash-title').innerText = tienda.nombre || slugActual;
       document.getElementById('shop-nombre').value = tienda.nombre || '';
@@ -527,6 +667,18 @@
         document.getElementById('dash-logo').src = tienda.logo;
         document.getElementById('shop-logo-preview').src = tienda.logo;
       }
+
+      // Cargar campos de combos
+      const combos = tienda.combos;
+      [0, 1, 2].forEach(i => {
+        const c = combos[i] || COMBOS_DEFAULT[i];
+        document.getElementById(`combo${i}-activo`).checked = c.activo !== false;
+        document.getElementById(`combo${i}-nombre`).value = c.nombre || '';
+        document.getElementById(`combo${i}-cant`).value = c.comboCantidad || (i + 2);
+        document.getElementById(`combo${i}-desc`).value = c.descuento || 10;
+        document.getElementById(`combo${i}-sub`).value = c.sub || '';
+        if (c.img) document.getElementById(`combo${i}-preview`).src = c.img;
+      });
 
       const txt = tienda.textos || {};
       document.getElementById('txt-pill').value = txt.pill || "✦ ATENCIÓN 24/7 ✦";
@@ -541,24 +693,12 @@
       elLink.href = publicLink;
       elLink.innerText = publicLink;
 
-      // Cargar Stock y Clientes
-      stockItems = (dbData.stock && dbData.stock[slugActual] && dbData.stock[slugActual].items) || [];
-      clientesItems = (dbData.clientes && dbData.clientes[slugActual] && dbData.clientes[slugActual].items) || [];
-
-      // Fechas de vencimiento predeterminada a +30 días para nuevos clientes
-      const f30 = new Date();
-      f30.setDate(f30.getDate() + 30);
-      document.getElementById('cli-vence').value = f30.toISOString().split('T')[0];
-
       actualizarContadorDias();
       renderProductos();
-      renderCombosForm();
-      renderStock();
-      renderClientes();
     }
 
     function cambiarTab(tab) {
-      ['shop', 'prods', 'combos', 'stock', 'clientes', 'texts', 'payments'].forEach(t => {
+      ['shop', 'prods', 'combos', 'texts', 'payments'].forEach(t => {
         document.getElementById('tab-' + t).classList.add('hidden');
         document.getElementById('tab-btn-' + t).classList.remove('active');
       });
@@ -566,285 +706,136 @@
       document.getElementById('tab-btn-' + tab).classList.add('active');
     }
 
-    // ==========================================
-    // SECCIÓN BÓVEDA STOCK (ENTREGA INMEDIATA)
-    // ==========================================
-    function renderStock() {
-      const cont = document.getElementById('lista-stock');
-      const badge = document.getElementById('stock-count-badge');
-      cont.innerHTML = '';
-      badge.innerText = `${stockItems.length} en stock`;
+    function renderProductos() {
+      const lista = document.getElementById('lista-productos');
+      lista.innerHTML = '';
+      const productos = dbData.tiendas[slugActual].productos || [];
 
-      if (stockItems.length === 0) {
-        cont.innerHTML = '<p style="color:#94a3b8; font-size:13px; text-align:center;">No tienes cuentas precargadas en stock.</p>';
+      if (productos.length === 0) {
+        lista.innerHTML = '<p style="color:#94a3b8; font-size:13px;">No has agregado servicios personalizados aún (tu catálogo mostrará los predeterminados de la plataforma).</p>';
         return;
       }
 
-      stockItems.forEach((st, idx) => {
+      productos.forEach((p, idx) => {
         const item = document.createElement('div');
-        item.className = 'item-card';
+        item.className = 'product-card';
         item.innerHTML = `
-          <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:8px;">
-            <strong style="color:#38bdf8; font-size:16px;">${st.servicio}</strong>
-            <span class="badge-dias green">DISPONIBLE</span>
+          <img src="${p.img || 'https://via.placeholder.com/65'}" class="product-img" onerror="this.src='https://via.placeholder.com/65'">
+          <div style="flex:1;">
+            <strong style="color:#fff; font-size:16px;">${p.nombre}</strong>
+            <div style="color:var(--accent); font-weight:bold; font-size:15px;">${dbData.tiendas[slugActual]?.textos?.currency || '$'}${p.precio}</div>
+            <small style="color:#94a3b8; font-size:12px;">${p.sub || ''}</small>
           </div>
-          <div style="font-size:13px; color:#cbd5e1; line-height:1.4; margin-bottom:10px;">
-            <div>📧 <b>Usuario:</b> ${st.correo}</div>
-            <div>🔑 <b>Clave:</b> ${st.clave}</div>
-            <div>📌 <b>PIN / Notas:</b> ${st.pin || 'Ninguna'}</div>
-          </div>
-          <div style="display:flex; gap:8px;">
-            <button style="background:#0284c7; color:#fff; padding:6px 10px; font-size:12px;" onclick="copiarFichaEntrega(${idx})">📋 COPIAR PARA WHATSAPP</button>
-            <button style="background:#dc2626; color:#fff; padding:6px 10px; font-size:12px; width:auto;" onclick="eliminarStock(${idx})">🗑️</button>
+          <div style="display:flex; flex-direction:column; gap:6px;">
+            <button style="background:#0284c7; color:#fff; padding:6px 10px; font-size:12px;" onclick="cargarEdicionProducto(${idx})">✏️</button>
+            <button style="background:#dc2626; color:#fff; padding:6px 10px; font-size:12px;" onclick="eliminarProducto(${idx})">🗑️</button>
           </div>
         `;
-        cont.appendChild(item);
+        lista.appendChild(item);
       });
     }
 
-    async function guardarStockItem() {
-      const idx = parseInt(document.getElementById('stock-edit-idx').value);
-      const servicio = document.getElementById('stock-servicio').value.trim();
-      const correo = document.getElementById('stock-correo').value.trim();
-      const clave = document.getElementById('stock-clave').value.trim();
-      const pin = document.getElementById('stock-pin').value.trim();
+    function cargarEdicionProducto(idx) {
+      const p = dbData.tiendas[slugActual].productos[idx];
+      document.getElementById('prod-edit-idx').value = idx;
+      document.getElementById('prod-nombre').value = p.nombre;
+      document.getElementById('prod-precio').value = p.precio;
+      document.getElementById('prod-cat').value = p.categoria || 'streaming';
+      document.getElementById('prod-tag').value = p.tag || '';
+      document.getElementById('prod-features').value = (p.features && p.features.length) ? p.features.join(', ') : '';
+      
+      const imgPrev = document.getElementById('prod-preview-img');
+      if (p.img) {
+        imgPrev.src = p.img;
+        imgPrev.style.display = 'block';
+        tempImgBase64 = p.img;
+      }
+      document.getElementById('btn-guardar-prod').innerText = "ACTUALIZAR SERVICIO";
+      cambiarTab('prods');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
 
-      if (!servicio || !correo || !clave) {
-        alert('Servicio, Correo y Contraseña son obligatorios.');
+    async function guardarProducto() {
+      const btn = document.getElementById('btn-guardar-prod');
+      const idx = parseInt(document.getElementById('prod-edit-idx').value);
+      const nombre = document.getElementById('prod-nombre').value.trim();
+      const precio = document.getElementById('prod-precio').value.trim();
+      const categoria = document.getElementById('prod-cat').value;
+      const tag = document.getElementById('prod-tag').value.trim();
+      const rawFeatures = document.getElementById('prod-features').value.trim();
+
+      if (!nombre || !precio) {
+        alert('Nombre y precio son obligatorios.');
         return;
       }
 
-      const obj = { servicio, correo, clave, pin, fecha: new Date().toISOString() };
-      if (idx >= 0) stockItems[idx] = obj;
-      else stockItems.push(obj);
-
-      await persistirStock();
-      document.getElementById('stock-edit-idx').value = "-1";
-      document.getElementById('stock-servicio').value = "";
-      document.getElementById('stock-correo').value = "";
-      document.getElementById('stock-clave').value = "";
-      document.getElementById('stock-pin').value = "";
-      renderStock();
-      alert('¡Cuenta guardada en tu bóveda de stock!');
-    }
-
-    async function eliminarStock(idx) {
-      if (confirm('¿Eliminar esta cuenta del stock?')) {
-        stockItems.splice(idx, 1);
-        await persistirStock();
-        renderStock();
-      }
-    }
-
-    function copiarFichaEntrega(idx) {
-      const st = stockItems[idx];
-      const texto = `🎉 ¡Tu cuenta está lista para disfrutar!\n\n` +
-        `🍿 *Servicio:* ${st.servicio}\n` +
-        `✉️ *Correo:* ${st.correo}\n` +
-        `🔑 *Contraseña:* ${st.clave}\n` +
-        (st.pin ? `📌 *Detalles:* ${st.pin}\n` : '') +
-        `\n_Por favor no cambiar datos de facturación para mantener tu garantía activa 24/7._`;
-
-      navigator.clipboard.writeText(texto).then(() => {
-        alert('¡Datos de la cuenta copiados! Pégaselos directamente en WhatsApp a tu cliente.');
-      });
-    }
-
-    async function persistirStock() {
-      try {
-        await fetch('/api/stock/guardar', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ slug: slugActual, items: stockItems })
-        });
-      } catch (e) {}
-    }
-
-    // ==========================================
-    // SECCIÓN CLIENTES & COBROS AUTOMÁTICOS
-    // ==========================================
-    function renderClientes() {
-      const cont = document.getElementById('lista-clientes');
-      cont.innerHTML = '';
-
-      let activos = 0;
-      let porVencer = 0;
-      let totalIngresos = 0;
-
-      if (clientesItems.length === 0) {
-        cont.innerHTML = '<p style="color:#94a3b8; font-size:13px; text-align:center;">No tienes ventas o clientes registrados todavía.</p>';
-      }
-
-      clientesItems.forEach((c, idx) => {
-        const dias = calcularDias(c.vence);
-        const precio = parseFloat(c.precio) || 0;
-        totalIngresos += precio;
-
-        let badgeClass = 'green';
-        let badgeText = `ACTIVO (${dias}d)`;
-
-        if (dias <= 0) {
-          badgeClass = 'red';
-          badgeText = `VENCIDO (${Math.abs(dias)}d)`;
-        } else if (dias <= 3) {
-          badgeClass = 'yellow';
-          badgeText = `COBRAR HOY (${dias}d)`;
-          porVencer++;
-          activos++;
-        } else {
-          activos++;
-        }
-
-        const wsLimpio = (c.ws || '').replace(/\D/g, '');
-        const msgCobro = encodeURIComponent(
-          `👋 ¡Hola *${c.nombre}*!\n\nTe recordamos que tu suscripción de *${c.servicio}* está por vencer el día *${c.vence}* (${dias > 0 ? `te quedan ${dias} días` : 'venció hoy'}).\n\n` +
-          `💰 *Monto de renovación:* $${precio.toFixed(2)}\n\n` +
-          `¿Deseas renovar tu servicio para continuar sin interrupciones? Responde a este mensaje para enviarte los datos de pago.`
-        );
-
-        const item = document.createElement('div');
-        item.className = 'item-card';
-        item.innerHTML = `
-          <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:8px;">
-            <div>
-              <strong style="color:#fff; font-size:16px;">${c.nombre}</strong>
-              <div style="color:var(--accent); font-size:13px; font-weight:bold;">${c.servicio} · $${precio.toFixed(2)}</div>
-            </div>
-            <span class="badge-dias ${badgeClass}">${badgeText}</span>
-          </div>
-          <div style="font-size:13px; color:#cbd5e1; margin-bottom:10px;">
-            <div>📱 <b>WhatsApp:</b> +${c.ws}</div>
-            <div>📅 <b>Vencimiento:</b> ${c.vence}</div>
-          </div>
-          <div style="display:flex; gap:8px;">
-            <a href="https://wa.me/${wsLimpio}?text=${msgCobro}" target="_blank" style="flex:1; background:#00d26a; color:#042512; padding:8px; border-radius:6px; font-weight:bold; font-size:12px; text-decoration:none; text-align:center;">
-              💬 COBRAR POR WHATSAPP
-            </a>
-            <button style="background:#0284c7; color:#fff; padding:6px 10px; font-size:12px; width:auto;" onclick="renovarCliente30Dias(${idx})">➕ 30D</button>
-            <button style="background:#dc2626; color:#fff; padding:6px 10px; font-size:12px; width:auto;" onclick="eliminarCliente(${idx})">🗑️</button>
-          </div>
-        `;
-        cont.appendChild(item);
-      });
-
-      document.getElementById('stat-clientes-activos').innerText = activos;
-      document.getElementById('stat-por-vencer').innerText = porVencer;
-      document.getElementById('stat-ingresos-estimados').innerText = `$${totalIngresos.toFixed(2)}`;
-    }
-
-    async function guardarClienteItem() {
-      const nombre = document.getElementById('cli-nombre').value.trim();
-      const ws = document.getElementById('cli-ws').value.trim();
-      const servicio = document.getElementById('cli-servicio').value.trim();
-      const precio = document.getElementById('cli-precio').value.trim();
-      const vence = document.getElementById('cli-vence').value;
-
-      if (!nombre || !ws || !servicio || !vence) {
-        alert('Por favor completa todos los campos del cliente.');
-        return;
-      }
-
-      clientesItems.push({ nombre, ws, servicio, precio, vence, fecha: new Date().toISOString() });
-      await persistirClientes();
-
-      document.getElementById('cli-nombre').value = '';
-      document.getElementById('cli-ws').value = '';
-      document.getElementById('cli-servicio').value = '';
-      document.getElementById('cli-precio').value = '';
-      renderClientes();
-      alert('¡Venta registrada y fecha de cobro agendada!');
-    }
-
-    async function renovarCliente30Dias(idx) {
-      const c = clientesItems[idx];
-      let base = new Date();
-      if (c.vence && new Date(c.vence) > base) base = new Date(c.vence);
-      base.setDate(base.getDate() + 30);
-      c.vence = base.toISOString().split('T')[0];
-
-      await persistirClientes();
-      renderClientes();
-      alert(`¡Suscripción de ${c.nombre} renovada por 30 días adicionales!`);
-    }
-
-    async function eliminarCliente(idx) {
-      if (confirm('¿Eliminar este cliente de tu lista?')) {
-        clientesItems.splice(idx, 1);
-        await persistirClientes();
-        renderClientes();
-      }
-    }
-
-    async function persistirClientes() {
-      try {
-        await fetch('/api/clientes/guardar', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ slug: slugActual, items: clientesItems })
-        });
-      } catch (e) {}
-    }
-
-    // ==========================================
-    // RENDER COMBOS Y SERVICIOS
-    // ==========================================
-    function renderCombosForm() {
-      const cont = document.getElementById('combos-container');
-      cont.innerHTML = '';
-      const tienda = dbData.tiendas[slugActual] || {};
-      const combos = (tienda.combos && tienda.combos.length > 0) ? tienda.combos : COMBOS_DEFAULT;
-
-      combos.forEach((c, idx) => {
-        const d = document.createElement('div');
-        d.className = 'item-card';
-        d.innerHTML = `
-          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-            <strong style="color:var(--primary); font-size:16px;">Combo ${idx + 1}</strong>
-            <label style="display:flex; align-items:center; gap:6px; cursor:pointer; color:#fff; font-size:13px;">
-              <input type="checkbox" id="combo-active-${idx}" ${c.activo !== false ? 'checked' : ''} style="width:16px; height:16px;"> Activo
-            </label>
-          </div>
-          <div class="form-group">
-            <label>Nombre del Combo</label>
-            <input type="text" id="combo-nombre-${idx}" value="${c.nombre || ''}">
-          </div>
-          <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
-            <div class="form-group">
-              <label>Cantidad de Cuentas Requeridas</label>
-              <input type="number" id="combo-cant-${idx}" value="${c.comboCantidad || (idx + 2)}">
-            </div>
-            <div class="form-group">
-              <label>% Descuento Automático</label>
-              <input type="number" id="combo-desc-${idx}" value="${c.descuento || 10}">
-            </div>
-          </div>
-        `;
-        cont.appendChild(d);
-      });
-    }
-
-    async function guardarAjustesCombos() {
-      const btn = document.getElementById('btn-save-combos');
       btn.disabled = true;
       btn.innerText = "⏳ GUARDANDO...";
 
+      const features = rawFeatures ? rawFeatures.split(',').map(s => s.trim()).filter(Boolean) : [];
+      const sub = `1 mes · ${categoria.charAt(0).toUpperCase() + categoria.slice(1)}`;
+      const img = tempImgBase64 || 'https://images.unsplash.com/photo-1522869635100-9f4c5e86aa37?w=500';
+
+      if (!dbData.tiendas[slugActual].productos) dbData.tiendas[slugActual].productos = [];
+
+      const nuevoObj = { nombre, sub, categoria, tag, precio, features, img };
+
+      if (idx >= 0) {
+        dbData.tiendas[slugActual].productos[idx] = nuevoObj;
+      } else {
+        dbData.tiendas[slugActual].productos.push(nuevoObj);
+      }
+
+      const guardado = await persistirTienda();
+      btn.disabled = false;
+      btn.innerText = "AGREGAR SERVICIO AL CATÁLOGO";
+
+      if (guardado) {
+        alert('¡Servicio guardado exitosamente en la nube!');
+        document.getElementById('prod-edit-idx').value = "-1";
+        document.getElementById('prod-nombre').value = '';
+        document.getElementById('prod-precio').value = '';
+        document.getElementById('prod-tag').value = '';
+        document.getElementById('prod-features').value = '';
+        document.getElementById('prod-file').value = '';
+        document.getElementById('prod-preview-img').style.display = 'none';
+        tempImgBase64 = null;
+        renderProductos();
+      }
+    }
+
+    async function eliminarProducto(idx) {
+      if (confirm('¿Deseas eliminar este servicio de tu catálogo?')) {
+        dbData.tiendas[slugActual].productos.splice(idx, 1);
+        await persistirTienda();
+        renderProductos();
+      }
+    }
+
+    // GUARDAR AJUSTES DE COMBOS
+    async function guardarAjustesCombos() {
+      const btn = document.getElementById('btn-save-combos');
+      btn.disabled = true;
+      btn.innerText = "⏳ GUARDANDO COMBOS...";
+
       const nuevosCombos = [];
-      [0, 1, 2].forEach(idx => {
-        const activo = document.getElementById(`combo-active-${idx}`).checked;
-        const nombre = document.getElementById(`combo-nombre-${idx}`).value.trim();
-        const comboCantidad = parseInt(document.getElementById(`combo-cant-${idx}`).value) || (idx + 2);
-        const descuento = parseInt(document.getElementById(`combo-desc-${idx}`).value) || 10;
-        const def = COMBOS_DEFAULT[idx] || {};
+      [0, 1, 2].forEach(i => {
+        const activo = document.getElementById(`combo${i}-activo`).checked;
+        const nombre = document.getElementById(`combo${i}-nombre`).value.trim();
+        const comboCantidad = parseInt(document.getElementById(`combo${i}-cant`).value) || (i + 2);
+        const descuento = parseInt(document.getElementById(`combo${i}-desc`).value) || 10;
+        const sub = document.getElementById(`combo${i}-sub`).value.trim();
+        const img = tempComboImgs[i] || document.getElementById(`combo${i}-preview`).src;
 
         nuevosCombos.push({
           activo,
           comboCantidad,
           descuento,
-          nombre: nombre || def.nombre,
-          sub: `A tu elección · ${descuento}% OFF`,
+          nombre: nombre || `Combo (${comboCantidad} Servicios)`,
+          sub: sub || `A tu elección · ${descuento}% OFF`,
           tag: `${descuento}% OFF`,
           precio: `${descuento}% OFF`,
-          img: def.img,
+          img,
           features: [
             `Elige ${comboCantidad} servicios del catálogo`,
             `Descuento automático del ${descuento}%`,
@@ -855,102 +846,83 @@
       });
 
       dbData.tiendas[slugActual].combos = nuevosCombos;
-      await persistirTienda();
+      const guardado = await persistirTienda();
       btn.disabled = false;
       btn.innerText = "GUARDAR CONFIGURACIÓN DE COMBOS";
-      alert('¡Combos actualizados!');
-    }
 
-    function renderProductos() {
-      const lista = document.getElementById('lista-productos');
-      lista.innerHTML = '';
-      const productos = (dbData.tiendas[slugActual] && dbData.tiendas[slugActual].productos) || [];
-
-      productos.forEach((p, idx) => {
-        const item = document.createElement('div');
-        item.className = 'item-card';
-        item.style.display = 'flex';
-        item.style.gap = '14px';
-        item.style.alignItems = 'center';
-        item.innerHTML = `
-          <img src="${p.img || 'https://via.placeholder.com/65'}" style="width:65px; height:65px; border-radius:8px; object-fit:cover;" onerror="this.src='https://via.placeholder.com/65'">
-          <div style="flex:1;">
-            <strong style="color:#fff; font-size:16px;">${p.nombre}</strong>
-            <div style="color:var(--accent); font-weight:bold; font-size:15px;">$${p.precio}</div>
-            <small style="color:#94a3b8; font-size:12px;">${p.sub || ''}</small>
-          </div>
-          <div style="display:flex; flex-direction:column; gap:6px;">
-            <button style="background:#dc2626; color:#fff; padding:6px 10px; font-size:12px;" onclick="eliminarProducto(${idx})">🗑️</button>
-          </div>
-        `;
-        lista.appendChild(item);
-      });
-    }
-
-    async function guardarProducto() {
-      const nombre = document.getElementById('prod-nombre').value.trim();
-      const precio = document.getElementById('prod-precio').value.trim();
-      const categoria = document.getElementById('prod-cat').value;
-      const tag = document.getElementById('prod-tag').value.trim();
-      const rawFeatures = document.getElementById('prod-features').value.trim();
-
-      if (!nombre || !precio) {
-        alert('Nombre y precio requeridos.');
-        return;
-      }
-
-      const features = rawFeatures ? rawFeatures.split(',').map(s => s.trim()).filter(Boolean) : ["1 perfil dedicado", "Activación inmediata"];
-      const sub = `1 mes · ${categoria.charAt(0).toUpperCase() + categoria.slice(1)}`;
-      const img = tempImgBase64 || 'https://images.unsplash.com/photo-1522869635100-9f4c5e86aa37?w=500';
-
-      if (!dbData.tiendas[slugActual].productos) dbData.tiendas[slugActual].productos = [];
-      dbData.tiendas[slugActual].productos.push({ nombre, sub, categoria, tag, precio, features, img });
-
-      await persistirTienda();
-      document.getElementById('prod-nombre').value = '';
-      document.getElementById('prod-precio').value = '';
-      renderProductos();
-      alert('¡Servicio agregado!');
-    }
-
-    async function eliminarProducto(idx) {
-      if (confirm('¿Eliminar este servicio?')) {
-        dbData.tiendas[slugActual].productos.splice(idx, 1);
-        await persistirTienda();
-        renderProductos();
+      if (guardado) {
+        alert('¡Configuración de combos guardada y actualizada con éxito en la nube!');
       }
     }
 
     async function guardarAjustesTienda() {
+      const btn = document.getElementById('btn-save-shop');
       const nombre = document.getElementById('shop-nombre').value.trim();
-      const ws = document.getElementById('shop-whatsapp').value.trim();
-      if (!nombre || !ws) return alert('Completa nombre y WhatsApp.');
+      const whatsapp = document.getElementById('shop-whatsapp').value.trim();
+
+      if (!nombre || !whatsapp) {
+        alert('Nombre y número de WhatsApp son obligatorios.');
+        return;
+      }
+
+      btn.disabled = true;
+      btn.innerText = "⏳ GUARDANDO...";
 
       dbData.tiendas[slugActual].nombre = nombre;
-      dbData.tiendas[slugActual].whatsapp = ws;
-      if (tempLogoBase64) dbData.tiendas[slugActual].logo = tempLogoBase64;
+      dbData.tiendas[slugActual].whatsapp = whatsapp;
+      if (tempLogoBase64) {
+        dbData.tiendas[slugActual].logo = tempLogoBase64;
+      }
 
-      await persistirTienda();
-      alert('¡Ajustes de tienda guardados!');
+      const guardado = await persistirTienda();
+      btn.disabled = false;
+      btn.innerText = "GUARDAR AJUSTES DE TIENDA";
+
+      if (guardado) {
+        alert('¡Ajustes personales y Logo guardados con éxito!');
+        document.getElementById('dash-title').innerText = nombre;
+        if (tempLogoBase64) document.getElementById('dash-logo').src = tempLogoBase64;
+      }
     }
 
     async function guardarTextos() {
+      const btn = document.getElementById('btn-save-texts');
+      btn.disabled = true;
+      btn.innerText = "⏳ GUARDANDO...";
+
       dbData.tiendas[slugActual].textos = {
-        pill: document.getElementById('txt-pill').value.trim(),
-        title1: document.getElementById('txt-title-1').value.trim(),
-        title2: document.getElementById('txt-title-2').value.trim(),
-        sub: document.getElementById('txt-sub').value.trim(),
-        currency: document.getElementById('txt-currency').value.trim(),
-        btnBuy: document.getElementById('txt-btn-buy').value.trim()
+        pill: document.getElementById('txt-pill').value.trim() || "✦ ATENCIÓN 24/7 ✦",
+        title1: document.getElementById('txt-title-1').value.trim() || "TU TIENDA DE",
+        title2: document.getElementById('txt-title-2').value.trim() || "SOFTWARE",
+        sub: document.getElementById('txt-sub').value.trim() || "Proveedor garantizado · Activación inmediata · Los mejores precios",
+        currency: document.getElementById('txt-currency').value.trim() || "$",
+        btnBuy: document.getElementById('txt-btn-buy').value.trim() || "Comprar ahora!"
       };
-      await persistirTienda();
-      alert('¡Textos guardados!');
+
+      const guardado = await persistirTienda();
+      btn.disabled = false;
+      btn.innerText = "GUARDAR TEXTOS DEL CATÁLOGO";
+
+      if (guardado) {
+        alert('¡Textos y frases guardados con éxito!');
+      }
     }
 
     async function guardarMetodosPago() {
-      dbData.tiendas[slugActual].metodosPago = document.getElementById('shop-payments').value.trim();
-      await persistirTienda();
-      alert('¡Métodos de pago guardados!');
+      const btn = document.getElementById('btn-save-payments');
+      btn.disabled = true;
+      btn.innerText = "⏳ GUARDANDO...";
+
+      const metodos = document.getElementById('shop-payments').value.trim();
+      dbData.tiendas[slugActual].metodosPago = metodos;
+
+      const guardado = await persistirTienda();
+      btn.disabled = false;
+      btn.innerText = "GUARDAR MÉTODOS DE PAGO";
+
+      if (guardado) {
+        alert('¡Métodos de pago guardados correctamente!');
+      }
     }
 
     function convertirImagenABase64(input, previewId) {
@@ -975,6 +947,9 @@
 
             if (previewId === 'prod-preview-img') tempImgBase64 = b64;
             if (previewId === 'shop-logo-preview') tempLogoBase64 = b64;
+            if (previewId === 'combo0-preview') tempComboImgs[0] = b64;
+            if (previewId === 'combo1-preview') tempComboImgs[1] = b64;
+            if (previewId === 'combo2-preview') tempComboImgs[2] = b64;
           };
           img.src = e.target.result;
         };
@@ -984,14 +959,21 @@
 
     async function persistirTienda() {
       try {
+        const payload = {
+          slug: slugActual,
+          tienda: dbData.tiendas[slugActual]
+        };
+
         const res = await fetch('/api/tienda/guardar', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ slug: slugActual, tienda: dbData.tiendas[slugActual] })
+          body: JSON.stringify(payload)
         });
+
         const data = await res.json();
         return !!data.success;
       } catch (err) {
+        alert('Error de conexión al guardar: ' + err.message);
         return false;
       }
     }
