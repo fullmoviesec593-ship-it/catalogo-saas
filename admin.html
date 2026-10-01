@@ -121,6 +121,42 @@
       margin-bottom: 18px;
     }
 
+    /* SELECTOR DE TEMAS DE COLOR */
+    .theme-selector {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+      margin-top: 6px;
+    }
+    @media (max-width: 480px) {
+      .theme-selector { grid-template-columns: repeat(2, 1fr); }
+    }
+    .theme-opt {
+      border: 2px solid #1e293b;
+      border-radius: 10px;
+      padding: 10px 6px;
+      text-align: center;
+      cursor: pointer;
+      font-size: 12px;
+      font-weight: bold;
+      background: #080d1a;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s;
+    }
+    .theme-circle {
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      border: 2px solid #fff;
+    }
+    .theme-opt.active {
+      border-color: #fff;
+      box-shadow: 0 0 12px rgba(255,255,255,0.3);
+    }
+
     .badge-dias {
       display: inline-flex;
       align-items: center;
@@ -207,10 +243,11 @@
       <div id="tab-btn-payments" class="nav-tab" onclick="cambiarTab('payments')">💳 PAGOS</div>
     </div>
 
-    <!-- PESTAÑA: TIENDA & LOGO -->
+    <!-- PESTAÑA: TIENDA & LOGO (INCLUYE TEMA Y ESTADO DE ATENCIÓN) -->
     <div id="tab-shop">
       <div style="background:#080d1a; padding:16px; border-radius:12px; border:1px solid var(--border);">
         <h4 style="color:var(--primary); margin-top:0;">Datos Personales y Logo de la Tienda</h4>
+        
         <div class="form-group">
           <label>Nombre Comercial de la Tienda</label>
           <input type="text" id="shop-nombre" placeholder="Ej: Mi Tienda Online">
@@ -218,6 +255,42 @@
         <div class="form-group">
           <label>Número de WhatsApp para Pedidos (con código de país, ej: 593982766054)</label>
           <input type="text" id="shop-whatsapp" placeholder="593982766054">
+        </div>
+
+        <!-- NOVEDAD: ESTADO DE ATENCIÓN EN LÍNEA -->
+        <div class="form-group" style="background:#111625; padding:12px; border-radius:10px; border:1px solid #1e293b;">
+          <label style="color:#fff; margin-bottom:8px;">Estado de Atención al Cliente</label>
+          <select id="shop-status-online" style="background:#080d1a; color:#fff;">
+            <option value="online">🟢 En línea (Entrega inmediata 5 min)</option>
+            <option value="offline">🌙 Fuera de horario (Deja tu pedido)</option>
+          </select>
+          <small style="color:#94a3b8; font-size:11px; display:block; margin-top:5px;">
+            Este aviso aparecerá destacado en la barra superior de tu catálogo.
+          </small>
+        </div>
+
+        <!-- NOVEDAD: SELECTOR DE COLOR DEL CATÁLOGO -->
+        <div class="form-group" style="background:#111625; padding:12px; border-radius:10px; border:1px solid #1e293b;">
+          <label style="color:#fff; margin-bottom:8px;">Color / Tema Visual de tu Marca</label>
+          <input type="hidden" id="shop-tema" value="orange">
+          <div class="theme-selector">
+            <div id="theme-orange" class="theme-opt active" onclick="seleccionarTema('orange')">
+              <div class="theme-circle" style="background:#ff6a00;"></div>
+              <span>Naranja</span>
+            </div>
+            <div id="theme-blue" class="theme-opt" onclick="seleccionarTema('blue')">
+              <div class="theme-circle" style="background:#0284c7;"></div>
+              <span>Azul Cyan</span>
+            </div>
+            <div id="theme-green" class="theme-opt" onclick="seleccionarTema('green')">
+              <div class="theme-circle" style="background:#10b981;"></div>
+              <span>Verde</span>
+            </div>
+            <div id="theme-purple" class="theme-opt" onclick="seleccionarTema('purple')">
+              <div class="theme-circle" style="background:#a855f7;"></div>
+              <span>Morado</span>
+            </div>
+          </div>
         </div>
         
         <div class="form-group">
@@ -233,6 +306,11 @@
         <div style="margin-top:16px; background:#111d33; padding:12px; border-radius:8px;">
           <label style="color:#38bdf8;">Enlace de tu Catálogo Público:</label>
           <a id="shop-public-link" href="#" target="_blank" style="color:var(--accent); font-weight:bold; word-break:break-all;"></a>
+          
+          <div style="margin-top:8px; font-size:12px; color:#cbd5e1;">
+            <b>💡 Enlaces rápidos para enviar por WhatsApp:</b>
+            <div style="margin-top:4px; font-family:monospace; color:#38bdf8;" id="quick-links-preview"></div>
+          </div>
         </div>
       </div>
     </div>
@@ -414,7 +492,7 @@
             <input type="text" id="txt-title-1" placeholder="TU TIENDA DE">
           </div>
           <div class="form-group">
-            <label>Palabra Destacada Naranja</label>
+            <label>Palabra Destacada</label>
             <input type="text" id="txt-title-2" placeholder="SOFTWARE o STREAMING">
           </div>
         </div>
@@ -475,6 +553,13 @@
         btn.innerText = '👁️';
         btn.title = 'Ver contraseña';
       }
+    }
+
+    function seleccionarTema(color) {
+      document.querySelectorAll('.theme-opt').forEach(el => el.classList.remove('active'));
+      const sel = document.getElementById('theme-' + color);
+      if (sel) sel.classList.add('active');
+      document.getElementById('shop-tema').value = color;
     }
 
     const COMBOS_DEFAULT = [
@@ -647,6 +732,8 @@
           combos: JSON.parse(JSON.stringify(COMBOS_DEFAULT)),
           logo: "",
           metodosPago: "",
+          tema: "orange",
+          estadoAtencion: "online",
           textos: {}
         };
       }
@@ -662,6 +749,10 @@
       document.getElementById('shop-nombre').value = tienda.nombre || '';
       document.getElementById('shop-whatsapp').value = tienda.whatsapp || '';
       document.getElementById('shop-payments').value = tienda.metodosPago || '';
+
+      // Cargar Tema y Estado de Atención
+      seleccionarTema(tienda.tema || 'orange');
+      document.getElementById('shop-status-online').value = tienda.estadoAtencion || 'online';
 
       if (tienda.logo) {
         document.getElementById('dash-logo').src = tienda.logo;
@@ -692,6 +783,13 @@
       const elLink = document.getElementById('shop-public-link');
       elLink.href = publicLink;
       elLink.innerText = publicLink;
+
+      // Generar vista previa de enlaces directos (Deep Links)
+      document.getElementById('quick-links-preview').innerHTML = `
+        • Combo Dúo: <a href="${publicLink}&combo=2" target="_blank" style="color:#22c55e;">?tienda=${slugActual}&combo=2</a><br>
+        • Combo Trío: <a href="${publicLink}&combo=3" target="_blank" style="color:#22c55e;">?tienda=${slugActual}&combo=3</a><br>
+        • Combo Cuádruple: <a href="${publicLink}&combo=4" target="_blank" style="color:#22c55e;">?tienda=${slugActual}&combo=4</a>
+      `;
 
       actualizarContadorDias();
       renderProductos();
@@ -791,7 +889,7 @@
       btn.innerText = "AGREGAR SERVICIO AL CATÁLOGO";
 
       if (guardado) {
-        alert('¡Servicio guardado exitosamente en la nube!');
+        alert('¡Servicio guardado exitosamente!');
         document.getElementById('prod-edit-idx').value = "-1";
         document.getElementById('prod-nombre').value = '';
         document.getElementById('prod-precio').value = '';
@@ -812,7 +910,6 @@
       }
     }
 
-    // GUARDAR AJUSTES DE COMBOS
     async function guardarAjustesCombos() {
       const btn = document.getElementById('btn-save-combos');
       btn.disabled = true;
@@ -851,7 +948,7 @@
       btn.innerText = "GUARDAR CONFIGURACIÓN DE COMBOS";
 
       if (guardado) {
-        alert('¡Configuración de combos guardada y actualizada con éxito en la nube!');
+        alert('¡Configuración de combos guardada con éxito!');
       }
     }
 
@@ -859,6 +956,8 @@
       const btn = document.getElementById('btn-save-shop');
       const nombre = document.getElementById('shop-nombre').value.trim();
       const whatsapp = document.getElementById('shop-whatsapp').value.trim();
+      const tema = document.getElementById('shop-tema').value;
+      const estadoAtencion = document.getElementById('shop-status-online').value;
 
       if (!nombre || !whatsapp) {
         alert('Nombre y número de WhatsApp son obligatorios.');
@@ -870,6 +969,9 @@
 
       dbData.tiendas[slugActual].nombre = nombre;
       dbData.tiendas[slugActual].whatsapp = whatsapp;
+      dbData.tiendas[slugActual].tema = tema;
+      dbData.tiendas[slugActual].estadoAtencion = estadoAtencion;
+
       if (tempLogoBase64) {
         dbData.tiendas[slugActual].logo = tempLogoBase64;
       }
@@ -879,7 +981,7 @@
       btn.innerText = "GUARDAR AJUSTES DE TIENDA";
 
       if (guardado) {
-        alert('¡Ajustes personales y Logo guardados con éxito!');
+        alert('¡Ajustes de tienda, tema y disponibilidad guardados con éxito!');
         document.getElementById('dash-title').innerText = nombre;
         if (tempLogoBase64) document.getElementById('dash-logo').src = tempLogoBase64;
       }
@@ -904,7 +1006,7 @@
       btn.innerText = "GUARDAR TEXTOS DEL CATÁLOGO";
 
       if (guardado) {
-        alert('¡Textos y frases guardados con éxito!');
+        alert('¡Textos guardados con éxito!');
       }
     }
 
