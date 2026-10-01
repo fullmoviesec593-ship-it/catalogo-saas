@@ -121,7 +121,6 @@
       margin-bottom: 18px;
     }
 
-    /* SELECTOR DE TEMAS DE COLOR */
     .theme-selector {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
@@ -243,7 +242,7 @@
       <div id="tab-btn-payments" class="nav-tab" onclick="cambiarTab('payments')">💳 PAGOS</div>
     </div>
 
-    <!-- PESTAÑA: TIENDA & LOGO (INCLUYE TEMA Y ESTADO DE ATENCIÓN) -->
+    <!-- PESTAÑA: TIENDA & LOGO -->
     <div id="tab-shop">
       <div style="background:#080d1a; padding:16px; border-radius:12px; border:1px solid var(--border);">
         <h4 style="color:var(--primary); margin-top:0;">Datos Personales y Logo de la Tienda</h4>
@@ -257,19 +256,14 @@
           <input type="text" id="shop-whatsapp" placeholder="593982766054">
         </div>
 
-        <!-- NOVEDAD: ESTADO DE ATENCIÓN EN LÍNEA -->
         <div class="form-group" style="background:#111625; padding:12px; border-radius:10px; border:1px solid #1e293b;">
           <label style="color:#fff; margin-bottom:8px;">Estado de Atención al Cliente</label>
           <select id="shop-status-online" style="background:#080d1a; color:#fff;">
             <option value="online">🟢 En línea (Entrega inmediata 5 min)</option>
             <option value="offline">🌙 Fuera de horario (Deja tu pedido)</option>
           </select>
-          <small style="color:#94a3b8; font-size:11px; display:block; margin-top:5px;">
-            Este aviso aparecerá destacado en la barra superior de tu catálogo.
-          </small>
         </div>
 
-        <!-- NOVEDAD: SELECTOR DE COLOR DEL CATÁLOGO -->
         <div class="form-group" style="background:#111625; padding:12px; border-radius:10px; border:1px solid #1e293b;">
           <label style="color:#fff; margin-bottom:8px;">Color / Tema Visual de tu Marca</label>
           <input type="hidden" id="shop-tema" value="orange">
@@ -306,11 +300,6 @@
         <div style="margin-top:16px; background:#111d33; padding:12px; border-radius:8px;">
           <label style="color:#38bdf8;">Enlace de tu Catálogo Público:</label>
           <a id="shop-public-link" href="#" target="_blank" style="color:var(--accent); font-weight:bold; word-break:break-all;"></a>
-          
-          <div style="margin-top:8px; font-size:12px; color:#cbd5e1;">
-            <b>💡 Enlaces rápidos para enviar por WhatsApp:</b>
-            <div style="margin-top:4px; font-family:monospace; color:#38bdf8;" id="quick-links-preview"></div>
-          </div>
         </div>
       </div>
     </div>
@@ -365,9 +354,6 @@
     <div id="tab-combos" class="hidden">
       <div style="background:#080d1a; padding:16px; border-radius:12px; border:1px solid var(--border); margin-bottom:16px;">
         <h4 style="color:var(--primary); margin-top:0;">🔥 Personalizar Servicios de Combos</h4>
-        <p style="font-size:13px; color:#94a3b8; margin-bottom:16px;">
-          Aquí puedes cambiar los nombres, imágenes y porcentaje de descuento de los combos armables de tu catálogo.
-        </p>
 
         <!-- COMBO 1: DÚO -->
         <div class="combo-edit-box">
@@ -387,12 +373,12 @@
               <input type="number" id="combo0-cant" value="2" min="2" max="10">
             </div>
             <div class="form-group">
-              <label>% Descuento (ej: 10)</label>
+              <label>% Descuento</label>
               <input type="number" id="combo0-desc" value="10" min="1" max="90">
             </div>
           </div>
           <div class="form-group">
-            <label>Foto de Portada (Subir imagen o cambiar)</label>
+            <label>Foto de Portada</label>
             <input type="file" accept="image/*" onchange="convertirImagenABase64(this, 'combo0-preview')">
             <div style="text-align:center; margin-top:6px;">
               <img id="combo0-preview" src="https://images.unsplash.com/photo-1578328819058-b69f3a3b0f6b?w=600" style="max-height:80px; border-radius:8px; object-fit:cover;">
@@ -422,7 +408,7 @@
               <input type="number" id="combo1-cant" value="3" min="2" max="10">
             </div>
             <div class="form-group">
-              <label>% Descuento (ej: 10)</label>
+              <label>% Descuento</label>
               <input type="number" id="combo1-desc" value="10" min="1" max="90">
             </div>
           </div>
@@ -457,7 +443,7 @@
               <input type="number" id="combo2-cant" value="4" min="2" max="10">
             </div>
             <div class="form-group">
-              <label>% Descuento (ej: 10)</label>
+              <label>% Descuento</label>
               <input type="number" id="combo2-desc" value="10" min="1" max="90">
             </div>
           </div>
@@ -481,7 +467,7 @@
     <!-- PESTAÑA: TEXTOS -->
     <div id="tab-texts" class="hidden">
       <div style="background:#080d1a; padding:16px; border-radius:12px; border:1px solid var(--border);">
-        <h4 style="color:var(--primary); margin-top:0;">Personalizar Palabras y Textos del Catálogo</h4>
+        <h4 style="color:var(--primary); margin-top:0;">Personalizar Palabras y Textos</h4>
         <div class="form-group">
           <label>Insignia Superior</label>
           <input type="text" id="txt-pill" placeholder="✦ ATENCIÓN 24/7 ✦">
@@ -497,8 +483,8 @@
           </div>
         </div>
         <div class="form-group">
-          <label>Subtítulo de Garantía / Entrega</label>
-          <input type="text" id="txt-sub" placeholder="Proveedor garantizado · Activación inmediata · Los mejores precios">
+          <label>Subtítulo de Garantía</label>
+          <input type="text" id="txt-sub" placeholder="Proveedor garantizado · Activación inmediata">
         </div>
         <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
           <div class="form-group">
@@ -520,13 +506,7 @@
         <h4 style="color:var(--accent); margin-top:0;">Tus Cuentas Bancarias y Métodos de Pago</h4>
         <div class="form-group">
           <label>Detalle de tus Métodos de Pago:</label>
-          <textarea id="shop-payments" rows="8" placeholder="Ejemplo:
-🏦 BANCO PICHINCHA
-• Ahorros: 2200000000
-• Titular: Tu Nombre
-• CI: 1300000000
-
-📱 DEUNA: 0999999999"></textarea>
+          <textarea id="shop-payments" rows="8" placeholder="🏦 BANCO PICHINCHA&#10;• Ahorros: 2200000000&#10;• Titular: Tu Nombre&#10;&#10;📱 DEUNA: 0999999999"></textarea>
         </div>
         <button id="btn-save-payments" class="btn-success" onclick="guardarMetodosPago()">GUARDAR MÉTODOS DE PAGO</button>
       </div>
@@ -535,24 +515,40 @@
   </div>
 
   <script>
-    let dbData = null;
     let revendedorActual = null;
     let slugActual = null;
+    let tiendaActual = {};
     let tempImgBase64 = null;
     let tempLogoBase64 = null;
     let tempComboImgs = [null, null, null];
 
+    const COMBOS_DEFAULT = [
+      {
+        activo: true, comboCantidad: 2, descuento: 10,
+        nombre: "Combo Dúo (2 Servicios)", sub: "A tu elección · 10% OFF",
+        img: "https://images.unsplash.com/photo-1578328819058-b69f3a3b0f6b?w=600"
+      },
+      {
+        activo: true, comboCantidad: 3, descuento: 10,
+        nombre: "Combo Trío (3 Servicios)", sub: "A tu elección · 10% OFF",
+        img: "https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=600"
+      },
+      {
+        activo: true, comboCantidad: 4, descuento: 10,
+        nombre: "Combo Cuádruple (4 Servicios)", sub: "A tu elección · 10% OFF",
+        img: "https://images.unsplash.com/photo-1594909122845-11baa439b7bf?w=600"
+      }
+    ];
+
     function togglePasswordVisibility(inputId, btn) {
       const input = document.getElementById(inputId);
-      if (input.type === 'password') {
-        input.type = 'text';
-        btn.innerText = '🙈';
-        btn.title = 'Ocultar contraseña';
-      } else {
-        input.type = 'password';
-        btn.innerText = '👁️';
-        btn.title = 'Ver contraseña';
-      }
+      input.type = input.type === 'password' ? 'text' : 'password';
+      btn.innerText = input.type === 'password' ? '👁️' : '🙈';
+    }
+
+    function toggleCheckbox() {
+      const chk = document.getElementById('remember-session');
+      chk.checked = !chk.checked;
     }
 
     function seleccionarTema(color) {
@@ -562,59 +558,10 @@
       document.getElementById('shop-tema').value = color;
     }
 
-    const COMBOS_DEFAULT = [
-      {
-        activo: true,
-        comboCantidad: 2,
-        descuento: 10,
-        nombre: "Combo Dúo (2 Servicios)",
-        sub: "A tu elección · 10% OFF",
-        tag: "10% OFF",
-        img: "https://images.unsplash.com/photo-1578328819058-b69f3a3b0f6b?w=600",
-        features: ["Elige 2 servicios del catálogo", "Descuento automático del 10%", "Activación inmediata 24/7", "Garantía total en ambos"]
-      },
-      {
-        activo: true,
-        comboCantidad: 3,
-        descuento: 10,
-        nombre: "Combo Trío (3 Servicios)",
-        sub: "A tu elección · 10% OFF",
-        tag: "10% OFF",
-        img: "https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=600",
-        features: ["Elige 3 servicios del catálogo", "Descuento automático del 10%", "Cine, series o música a tu gusto", "Activación inmediata 24/7"]
-      },
-      {
-        activo: true,
-        comboCantidad: 4,
-        descuento: 10,
-        nombre: "Combo Cuádruple (4 Servicios)",
-        sub: "A tu elección · 10% OFF",
-        tag: "10% OFF",
-        img: "https://images.unsplash.com/photo-1594909122845-11baa439b7bf?w=600",
-        features: ["Elige 4 servicios completos", "Descuento automático del 10%", "Ideal para toda la familia", "Activación inmediata 24/7"]
-      }
-    ];
-
-    async function cargarBD() {
-      try {
-        const res = await fetch('/api/db');
-        dbData = await res.json();
-      } catch (e) {
-        alert('Error conectando a la API: ' + e.message);
-      }
-    }
-
-    function toggleCheckbox() {
-      const chk = document.getElementById('remember-session');
-      chk.checked = !chk.checked;
-    }
-
-    function calcularDiasRestantes(fechaVencimiento) {
-      if (!fechaVencimiento) return 999;
-      const ahora = new Date();
-      const vence = new Date(fechaVencimiento);
-      const diffMs = vence.getTime() - ahora.getTime();
-      return Math.ceil(diffMs / (1000 * 60 * 60 * 24));
+    function calcularDias(vence) {
+      if (!vence) return 999;
+      const diff = new Date(vence) - new Date();
+      return Math.ceil(diff / (1000 * 60 * 60 * 24));
     }
 
     function actualizarContadorDias() {
@@ -624,19 +571,16 @@
         tag.innerText = '● SERVICIO ACTIVO';
         return;
       }
-      const dias = calcularDiasRestantes(revendedorActual.vencimiento);
-      if (revendedorActual.activo === false) {
+      const dias = calcularDias(revendedorActual.vencimiento);
+      if (revendedorActual.activo === false || dias <= 0) {
         tag.className = 'badge-dias red';
-        tag.innerText = '⛔ CUENTA SUSPENDIDA';
-      } else if (dias <= 0) {
-        tag.className = 'badge-dias red';
-        tag.innerText = dias === 0 ? '⚠️ TU SERVICIO VENCE HOY' : `⛔ SERVICIO VENCIDO (${Math.abs(dias)}d)`;
+        tag.innerText = dias <= 0 ? `⛔ SERVICIO VENCIDO (${Math.abs(dias)}d)` : '⛔ CUENTA SUSPENDIDA';
       } else if (dias <= 5) {
         tag.className = 'badge-dias yellow';
-        tag.innerText = `⏳ TE QUEDAN ${dias} DÍAS RESTANTES`;
+        tag.innerText = `⏳ TE QUEDAN ${dias} DÍAS`;
       } else {
         tag.className = 'badge-dias green';
-        tag.innerText = `✨ TE QUEDAN ${dias} DÍAS RESTANTES`;
+        tag.innerText = `✨ TE QUEDAN ${dias} DÍAS`;
       }
     }
 
@@ -645,122 +589,93 @@
       const pass = autoPass || document.getElementById('password').value.trim();
       const recordar = document.getElementById('remember-session').checked;
 
-      if (!dbData) await cargarBD();
+      try {
+        const res = await fetch('/api/db');
+        const db = await res.json();
+        const revendedores = db.revendedores || {};
 
-      const revendedores = dbData.revendedores || dbData.usuarios || {};
-      const foundSlug = Object.keys(revendedores).find(slug => {
-        const r = revendedores[slug];
-        return (r.email === email || r.correo === email) && (r.password === pass || r.clave === pass);
-      });
+        const foundSlug = Object.keys(revendedores).find(slug => {
+          const r = revendedores[slug];
+          return (r.email === email || r.correo === email) && (r.password === pass || r.clave === pass);
+        });
 
-      if (foundSlug) {
-        slugActual = foundSlug;
-        revendedorActual = revendedores[slugActual];
-        if (revendedorActual.activo === false) {
-          alert('Tu cuenta está suspendida. Contacta al Súper Administrador.');
-          return;
+        if (foundSlug) {
+          slugActual = foundSlug;
+          revendedorActual = revendedores[slugActual];
+          if (revendedorActual.activo === false) {
+            alert('Tu cuenta está suspendida. Contacta a soporte.');
+            return;
+          }
+
+          if (recordar || autoEmail) {
+            localStorage.setItem('revendedor_session', JSON.stringify({ slug: slugActual, email, pass }));
+          }
+
+          // Cargar datos reales de la tienda sin sobreescribir nada
+          tiendaActual = (db.tiendas && db.tiendas[slugActual]) ? db.tiendas[slugActual] : {};
+
+          document.getElementById('login-section').classList.add('hidden');
+          document.getElementById('dashboard-section').classList.remove('hidden');
+          pintarDashboard();
+        } else {
+          if (!autoEmail) alert('Correo o contraseña incorrectos.');
         }
-
-        if (recordar || autoEmail) {
-          localStorage.setItem('revendedor_session', JSON.stringify({ slug: slugActual, email, pass }));
-        }
-
-        document.getElementById('login-section').classList.add('hidden');
-        document.getElementById('dashboard-section').classList.remove('hidden');
-        cargarTienda();
-      } else {
-        if (!autoEmail) alert('Correo o contraseña incorrectos.');
+      } catch (err) {
+        alert('Error de conexión con el servidor: ' + err.message);
       }
     }
 
     function cerrarSesion() {
       localStorage.removeItem('revendedor_session');
-      const urlParams = new URLSearchParams(window.location.search);
-      const urlTienda = urlParams.get('tienda');
-      if (urlTienda) {
-        window.location.href = `/admin.html?tienda=${urlTienda}`;
-      } else {
-        location.reload();
-      }
+      location.reload();
     }
 
     async function verificarSesionGuardada() {
-      await cargarBD();
-
       const urlParams = new URLSearchParams(window.location.search);
       const urlTienda = urlParams.get('tienda');
-
-      const revendedores = dbData.revendedores || dbData.usuarios || {};
-
-      if (urlTienda && revendedores[urlTienda]) {
-        const revUrl = revendedores[urlTienda];
-        const saved = localStorage.getItem('revendedor_session');
-
-        if (saved) {
-          try {
-            const parsed = JSON.parse(saved);
-            if (parsed.slug && parsed.slug !== urlTienda) {
-              localStorage.removeItem('revendedor_session');
-            } else if (parsed.email && parsed.pass && parsed.slug === urlTienda) {
-              iniciarSesion(parsed.email, parsed.pass);
-              return;
-            }
-          } catch(e) {}
-        }
-
-        document.getElementById('email').value = revUrl.email || revUrl.correo || '';
-        document.getElementById('login-submsg').innerText = `Inicia sesión para administrar: ${revUrl.nombre || urlTienda}`;
-        return;
-      }
 
       const saved = localStorage.getItem('revendedor_session');
       if (saved) {
         try {
-          const { email, pass } = JSON.parse(saved);
-          if (email && pass) iniciarSesion(email, pass);
-        } catch (e) {}
+          const parsed = JSON.parse(saved);
+          if (urlTienda && parsed.slug !== urlTienda) {
+            localStorage.removeItem('revendedor_session');
+          } else if (parsed.email && parsed.pass) {
+            iniciarSesion(parsed.email, parsed.pass);
+            return;
+          }
+        } catch(e) {}
+      }
+
+      if (urlTienda) {
+        try {
+          const res = await fetch('/api/db');
+          const db = await res.json();
+          const r = (db.revendedores && db.revendedores[urlTienda]) || null;
+          if (r) {
+            document.getElementById('email').value = r.email || r.correo || '';
+            document.getElementById('login-submsg').innerText = `Administrando: ${r.nombre || urlTienda}`;
+          }
+        } catch(e) {}
       }
     }
 
-    function cargarTienda() {
-      if (!dbData.tiendas) dbData.tiendas = {};
-      if (!dbData.tiendas[slugActual]) {
-        dbData.tiendas[slugActual] = {
-          nombre: revendedorActual.nombre || revendedorActual.nombreTienda || slugActual,
-          whatsapp: revendedorActual.whatsapp || "593982766054",
-          productos: [],
-          combos: JSON.parse(JSON.stringify(COMBOS_DEFAULT)),
-          logo: "",
-          metodosPago: "",
-          tema: "orange",
-          estadoAtencion: "online",
-          textos: {}
-        };
+    function pintarDashboard() {
+      document.getElementById('dash-title').innerText = tiendaActual.nombre || revendedorActual.nombre || slugActual;
+      document.getElementById('shop-nombre').value = tiendaActual.nombre || revendedorActual.nombre || '';
+      document.getElementById('shop-whatsapp').value = tiendaActual.whatsapp || revendedorActual.whatsapp || '';
+      document.getElementById('shop-payments').value = tiendaActual.metodosPago || '';
+
+      seleccionarTema(tiendaActual.tema || 'orange');
+      document.getElementById('shop-status-online').value = tiendaActual.estadoAtencion || 'online';
+
+      if (tiendaActual.logo) {
+        document.getElementById('dash-logo').src = tiendaActual.logo;
+        document.getElementById('shop-logo-preview').src = tiendaActual.logo;
       }
 
-      const tienda = dbData.tiendas[slugActual];
-
-      if (!tienda.combos || tienda.combos.length === 0) {
-        tienda.combos = JSON.parse(JSON.stringify(COMBOS_DEFAULT));
-        persistirTienda();
-      }
-
-      document.getElementById('dash-title').innerText = tienda.nombre || slugActual;
-      document.getElementById('shop-nombre').value = tienda.nombre || '';
-      document.getElementById('shop-whatsapp').value = tienda.whatsapp || '';
-      document.getElementById('shop-payments').value = tienda.metodosPago || '';
-
-      // Cargar Tema y Estado de Atención
-      seleccionarTema(tienda.tema || 'orange');
-      document.getElementById('shop-status-online').value = tienda.estadoAtencion || 'online';
-
-      if (tienda.logo) {
-        document.getElementById('dash-logo').src = tienda.logo;
-        document.getElementById('shop-logo-preview').src = tienda.logo;
-      }
-
-      // Cargar campos de combos
-      const combos = tienda.combos;
+      // Combos
+      const combos = (tiendaActual.combos && tiendaActual.combos.length > 0) ? tiendaActual.combos : COMBOS_DEFAULT;
       [0, 1, 2].forEach(i => {
         const c = combos[i] || COMBOS_DEFAULT[i];
         document.getElementById(`combo${i}-activo`).checked = c.activo !== false;
@@ -771,7 +686,8 @@
         if (c.img) document.getElementById(`combo${i}-preview`).src = c.img;
       });
 
-      const txt = tienda.textos || {};
+      // Textos
+      const txt = tiendaActual.textos || {};
       document.getElementById('txt-pill').value = txt.pill || "✦ ATENCIÓN 24/7 ✦";
       document.getElementById('txt-title-1').value = txt.title1 || "TU TIENDA DE";
       document.getElementById('txt-title-2').value = txt.title2 || "SOFTWARE";
@@ -783,13 +699,6 @@
       const elLink = document.getElementById('shop-public-link');
       elLink.href = publicLink;
       elLink.innerText = publicLink;
-
-      // Generar vista previa de enlaces directos (Deep Links)
-      document.getElementById('quick-links-preview').innerHTML = `
-        • Combo Dúo: <a href="${publicLink}&combo=2" target="_blank" style="color:#22c55e;">?tienda=${slugActual}&combo=2</a><br>
-        • Combo Trío: <a href="${publicLink}&combo=3" target="_blank" style="color:#22c55e;">?tienda=${slugActual}&combo=3</a><br>
-        • Combo Cuádruple: <a href="${publicLink}&combo=4" target="_blank" style="color:#22c55e;">?tienda=${slugActual}&combo=4</a>
-      `;
 
       actualizarContadorDias();
       renderProductos();
@@ -807,10 +716,10 @@
     function renderProductos() {
       const lista = document.getElementById('lista-productos');
       lista.innerHTML = '';
-      const productos = dbData.tiendas[slugActual].productos || [];
+      const productos = tiendaActual.productos || [];
 
       if (productos.length === 0) {
-        lista.innerHTML = '<p style="color:#94a3b8; font-size:13px;">No has agregado servicios personalizados aún (tu catálogo mostrará los predeterminados de la plataforma).</p>';
+        lista.innerHTML = '<p style="color:#94a3b8; font-size:13px;">No has agregado servicios personalizados aún (tu catálogo muestra los servicios generales).</p>';
         return;
       }
 
@@ -821,11 +730,11 @@
           <img src="${p.img || 'https://via.placeholder.com/65'}" class="product-img" onerror="this.src='https://via.placeholder.com/65'">
           <div style="flex:1;">
             <strong style="color:#fff; font-size:16px;">${p.nombre}</strong>
-            <div style="color:var(--accent); font-weight:bold; font-size:15px;">${dbData.tiendas[slugActual]?.textos?.currency || '$'}${p.precio}</div>
+            <div style="color:var(--accent); font-weight:bold; font-size:15px;">$${p.precio}</div>
             <small style="color:#94a3b8; font-size:12px;">${p.sub || ''}</small>
           </div>
           <div style="display:flex; flex-direction:column; gap:6px;">
-            <button style="background:#0284c7; color:#fff; padding:6px 10px; font-size:12px;" onclick="cargarEdicionProducto(${idx})">✏️</button>
+            <button style="background:#0284c7; color:#fff; padding:6px 10px; font-size:12px;" onclick="cargarEdicionProducto(${idx})">✏️️</button>
             <button style="background:#dc2626; color:#fff; padding:6px 10px; font-size:12px;" onclick="eliminarProducto(${idx})">🗑️</button>
           </div>
         `;
@@ -834,7 +743,7 @@
     }
 
     function cargarEdicionProducto(idx) {
-      const p = dbData.tiendas[slugActual].productos[idx];
+      const p = tiendaActual.productos[idx];
       document.getElementById('prod-edit-idx').value = idx;
       document.getElementById('prod-nombre').value = p.nombre;
       document.getElementById('prod-precio').value = p.precio;
@@ -868,28 +777,27 @@
       }
 
       btn.disabled = true;
-      btn.innerText = "⏳ GUARDANDO...";
+      btn.innerText = "⏳ GUARDANDO EN FIRESTORE...";
 
-      const features = rawFeatures ? rawFeatures.split(',').map(s => s.trim()).filter(Boolean) : [];
+      const features = rawFeatures ? rawFeatures.split(',').map(s => s.trim()).filter(Boolean) : ["1 perfil dedicado", "Activación inmediata"];
       const sub = `1 mes · ${categoria.charAt(0).toUpperCase() + categoria.slice(1)}`;
       const img = tempImgBase64 || 'https://images.unsplash.com/photo-1522869635100-9f4c5e86aa37?w=500';
 
-      if (!dbData.tiendas[slugActual].productos) dbData.tiendas[slugActual].productos = [];
-
+      if (!tiendaActual.productos) tiendaActual.productos = [];
       const nuevoObj = { nombre, sub, categoria, tag, precio, features, img };
 
       if (idx >= 0) {
-        dbData.tiendas[slugActual].productos[idx] = nuevoObj;
+        tiendaActual.productos[idx] = nuevoObj;
       } else {
-        dbData.tiendas[slugActual].productos.push(nuevoObj);
+        tiendaActual.productos.push(nuevoObj);
       }
 
-      const guardado = await persistirTienda();
+      const ok = await persistirEnNube({ productos: tiendaActual.productos });
       btn.disabled = false;
       btn.innerText = "AGREGAR SERVICIO AL CATÁLOGO";
 
-      if (guardado) {
-        alert('¡Servicio guardado exitosamente!');
+      if (ok) {
+        alert('¡Servicio guardado con éxito en la nube!');
         document.getElementById('prod-edit-idx').value = "-1";
         document.getElementById('prod-nombre').value = '';
         document.getElementById('prod-precio').value = '';
@@ -904,8 +812,8 @@
 
     async function eliminarProducto(idx) {
       if (confirm('¿Deseas eliminar este servicio de tu catálogo?')) {
-        dbData.tiendas[slugActual].productos.splice(idx, 1);
-        await persistirTienda();
+        tiendaActual.productos.splice(idx, 1);
+        await persistirEnNube({ productos: tiendaActual.productos });
         renderProductos();
       }
     }
@@ -913,7 +821,7 @@
     async function guardarAjustesCombos() {
       const btn = document.getElementById('btn-save-combos');
       btn.disabled = true;
-      btn.innerText = "⏳ GUARDANDO COMBOS...";
+      btn.innerText = "⏳ GUARDANDO EN FIRESTORE...";
 
       const nuevosCombos = [];
       [0, 1, 2].forEach(i => {
@@ -942,14 +850,12 @@
         });
       });
 
-      dbData.tiendas[slugActual].combos = nuevosCombos;
-      const guardado = await persistirTienda();
+      tiendaActual.combos = nuevosCombos;
+      const ok = await persistirEnNube({ combos: nuevosCombos });
       btn.disabled = false;
       btn.innerText = "GUARDAR CONFIGURACIÓN DE COMBOS";
 
-      if (guardado) {
-        alert('¡Configuración de combos guardada con éxito!');
-      }
+      if (ok) alert('¡Configuración de combos guardada permanentemente en la nube!');
     }
 
     async function guardarAjustesTienda() {
@@ -960,28 +866,23 @@
       const estadoAtencion = document.getElementById('shop-status-online').value;
 
       if (!nombre || !whatsapp) {
-        alert('Nombre y número de WhatsApp son obligatorios.');
+        alert('Nombre y WhatsApp son obligatorios.');
         return;
       }
 
       btn.disabled = true;
       btn.innerText = "⏳ GUARDANDO...";
 
-      dbData.tiendas[slugActual].nombre = nombre;
-      dbData.tiendas[slugActual].whatsapp = whatsapp;
-      dbData.tiendas[slugActual].tema = tema;
-      dbData.tiendas[slugActual].estadoAtencion = estadoAtencion;
+      const payload = { nombre, whatsapp, tema, estadoAtencion };
+      if (tempLogoBase64) payload.logo = tempLogoBase64;
 
-      if (tempLogoBase64) {
-        dbData.tiendas[slugActual].logo = tempLogoBase64;
-      }
-
-      const guardado = await persistirTienda();
+      tiendaActual = { ...tiendaActual, ...payload };
+      const ok = await persistirEnNube(payload);
       btn.disabled = false;
       btn.innerText = "GUARDAR AJUSTES DE TIENDA";
 
-      if (guardado) {
-        alert('¡Ajustes de tienda, tema y disponibilidad guardados con éxito!');
+      if (ok) {
+        alert('¡Datos de la tienda y tema guardados en la nube!');
         document.getElementById('dash-title').innerText = nombre;
         if (tempLogoBase64) document.getElementById('dash-logo').src = tempLogoBase64;
       }
@@ -992,7 +893,7 @@
       btn.disabled = true;
       btn.innerText = "⏳ GUARDANDO...";
 
-      dbData.tiendas[slugActual].textos = {
+      const textos = {
         pill: document.getElementById('txt-pill').value.trim() || "✦ ATENCIÓN 24/7 ✦",
         title1: document.getElementById('txt-title-1').value.trim() || "TU TIENDA DE",
         title2: document.getElementById('txt-title-2').value.trim() || "SOFTWARE",
@@ -1001,13 +902,12 @@
         btnBuy: document.getElementById('txt-btn-buy').value.trim() || "Comprar ahora!"
       };
 
-      const guardado = await persistirTienda();
+      tiendaActual.textos = textos;
+      const ok = await persistirEnNube({ textos });
       btn.disabled = false;
       btn.innerText = "GUARDAR TEXTOS DEL CATÁLOGO";
 
-      if (guardado) {
-        alert('¡Textos guardados con éxito!');
-      }
+      if (ok) alert('¡Textos guardados en la nube!');
     }
 
     async function guardarMetodosPago() {
@@ -1015,16 +915,14 @@
       btn.disabled = true;
       btn.innerText = "⏳ GUARDANDO...";
 
-      const metodos = document.getElementById('shop-payments').value.trim();
-      dbData.tiendas[slugActual].metodosPago = metodos;
+      const metodosPago = document.getElementById('shop-payments').value.trim();
+      tiendaActual.metodosPago = metodosPago;
 
-      const guardado = await persistirTienda();
+      const ok = await persistirEnNube({ metodosPago });
       btn.disabled = false;
       btn.innerText = "GUARDAR MÉTODOS DE PAGO";
 
-      if (guardado) {
-        alert('¡Métodos de pago guardados correctamente!');
-      }
+      if (ok) alert('¡Métodos de pago guardados en la nube!');
     }
 
     function convertirImagenABase64(input, previewId) {
@@ -1059,23 +957,18 @@
       }
     }
 
-    async function persistirTienda() {
+    // PERSISTENCIA BLINDADA (MERGE ATÓMICO)
+    async function persistirEnNube(datosParciales) {
       try {
-        const payload = {
-          slug: slugActual,
-          tienda: dbData.tiendas[slugActual]
-        };
-
         const res = await fetch('/api/tienda/guardar', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload)
+          body: JSON.stringify({ slug: slugActual, tienda: datosParciales })
         });
-
         const data = await res.json();
         return !!data.success;
       } catch (err) {
-        alert('Error de conexión al guardar: ' + err.message);
+        alert('Error al guardar en la nube: ' + err.message);
         return false;
       }
     }
