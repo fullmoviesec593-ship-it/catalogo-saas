@@ -304,108 +304,6 @@
       pointer-events: none;
     }
 
-    /* SECCIÓN COMBOS ESPECIALES (3 TARJETAS) */
-    .combos-section {
-      max-width: 680px;
-      margin: 0 auto 20px auto;
-      padding: 0 14px;
-    }
-    .combos-title {
-      font-size: 12px;
-      font-weight: 800;
-      letter-spacing: 0.8px;
-      color: #ff8c3b;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      margin-bottom: 12px;
-    }
-    .combos-title::before {
-      content: '';
-      display: inline-block;
-      width: 3px;
-      height: 14px;
-      background: #ff4500;
-      border-radius: 2px;
-    }
-    .combos-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 10px;
-    }
-    @media (max-width: 640px) {
-      .combos-grid {
-        grid-template-columns: 1fr;
-      }
-    }
-    .combo-card {
-      background: linear-gradient(145deg, #15102a 0%, #0d1222 100%);
-      border: 1px solid rgba(255, 106, 0, 0.45);
-      border-radius: 16px;
-      padding: 15px;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      box-shadow: 0 6px 20px rgba(0,0,0,0.5);
-      position: relative;
-      overflow: hidden;
-    }
-    .combo-card::before {
-      content: '';
-      position: absolute;
-      top: -30px; right: -30px;
-      width: 80px; height: 80px;
-      background: rgba(255, 106, 0, 0.15);
-      border-radius: 50%;
-      filter: blur(20px);
-    }
-    .combo-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      margin-bottom: 8px;
-    }
-    .combo-badge-discount {
-      background: #22c55e;
-      color: #032412;
-      font-size: 10px;
-      font-weight: 900;
-      padding: 3px 7px;
-      border-radius: 6px;
-      letter-spacing: 0.5px;
-    }
-    .combo-name {
-      font-size: 16px;
-      font-weight: 900;
-      color: #fff;
-    }
-    .combo-desc {
-      font-size: 11px;
-      color: #94a3b8;
-      line-height: 1.35;
-      margin-bottom: 12px;
-    }
-    .btn-combo-action {
-      background: linear-gradient(135deg, #ff7a00 0%, #ff4500 100%);
-      color: #fff;
-      border: none;
-      border-radius: 10px;
-      padding: 10px 8px;
-      font-size: 12px;
-      font-weight: 800;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 6px;
-      box-shadow: 0 4px 15px rgba(255, 69, 0, 0.35);
-      transition: filter 0.2s;
-      width: 100%;
-    }
-    .btn-combo-action:active {
-      filter: brightness(0.9);
-    }
-
     /* STATS BAR */
     .stats-bar {
       display: grid;
@@ -494,7 +392,7 @@
       color: #fff;
     }
 
-    /* GRID DE PRODUCTOS */
+    /* GRID DE PRODUCTOS EN 2 COLUMNAS */
     .products-grid {
       display: grid;
       grid-template-columns: repeat(2, 1fr);
@@ -566,6 +464,11 @@
 
     .card-tag.top {
       background: #9333ea;
+    }
+    .card-tag.discount {
+      background: #22c55e;
+      color: #042f1a;
+      box-shadow: 0 2px 10px rgba(34, 197, 94, 0.4);
     }
 
     .card-body {
@@ -657,7 +560,7 @@
       filter: brightness(0.9);
     }
 
-    /* MODAL DE COMPRA INDIVIDUAL */
+    /* MODAL DE COMPRA */
     .modal-overlay {
       position: fixed;
       top: 0; left: 0; width: 100%; height: 100%;
@@ -706,7 +609,7 @@
 
     /* LISTA SELECCIÓN DE COMBOS */
     .combo-select-list {
-      max-height: 220px;
+      max-height: 240px;
       overflow-y: auto;
       margin: 12px 0;
       display: flex;
@@ -770,7 +673,6 @@
       margin-top: 6px;
     }
 
-    /* CONTENEDOR DE PAGOS CON BOTÓN INDIVIDUAL */
     .payment-box {
       background: #080a11;
       border: 1px solid #1a1e2d;
@@ -927,7 +829,7 @@
         <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12.04 2c-5.46 0-9.91 4.45-9.91 9.91 0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38c1.45.79 3.08 1.21 4.74 1.21 5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.14-2.9-7.01A9.816 9.816 0 0 0 12.04 2z"/></svg>
         Whatsapp
       </a>
-      <a href="#combos" class="btn-hero-serv">Ver combos ↓</a>
+      <a href="#catalogo" class="btn-hero-serv">Ver catálogo ↓</a>
     </div>
 
     <!-- STATS -->
@@ -947,71 +849,24 @@
     </div>
   </section>
 
-  <!-- SECCIÓN COMBOS (DÚO, TRÍO Y CUÁDRUPLE) -->
-  <section id="combos" class="combos-section">
-    <div class="combos-title">🔥 COMBOS CON 10% DE DESCUENTO</div>
-    <div class="combos-grid">
-      <!-- COMBO DÚO -->
-      <div class="combo-card">
-        <div>
-          <div class="combo-header">
-            <div class="combo-name">⚡ Combo Dúo</div>
-            <span class="combo-badge-discount">10% OFF</span>
-          </div>
-          <p class="combo-desc">Elige <b>2 servicios a tu gusto</b> de todo el catálogo y recibe 10% de descuento en el total.</p>
-        </div>
-        <button class="btn-combo-action" onclick="abrirModalCombo(2)">
-          🎯 Armar Dúo
-        </button>
-      </div>
-
-      <!-- COMBO TRÍO -->
-      <div class="combo-card" style="border-color: rgba(147, 51, 234, 0.45); background: linear-gradient(145deg, #1b0f2e 0%, #0d1222 100%);">
-        <div>
-          <div class="combo-header">
-            <div class="combo-name">👑 Combo Trío</div>
-            <span class="combo-badge-discount" style="background:#a855f7; color:#fff;">10% OFF</span>
-          </div>
-          <p class="combo-desc">Elige <b>3 servicios a tu gusto</b> (cine, series o música) y ahorra 10% directo en tu compra.</p>
-        </div>
-        <button class="btn-combo-action" style="background: linear-gradient(135deg, #a855f7 0%, #7c3aed 100%);" onclick="abrirModalCombo(3)">
-          👑 Armar Trío
-        </button>
-      </div>
-
-      <!-- COMBO CUÁDRUPLE -->
-      <div class="combo-card" style="border-color: rgba(6, 182, 212, 0.45); background: linear-gradient(145deg, #09212c 0%, #0d1222 100%);">
-        <div>
-          <div class="combo-header">
-            <div class="combo-name">💎 Cuádruple</div>
-            <span class="combo-badge-discount" style="background:#06b6d4; color:#042127;">10% OFF</span>
-          </div>
-          <p class="combo-desc">Elige <b>4 servicios completos</b> para toda la familia y llévate 10% de ahorro total.</p>
-        </div>
-        <button class="btn-combo-action" style="background: linear-gradient(135deg, #06b6d4 0%, #0284c7 100%);" onclick="abrirModalCombo(4)">
-          💎 Armar Cuádruple
-        </button>
-      </div>
-    </div>
-  </section>
-
   <!-- BUSCADOR -->
   <div class="search-wrapper">
     <span class="search-icon">🔍</span>
-    <input type="text" id="catalogo-search" class="search-input-box" placeholder="Buscar Netflix, Disney, Spotify o licencias..." oninput="ejecutarBusqueda()">
+    <input type="text" id="catalogo-search" class="search-input-box" placeholder="Buscar Netflix, Disney, Combos o licencias..." oninput="ejecutarBusqueda()">
   </div>
 
   <!-- CATÁLOGO HEADER -->
   <div id="catalogo" class="section-header">
-    <div class="section-title">SERVICIOS INDIVIDUALES</div>
+    <div class="section-title">SERVICIOS DISPONIBLES</div>
     <div class="tabs">
       <button class="tab-btn active" onclick="filtrarCategoria('todos', this)">Todos</button>
+      <button class="tab-btn" onclick="filtrarCategoria('combos', this)">Combos</button>
       <button class="tab-btn" onclick="filtrarCategoria('video', this)">Video</button>
       <button class="tab-btn" onclick="filtrarCategoria('musica', this)">Música</button>
     </div>
   </div>
 
-  <!-- GRID DE PRODUCTOS -->
+  <!-- GRID DE PRODUCTOS EN 2 COLUMNAS (INCLUYE SERVICIOS Y COMBOS) -->
   <div id="products-grid" class="products-grid"></div>
 
   <!-- BOTÓN FLOTANTE WHATSAPP -->
@@ -1059,9 +914,10 @@
       </div>
 
       <p id="combo-modal-instructions" style="font-size:12px; color:#94a3b8; margin-bottom:10px;">
-        Selecciona los servicios para completar tu combo con 10% de descuento.
+        Selecciona los servicios de la lista para completar tu combo con 10% de descuento.
       </p>
 
+      <!-- LISTA DE TODOS LOS SERVICIOS -->
       <div id="combo-items-container" class="combo-select-list"></div>
 
       <!-- RESUMEN DE PRECIOS -->
@@ -1095,14 +951,105 @@
   <script>
     let tiendaActiva = null;
     let todosLosProductos = [];
+    let itemsParaMostrar = [];
     let productosVisibles = [];
     let categoriaSeleccionada = 'todos';
     let textosTienda = {};
     let deferredPrompt = null;
 
-    // Estado del selector de combos
-    let comboTipoCantidad = 2; // 2 para Dúo, 3 para Trío, 4 para Cuádruple
+    let comboTipoCantidad = 2;
     let comboSeleccionados = [];
+
+    // TARJETAS FIJAS DE COMBOS (DÚO, TRÍO, CUÁDRUPLE)
+    const COMBOS_FIJOS = [
+      {
+        isCombo: true,
+        comboCantidad: 2,
+        nombre: "Combo Dúo (2 Servicios)",
+        sub: "A tu elección · 10% OFF",
+        categoria: "combos",
+        tag: "10% OFF",
+        precio: "10% OFF",
+        features: [
+          "Elige 2 servicios del catálogo",
+          "Descuento automático del 10%",
+          "Activación inmediata 24/7",
+          "Garantía total en ambos"
+        ],
+        img: "https://images.unsplash.com/photo-1578328819058-b69f3a3b0f6b?w=600"
+      },
+      {
+        isCombo: true,
+        comboCantidad: 3,
+        nombre: "Combo Trío (3 Servicios)",
+        sub: "A tu elección · 10% OFF",
+        categoria: "combos",
+        tag: "10% OFF",
+        precio: "10% OFF",
+        features: [
+          "Elige 3 servicios del catálogo",
+          "Descuento automático del 10%",
+          "Cine, series o música a tu gusto",
+          "Activación inmediata 24/7"
+        ],
+        img: "https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=600"
+      },
+      {
+        isCombo: true,
+        comboCantidad: 4,
+        nombre: "Combo Cuádruple (4 Servicios)",
+        sub: "A tu elección · 10% OFF",
+        categoria: "combos",
+        tag: "10% OFF",
+        precio: "10% OFF",
+        features: [
+          "Elige 4 servicios completos",
+          "Descuento automático del 10%",
+          "Ideal para toda la familia",
+          "Activación inmediata 24/7"
+        ],
+        img: "https://images.unsplash.com/photo-1594909122845-11baa439b7bf?w=600"
+      }
+    ];
+
+    const SERVICIOS_DEFAULT = [
+      {
+        nombre: "Netflix",
+        sub: "1 mes · Video",
+        categoria: "video",
+        tag: "POPULAR",
+        precio: "4.00",
+        features: ["1 perfil dedicado", "Calidad HD / 4K", "Activación el mismo día", "Sin compartir cuenta"],
+        img: "https://images.unsplash.com/photo-1574375927938-d5a98e8ffe85?w=500"
+      },
+      {
+        nombre: "Disney+",
+        sub: "1 mes · Video",
+        categoria: "video",
+        tag: "",
+        precio: "3.00",
+        features: ["Disney Marvel Star Wars", "Series exclusivas", "Perfil personal", "Activación inmediata"],
+        img: "https://images.unsplash.com/photo-1607604276583-eef5d076aa5f?w=500"
+      },
+      {
+        nombre: "Spotify",
+        sub: "1 mes · Música",
+        categoria: "musica",
+        tag: "TOP",
+        precio: "2.50",
+        features: ["Música sin anuncios", "Modo offline disponible", "A tu propio correo", "Calidad Extreme Audio"],
+        img: "https://images.unsplash.com/photo-1614680376593-902f749f7ffc?w=500"
+      },
+      {
+        nombre: "HBO Max",
+        sub: "1 mes · Video",
+        categoria: "video",
+        tag: "",
+        precio: "3.50",
+        features: ["Estrenos exclusivos", "Champions League en vivo", "Reproducción en 4K UHD", "Garantía mensual"],
+        img: "https://images.unsplash.com/photo-1585951237318-9ea5e175b891?w=500"
+      }
+    ];
 
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
@@ -1131,45 +1078,6 @@
       }
     }
 
-    const SERVICIOS_DEFAULT = [
-      {
-        nombre: "Netflix",
-        sub: "1 mes · Video",
-        categoria: "video",
-        tag: "POPULAR",
-        precio: "3.50",
-        features: ["1 perfil dedicado", "Calidad HD / 4K", "Activación el mismo día", "Sin compartir cuenta"],
-        img: "https://images.unsplash.com/photo-1574375927938-d5a98e8ffe85?w=500"
-      },
-      {
-        nombre: "Disney+",
-        sub: "1 mes · Video",
-        categoria: "video",
-        tag: "",
-        precio: "4.00",
-        features: ["Disney Marvel Star Wars", "Series exclusivas", "Perfil personal", "Activación inmediata"],
-        img: "https://images.unsplash.com/photo-1607604276583-eef5d076aa5f?w=500"
-      },
-      {
-        nombre: "Spotify",
-        sub: "1 mes · Música",
-        categoria: "musica",
-        tag: "TOP",
-        precio: "2.50",
-        features: ["Música sin anuncios", "Modo offline disponible", "A tu propio correo", "Calidad Extreme Audio"],
-        img: "https://images.unsplash.com/photo-1614680376593-902f749f7ffc?w=500"
-      },
-      {
-        nombre: "HBO Max",
-        sub: "1 mes · Video",
-        categoria: "video",
-        tag: "",
-        precio: "3.50",
-        features: ["Estrenos exclusivos", "Champions League en vivo", "Reproducción en 4K UHD", "Garantía mensual"],
-        img: "https://images.unsplash.com/photo-1585951237318-9ea5e175b891?w=500"
-      }
-    ];
-
     async function cargarTienda() {
       const urlParams = new URLSearchParams(window.location.search);
       let tiendaSlug = urlParams.get('tienda');
@@ -1185,7 +1093,7 @@
         }
 
         tiendaActiva = tiendas[tiendaSlug] || {
-          nombre: "BellStream",
+          nombre: "Mi Tienda",
           whatsapp: "593982766054",
           productos: SERVICIOS_DEFAULT,
           textos: {}
@@ -1210,7 +1118,7 @@
           document.getElementById('stat-lbl-3').innerText = p3.slice(1).join(' ') || 'Inmediato';
         }
 
-        const nombreTienda = tiendaActiva.nombre || "BellStream";
+        const nombreTienda = tiendaActiva.nombre || "Mi Tienda";
         document.getElementById('nav-store-name').innerText = nombreTienda;
         document.getElementById('nav-initial').innerText = nombreTienda.charAt(0).toUpperCase();
 
@@ -1228,11 +1136,15 @@
         document.getElementById('hero-btn-ws').href = `https://wa.me/${ws}?text=${baseMsg}`;
         document.getElementById('floating-ws-btn').href = `https://wa.me/${ws}?text=${baseMsg}`;
 
+        // Todos los servicios reales del revendedor
         todosLosProductos = (tiendaActiva.productos && tiendaActiva.productos.length > 0) 
           ? tiendaActiva.productos 
           : SERVICIOS_DEFAULT;
 
         document.getElementById('stat-count').innerText = todosLosProductos.length;
+
+        // En la cuadrícula se muestran primero los combos y luego los servicios individuales
+        itemsParaMostrar = [...COMBOS_FIJOS, ...todosLosProductos];
         aplicarFiltros();
 
       } catch (e) {
@@ -1243,8 +1155,18 @@
     function aplicarFiltros() {
       const q = (document.getElementById('catalogo-search')?.value || '').toLowerCase().trim();
 
-      productosVisibles = todosLosProductos.filter(p => {
-        const coincideCat = (categoriaSeleccionada === 'todos') || ((p.categoria || 'video').toLowerCase() === categoriaSeleccionada.toLowerCase());
+      productosVisibles = itemsParaMostrar.filter(p => {
+        const cat = (p.categoria || 'video').toLowerCase();
+        let coincideCat = false;
+
+        if (categoriaSeleccionada === 'todos') {
+          coincideCat = true;
+        } else if (categoriaSeleccionada === 'combos') {
+          coincideCat = p.isCombo === true;
+        } else {
+          coincideCat = cat === categoriaSeleccionada.toLowerCase();
+        }
+
         const textoCompleto = `${p.nombre} ${p.sub || ''} ${p.tag || ''} ${(p.features || []).join(' ')}`.toLowerCase();
         const coincideBusqueda = !q || textoCompleto.includes(q);
         return coincideCat && coincideBusqueda;
@@ -1287,7 +1209,11 @@
 
       productos.forEach((p, idx) => {
         const sub = p.sub || (p.categoria === 'musica' ? '1 mes · Música' : '1 mes · Video');
-        const tagHtml = p.tag ? `<span class="card-tag ${p.tag.toLowerCase()}">${p.tag}</span>` : '';
+        let tagClass = 'card-tag';
+        if (p.isCombo) tagClass += ' discount';
+        else if (p.tag && p.tag.toLowerCase() === 'top') tagClass += ' top';
+
+        const tagHtml = p.tag ? `<span class="${tagClass}">${p.tag}</span>` : '';
 
         let features = p.features;
         if (!features || !features.length) {
@@ -1300,6 +1226,30 @@
         }
 
         const featuresHtml = features.map(f => `<li>${f}</li>`).join('');
+
+        // Manejo de precio para combos vs individuales
+        let priceHtml = '';
+        if (p.isCombo) {
+          priceHtml = `
+            <div class="card-price-row">
+              <span class="price-num" style="font-size:17px; color:#22c55e;">10% DESCUENTO</span>
+              <span class="price-sub">/ al armar</span>
+            </div>
+          `;
+        } else {
+          priceHtml = `
+            <div class="card-price-row">
+              <span class="currency">${moneda}</span>
+              <span class="price-num">${p.precio}</span>
+              <span class="price-sub">/ 1 mes</span>
+            </div>
+          `;
+        }
+
+        // Si es combo llama a abrirModalCombo, si es normal a abrirModal
+        const actionClick = p.isCombo 
+          ? `abrirModalCombo(${p.comboCantidad})`
+          : `abrirModal(${idx})`;
 
         const card = document.createElement('div');
         card.className = 'card';
@@ -1314,12 +1264,8 @@
             <ul class="card-features">
               ${featuresHtml}
             </ul>
-            <div class="card-price-row">
-              <span class="currency">${moneda}</span>
-              <span class="price-num">${p.precio}</span>
-              <span class="price-sub">/ 1 mes</span>
-            </div>
-            <button class="btn-buy-ws" onclick="abrirModal(${idx})">
+            ${priceHtml}
+            <button class="btn-buy-ws" onclick="${actionClick}">
               <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49c.08-.14.12-.31.12-.48 0-.55-.45-1-1-1H5.21l-.94-2H1zm16 16c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2z"/></svg>
               ${textoBoton}
             </button>
@@ -1362,7 +1308,7 @@
       document.getElementById('modal-compra').classList.add('hidden');
     }
 
-    /* LÓGICA DE COMBOS (DÚO, TRÍO, CUÁDRUPLE) CON 10% DE DESCUENTO */
+    /* DESPLIEGUE DE TODOS LOS SERVICIOS AL ELEGIR COMBO */
     function abrirModalCombo(cantidad) {
       comboTipoCantidad = cantidad;
       comboSeleccionados = [];
@@ -1372,7 +1318,7 @@
       if (cantidad === 4) titulo = '💎 Personaliza tu Combo Cuádruple (4 Servicios)';
 
       document.getElementById('combo-modal-title').innerText = titulo;
-      document.getElementById('combo-modal-instructions').innerText = `Selecciona exactamente ${cantidad} servicios de la lista. Se aplicará el 10% de descuento automático.`;
+      document.getElementById('combo-modal-instructions').innerText = `Selecciona exactamente ${cantidad} servicios de la lista a continuación. Tienes a disposición TODOS los servicios del catálogo con 10% de descuento automático.`;
 
       const rawMetodos = tiendaActiva.metodosPago || "🏦 BANCO PICHINCHA / DEUNA / TRANSFERENCIA\nComunícate por WhatsApp para recibir las cuentas activas.";
       document.getElementById('combo-payment-info').innerHTML = formatearMetodosDePagoConBotones(rawMetodos);
@@ -1387,6 +1333,7 @@
       document.getElementById('modal-combo-selector').classList.add('hidden');
     }
 
+    // LISTA COMPLETA: MUESTRA ABSOLUTAMENTE TODOS LOS SERVICIOS DE LA TIENDA
     function renderListaComboItems() {
       const container = document.getElementById('combo-items-container');
       container.innerHTML = '';
@@ -1401,7 +1348,10 @@
         row.innerHTML = `
           <div style="display:flex; align-items:center; gap:10px;">
             <div class="chk">${isSelected ? '✓' : ''}</div>
-            <span style="font-weight:700; color:#fff; font-size:14px;">${p.nombre}</span>
+            <div>
+              <div style="font-weight:700; color:#fff; font-size:14px;">${p.nombre}</div>
+              <small style="color:#94a3b8; font-size:11px;">${p.sub || ''}</small>
+            </div>
           </div>
           <span style="color:#ff8c3b; font-weight:800; font-size:13px;">${moneda}${p.precio}</span>
         `;
@@ -1415,7 +1365,7 @@
         comboSeleccionados.splice(yaEsta, 1);
       } else {
         if (comboSeleccionados.length >= comboTipoCantidad) {
-          alert(`En este combo solo puedes seleccionar ${comboTipoCantidad} servicios. Desmarca uno para cambiarlo.`);
+          alert(`En este combo solo puedes elegir ${comboTipoCantidad} servicios. Desmarca uno para cambiar.`);
           return;
         }
         comboSeleccionados.push(idx);
