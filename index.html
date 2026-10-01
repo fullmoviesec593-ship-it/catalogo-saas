@@ -609,7 +609,7 @@
       font-weight: bold;
     }
 
-    /* LISTA SELECCIÓN DE COMBOS CON TODOS LOS SERVICIOS */
+    /* LISTA SELECCIÓN DE COMBOS */
     .combo-select-list {
       max-height: 280px;
       overflow-y: auto;
@@ -909,7 +909,7 @@
     </div>
   </div>
 
-  <!-- MODAL INTERACTIVO DE COMBOS CON TODOS LOS SERVICIOS -->
+  <!-- MODAL INTERACTIVO DE COMBOS -->
   <div id="modal-combo-selector" class="modal-overlay hidden">
     <div class="modal-box">
       <div class="modal-header">
@@ -918,10 +918,9 @@
       </div>
 
       <p id="combo-modal-instructions" style="font-size:12px; color:#94a3b8; margin-bottom:10px;">
-        Selecciona los servicios de la lista para completar tu combo con 10% de descuento.
+        Selecciona los servicios para completar tu combo.
       </p>
 
-      <!-- LISTA DE TODOS LOS SERVICIOS DISPONIBLES -->
       <div id="combo-items-container" class="combo-select-list"></div>
 
       <!-- RESUMEN DE PRECIOS -->
@@ -931,7 +930,7 @@
           <span id="combo-subtotal">$0.00</span>
         </div>
         <div class="combo-pricing-line" style="color:#22c55e;">
-          <span>Descuento Especial (10% OFF):</span>
+          <span id="combo-discount-label">Descuento Especial (10% OFF):</span>
           <span id="combo-discount">-$0.00</span>
         </div>
         <div class="combo-pricing-line total">
@@ -961,62 +960,44 @@
     let textosTienda = {};
     let deferredPrompt = null;
 
+    let comboActualConfig = null;
     let comboTipoCantidad = 2;
+    let comboPorcentajeDesc = 10;
     let comboSeleccionados = [];
 
-    // COMBOS FIJOS EN EL GRID
-    const COMBOS_FIJOS = [
+    const COMBOS_DEFAULT = [
       {
-        isCombo: true,
+        activo: true,
         comboCantidad: 2,
+        descuento: 10,
         nombre: "Combo Dúo (2 Servicios)",
         sub: "A tu elección · 10% OFF",
-        categoria: "combos",
         tag: "10% OFF",
-        precio: "10% OFF",
-        features: [
-          "Elige 2 servicios del catálogo",
-          "Descuento automático del 10%",
-          "Activación inmediata 24/7",
-          "Garantía total en ambos"
-        ],
-        img: "https://images.unsplash.com/photo-1578328819058-b69f3a3b0f6b?w=600"
+        img: "https://images.unsplash.com/photo-1578328819058-b69f3a3b0f6b?w=600",
+        features: ["Elige 2 servicios del catálogo", "Descuento automático del 10%", "Activación inmediata 24/7", "Garantía total en ambos"]
       },
       {
-        isCombo: true,
+        activo: true,
         comboCantidad: 3,
+        descuento: 10,
         nombre: "Combo Trío (3 Servicios)",
         sub: "A tu elección · 10% OFF",
-        categoria: "combos",
         tag: "10% OFF",
-        precio: "10% OFF",
-        features: [
-          "Elige 3 servicios del catálogo",
-          "Descuento automático del 10%",
-          "Cine, series o música a tu gusto",
-          "Activación inmediata 24/7"
-        ],
-        img: "https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=600"
+        img: "https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=600",
+        features: ["Elige 3 servicios del catálogo", "Descuento automático del 10%", "Cine, series o música a tu gusto", "Activación inmediata 24/7"]
       },
       {
-        isCombo: true,
+        activo: true,
         comboCantidad: 4,
+        descuento: 10,
         nombre: "Combo Cuádruple (4 Servicios)",
         sub: "A tu elección · 10% OFF",
-        categoria: "combos",
         tag: "10% OFF",
-        precio: "10% OFF",
-        features: [
-          "Elige 4 servicios completos",
-          "Descuento automático del 10%",
-          "Ideal para toda la familia",
-          "Activación inmediata 24/7"
-        ],
-        img: "https://images.unsplash.com/photo-1594909122845-11baa439b7bf?w=600"
+        img: "https://images.unsplash.com/photo-1594909122845-11baa439b7bf?w=600",
+        features: ["Elige 4 servicios completos", "Descuento automático del 10%", "Ideal para toda la familia", "Activación inmediata 24/7"]
       }
     ];
 
-    // CATÁLOGO COMPLETO DE SERVICIOS
     const CATALOGO_COMPLETO = [
       {
         nombre: "Netflix Premium",
@@ -1209,6 +1190,7 @@
           nombre: "Mi Tienda",
           whatsapp: "593982766054",
           productos: CATALOGO_COMPLETO,
+          combos: COMBOS_DEFAULT,
           textos: {}
         };
 
@@ -1249,18 +1231,27 @@
         document.getElementById('hero-btn-ws').href = `https://wa.me/${ws}?text=${baseMsg}`;
         document.getElementById('floating-ws-btn').href = `https://wa.me/${ws}?text=${baseMsg}`;
 
-        // Usar los productos personalizados si la tienda tiene más de 4, de lo contrario cargar el catálogo completo
+        // Obtener servicios de la tienda o catálogo predeterminado
         const prodsTienda = tiendaActiva.productos || [];
-        if (prodsTienda.length > 4) {
-          todosLosProductos = prodsTienda;
-        } else {
-          todosLosProductos = CATALOGO_COMPLETO;
-        }
-
+        todosLosProductos = (prodsTienda.length > 4) ? prodsTienda : CATALOGO_COMPLETO;
         document.getElementById('stat-count').innerText = todosLosProductos.length;
 
-        // Combos fijos + todos los productos
-        itemsParaMostrar = [...COMBOS_FIJOS, ...todosLosProductos];
+        // Cargar combos configurados por el revendedor
+        const combosConfigurados = (tiendaActiva.combos && tiendaActiva.combos.length > 0)
+          ? tiendaActiva.combos
+          : COMBOS_DEFAULT;
+
+        const combosParaGrid = combosConfigurados
+          .filter(c => c.activo !== false)
+          .map((c, idx) => ({
+            ...c,
+            isCombo: true,
+            comboIdx: idx,
+            categoria: 'combos'
+          }));
+
+        // Lista global del grid
+        itemsParaMostrar = [...combosParaGrid, ...todosLosProductos];
         aplicarFiltros();
 
       } catch (e) {
@@ -1349,7 +1340,7 @@
         if (p.isCombo) {
           priceHtml = `
             <div class="card-price-row">
-              <span class="price-num" style="font-size:17px; color:#22c55e;">10% DESCUENTO</span>
+              <span class="price-num" style="font-size:17px; color:#22c55e;">${p.descuento || 10}% DESCUENTO</span>
               <span class="price-sub">/ al armar</span>
             </div>
           `;
@@ -1364,7 +1355,7 @@
         }
 
         const actionClick = p.isCombo 
-          ? `abrirModalCombo(${p.comboCantidad})`
+          ? `abrirModalComboDirecto(${idx})`
           : `abrirModal(${idx})`;
 
         const card = document.createElement('div');
@@ -1424,17 +1415,17 @@
       document.getElementById('modal-compra').classList.add('hidden');
     }
 
-    /* MODAL DE COMBOS: DESPLIEGA TODOS LOS SERVICIOS */
-    function abrirModalCombo(cantidad) {
-      comboTipoCantidad = cantidad;
+    /* MODAL DE COMBOS PERSONALIZADOS */
+    function abrirModalComboDirecto(idxEnGrid) {
+      const combo = productosVisibles[idxEnGrid];
+      comboActualConfig = combo;
+      comboTipoCantidad = combo.comboCantidad || 2;
+      comboPorcentajeDesc = combo.descuento || 10;
       comboSeleccionados = [];
 
-      let titulo = '⚡ Personaliza tu Combo Dúo (2 Servicios)';
-      if (cantidad === 3) titulo = '👑 Personaliza tu Combo Trío (3 Servicios)';
-      if (cantidad === 4) titulo = '💎 Personaliza tu Combo Cuádruple (4 Servicios)';
-
-      document.getElementById('combo-modal-title').innerText = titulo;
-      document.getElementById('combo-modal-instructions').innerText = `Selecciona exactamente ${cantidad} servicios de la lista a continuación. Tienes a disposición TODOS los servicios del catálogo con 10% de descuento automático.`;
+      document.getElementById('combo-modal-title').innerText = `🔥 ${combo.nombre}`;
+      document.getElementById('combo-modal-instructions').innerText = `Selecciona exactamente ${comboTipoCantidad} servicios de la lista a continuación. Recibirás un ${comboPorcentajeDesc}% de descuento automático.`;
+      document.getElementById('combo-discount-label').innerText = `Descuento Especial (${comboPorcentajeDesc}% OFF):`;
 
       const rawMetodos = tiendaActiva.metodosPago || "🏦 BANCO PICHINCHA / DEUNA / TRANSFERENCIA\nComunícate por WhatsApp para recibir las cuentas activas.";
       document.getElementById('combo-payment-info').innerHTML = formatearMetodosDePagoConBotones(rawMetodos);
@@ -1499,7 +1490,8 @@
         subtotal += precioNum;
       });
 
-      const descuento = subtotal * 0.10;
+      const porcentaje = comboPorcentajeDesc / 100;
+      const descuento = subtotal * porcentaje;
       const totalFinal = subtotal - descuento;
 
       document.getElementById('combo-subtotal').innerText = `${moneda}${subtotal.toFixed(2)}`;
@@ -1512,14 +1504,11 @@
         btnOrder.style.pointerEvents = 'auto';
 
         const listaNombres = comboSeleccionados.map(idx => `• ${todosLosProductos[idx].nombre} (${moneda}${todosLosProductos[idx].precio})`).join('\n');
-        
-        let tipoNombre = 'Combo Dúo';
-        if (comboTipoCantidad === 3) tipoNombre = 'Combo Trío';
-        if (comboTipoCantidad === 4) tipoNombre = 'Combo Cuádruple';
+        const nombreCombo = comboActualConfig?.nombre || `Combo (${comboTipoCantidad} Servicios)`;
 
-        const textoWs = `👋 ¡Hola! Vengo del catálogo y quiero ordenar mi *${tipoNombre} (10% OFF)*:\n\n${listaNombres}\n\n` +
+        const textoWs = `👋 ¡Hola! Vengo del catálogo y quiero ordenar mi *${nombreCombo} (${comboPorcentajeDesc}% OFF)*:\n\n${listaNombres}\n\n` +
           `💰 *Subtotal:* ${moneda}${subtotal.toFixed(2)}\n` +
-          `🎁 *Descuento 10%:* -${moneda}${descuento.toFixed(2)}\n` +
+          `🎁 *Descuento ${comboPorcentajeDesc}%:* -${moneda}${descuento.toFixed(2)}\n` +
           `✅ *Total a Pagar:* ${moneda}${totalFinal.toFixed(2)}\n\n` +
           `Adjunto comprobante o espero los datos para completar mi activación inmediata.`;
 

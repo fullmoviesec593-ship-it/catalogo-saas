@@ -48,16 +48,13 @@
       outline: none;
     }
     input:focus, textarea:focus { border-color: var(--primary); }
-    
-    /* ENVOLTORIO PARA INPUT CON OJITO */
+
     .password-wrapper {
       position: relative;
       display: flex;
       align-items: center;
     }
-    .password-wrapper input {
-      padding-right: 44px;
-    }
+    .password-wrapper input { padding-right: 44px; }
     .toggle-password-btn {
       position: absolute;
       right: 10px;
@@ -72,9 +69,6 @@
       justify-content: center;
       width: auto;
       user-select: none;
-    }
-    .toggle-password-btn:hover {
-      color: var(--primary);
     }
 
     button {
@@ -118,6 +112,15 @@
     }
     .product-img { width: 65px; height: 65px; border-radius: 8px; object-fit: cover; border: 1px solid #334155; }
     .preview-logo { width: 75px; height: 75px; border-radius: 50%; object-fit: cover; border: 2px solid var(--primary); margin: 8px 0; }
+
+    .combo-edit-box {
+      background: #080d1a;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 18px;
+    }
+    .combo-edit-box.disabled { opacity: 0.55; }
 
     .badge-dias {
       display: inline-flex;
@@ -198,9 +201,10 @@
 
     <!-- Pestañas -->
     <div class="nav-tabs">
-      <div id="tab-btn-shop" class="nav-tab active" onclick="cambiarTab('shop')">⚙️️ TIENDA & LOGO</div>
+      <div id="tab-btn-shop" class="nav-tab active" onclick="cambiarTab('shop')">⚙️ TIENDA & LOGO</div>
       <div id="tab-btn-prods" class="nav-tab" onclick="cambiarTab('prods')">📦 SERVICIOS</div>
-      <div id="tab-btn-texts" class="nav-tab" onclick="cambiarTab('texts')">📝 TEXTOS Y FRASES</div>
+      <div id="tab-btn-combos" class="nav-tab" onclick="cambiarTab('combos')">🔥 COMBOS</div>
+      <div id="tab-btn-texts" class="nav-tab" onclick="cambiarTab('texts')">📝 TEXTOS</div>
       <div id="tab-btn-payments" class="nav-tab" onclick="cambiarTab('payments')">💳 PAGOS</div>
     </div>
 
@@ -245,7 +249,7 @@
         </div>
         <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
           <div class="form-group">
-            <label>Precio</label>
+            <label>Precio ($)</label>
             <input type="text" id="prod-precio" placeholder="3.50">
           </div>
           <div class="form-group">
@@ -258,8 +262,10 @@
           <div class="form-group">
             <label>Categoría</label>
             <select id="prod-cat">
-              <option value="video">Video</option>
+              <option value="streaming">Streaming</option>
+              <option value="iptv">IPTV</option>
               <option value="musica">Música</option>
+              <option value="software">Software</option>
             </select>
           </div>
           <div class="form-group">
@@ -276,6 +282,123 @@
 
       <h4 style="color:#fff;">Mis Servicios Activos</h4>
       <div id="lista-productos"></div>
+    </div>
+
+    <!-- PESTAÑA: COMBOS EDITABLES -->
+    <div id="tab-combos" class="hidden">
+      <div style="background:#080d1a; padding:16px; border-radius:12px; border:1px solid var(--border); margin-bottom:16px;">
+        <h4 style="color:var(--primary); margin-top:0;">🔥 Personalizar Servicios de Combos</h4>
+        <p style="font-size:13px; color:#94a3b8; margin-bottom:16px;">
+          Aquí puedes cambiar los nombres, imágenes y porcentaje de descuento de los combos armables de tu catálogo.
+        </p>
+
+        <!-- COMBO 1: DÚO -->
+        <div class="combo-edit-box">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+            <strong style="color:#ff8c3b; font-size:16px;">Combo 1 (Dúo)</strong>
+            <label style="display:flex; align-items:center; gap:6px; cursor:pointer; color:#fff; font-size:13px;">
+              <input type="checkbox" id="combo0-activo" checked style="width:16px; height:16px;"> Activo
+            </label>
+          </div>
+          <div class="form-group">
+            <label>Nombre del Combo</label>
+            <input type="text" id="combo0-nombre" value="Combo Dúo (2 Servicios)">
+          </div>
+          <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+            <div class="form-group">
+              <label>Cantidad de Cuentas</label>
+              <input type="number" id="combo0-cant" value="2" min="2" max="10">
+            </div>
+            <div class="form-group">
+              <label>% Descuento (ej: 10)</label>
+              <input type="number" id="combo0-desc" value="10" min="1" max="90">
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Foto de Portada (Subir imagen o cambiar)</label>
+            <input type="file" accept="image/*" onchange="convertirImagenABase64(this, 'combo0-preview')">
+            <div style="text-align:center; margin-top:6px;">
+              <img id="combo0-preview" src="https://images.unsplash.com/photo-1578328819058-b69f3a3b0f6b?w=600" style="max-height:80px; border-radius:8px; object-fit:cover;">
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Descripción corta</label>
+            <input type="text" id="combo0-sub" value="A tu elección · 10% OFF">
+          </div>
+        </div>
+
+        <!-- COMBO 2: TRÍO -->
+        <div class="combo-edit-box">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+            <strong style="color:#a855f7; font-size:16px;">Combo 2 (Trío)</strong>
+            <label style="display:flex; align-items:center; gap:6px; cursor:pointer; color:#fff; font-size:13px;">
+              <input type="checkbox" id="combo1-activo" checked style="width:16px; height:16px;"> Activo
+            </label>
+          </div>
+          <div class="form-group">
+            <label>Nombre del Combo</label>
+            <input type="text" id="combo1-nombre" value="Combo Trío (3 Servicios)">
+          </div>
+          <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+            <div class="form-group">
+              <label>Cantidad de Cuentas</label>
+              <input type="number" id="combo1-cant" value="3" min="2" max="10">
+            </div>
+            <div class="form-group">
+              <label>% Descuento (ej: 10)</label>
+              <input type="number" id="combo1-desc" value="10" min="1" max="90">
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Foto de Portada</label>
+            <input type="file" accept="image/*" onchange="convertirImagenABase64(this, 'combo1-preview')">
+            <div style="text-align:center; margin-top:6px;">
+              <img id="combo1-preview" src="https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=600" style="max-height:80px; border-radius:8px; object-fit:cover;">
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Descripción corta</label>
+            <input type="text" id="combo1-sub" value="A tu elección · 10% OFF">
+          </div>
+        </div>
+
+        <!-- COMBO 3: CUÁDRUPLE -->
+        <div class="combo-edit-box">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+            <strong style="color:#06b6d4; font-size:16px;">Combo 3 (Cuádruple)</strong>
+            <label style="display:flex; align-items:center; gap:6px; cursor:pointer; color:#fff; font-size:13px;">
+              <input type="checkbox" id="combo2-activo" checked style="width:16px; height:16px;"> Activo
+            </label>
+          </div>
+          <div class="form-group">
+            <label>Nombre del Combo</label>
+            <input type="text" id="combo2-nombre" value="Combo Cuádruple (4 Servicios)">
+          </div>
+          <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+            <div class="form-group">
+              <label>Cantidad de Cuentas</label>
+              <input type="number" id="combo2-cant" value="4" min="2" max="10">
+            </div>
+            <div class="form-group">
+              <label>% Descuento (ej: 10)</label>
+              <input type="number" id="combo2-desc" value="10" min="1" max="90">
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Foto de Portada</label>
+            <input type="file" accept="image/*" onchange="convertirImagenABase64(this, 'combo2-preview')">
+            <div style="text-align:center; margin-top:6px;">
+              <img id="combo2-preview" src="https://images.unsplash.com/photo-1594909122845-11baa439b7bf?w=600" style="max-height:80px; border-radius:8px; object-fit:cover;">
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Descripción corta</label>
+            <input type="text" id="combo2-sub" value="A tu elección · 10% OFF">
+          </div>
+        </div>
+
+        <button id="btn-save-combos" class="btn-success" onclick="guardarAjustesCombos()">GUARDAR CONFIGURACIÓN DE COMBOS</button>
+      </div>
     </div>
 
     <!-- PESTAÑA: TEXTOS -->
@@ -307,7 +430,7 @@
           </div>
           <div class="form-group">
             <label>Texto Botón Comprar</label>
-            <input type="text" id="txt-btn-buy" placeholder="Comprar por WhatsApp">
+            <input type="text" id="txt-btn-buy" placeholder="Comprar ahora!">
           </div>
         </div>
         <button id="btn-save-texts" class="btn-primary" onclick="guardarTextos()">GUARDAR TEXTOS DEL CATÁLOGO</button>
@@ -340,6 +463,7 @@
     let slugActual = null;
     let tempImgBase64 = null;
     let tempLogoBase64 = null;
+    let tempComboImgs = [null, null, null];
 
     function togglePasswordVisibility(inputId, btn) {
       const input = document.getElementById(inputId);
@@ -354,42 +478,36 @@
       }
     }
 
-    const SERVICIOS_DEFAULT = [
+    const COMBOS_DEFAULT = [
       {
-        nombre: "Netflix",
-        sub: "1 mes · Video",
-        categoria: "video",
-        tag: "POPULAR",
-        precio: "3.50",
-        features: ["1 perfil dedicado", "Calidad HD / 4K", "Activación el mismo día", "Sin compartir cuenta"],
-        img: "https://images.unsplash.com/photo-1574375927938-d5a98e8ffe85?w=500"
+        activo: true,
+        comboCantidad: 2,
+        descuento: 10,
+        nombre: "Combo Dúo (2 Servicios)",
+        sub: "A tu elección · 10% OFF",
+        tag: "10% OFF",
+        img: "https://images.unsplash.com/photo-1578328819058-b69f3a3b0f6b?w=600",
+        features: ["Elige 2 servicios del catálogo", "Descuento automático del 10%", "Activación inmediata 24/7", "Garantía total en ambos"]
       },
       {
-        nombre: "Disney+",
-        sub: "1 mes · Video",
-        categoria: "video",
-        tag: "",
-        precio: "4.00",
-        features: ["Disney Marvel Star Wars", "Series exclusivas", "Perfil personal", "Activación inmediata"],
-        img: "https://images.unsplash.com/photo-1607604276583-eef5d076aa5f?w=500"
+        activo: true,
+        comboCantidad: 3,
+        descuento: 10,
+        nombre: "Combo Trío (3 Servicios)",
+        sub: "A tu elección · 10% OFF",
+        tag: "10% OFF",
+        img: "https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=600",
+        features: ["Elige 3 servicios del catálogo", "Descuento automático del 10%", "Cine, series o música a tu gusto", "Activación inmediata 24/7"]
       },
       {
-        nombre: "Spotify",
-        sub: "1 mes · Música",
-        categoria: "musica",
-        tag: "TOP",
-        precio: "2.50",
-        features: ["Música sin anuncios", "Modo offline disponible", "A tu propio correo", "Calidad Extreme Audio"],
-        img: "https://images.unsplash.com/photo-1614680376593-902f749f7ffc?w=500"
-      },
-      {
-        nombre: "HBO Max",
-        sub: "1 mes · Video",
-        categoria: "video",
-        tag: "",
-        precio: "3.50",
-        features: ["Estrenos exclusivos", "Champions League en vivo", "Reproducción en 4K UHD", "Garantía mensual"],
-        img: "https://images.unsplash.com/photo-1585951237318-9ea5e175b891?w=500"
+        activo: true,
+        comboCantidad: 4,
+        descuento: 10,
+        nombre: "Combo Cuádruple (4 Servicios)",
+        sub: "A tu elección · 10% OFF",
+        tag: "10% OFF",
+        img: "https://images.unsplash.com/photo-1594909122845-11baa439b7bf?w=600",
+        features: ["Elige 4 servicios completos", "Descuento automático del 10%", "Ideal para toda la familia", "Activación inmediata 24/7"]
       }
     ];
 
@@ -525,25 +643,19 @@
       if (!dbData.tiendas[slugActual]) {
         dbData.tiendas[slugActual] = {
           nombre: revendedorActual.nombre || revendedorActual.nombreTienda || slugActual,
-          whatsapp: revendedorActual.whatsapp || "593999999999",
-          productos: JSON.parse(JSON.stringify(SERVICIOS_DEFAULT)),
+          whatsapp: revendedorActual.whatsapp || "593982766054",
+          productos: [],
+          combos: JSON.parse(JSON.stringify(COMBOS_DEFAULT)),
           logo: "",
           metodosPago: "",
-          textos: {
-            pill: "✦ ATENCIÓN 24/7 ✦",
-            title1: "TU TIENDA DE",
-            title2: "SOFTWARE",
-            sub: "Proveedor garantizado · Activación inmediata · Los mejores precios",
-            currency: "$",
-            btnBuy: "Comprar por WhatsApp"
-          }
+          textos: {}
         };
       }
 
       const tienda = dbData.tiendas[slugActual];
 
-      if (!tienda.productos || tienda.productos.length === 0) {
-        tienda.productos = JSON.parse(JSON.stringify(SERVICIOS_DEFAULT));
+      if (!tienda.combos || tienda.combos.length === 0) {
+        tienda.combos = JSON.parse(JSON.stringify(COMBOS_DEFAULT));
         persistirTienda();
       }
 
@@ -555,10 +667,19 @@
       if (tienda.logo) {
         document.getElementById('dash-logo').src = tienda.logo;
         document.getElementById('shop-logo-preview').src = tienda.logo;
-      } else {
-        document.getElementById('dash-logo').src = 'https://via.placeholder.com/40';
-        document.getElementById('shop-logo-preview').src = 'https://via.placeholder.com/80';
       }
+
+      // Cargar campos de combos
+      const combos = tienda.combos;
+      [0, 1, 2].forEach(i => {
+        const c = combos[i] || COMBOS_DEFAULT[i];
+        document.getElementById(`combo${i}-activo`).checked = c.activo !== false;
+        document.getElementById(`combo${i}-nombre`).value = c.nombre || '';
+        document.getElementById(`combo${i}-cant`).value = c.comboCantidad || (i + 2);
+        document.getElementById(`combo${i}-desc`).value = c.descuento || 10;
+        document.getElementById(`combo${i}-sub`).value = c.sub || '';
+        if (c.img) document.getElementById(`combo${i}-preview`).src = c.img;
+      });
 
       const txt = tienda.textos || {};
       document.getElementById('txt-pill').value = txt.pill || "✦ ATENCIÓN 24/7 ✦";
@@ -566,7 +687,7 @@
       document.getElementById('txt-title-2').value = txt.title2 || "SOFTWARE";
       document.getElementById('txt-sub').value = txt.sub || "Proveedor garantizado · Activación inmediata · Los mejores precios";
       document.getElementById('txt-currency').value = txt.currency || "$";
-      document.getElementById('txt-btn-buy').value = txt.btnBuy || "Comprar por WhatsApp";
+      document.getElementById('txt-btn-buy').value = txt.btnBuy || "Comprar ahora!";
 
       const publicLink = window.location.origin + '/?tienda=' + slugActual;
       const elLink = document.getElementById('shop-public-link');
@@ -578,7 +699,7 @@
     }
 
     function cambiarTab(tab) {
-      ['shop', 'prods', 'texts', 'payments'].forEach(t => {
+      ['shop', 'prods', 'combos', 'texts', 'payments'].forEach(t => {
         document.getElementById('tab-' + t).classList.add('hidden');
         document.getElementById('tab-btn-' + t).classList.remove('active');
       });
@@ -590,6 +711,11 @@
       const lista = document.getElementById('lista-productos');
       lista.innerHTML = '';
       const productos = dbData.tiendas[slugActual].productos || [];
+
+      if (productos.length === 0) {
+        lista.innerHTML = '<p style="color:#94a3b8; font-size:13px;">No has agregado servicios personalizados aún (tu catálogo mostrará los predeterminados).</p>';
+        return;
+      }
 
       productos.forEach((p, idx) => {
         const item = document.createElement('div');
@@ -615,7 +741,7 @@
       document.getElementById('prod-edit-idx').value = idx;
       document.getElementById('prod-nombre').value = p.nombre;
       document.getElementById('prod-precio').value = p.precio;
-      document.getElementById('prod-cat').value = p.categoria || 'video';
+      document.getElementById('prod-cat').value = p.categoria || 'streaming';
       document.getElementById('prod-tag').value = p.tag || '';
       document.getElementById('prod-features').value = (p.features && p.features.length) ? p.features.join(', ') : '';
       
@@ -645,10 +771,10 @@
       }
 
       btn.disabled = true;
-      btn.innerText = "⏳ GUARDANDO SERVICIO...";
+      btn.innerText = "⏳ GUARDANDO...";
 
       const features = rawFeatures ? rawFeatures.split(',').map(s => s.trim()).filter(Boolean) : [];
-      const sub = categoria === 'musica' ? '1 mes · Música' : '1 mes · Video';
+      const sub = `1 mes · ${categoria.charAt(0).toUpperCase() + categoria.slice(1)}`;
       const img = tempImgBase64 || 'https://images.unsplash.com/photo-1522869635100-9f4c5e86aa37?w=500';
 
       if (!dbData.tiendas[slugActual].productos) dbData.tiendas[slugActual].productos = [];
@@ -687,6 +813,49 @@
       }
     }
 
+    // GUARDAR AJUSTES DE COMBOS
+    async function guardarAjustesCombos() {
+      const btn = document.getElementById('btn-save-combos');
+      btn.disabled = true;
+      btn.innerText = "⏳ GUARDANDO COMBOS...";
+
+      const nuevosCombos = [];
+      [0, 1, 2].forEach(i => {
+        const activo = document.getElementById(`combo${i}-activo`).checked;
+        const nombre = document.getElementById(`combo${i}-nombre`).value.trim();
+        const comboCantidad = parseInt(document.getElementById(`combo${i}-cant`).value) || (i + 2);
+        const descuento = parseInt(document.getElementById(`combo${i}-desc`).value) || 10;
+        const sub = document.getElementById(`combo${i}-sub`).value.trim();
+        const img = tempComboImgs[i] || document.getElementById(`combo${i}-preview`).src;
+
+        nuevosCombos.push({
+          activo,
+          comboCantidad,
+          descuento,
+          nombre: nombre || `Combo (${comboCantidad} Servicios)`,
+          sub: sub || `A tu elección · ${descuento}% OFF`,
+          tag: `${descuento}% OFF`,
+          precio: `${descuento}% OFF`,
+          img,
+          features: [
+            `Elige ${comboCantidad} servicios del catálogo`,
+            `Descuento automático del ${descuento}%`,
+            `Activación inmediata 24/7`,
+            `Garantía total en todos`
+          ]
+        });
+      });
+
+      dbData.tiendas[slugActual].combos = nuevosCombos;
+      const guardado = await persistirTienda();
+      btn.disabled = false;
+      btn.innerText = "GUARDAR CONFIGURACIÓN DE COMBOS";
+
+      if (guardado) {
+        alert('¡Configuración de combos guardada y actualizada con éxito en la nube!');
+      }
+    }
+
     async function guardarAjustesTienda() {
       const btn = document.getElementById('btn-save-shop');
       const nombre = document.getElementById('shop-nombre').value.trim();
@@ -698,7 +867,7 @@
       }
 
       btn.disabled = true;
-      btn.innerText = "⏳ GUARDANDO EN LA NUBE...";
+      btn.innerText = "⏳ GUARDANDO...";
 
       dbData.tiendas[slugActual].nombre = nombre;
       dbData.tiendas[slugActual].whatsapp = whatsapp;
@@ -728,7 +897,7 @@
         title2: document.getElementById('txt-title-2').value.trim() || "SOFTWARE",
         sub: document.getElementById('txt-sub').value.trim() || "Proveedor garantizado · Activación inmediata · Los mejores precios",
         currency: document.getElementById('txt-currency').value.trim() || "$",
-        btnBuy: document.getElementById('txt-btn-buy').value.trim() || "Comprar por WhatsApp"
+        btnBuy: document.getElementById('txt-btn-buy').value.trim() || "Comprar ahora!"
       };
 
       const guardado = await persistirTienda();
@@ -779,6 +948,9 @@
 
             if (previewId === 'prod-preview-img') tempImgBase64 = b64;
             if (previewId === 'shop-logo-preview') tempLogoBase64 = b64;
+            if (previewId === 'combo0-preview') tempComboImgs[0] = b64;
+            if (previewId === 'combo1-preview') tempComboImgs[1] = b64;
+            if (previewId === 'combo2-preview') tempComboImgs[2] = b64;
           };
           img.src = e.target.result;
         };
