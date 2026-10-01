@@ -374,17 +374,19 @@
       padding: 3px;
       border-radius: 8px;
       border: 1px solid #1f2436;
+      overflow-x: auto;
     }
 
     .tab-btn {
       background: transparent;
       border: none;
       color: #8b92a3;
-      padding: 5px 12px;
+      padding: 5px 11px;
       font-size: 11px;
       font-weight: 700;
       border-radius: 6px;
       cursor: pointer;
+      white-space: nowrap;
     }
 
     .tab-btn.active {
@@ -560,7 +562,7 @@
       filter: brightness(0.9);
     }
 
-    /* MODAL DE COMPRA */
+    /* MODAL DE COMPRA INDIVIDUAL */
     .modal-overlay {
       position: fixed;
       top: 0; left: 0; width: 100%; height: 100%;
@@ -607,9 +609,9 @@
       font-weight: bold;
     }
 
-    /* LISTA SELECCIÓN DE COMBOS */
+    /* LISTA SELECCIÓN DE COMBOS CON TODOS LOS SERVICIOS */
     .combo-select-list {
-      max-height: 240px;
+      max-height: 280px;
       overflow-y: auto;
       margin: 12px 0;
       display: flex;
@@ -835,7 +837,7 @@
     <!-- STATS -->
     <div class="stats-bar">
       <div class="stat-card">
-        <div id="stat-count" class="stat-val">4</div>
+        <div id="stat-count" class="stat-val">16</div>
         <div class="stat-lbl">Servicios</div>
       </div>
       <div class="stat-card">
@@ -852,7 +854,7 @@
   <!-- BUSCADOR -->
   <div class="search-wrapper">
     <span class="search-icon">🔍</span>
-    <input type="text" id="catalogo-search" class="search-input-box" placeholder="Buscar Netflix, Disney, Combos o licencias..." oninput="ejecutarBusqueda()">
+    <input type="text" id="catalogo-search" class="search-input-box" placeholder="Buscar Netflix, Disney, Flujo TV, Combos o licencias..." oninput="ejecutarBusqueda()">
   </div>
 
   <!-- CATÁLOGO HEADER -->
@@ -861,12 +863,14 @@
     <div class="tabs">
       <button class="tab-btn active" onclick="filtrarCategoria('todos', this)">Todos</button>
       <button class="tab-btn" onclick="filtrarCategoria('combos', this)">Combos</button>
-      <button class="tab-btn" onclick="filtrarCategoria('video', this)">Video</button>
+      <button class="tab-btn" onclick="filtrarCategoria('streaming', this)">Streaming</button>
+      <button class="tab-btn" onclick="filtrarCategoria('iptv', this)">IPTV</button>
       <button class="tab-btn" onclick="filtrarCategoria('musica', this)">Música</button>
+      <button class="tab-btn" onclick="filtrarCategoria('software', this)">Software</button>
     </div>
   </div>
 
-  <!-- GRID DE PRODUCTOS EN 2 COLUMNAS (INCLUYE SERVICIOS Y COMBOS) -->
+  <!-- GRID DE PRODUCTOS EN 2 COLUMNAS -->
   <div id="products-grid" class="products-grid"></div>
 
   <!-- BOTÓN FLOTANTE WHATSAPP -->
@@ -905,7 +909,7 @@
     </div>
   </div>
 
-  <!-- MODAL INTERACTIVO PARA COMBOS DÚO / TRÍO / CUÁDRUPLE -->
+  <!-- MODAL INTERACTIVO DE COMBOS CON TODOS LOS SERVICIOS -->
   <div id="modal-combo-selector" class="modal-overlay hidden">
     <div class="modal-box">
       <div class="modal-header">
@@ -917,7 +921,7 @@
         Selecciona los servicios de la lista para completar tu combo con 10% de descuento.
       </p>
 
-      <!-- LISTA DE TODOS LOS SERVICIOS -->
+      <!-- LISTA DE TODOS LOS SERVICIOS DISPONIBLES -->
       <div id="combo-items-container" class="combo-select-list"></div>
 
       <!-- RESUMEN DE PRECIOS -->
@@ -960,7 +964,7 @@
     let comboTipoCantidad = 2;
     let comboSeleccionados = [];
 
-    // TARJETAS FIJAS DE COMBOS (DÚO, TRÍO, CUÁDRUPLE)
+    // COMBOS FIJOS EN EL GRID
     const COMBOS_FIJOS = [
       {
         isCombo: true,
@@ -1012,42 +1016,151 @@
       }
     ];
 
-    const SERVICIOS_DEFAULT = [
+    // CATÁLOGO COMPLETO DE SERVICIOS
+    const CATALOGO_COMPLETO = [
       {
-        nombre: "Netflix",
-        sub: "1 mes · Video",
-        categoria: "video",
+        nombre: "Netflix Premium",
+        sub: "1 mes · Streaming",
+        categoria: "streaming",
         tag: "POPULAR",
         precio: "4.00",
-        features: ["1 perfil dedicado", "Calidad HD / 4K", "Activación el mismo día", "Sin compartir cuenta"],
+        features: ["1 perfil Ultra HD 4K", "Activación inmediata", "Soporte y garantía mensual", "Sin caídas"],
         img: "https://images.unsplash.com/photo-1574375927938-d5a98e8ffe85?w=500"
       },
       {
-        nombre: "Disney+",
-        sub: "1 mes · Video",
-        categoria: "video",
-        tag: "",
-        precio: "3.00",
-        features: ["Disney Marvel Star Wars", "Series exclusivas", "Perfil personal", "Activación inmediata"],
+        nombre: "Disney+ & ESPN",
+        sub: "1 mes · Streaming",
+        categoria: "streaming",
+        tag: "TOP",
+        precio: "4.00",
+        features: ["Disney, Marvel, Star Wars", "Deportes ESPN en vivo", "Calidad 4K UHD", "Perfil exclusivo"],
         img: "https://images.unsplash.com/photo-1607604276583-eef5d076aa5f?w=500"
       },
       {
-        nombre: "Spotify",
+        nombre: "Max (HBO)",
+        sub: "1 mes · Streaming",
+        categoria: "streaming",
+        tag: "POPULAR",
+        precio: "3.50",
+        features: ["Estrenos de cine Warner", "Champions League en vivo", "Calidad 4K UHD", "Perfil personal"],
+        img: "https://images.unsplash.com/photo-1585951237318-9ea5e175b891?w=500"
+      },
+      {
+        nombre: "Prime Video",
+        sub: "1 mes · Streaming",
+        categoria: "streaming",
+        tag: "",
+        precio: "3.00",
+        features: ["Películas y series Amazon", "Calidad Full HD y 4K", "Activación inmediata", "Perfil propio"],
+        img: "https://images.unsplash.com/photo-1522869635100-9f4c5e86aa37?w=500"
+      },
+      {
+        nombre: "Spotify Premium",
         sub: "1 mes · Música",
         categoria: "musica",
         tag: "TOP",
-        precio: "2.50",
-        features: ["Música sin anuncios", "Modo offline disponible", "A tu propio correo", "Calidad Extreme Audio"],
+        precio: "3.00",
+        features: ["Música sin publicidad", "Descargas offline", "Calidad Extreme Audio", "A tu propio correo"],
         img: "https://images.unsplash.com/photo-1614680376593-902f749f7ffc?w=500"
       },
       {
-        nombre: "HBO Max",
-        sub: "1 mes · Video",
-        categoria: "video",
+        nombre: "YouTube Premium",
+        sub: "1 mes · Música",
+        categoria: "musica",
         tag: "",
         precio: "3.50",
-        features: ["Estrenos exclusivos", "Champions League en vivo", "Reproducción en 4K UHD", "Garantía mensual"],
-        img: "https://images.unsplash.com/photo-1585951237318-9ea5e175b891?w=500"
+        features: ["Sin anuncios en videos", "YouTube Music incluido", "Reproducción en 2do plano", "A tu propia cuenta"],
+        img: "https://images.unsplash.com/photo-1611162617213-7d7a39e9b1d7?w=500"
+      },
+      {
+        nombre: "Flujo TV",
+        sub: "1 mes · IPTV",
+        categoria: "iptv",
+        tag: "EN VIVO",
+        precio: "4.00",
+        features: ["Más de 1.200 canales en vivo", "Fútbol ecuatoriano e internacional", "Películas y series VOD", "Calidad Full HD estable"],
+        img: "https://images.unsplash.com/photo-1593784991095-a205069470b6?w=500"
+      },
+      {
+        nombre: "IPTV Smarters Pro",
+        sub: "1 mes · IPTV",
+        categoria: "iptv",
+        tag: "FÚTBOL",
+        precio: "3.50",
+        features: ["Todos los canales deportivos", "Canales de cable prémium", "Guía de programación EPG", "Compatible Smart TV y TV Box"],
+        img: "https://images.unsplash.com/photo-1461151304267-38535e780c79?w=500"
+      },
+      {
+        nombre: "Crunchyroll Mega Fan",
+        sub: "1 mes · Streaming",
+        categoria: "streaming",
+        tag: "ANIME",
+        precio: "3.00",
+        features: ["Anime en simultáneo con Japón", "Sin anuncios en HD", "Catálogo completo ilimitado", "Perfil personal"],
+        img: "https://images.unsplash.com/photo-1563089145-599997674d42?w=500"
+      },
+      {
+        nombre: "ViX+ Premium",
+        sub: "1 mes · Streaming",
+        categoria: "streaming",
+        tag: "",
+        precio: "2.50",
+        features: ["Liga mexicana y deportes", "Series y novelas en español", "Transmisiones en vivo", "Garantía total"],
+        img: "https://images.unsplash.com/photo-1517604931442-7e0c8ed2963c?w=500"
+      },
+      {
+        nombre: "Paramount+",
+        sub: "1 mes · Streaming",
+        categoria: "streaming",
+        tag: "",
+        precio: "3.00",
+        features: ["Películas de cine Paramount", "Premier League en vivo", "Nickelodeon y series", "Perfil individual"],
+        img: "https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?w=500"
+      },
+      {
+        nombre: "Plex Cine",
+        sub: "1 mes · Streaming",
+        categoria: "streaming",
+        tag: "",
+        precio: "2.75",
+        features: ["Cine y estrenos en alta calidad", "Biblioteca gigante de películas", "Servidor privado 24/7", "Garantía mensual"],
+        img: "https://images.unsplash.com/photo-1518173946687-a4c8a383392e?w=500"
+      },
+      {
+        nombre: "Canva Pro",
+        sub: "1 mes / Anual · Software",
+        categoria: "software",
+        tag: "DISEÑO",
+        precio: "3.00",
+        features: ["Plantillas y fotos prémium", "Quitar fondos con 1 clic", "Herramientas de IA", "A tu propio correo"],
+        img: "https://images.unsplash.com/photo-1626785774573-4b799315345d?w=500"
+      },
+      {
+        nombre: "CapCut Pro",
+        sub: "1 mes · Software",
+        categoria: "software",
+        tag: "EDICIÓN",
+        precio: "4.50",
+        features: ["Filtros y efectos pro", "Subtítulos automáticos", "Exportación en 4K 60fps", "Sin marcas de agua"],
+        img: "https://images.unsplash.com/photo-1574717024653-61fd2cf4d44d?w=500"
+      },
+      {
+        nombre: "ChatGPT Plus",
+        sub: "1 mes · Software",
+        categoria: "software",
+        tag: "IA",
+        precio: "4.50",
+        features: ["Acceso a GPT-4o sin límites", "Generación de imágenes DALL·E", "Análisis avanzado de datos", "Navegación web rápida"],
+        img: "https://images.unsplash.com/photo-1677442136019-21780ecad995?w=500"
+      },
+      {
+        nombre: "Microsoft 365 / Office",
+        sub: "1 año · Software",
+        categoria: "software",
+        tag: "OFICINA",
+        precio: "8.50",
+        features: ["Word, Excel, PowerPoint", "1 TB en OneDrive en la nube", "Hasta 5 dispositivos PC/Móvil", "Licencia original"],
+        img: "https://images.unsplash.com/photo-1531403009284-440f080d1e12?w=500"
       }
     ];
 
@@ -1095,7 +1208,7 @@
         tiendaActiva = tiendas[tiendaSlug] || {
           nombre: "Mi Tienda",
           whatsapp: "593982766054",
-          productos: SERVICIOS_DEFAULT,
+          productos: CATALOGO_COMPLETO,
           textos: {}
         };
 
@@ -1136,14 +1249,17 @@
         document.getElementById('hero-btn-ws').href = `https://wa.me/${ws}?text=${baseMsg}`;
         document.getElementById('floating-ws-btn').href = `https://wa.me/${ws}?text=${baseMsg}`;
 
-        // Todos los servicios reales del revendedor
-        todosLosProductos = (tiendaActiva.productos && tiendaActiva.productos.length > 0) 
-          ? tiendaActiva.productos 
-          : SERVICIOS_DEFAULT;
+        // Usar los productos personalizados si la tienda tiene más de 4, de lo contrario cargar el catálogo completo
+        const prodsTienda = tiendaActiva.productos || [];
+        if (prodsTienda.length > 4) {
+          todosLosProductos = prodsTienda;
+        } else {
+          todosLosProductos = CATALOGO_COMPLETO;
+        }
 
         document.getElementById('stat-count').innerText = todosLosProductos.length;
 
-        // En la cuadrícula se muestran primero los combos y luego los servicios individuales
+        // Combos fijos + todos los productos
         itemsParaMostrar = [...COMBOS_FIJOS, ...todosLosProductos];
         aplicarFiltros();
 
@@ -1156,13 +1272,15 @@
       const q = (document.getElementById('catalogo-search')?.value || '').toLowerCase().trim();
 
       productosVisibles = itemsParaMostrar.filter(p => {
-        const cat = (p.categoria || 'video').toLowerCase();
+        const cat = (p.categoria || 'streaming').toLowerCase();
         let coincideCat = false;
 
         if (categoriaSeleccionada === 'todos') {
           coincideCat = true;
         } else if (categoriaSeleccionada === 'combos') {
           coincideCat = p.isCombo === true;
+        } else if (categoriaSeleccionada === 'streaming') {
+          coincideCat = cat === 'streaming' || cat === 'video';
         } else {
           coincideCat = cat === categoriaSeleccionada.toLowerCase();
         }
@@ -1208,7 +1326,7 @@
       }
 
       productos.forEach((p, idx) => {
-        const sub = p.sub || (p.categoria === 'musica' ? '1 mes · Música' : '1 mes · Video');
+        const sub = p.sub || (p.categoria === 'musica' ? '1 mes · Música' : '1 mes · Streaming');
         let tagClass = 'card-tag';
         if (p.isCombo) tagClass += ' discount';
         else if (p.tag && p.tag.toLowerCase() === 'top') tagClass += ' top';
@@ -1227,7 +1345,6 @@
 
         const featuresHtml = features.map(f => `<li>${f}</li>`).join('');
 
-        // Manejo de precio para combos vs individuales
         let priceHtml = '';
         if (p.isCombo) {
           priceHtml = `
@@ -1246,7 +1363,6 @@
           `;
         }
 
-        // Si es combo llama a abrirModalCombo, si es normal a abrirModal
         const actionClick = p.isCombo 
           ? `abrirModalCombo(${p.comboCantidad})`
           : `abrirModal(${idx})`;
@@ -1308,7 +1424,7 @@
       document.getElementById('modal-compra').classList.add('hidden');
     }
 
-    /* DESPLIEGUE DE TODOS LOS SERVICIOS AL ELEGIR COMBO */
+    /* MODAL DE COMBOS: DESPLIEGA TODOS LOS SERVICIOS */
     function abrirModalCombo(cantidad) {
       comboTipoCantidad = cantidad;
       comboSeleccionados = [];
@@ -1333,7 +1449,6 @@
       document.getElementById('modal-combo-selector').classList.add('hidden');
     }
 
-    // LISTA COMPLETA: MUESTRA ABSOLUTAMENTE TODOS LOS SERVICIOS DE LA TIENDA
     function renderListaComboItems() {
       const container = document.getElementById('combo-items-container');
       container.innerHTML = '';
@@ -1365,7 +1480,7 @@
         comboSeleccionados.splice(yaEsta, 1);
       } else {
         if (comboSeleccionados.length >= comboTipoCantidad) {
-          alert(`En este combo solo puedes elegir ${comboTipoCantidad} servicios. Desmarca uno para cambiar.`);
+          alert(`En este combo solo puedes elegir ${comboTipoCantidad} servicios. Desmarca uno para cambiarlo.`);
           return;
         }
         comboSeleccionados.push(idx);
