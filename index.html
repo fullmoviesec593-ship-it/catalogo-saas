@@ -5,7 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Catálogo Oficial | Streaming & Software</title>
 
-  <link rel="manifest" href="/manifest.json">
+  <!-- EL MANIFEST AHORA SE VINCULA DINÁMICAMENTE CON EL SLUG EN JAVASCRIPT -->
+  <link id="manifest-link" rel="manifest" href="/manifest.json">
   <meta id="theme-color-meta" name="theme-color" content="#ff6a00">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -87,7 +88,6 @@
     .brand-name { font-size: 15px; font-weight: 800; color: #fff; letter-spacing: -0.2px; }
     .nav-actions { display: flex; align-items: center; gap: 6px; }
 
-    /* BOTÓN DESTACADO DESCARGA APK */
     .btn-download-apk {
       background: #1e1b4b;
       border: 1px solid #818cf8;
@@ -282,7 +282,6 @@
       <span id="nav-store-name" class="brand-name">Full Movies EC</span>
     </a>
     <div class="nav-actions">
-      <!-- BOTÓN DIRECTO DESCARGAR APK -->
       <button class="btn-download-apk" onclick="abrirModalInstalacionAPK()">
         📱 Descargar App / APK
       </button>
@@ -449,17 +448,15 @@
       </div>
 
       <div style="font-size:45px; margin:10px 0;">🚀</div>
-      <h4 style="color:#fff; margin-bottom:8px;">Lleva el catálogo en tu teléfono</h4>
+      <h4 id="apk-modal-store-name" style="color:#fff; margin-bottom:8px;">Lleva esta tienda en tu teléfono</h4>
       <p style="color:#94a3b8; font-size:13px; line-height:1.5; margin-bottom:18px;">
         Accede más rápido, recibe actualizaciones automáticas y consulta precios al instante sin usar el navegador.
       </p>
 
-      <!-- BOTÓN 1: INSTALACIÓN RÁPIDA PWA ANDROID -->
       <button id="btn-pwa-direct" onclick="ejecutarInstalacionPWA()" style="background:var(--accent-gradient); color:#fff; width:100%; padding:13px; border:none; border-radius:10px; font-weight:800; font-size:14px; cursor:pointer; margin-bottom:10px;">
         ⚡ INSTALAR DIRECTO EN MI CELULAR
       </button>
 
-      <!-- BOTÓN 2: DESCARGA DE ARCHIVO APK (SI LA TIENDA CONFIGURÓ UN LINK EXTERNO) -->
       <a id="btn-custom-apk" href="#" target="_blank" class="hidden" style="background:#1e1b4b; border:1px solid #818cf8; color:#c7d2fe; display:block; width:100%; padding:11px; border-radius:10px; font-weight:800; font-size:13px; text-decoration:none; margin-bottom:12px;">
         📥 Descargar archivo .APK directo
       </a>
@@ -468,7 +465,7 @@
         <b>💡 Si no se abre la instalación automática:</b><br>
         1. Toca los tres puntos (<b>⋮</b>) de tu navegador Chrome.<br>
         2. Selecciona <b>"Agregar a pantalla principal"</b> o <b>"Instalar aplicación"</b>.<br>
-        3. ¡Listo! Se creará el icono oficial en tu teléfono.
+        3. ¡Listo! Se creará el acceso exclusivo a esta tienda.
       </div>
     </div>
   </div>
@@ -482,13 +479,13 @@
     let categoriaSeleccionada = 'todos';
     let textosTienda = {};
     let deferredPrompt = null;
+    let slugActualDetectado = null;
 
     let comboActualConfig = null;
     let comboTipoCantidad = 2;
     let comboPorcentajeDesc = 10;
     let comboSeleccionados = [];
 
-    // REGISTRO DE SERVICE WORKER
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
         navigator.serviceWorker.register('/sw.js').catch(() => {});
@@ -501,6 +498,9 @@
     });
 
     function abrirModalInstalacionAPK() {
+      if (tiendaActiva && tiendaActiva.nombre) {
+        document.getElementById('apk-modal-store-name').innerText = `Lleva ${tiendaActiva.nombre} en tu teléfono`;
+      }
       if (tiendaActiva && tiendaActiva.apkUrl) {
         const btnApk = document.getElementById('btn-custom-apk');
         btnApk.href = tiendaActiva.apkUrl;
@@ -523,7 +523,7 @@
           deferredPrompt = null;
         });
       } else {
-        alert("Para instalar en tu teléfono:\n\n1. Toca el menú (⋮) arriba a la derecha de tu navegador Chrome.\n2. Presiona 'Instalar aplicación' o 'Agregar a la pantalla principal'.\n\n¡Se instalará con su icono oficial en segundos!");
+        alert("Para instalar en tu teléfono:\n\n1. Toca el menú (⋮) arriba a la derecha de tu navegador Chrome.\n2. Presiona 'Instalar aplicación' o 'Agregar a la pantalla principal'.\n\n¡Se instalará directamente esta tienda!");
       }
     }
 
@@ -583,6 +583,14 @@
       const urlParams = new URLSearchParams(window.location.search);
       let tiendaSlug = urlParams.get('tienda');
 
+      // SI NO VIENE EN LA URL, BUSCAR EN LA MEMORIA DE LA APP (PWA INSTALADA)
+      if (!tiendaSlug) {
+        const guardada = localStorage.getItem('pwa_tienda_actual');
+        if (guardada) {
+          tiendaSlug = guardada;
+        }
+      }
+
       try {
         const res = await fetch('/api/db');
         const db = await res.json();
@@ -593,6 +601,16 @@
         if (!tiendaSlug || !tiendas[tiendaSlug]) {
           const keys = Object.keys(tiendas);
           tiendaSlug = keys.length > 0 ? keys[0] : 'bellstream';
+        }
+
+        // GUARDAR TIENDA EN MEMORIA PARA QUE LA APP NUNCA LA OLVIDE
+        slugActualDetectado = tiendaSlug;
+        localStorage.setItem('pwa_tienda_actual', slugActualDetectado);
+
+        // ACTUALIZAR LINK DEL MANIFEST EN VIVO CON LA TIENDA EXACTA
+        const manifestTag = document.getElementById('manifest-link');
+        if (manifestTag) {
+          manifestTag.href = `/manifest.json?tienda=${encodeURIComponent(slugActualDetectado)}`;
         }
 
         revendedorInfo = revendedores[tiendaSlug] || null;

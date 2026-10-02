@@ -39,6 +39,66 @@ try {
   console.error('Error al inicializar Firestore:', e);
 }
 
+const LOCAL_DB_PATH = path.join(__dirname, 'database.json');
+function leerDBLocal() {
+  if (fs.existsSync(LOCAL_DB_PATH)) {
+    try { return JSON.parse(fs.readFileSync(LOCAL_DB_PATH, 'utf8')); } catch (e) {}
+  }
+  return { revendedores: {}, tiendas: {} };
+}
+
+function guardarDBLocal(data) {
+  try { fs.writeFileSync(LOCAL_DB_PATH, JSON.stringify(data, null, 2)); } catch (e) {}
+}
+
+// MANIFEST DINÁMICO POR TIENDA (RESUELVE QUE SE ABRA LA TIENDA CORRECTA AL INSTALAR)
+app.get('/manifest.json', async (req, res) => {
+  const slug = req.query.tienda || '';
+  let nombreTienda = "Catálogo Oficial";
+
+  try {
+    let db = leerDBLocal();
+    if (dbFirestore) {
+      if (slug) {
+        const docTienda = await dbFirestore.collection('saas_tiendas').doc(slug).get();
+        if (docTienda.exists) {
+          const tData = docTienda.data();
+          if (tData.nombre) nombreTienda = tData.nombre;
+        }
+      }
+    } else if (slug && db.tiendas && db.tiendas[slug]) {
+      nombreTienda = db.tiendas[slug].nombre || nombreTienda;
+    }
+  } catch (err) {}
+
+  const startUrl = slug ? `/?tienda=${encodeURIComponent(slug)}&source=pwa` : `/?source=pwa`;
+
+  const manifest = {
+    name: nombreTienda,
+    short_name: nombreTienda.length > 12 ? nombreTienda.substring(0, 12) : nombreTienda,
+    start_url: startUrl,
+    display: "standalone",
+    background_color: "#090a0f",
+    theme_color: "#ff6a00",
+    orientation: "portrait",
+    icons: [
+      {
+        src: "https://cdn-icons-png.flaticon.com/512/3074/3074767.png",
+        sizes: "192x192",
+        type: "image/png"
+      },
+      {
+        src: "https://cdn-icons-png.flaticon.com/512/3074/3074767.png",
+        sizes: "512x512",
+        type: "image/png"
+      }
+    ]
+  };
+
+  res.setHeader('Content-Type', 'application/manifest+json; charset=utf-8');
+  res.json(manifest);
+});
+
 // ESTADO
 app.get('/api/status', async (req, res) => {
   let pruebaEscritura = false;
@@ -57,18 +117,6 @@ app.get('/api/status', async (req, res) => {
     timestamp: new Date().toISOString()
   });
 });
-
-const LOCAL_DB_PATH = path.join(__dirname, 'database.json');
-function leerDBLocal() {
-  if (fs.existsSync(LOCAL_DB_PATH)) {
-    try { return JSON.parse(fs.readFileSync(LOCAL_DB_PATH, 'utf8')); } catch (e) {}
-  }
-  return { revendedores: {}, tiendas: {} };
-}
-
-function guardarDBLocal(data) {
-  try { fs.writeFileSync(LOCAL_DB_PATH, JSON.stringify(data, null, 2)); } catch (e) {}
-}
 
 app.get('/api/db', async (req, res) => {
   try {
@@ -141,7 +189,6 @@ app.post('/api/revendedor/guardar', async (req, res) => {
   }
 });
 
-// ALTERNAR SUSPENSIÓN POR FALTA DE PAGO DIRECTA
 app.post('/api/revendedor/toggle-suspension', async (req, res) => {
   try {
     const { slug, suspendido } = req.body;
@@ -164,7 +211,6 @@ app.post('/api/revendedor/toggle-suspension', async (req, res) => {
   }
 });
 
-// RECUPERAR CONTRASEÑA CON TOKEN / CÓDIGO TEMPORAL
 app.post('/api/auth/recuperar-password', async (req, res) => {
   try {
     const { email, nuevaPassword } = req.body;
@@ -185,7 +231,7 @@ app.post('/api/auth/recuperar-password', async (req, res) => {
     });
 
     if (!foundSlug) {
-      return res.status(404).json({ error: 'No se encontró ninguna cuenta asociada a este correo electrónico.' });
+      return res.status(404).json({ error: 'No se encontró cuenta asociada a este correo.' });
     }
 
     if (nuevaPassword) {
@@ -196,10 +242,10 @@ app.post('/api/auth/recuperar-password', async (req, res) => {
         db.revendedores[foundSlug].password = nuevaPassword;
         guardarDBLocal(db);
       }
-      return res.json({ success: true, message: '¡Tu contraseña ha sido restablecida exitosamente!' });
+      return res.json({ success: true, message: 'Contraseña actualizada con éxito.' });
     }
 
-    return res.json({ success: true, slug: foundSlug, message: 'Correo verificado. Procede a ingresar la nueva clave.' });
+    return res.json({ success: true, slug: foundSlug });
   } catch (err) {
     return res.status(500).json({ error: err.message });
   }
