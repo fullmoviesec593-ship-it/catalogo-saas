@@ -99,7 +99,6 @@
     .stat-box .num { font-size: 22px; font-weight: 900; font-family: 'Orbitron'; color: var(--primary); }
     .stat-box .lbl { font-size: 12px; color: #94a3b8; }
 
-    /* NUEVO DISEÑO: TARJETAS DE REVENDEDORES */
     .reseller-cards-grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
@@ -159,11 +158,29 @@
       border: 1px solid #22c55e;
       color: #86efac;
     }
+
+    .btn-copy-access {
+      background: #1e293b;
+      border: 1px solid #38bdf8;
+      color: #38bdf8;
+      padding: 7px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 800;
+      cursor: pointer;
+      font-family: 'Orbitron';
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      width: 100%;
+      transition: all 0.2s;
+    }
   </style>
 </head>
 <body>
 
-  <!-- LOGIN SÚPER ADMIN (CON CORREO, CONTRASEÑA, OJITO Y SESIÓN RECORDADA) -->
+  <!-- LOGIN SÚPER ADMIN -->
   <div id="sa-login-box" class="card" style="max-width:440px; align-self:center;">
     <h2 style="text-align:center;">👑 SÚPER ADMIN SAAS</h2>
     <p style="text-align:center; color:#94a3b8; font-size:14px; margin-bottom:20px;">Control total de tiendas, revendedores y cobranza</p>
@@ -230,7 +247,7 @@
       </div>
     </div>
 
-    <!-- RESUMEN EN TARJETAS -->
+    <!-- RESUMEN -->
     <div class="stats-summary">
       <div class="stat-box">
         <div id="stat-total" class="num">0</div>
@@ -302,7 +319,7 @@
 
     <!-- TARJETAS MODERNAS DE REVENDEDORES -->
     <h4 style="color:#fff; margin-bottom:4px;">Directorio de Tiendas Registradas</h4>
-    <p style="color:#94a3b8; font-size:13px; margin-bottom:12px;">Haz clic en el botón de suspensión para congelar o reactivar el catálogo inmediatamente.</p>
+    <p style="color:#94a3b8; font-size:13px; margin-bottom:12px;">Usa los botones para copiar accesos, cobrar por WhatsApp o suspender por falta de pago.</p>
 
     <div id="reseller-cards-container" class="reseller-cards-grid"></div>
   </div>
@@ -335,7 +352,6 @@
       const pass = autoPass || document.getElementById('sa-pass').value.trim();
       const recordar = document.getElementById('sa-remember').checked;
 
-      // Credenciales maestras
       const emailValido = (email.toLowerCase() === "admin@catalogo.com" || email.toLowerCase() === "admin@fullmovies.com" || email.includes("admin"));
       const passValido = (pass === "admin123" || pass === "fullmovies2026");
 
@@ -407,6 +423,44 @@
       return Math.ceil(diff / (1000 * 60 * 60 * 24));
     }
 
+    // FUNCIÓN PARA COPIAR LOS DATOS DE ACCESO AL PORTAPAPELES
+    function copiarDatosAcceso(slug, btn) {
+      const r = dbData.revendedores[slug];
+      if (!r) return;
+
+      const origin = window.location.origin;
+      const texto = 
+`🚀 ¡HOLA ${r.nombre || slug}! AQUÍ ESTÁN TUS ACCESOS A TU CATÁLOGO:
+
+🔗 Link de tu Catálogo Público:
+${origin}/?tienda=${slug}
+
+⚙️ Link a tu Panel de Administración:
+${origin}/admin.html?tienda=${slug}
+
+📧 Correo de acceso: ${r.email || r.correo || '-'}
+🔑 Contraseña: ${r.password || r.clave || '-'}
+📅 Vencimiento de tu servicio: ${r.vencimiento || 'Indefinido'}
+
+¡Guarda estos datos para administrar tus productos y precios! ✨`;
+
+      navigator.clipboard.writeText(texto).then(() => {
+        const originalText = btn.innerHTML;
+        btn.innerHTML = "✅ ¡Copiado para WhatsApp!";
+        btn.style.background = "#22c55e";
+        btn.style.color = "#042f1a";
+        btn.style.borderColor = "#22c55e";
+        setTimeout(() => {
+          btn.innerHTML = originalText;
+          btn.style.background = "#1e293b";
+          btn.style.color = "#38bdf8";
+          btn.style.borderColor = "#38bdf8";
+        }, 1800);
+      }).catch(err => {
+        alert("Error al copiar: " + err);
+      });
+    }
+
     function renderTarjetasRevendedores() {
       const container = document.getElementById('reseller-cards-container');
       container.innerHTML = '';
@@ -476,14 +530,19 @@
           </div>
 
           <div class="card-actions-box">
+            <!-- BOTÓN DESTACADO PARA COPIAR DATOS DE ACCESO -->
+            <button class="btn-copy-access" onclick="copiarDatosAcceso('${slug}', this)">
+              📋 Copiar Accesos (WhatsApp)
+            </button>
+
             <!-- BOTÓN DE SUSPENSIÓN POR FALTA DE PAGO DIRECTA -->
             <button class="btn-suspend-toggle ${r.activo === false ? 'to-reactivate' : 'to-suspend'}" onclick="alternarSuspension('${slug}', ${r.activo !== false})">
               ${r.activo === false ? '✅ Reactivar Servicio' : '⛔ Suspender por Falta de Pago'}
             </button>
 
             <div style="display:grid; grid-template-columns: 1fr 1fr; gap:6px;">
-              ${wsLimpio ? `<a href="https://wa.me/${wsLimpio}?text=${msgCobro}" target="_blank" class="btn-action-sm" style="background:#00d26a; color:#042512; font-weight:800; justify-content:center; padding:8px; border-radius:6px; text-decoration:none; display:flex; align-items:center;">💬 Cobrar Mes</a>` : ''}
-              <button style="background:#0284c7; color:#fff; padding:8px; border-radius:6px; font-size:12px;" onclick="editarRevendedor('${slug}')">✏️ Editar</button>
+              ${wsLimpio ? `<a href="https://wa.me/${wsLimpio}?text=${msgCobro}" target="_blank" style="background:#00d26a; color:#042512; font-weight:800; justify-content:center; padding:8px; border-radius:6px; text-decoration:none; display:flex; align-items:center; font-size:11px; font-family:'Orbitron';">💬 Cobrar Mes</a>` : ''}
+              <button style="background:#0284c7; color:#fff; padding:8px; border-radius:6px; font-size:12px;" onclick="editarRevendedor('${slug}')">✏️️ Editar</button>
             </div>
             
             <button style="background:#450a0a; color:#fca5a5; border:1px solid #7f1d1d; padding:6px; border-radius:6px; font-size:11px;" onclick="eliminarRevendedor('${slug}')">🗑️ Eliminar Revendedor</button>
@@ -498,7 +557,7 @@
     }
 
     async function alternarSuspension(slug, estadoActualActivo) {
-      const nuevoEstadoSuspendido = estadoActualActivo; // si está activo, lo pasamos a suspendido
+      const nuevoEstadoSuspendido = estadoActualActivo;
       const textoAccion = nuevoEstadoSuspendido ? "suspender por falta de pago" : "reactivar el servicio de";
       
       if (confirm(`¿Deseas ${textoAccion} la tienda "${slug}"?`)) {
