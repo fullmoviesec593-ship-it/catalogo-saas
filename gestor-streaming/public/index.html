@@ -1,0 +1,861 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gestor Streaming Pro</title>
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#e50914">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+</head>
+<body class="bg-gray-950 text-gray-100 min-h-screen font-sans">
+
+  <!-- PANTALLA DE LOGIN -->
+  <div id="login-screen" class="min-h-screen flex items-center justify-center p-4">
+    <div class="bg-gray-900 border border-gray-800 p-6 sm:p-8 rounded-2xl max-w-sm w-full shadow-2xl space-y-6">
+      <div class="text-center space-y-2">
+        <i class="fa-solid fa-play-circle text-red-600 text-5xl"></i>
+        <h2 class="text-2xl font-bold tracking-wide">Gestor Streaming</h2>
+        <p class="text-xs text-gray-400">Acceso exclusivo administrador</p>
+      </div>
+      <form id="login-form" class="space-y-4">
+        <div>
+          <label class="block text-xs text-gray-400 mb-1">Correo Registrado en Firebase</label>
+          <input type="email" id="login-email" required value="fullmoviesec593@gmail.com" class="w-full bg-gray-950 border border-gray-800 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-red-500 text-white">
+        </div>
+        <div>
+          <label class="block text-xs text-gray-400 mb-1">Contraseña</label>
+          <input type="password" id="login-password" required placeholder="Tu contraseña" class="w-full bg-gray-950 border border-gray-800 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-red-500 text-white">
+        </div>
+
+        <!-- Opción Mantener Sesión Iniciada -->
+        <div class="flex items-center gap-2 pt-1">
+          <input type="checkbox" id="recordar-sesion" checked class="w-4 h-4 rounded bg-gray-950 border-gray-800 text-red-600 focus:ring-0 focus:ring-offset-0 accent-red-600 cursor-pointer">
+          <label for="recordar-sesion" class="text-xs text-gray-300 cursor-pointer select-none">
+            Mantener sesión iniciada en este dispositivo
+          </label>
+        </div>
+
+        <div id="login-error-box" class="bg-red-950/80 border border-red-800 text-red-200 text-xs p-3 rounded-xl hidden text-center"></div>
+        <button type="submit" id="login-btn" class="w-full bg-red-600 hover:bg-red-700 transition font-semibold py-2.5 rounded-xl shadow-lg flex items-center justify-center gap-2 text-sm">
+          <i class="fa-solid fa-right-to-bracket"></i> Iniciar Sesión
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- APP PRINCIPAL -->
+  <div id="app-screen" class="min-h-screen pb-24" style="display: none;">
+    <!-- Header -->
+    <header class="bg-gray-900 border-b border-gray-800 p-4 sticky top-0 z-40 flex items-center justify-between">
+      <div class="flex items-center space-x-2">
+        <i class="fa-solid fa-play-circle text-red-600 text-2xl"></i>
+        <h1 class="text-xl font-bold tracking-wide">Gestor Streaming</h1>
+      </div>
+      <div class="flex items-center gap-2">
+        <button onclick="exportarCSV()" title="Descargar Respaldo CSV" class="bg-gray-800 hover:bg-gray-700 text-green-400 border border-gray-700 text-xs px-2.5 py-1.5 rounded-lg flex items-center gap-1.5 transition">
+          <i class="fa-solid fa-file-excel"></i> Exportar
+        </button>
+        <button id="logout-btn" title="Cerrar Sesión" class="text-gray-400 hover:text-red-400 text-sm p-1.5 transition">
+          <i class="fa-solid fa-right-from-bracket"></i>
+        </button>
+      </div>
+    </header>
+
+    <!-- NAVEGACIÓN PRINCIPAL -->
+    <div class="max-w-3xl mx-auto px-4 pt-4">
+      <div class="grid grid-cols-2 bg-gray-900 p-1 rounded-xl border border-gray-800 text-xs font-semibold text-center gap-1">
+        <button onclick="cambiarSeccion('cuentas')" id="nav-btn-cuentas" class="py-2.5 rounded-lg bg-red-600 text-white transition flex items-center justify-center gap-1.5">
+          <i class="fa-solid fa-layer-group"></i> Cuentas y Pantallas
+        </button>
+        <button onclick="cambiarSeccion('finanzas')" id="nav-btn-finanzas" class="py-2.5 rounded-lg text-gray-400 hover:text-white transition flex items-center justify-center gap-1.5">
+          <i class="fa-solid fa-chart-line"></i> Finanzas
+        </button>
+      </div>
+    </div>
+
+    <main class="max-w-3xl mx-auto p-4 space-y-6">
+
+      <!-- SECCIÓN CUENTAS -->
+      <div id="sec-cuentas" class="space-y-6">
+        <!-- Leyenda -->
+        <div class="bg-gray-900/90 border border-gray-800 rounded-xl p-3 flex items-center justify-between gap-2 overflow-x-auto text-[11px]">
+          <span class="flex items-center gap-1.5 text-blue-400 font-semibold"><span class="w-3 h-3 rounded-full bg-blue-500 inline-block shadow"></span> Azul: Libre</span>
+          <span class="flex items-center gap-1.5 text-green-400 font-semibold"><span class="w-3 h-3 rounded-full bg-emerald-500 inline-block shadow"></span> Verde: Activo (>3d)</span>
+          <span class="flex items-center gap-1.5 text-yellow-400 font-semibold"><span class="w-3 h-3 rounded-full bg-amber-400 inline-block shadow"></span> Amarillo: 2-3 días</span>
+          <span class="flex items-center gap-1.5 text-red-400 font-semibold"><span class="w-3 h-3 rounded-full bg-red-500 inline-block shadow"></span> Rojo: ≤1 día / Vencido</span>
+        </div>
+
+        <!-- Formulario Crear Cuenta -->
+        <div class="bg-gray-900 rounded-2xl p-5 border border-gray-800 shadow-xl space-y-4">
+          <h2 class="text-base font-semibold text-gray-200 flex items-center gap-2">
+            <i class="fa-solid fa-tv text-red-500"></i> Registrar Cuenta Completa con Perfiles
+          </h2>
+          <form id="form-cuenta-completa" class="space-y-4">
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <div>
+                <label class="block text-xs text-gray-400 mb-1">Servicio</label>
+                <select id="cta-servicio" class="w-full bg-gray-950 border border-gray-800 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-red-500">
+                  <option value="Netflix">Netflix</option>
+                  <option value="Disney+">Disney+</option>
+                  <option value="Max">Max</option>
+                  <option value="Prime Video">Prime Video</option>
+                  <option value="Magis TV">Magis TV</option>
+                  <option value="Paramount+">Paramount+</option>
+                  <option value="Spotify">Spotify</option>
+                  <option value="Otro">Otro</option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-xs text-gray-400 mb-1">Nº de Perfiles</label>
+                <select id="cta-num-perfiles" onchange="generarCamposPerfiles(this.value)" class="w-full bg-gray-950 border border-gray-800 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-red-500">
+                  <option value="1">1 Perfil</option>
+                  <option value="2">2 Perfiles</option>
+                  <option value="3">3 Perfiles</option>
+                  <option value="4">4 Perfiles</option>
+                  <option value="5" selected>5 Perfiles</option>
+                  <option value="6">6 Perfiles</option>
+                  <option value="7">7 Perfiles</option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-xs text-gray-400 mb-1">Costo al Proveedor ($)</label>
+                <input type="number" step="0.50" id="cta-costo" required value="8.00" class="w-full bg-gray-950 border border-gray-800 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-red-500 text-yellow-400 font-semibold">
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <div>
+                <label class="block text-xs text-gray-400 mb-1">Correo Maestro</label>
+                <input type="email" id="cta-correo" required placeholder="correo@proveedor.com" class="w-full bg-gray-950 border border-gray-800 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-red-500">
+              </div>
+              <div>
+                <label class="block text-xs text-gray-400 mb-1">Contraseña Maestra</label>
+                <input type="text" id="cta-clave" required placeholder="Pass1234*" class="w-full bg-gray-950 border border-gray-800 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-red-500">
+              </div>
+              <div>
+                <label class="block text-xs text-gray-400 mb-1">Vence Proveedor</label>
+                <input type="date" id="cta-vence" required class="w-full bg-gray-950 border border-gray-800 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-red-500 text-gray-200">
+              </div>
+            </div>
+
+            <div class="bg-gray-950 p-3.5 rounded-xl border border-gray-800 space-y-2">
+              <label class="block text-xs font-semibold text-gray-300">Configuración Inicial de Perfiles:</label>
+              <div id="contenedor-inputs-perfiles" class="grid grid-cols-1 sm:grid-cols-2 gap-2"></div>
+            </div>
+
+            <button type="submit" id="btn-crear-cuenta" class="w-full bg-red-600 hover:bg-red-700 transition font-medium py-2.5 rounded-xl shadow-lg flex items-center justify-center gap-2 text-sm">
+              <i class="fa-solid fa-plus-circle"></i> Guardar Cuenta y Activar Perfiles
+            </button>
+          </form>
+        </div>
+
+        <div class="flex items-center justify-between gap-2 flex-wrap">
+          <h3 class="text-sm font-semibold text-gray-400 uppercase tracking-wider">Cuentas Registradas</h3>
+          <input type="text" id="buscar-cuenta" placeholder="Buscar cuenta o cliente..." class="bg-gray-900 border border-gray-800 rounded-lg px-3 py-1.5 text-xs focus:outline-none focus:border-red-500">
+        </div>
+
+        <div id="lista-cuentas-grid" class="space-y-5"></div>
+      </div>
+
+      <!-- SECCIÓN FINANZAS -->
+      <div id="sec-finanzas" class="space-y-6" style="display: none;">
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          <div class="bg-gray-900 border border-gray-800 rounded-2xl p-4 shadow-lg">
+            <span class="text-xs text-gray-400 flex items-center gap-1.5"><i class="fa-solid fa-money-bill-wave text-green-400"></i> Ingresos / Mes</span>
+            <p id="fin-ingresos" class="text-2xl font-bold text-green-400 mt-2">$0.00</p>
+          </div>
+          <div class="bg-gray-900 border border-gray-800 rounded-2xl p-4 shadow-lg">
+            <span class="text-xs text-gray-400 flex items-center gap-1.5"><i class="fa-solid fa-receipt text-yellow-400"></i> Costo Proveedores</span>
+            <p id="fin-costos" class="text-2xl font-bold text-yellow-400 mt-2">$0.00</p>
+          </div>
+          <div class="bg-gray-900 border border-gray-800 rounded-2xl p-4 shadow-lg">
+            <span class="text-xs text-gray-400 flex items-center gap-1.5"><i class="fa-solid fa-piggy-bank text-blue-400"></i> Ganancia Neta</span>
+            <p id="fin-ganancia" class="text-2xl font-bold text-blue-400 mt-2">$0.00</p>
+          </div>
+        </div>
+
+        <div class="bg-gray-900 rounded-2xl p-5 border border-gray-800 shadow-xl space-y-4">
+          <h3 class="text-sm font-semibold text-gray-300 uppercase tracking-wider flex items-center gap-2">
+            <i class="fa-solid fa-chart-pie text-red-500"></i> Resumen por Plataforma
+          </h3>
+          <div id="fin-tabla-servicios" class="divide-y divide-gray-800 text-xs"></div>
+        </div>
+      </div>
+
+    </main>
+  </div>
+
+  <!-- MODAL VENDER / EDITAR PERFIL -->
+  <div id="modal-perfil" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+    <div class="bg-gray-900 border border-gray-800 rounded-2xl max-w-sm w-full p-5 space-y-4 shadow-2xl">
+      <div class="flex items-center justify-between border-b border-gray-800 pb-3">
+        <h3 class="font-bold text-sm text-gray-100 flex items-center gap-2">
+          <i class="fa-solid fa-user-tag text-red-500"></i> <span id="modal-perfil-titulo">Gestionar Perfil</span>
+        </h3>
+        <button onclick="cerrarModalPerfil()" class="text-gray-400 hover:text-white text-lg">&times;</button>
+      </div>
+
+      <form id="form-vender-perfil" class="space-y-3 text-xs">
+        <div>
+          <label class="block text-gray-400 mb-1">Nombre del Perfil</label>
+          <input type="text" id="m-nombre-perfil" required class="w-full bg-gray-950 border border-gray-800 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-red-500">
+        </div>
+        <div>
+          <label class="block text-gray-400 mb-1">PIN del Perfil</label>
+          <input type="text" id="m-pin-perfil" placeholder="PIN 1234" class="w-full bg-gray-950 border border-gray-800 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-red-500">
+        </div>
+
+        <div class="border-t border-gray-800/80 pt-3 space-y-3">
+          <div class="flex items-center justify-between">
+            <span class="font-semibold text-gray-300">Datos de Venta</span>
+            <span id="m-estado-badge" class="px-2 py-0.5 rounded text-[10px] font-bold"></span>
+          </div>
+
+          <div>
+            <label class="block text-gray-400 mb-1">Nombre del Cliente</label>
+            <input type="text" id="m-cliente-nombre" placeholder="Nombre completo" class="w-full bg-gray-950 border border-gray-800 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-red-500">
+          </div>
+          <div>
+            <label class="block text-gray-400 mb-1">WhatsApp Cliente</label>
+            <input type="tel" id="m-cliente-wa" placeholder="Ej: 593987654321" class="w-full bg-gray-950 border border-gray-800 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-red-500">
+          </div>
+
+          <div class="grid grid-cols-2 gap-2">
+            <div>
+              <label class="block text-gray-400 mb-1">Fecha de Venta</label>
+              <input type="date" id="m-fecha-venta" onchange="autoCalcularVencimiento(this.value)" class="w-full bg-gray-950 border border-gray-800 rounded-xl px-2.5 py-1.5 text-xs text-gray-200">
+            </div>
+            <div>
+              <label class="block text-gray-400 mb-1">Vence (+30 días)</label>
+              <input type="date" id="m-fecha-vence" required class="w-full bg-gray-950 border border-gray-800 rounded-xl px-2.5 py-1.5 text-xs text-gray-200">
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-gray-400 mb-1">Precio Cobrado ($)</label>
+            <input type="number" step="0.25" id="m-precio" value="3.50" class="w-full bg-gray-950 border border-gray-800 rounded-xl px-3 py-1.5 text-xs text-green-400 font-bold">
+          </div>
+        </div>
+
+        <div class="flex gap-2 pt-2">
+          <button type="submit" class="flex-1 bg-red-600 hover:bg-red-700 py-2.5 rounded-xl font-semibold text-white shadow-lg">
+            Guardar Cambios
+          </button>
+          <button type="button" id="btn-liberar-perfil" onclick="liberarPerfilActual()" class="bg-gray-800 hover:bg-red-950 text-red-400 hover:text-red-300 px-3 py-2.5 rounded-xl font-medium border border-gray-700">
+            <i class="fa-solid fa-arrow-rotate-left"></i> Liberar
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL DE MENSAJES WHATSAPP -->
+  <div id="wa-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+    <div class="bg-gray-900 border border-gray-800 rounded-2xl max-w-sm w-full p-5 space-y-4 shadow-2xl">
+      <div class="flex items-center justify-between border-b border-gray-800 pb-3">
+        <h3 class="font-bold text-sm text-gray-100 flex items-center gap-2">
+          <i class="fa-brands fa-whatsapp text-green-500 text-xl"></i> <span id="wa-modal-title">Mensajes WhatsApp</span>
+        </h3>
+        <button onclick="cerrarWaModal()" class="text-gray-400 hover:text-white text-lg">&times;</button>
+      </div>
+
+      <div class="space-y-2 text-xs">
+        <button onclick="enviarMensaje('bienvenida')" class="w-full text-left bg-gray-950 hover:bg-gray-800 p-3 rounded-xl border border-gray-800 transition flex items-center gap-3">
+          <i class="fa-solid fa-key text-blue-400 text-lg"></i>
+          <div>
+            <span class="font-semibold text-gray-200 block">1. Entrega / Bienvenida</span>
+            <span class="text-gray-500 text-[11px]">Envía correo, clave, perfil, PIN y fecha</span>
+          </div>
+        </button>
+
+        <button onclick="enviarMensaje('recordatorio')" class="w-full text-left bg-gray-950 hover:bg-gray-800 p-3 rounded-xl border border-gray-800 transition flex items-center gap-3">
+          <i class="fa-solid fa-bell text-yellow-400 text-lg"></i>
+          <div>
+            <span class="font-semibold text-gray-200 block">2. Recordatorio Preventivo</span>
+            <span class="text-gray-500 text-[11px]">Aviso cordial de vencimiento</span>
+          </div>
+        </button>
+
+        <button onclick="enviarMensaje('corte')" class="w-full text-left bg-gray-950 hover:bg-gray-800 p-3 rounded-xl border border-gray-800 transition flex items-center gap-3">
+          <i class="fa-solid fa-ban text-red-400 text-lg"></i>
+          <div>
+            <span class="font-semibold text-gray-200 block">3. Aviso de Corte / Vencido</span>
+            <span class="text-gray-500 text-[11px]">Avisa corte y consulta renovación</span>
+          </div>
+        </button>
+      </div>
+
+      <button onclick="cerrarWaModal()" class="w-full py-2 bg-gray-800 hover:bg-gray-700 text-gray-300 rounded-xl text-xs font-medium transition">
+        Cerrar
+      </button>
+    </div>
+  </div>
+
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyABh7--PdAR1msceda4SpLqXF06jCmH1Ys",
+      authDomain: "fullstreaming593.firebaseapp.com",
+      projectId: "fullstreaming593",
+      storageBucket: "fullstreaming593.firebasestorage.app",
+      messagingSenderId: "1066040434052",
+      appId: "1:1066040434052:web:52b412c398fe7672c991d1",
+      measurementId: "G-KFERYH47XR"
+    };
+
+    if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+
+    let cuentasList = [];
+    let unsubscribeCuentas = null;
+
+    let cuentaActualEditando = null;
+    let perfilIndexEditando = null;
+    let datosWaSeleccionados = null;
+
+    const loginScreen = document.getElementById('login-screen');
+    const appScreen = document.getElementById('app-screen');
+    const loginForm = document.getElementById('login-form');
+    const loginErrorBox = document.getElementById('login-error-box');
+    const loginBtn = document.getElementById('login-btn');
+    const logoutBtn = document.getElementById('logout-btn');
+    const chkRecordar = document.getElementById('recordar-sesion');
+
+    const formCuenta = document.getElementById('form-cuenta-completa');
+    const listaGrid = document.getElementById('lista-cuentas-grid');
+    const buscarCuenta = document.getElementById('buscar-cuenta');
+    const modalPerfil = document.getElementById('modal-perfil');
+    const formVender = document.getElementById('form-vender-perfil');
+    const waModal = document.getElementById('wa-modal');
+
+    window.cambiarSeccion = function(seccion) {
+      const secCuentas = document.getElementById('sec-cuentas');
+      const secFinanzas = document.getElementById('sec-finanzas');
+      const btnCuentas = document.getElementById('nav-btn-cuentas');
+      const btnFinanzas = document.getElementById('nav-btn-finanzas');
+
+      if (seccion === 'cuentas') {
+        secCuentas.style.display = 'block';
+        secFinanzas.style.display = 'none';
+        btnCuentas.className = 'py-2.5 rounded-lg bg-red-600 text-white transition flex items-center justify-center gap-1.5';
+        btnFinanzas.className = 'py-2.5 rounded-lg text-gray-400 hover:text-white transition flex items-center justify-center gap-1.5';
+      } else {
+        secCuentas.style.display = 'none';
+        secFinanzas.style.display = 'block';
+        btnFinanzas.className = 'py-2.5 rounded-lg bg-green-600 text-white transition flex items-center justify-center gap-1.5';
+        btnCuentas.className = 'py-2.5 rounded-lg text-gray-400 hover:text-white transition flex items-center justify-center gap-1.5';
+        renderFinanzas();
+      }
+    };
+
+    window.generarCamposPerfiles = function(cantidad) {
+      const contenedor = document.getElementById('contenedor-inputs-perfiles');
+      if (!contenedor) return;
+      contenedor.innerHTML = '';
+      const sugerencias = ['Perfil 1', 'Perfil 2', 'Perfil 3', 'Perfil 4', 'Perfil 5', 'Perfil 6', 'Perfil 7'];
+
+      for (let i = 1; i <= cantidad; i++) {
+        const pinRandom = Math.floor(1000 + Math.random() * 9000);
+        const nom = sugerencias[i - 1] || `Perfil ${i}`;
+        const div = document.createElement('div');
+        div.className = 'flex items-center gap-2 bg-gray-900 p-2 rounded-lg border border-gray-800 text-xs';
+        div.innerHTML = `
+          <span class="text-gray-500 font-bold">#${i}</span>
+          <input type="text" id="init-p-nom-${i}" value="${nom}" placeholder="Nombre" class="bg-gray-950 border border-gray-800 rounded px-2 py-1 text-xs w-1/2 focus:outline-none focus:border-red-500">
+          <input type="text" id="init-p-pin-${i}" value="${pinRandom}" placeholder="PIN" class="bg-gray-950 border border-gray-800 rounded px-2 py-1 text-xs w-1/2 focus:outline-none focus:border-red-500 text-yellow-300">
+        `;
+        contenedor.appendChild(div);
+      }
+    };
+
+    function calcularDias(fechaStr) {
+      if (!fechaStr) return 999;
+      const hoy = new Date();
+      hoy.setHours(0,0,0,0);
+      const fin = new Date(fechaStr + 'T00:00:00');
+      return Math.ceil((fin - hoy) / (1000 * 60 * 60 * 24));
+    }
+
+    function obtenerEstadoPerfil(p) {
+      if (!p.vendido) {
+        return {
+          estado: 'libre',
+          colorClase: 'bg-blue-600/20 border-blue-500 text-blue-300 hover:bg-blue-600/30',
+          badgeClase: 'bg-blue-900/70 text-blue-200 border border-blue-600',
+          texto: 'LIBRE'
+        };
+      }
+      const dias = calcularDias(p.fechaVence);
+      if (dias >= 4) {
+        return {
+          estado: 'activo',
+          colorClase: 'bg-emerald-600/20 border-emerald-500 text-emerald-300 hover:bg-emerald-600/30',
+          badgeClase: 'bg-emerald-900/70 text-emerald-200 border border-emerald-500',
+          texto: `${dias}d restantes`
+        };
+      } else if (dias === 2 || dias === 3) {
+        return {
+          estado: 'alerta',
+          colorClase: 'bg-amber-500/25 border-amber-400 text-amber-200 hover:bg-amber-500/35',
+          badgeClase: 'bg-amber-900/80 text-amber-200 border border-amber-400',
+          texto: `Quedan ${dias}d`
+        };
+      } else {
+        return {
+          estado: 'urgente',
+          colorClase: 'bg-red-600/30 border-red-500 text-red-200 hover:bg-red-600/40',
+          badgeClase: 'bg-red-900/90 text-red-100 border border-red-500',
+          texto: dias <= 0 ? (dias === 0 ? 'VENCE HOY' : `VENCIDO (${Math.abs(dias)}d)`) : 'ÚLTIMO DÍA'
+        };
+      }
+    }
+
+    function renderCuentas() {
+      listaGrid.innerHTML = '';
+      const filtro = (buscarCuenta.value || '').toLowerCase();
+
+      const filtradas = cuentasList.filter(cta => {
+        if ((cta.servicio || '').toLowerCase().includes(filtro)) return true;
+        if ((cta.correo || '').toLowerCase().includes(filtro)) return true;
+        if (cta.perfiles && cta.perfiles.some(p => (p.clienteNombre || '').toLowerCase().includes(filtro))) return true;
+        return false;
+      });
+
+      if (filtradas.length === 0) {
+        listaGrid.innerHTML = '<p class="text-center text-gray-500 text-xs py-8">No hay cuentas registradas todavía. Crea tu primera cuenta arriba.</p>';
+        return;
+      }
+
+      filtradas.forEach(cta => {
+        const perfiles = cta.perfiles || [];
+        const ocupados = perfiles.filter(p => p.vendido).length;
+        const total = perfiles.length;
+        const libres = total - ocupados;
+        const diasProv = calcularDias(cta.vence);
+
+        const card = document.createElement('div');
+        card.className = 'bg-gray-900 border border-gray-800 rounded-2xl p-4 sm:p-5 shadow-xl space-y-4';
+
+        card.innerHTML = `
+          <div class="flex items-start justify-between flex-wrap gap-2 border-b border-gray-800 pb-3">
+            <div>
+              <div class="flex items-center gap-2">
+                <span class="text-base font-bold text-white">${cta.servicio}</span>
+                <span class="text-xs px-2 py-0.5 rounded font-medium bg-gray-800 text-gray-300">
+                  Prov: ${cta.vence} (${diasProv >= 0 ? diasProv + 'd' : 'Vencida'})
+                </span>
+                <span class="text-xs px-2 py-0.5 rounded font-semibold ${libres > 0 ? 'bg-blue-950 text-blue-400 border border-blue-800' : 'bg-red-950 text-red-400 border border-red-800'}">
+                  ${libres > 0 ? libres + ' libres' : 'COMPLETA'}
+                </span>
+              </div>
+              <p class="text-xs text-gray-400 mt-1 font-mono">${cta.correo} | Pass: <span class="text-gray-200 font-bold">${cta.clave}</span></p>
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="text-xs text-yellow-400 font-semibold bg-yellow-950/60 px-2 py-1 rounded border border-yellow-800/50">Costo: $${parseFloat(cta.costo || 0).toFixed(2)}</span>
+              <button onclick="eliminarCuenta('${cta.id}')" title="Eliminar cuenta" class="text-red-400 hover:text-red-300 text-sm p-1">
+                <i class="fa-solid fa-trash"></i>
+              </button>
+            </div>
+          </div>
+
+          <div>
+            <h4 class="text-xs font-semibold text-gray-400 mb-2 uppercase tracking-wider">Perfiles:</h4>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5">
+              ${perfiles.map((p, idx) => {
+                const est = obtenerEstadoPerfil(p);
+                return `
+                  <div class="border rounded-xl p-3 flex flex-col justify-between transition shadow-md ${est.colorClase}">
+                    <div>
+                      <div class="flex items-center justify-between mb-1.5">
+                        <span class="font-bold text-sm text-white flex items-center gap-1.5">
+                          <i class="fa-solid fa-tv text-xs opacity-75"></i> ${p.nombrePerfil}
+                        </span>
+                        <span class="text-[10px] font-bold px-2 py-0.5 rounded-full ${est.badgeClase}">
+                          ${est.texto}
+                        </span>
+                      </div>
+                      <p class="text-[11px] font-mono text-gray-300">PIN: <strong class="text-yellow-300">${p.pin \vert{}\vert{} 'Sin PIN'}</strong></p>${p.vendido ? `
+                        <div class="mt-2 pt-2 border-t border-gray-700/50 text-[11px] space-y-0.5">
+                          <p class="font-semibold text-white truncate"><i class="fa-solid fa-user text-gray-400 mr-1"></i>${p.clienteNombre}</p>
+                          <p class="text-gray-300"><i class="fa-brands fa-whatsapp text-green-400 mr-1"></i>${p.clienteWa}</p>
+                          <p class="text-gray-400">Vence: <strong class="text-white">${p.fechaVence}</strong></p>
+                        </div>
+                      ` : `
+                        <p class="text-[11px] text-blue-200/80 italic mt-3 flex items-center gap-1">
+                          <i class="fa-solid fa-circle-check text-blue-400"></i> Listo para vender
+                        </p>
+                      `}
+                    </div>
+
+                    <div class="mt-3 pt-2 border-t border-gray-700/40 flex items-center justify-between gap-1">
+                      <button onclick="abrirModalPerfil('${cta.id}',${idx})" class="flex-1 bg-gray-900/90 hover:bg-gray-900 text-white text-[11px] font-medium py-1.5 px-2 rounded-lg border border-gray-700 flex items-center justify-center gap-1 transition">
+                        <i class="fa-solid fa-pen-to-square"></i> ${p.vendido ? 'Editar' : 'Vender'}
+                      </button>
+
+                      ${p.vendido ? `
+                        <button onclick="renovarPerfil30d('${cta.id}', ${idx})" title="Sumar 30 días" class="bg-blue-600 hover:bg-blue-700 text-white text-[11px] px-2 py-1.5 rounded-lg transition font-medium">
+                          +30d
+                        </button>
+                        <button onclick="abrirWaModalDirecto('${cta.id}', ${idx})" title="Enviar WhatsApp" class="bg-green-600 hover:bg-green-700 text-white text-[11px] px-2 py-1.5 rounded-lg transition">
+                          <i class="fa-brands fa-whatsapp"></i>
+                        </button>
+                      ` : ''}
+                    </div>
+                  </div>
+                `;
+              }).join('')}
+            </div>
+          </div>
+        `;
+        listaGrid.appendChild(card);
+      });
+    }
+
+    window.abrirModalPerfil = function(cuentaId, perfilIdx) {
+      cuentaActualEditando = cuentasList.find(c => c.id === cuentaId);
+      if (!cuentaActualEditando) return;
+      perfilIndexEditando = perfilIdx;
+
+      const p = cuentaActualEditando.perfiles[perfilIdx];
+      const est = obtenerEstadoPerfil(p);
+
+      document.getElementById('modal-perfil-titulo').textContent = `${cuentaActualEditando.servicio} - Perfil #${perfilIdx + 1}`;
+      document.getElementById('m-nombre-perfil').value = p.nombrePerfil || '';
+      document.getElementById('m-pin-perfil').value = p.pin || '';
+
+      const badgeEst = document.getElementById('m-estado-badge');
+      badgeEst.className = `px-2 py-0.5 rounded text-[10px] font-bold ${est.badgeClase}`;
+      badgeEst.textContent = est.texto;
+
+      document.getElementById('m-cliente-nombre').value = p.clienteNombre || '';
+      document.getElementById('m-cliente-wa').value = p.clienteWa || '';
+
+      const hoyStr = new Date().toISOString().split('T')[0];
+      document.getElementById('m-fecha-venta').value = p.fechaVenta || hoyStr;
+
+      if (p.fechaVence) {
+        document.getElementById('m-fecha-vence').value = p.fechaVence;
+      } else {
+        autoCalcularVencimiento(hoyStr);
+      }
+
+      document.getElementById('m-precio').value = p.precio || 3.50;
+
+      const btnLiberar = document.getElementById('btn-liberar-perfil');
+      if (p.vendido) {
+        btnLiberar.classList.remove('hidden');
+      } else {
+        btnLiberar.classList.add('hidden');
+      }
+
+      modalPerfil.classList.remove('hidden');
+    };
+
+    window.cerrarModalPerfil = function() {
+      modalPerfil.classList.add('hidden');
+      cuentaActualEditando = null;
+      perfilIndexEditando = null;
+    };
+
+    window.autoCalcularVencimiento = function(fechaVentaStr) {
+      if (!fechaVentaStr) return;
+      const d = new Date(fechaVentaStr + 'T00:00:00');
+      d.setDate(d.getDate() + 30);
+      document.getElementById('m-fecha-vence').value = d.toISOString().split('T')[0];
+    };
+
+    formVender.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      if (!cuentaActualEditando || perfilIndexEditando === null) return;
+
+      const perfiles = [...cuentaActualEditando.perfiles];
+      const cliNom = document.getElementById('m-cliente-nombre').value.trim();
+
+      perfiles[perfilIndexEditando] = {
+        ...perfiles[perfilIndexEditando],
+        nombrePerfil: document.getElementById('m-nombre-perfil').value.trim(),
+        pin: document.getElementById('m-pin-perfil').value.trim(),
+        clienteNombre: cliNom,
+        clienteWa: document.getElementById('m-cliente-wa').value.trim(),
+        fechaVenta: document.getElementById('m-fecha-venta').value,
+        fechaVence: document.getElementById('m-fecha-vence').value,
+        precio: parseFloat(document.getElementById('m-precio').value) || 3.50,
+        vendido: cliNom.length > 0
+      };
+
+      try {
+        await db.collection('cuentasMaestras').doc(cuentaActualEditando.id).update({ perfiles });
+        cerrarModalPerfil();
+      } catch (err) {
+        alert('Error: ' + err.message);
+      }
+    });
+
+    window.liberarPerfilActual = async function() {
+      if (!confirm('¿Liberar perfil para venta de nuevo?')) return;
+      const perfiles = [...cuentaActualEditando.perfiles];
+      perfiles[perfilIndexEditando] = {
+        nombrePerfil: perfiles[perfilIndexEditando].nombrePerfil,
+        pin: perfiles[perfilIndexEditando].pin,
+        vendido: false,
+        clienteNombre: '',
+        clienteWa: '',
+        fechaVenta: '',
+        fechaVence: '',
+        precio: 3.50
+      };
+
+      try {
+        await db.collection('cuentasMaestras').doc(cuentaActualEditando.id).update({ perfiles });
+        cerrarModalPerfil();
+      } catch (err) {
+        alert('Error al liberar: ' + err.message);
+      }
+    };
+
+    window.renovarPerfil30d = async function(cuentaId, pIdx) {
+      const cta = cuentasList.find(c => c.id === cuentaId);
+      if (!cta) return;
+      const p = cta.perfiles[pIdx];
+
+      let baseDate = new Date((p.fechaVence || new Date().toISOString().split('T')[0]) + 'T00:00:00');
+      const hoy = new Date();
+      hoy.setHours(0,0,0,0);
+      if (baseDate < hoy) baseDate = hoy;
+      baseDate.setDate(baseDate.getDate() + 30);
+      const nuevaFecha = baseDate.toISOString().split('T')[0];
+
+      if (confirm(`¿Renovar suscripción de ${p.clienteNombre} hasta el ${nuevaFecha}?`)) {
+        const perfiles = [...cta.perfiles];
+        perfiles[pIdx].fechaVence = nuevaFecha;
+        await db.collection('cuentasMaestras').doc(cuentaId).update({ perfiles });
+      }
+    };
+
+    window.abrirWaModalDirecto = function(cuentaId, pIdx) {
+      const cta = cuentasList.find(c => c.id === cuentaId);
+      if (!cta) return;
+      datosWaSeleccionados = { cuenta: cta, perfil: cta.perfiles[pIdx] };
+      document.getElementById('wa-modal-title').textContent = `Avisar a ${cta.perfiles[pIdx].clienteNombre}`;
+      waModal.classList.remove('hidden');
+    };
+
+    window.cerrarWaModal = function() {
+      waModal.classList.add('hidden');
+      datosWaSeleccionados = null;
+    };
+
+    window.enviarMensaje = function(tipo) {
+      if (!datosWaSeleccionados) return;
+      const { cuenta, perfil } = datosWaSeleccionados;
+      const dias = calcularDias(perfil.fechaVence);
+      const numLimpio = (perfil.clienteWa || '').replace(/\D/g, '');
+
+      let msg = '';
+      if (tipo === 'bienvenida') {
+        msg = `¡Hola ${perfil.clienteNombre}! Te damos la bienvenida a *Full Movies Ec* 🎬🍿.\n\nAquí tienes tus datos de acceso para *${cuenta.servicio}*:\n` +
+              `📧 Correo: ${cuenta.correo}\n` +
+              `🔑 Clave: ${cuenta.clave}\n` +
+              `👤 Perfil: *${perfil.nombrePerfil}*\n` +
+              (perfil.pin ? `🔢 PIN: *${perfil.pin}*\n` : '') +
+              `📅 Activo hasta: *${perfil.fechaVence}*\n\n¡Gracias por preferirnos!`;
+      } else if (tipo === 'recordatorio') {
+        const t = dias === 1 ? 'mañana' : `en ${dias} días`;
+        msg = `Hola ${perfil.clienteNombre}, te saludamos de *Full Movies Ec* 👋.\n\nTe recordamos que tu perfil *${perfil.nombrePerfil}* en *${cuenta.servicio}* vence ${t} (*${perfil.fechaVence}*).\n\n¿Deseas renovar tu pantalla para continuar disfrutando sin cortes?`;
+      } else if (tipo === 'corte') {
+        msg = `Hola ${perfil.clienteNombre}, te saludamos de *Full Movies Ec* 👋.\n\nTe informamos que tu suscripción de *${cuenta.servicio}* (Perfil: ${perfil.nombrePerfil}) ha culminado (*${perfil.fechaVence}*).\n\nPor favor confírmanos si deseas renovar para mantener tu perfil activo.`;
+      }
+
+      window.open(`https://wa.me/${numLimpio}?text=${encodeURIComponent(msg)}`, '_blank');
+      cerrarWaModal();
+    };
+
+    formCuenta.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const btn = document.getElementById('btn-crear-cuenta');
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Guardando...';
+
+      const numPerfiles = parseInt(document.getElementById('cta-num-perfiles').value) || 5;
+      const perfilesArr = [];
+
+      for (let i = 1; i <= numPerfiles; i++) {
+        const nomInput = document.getElementById(`init-p-nom-${i}`);
+        const pinInput = document.getElementById(`init-p-pin-${i}`);
+        perfilesArr.push({
+          nombrePerfil: nomInput ? nomInput.value.trim() : `Perfil ${i}`,
+          pin: pinInput ? pinInput.value.trim() : '',
+          vendido: false,
+          clienteNombre: '',
+          clienteWa: '',
+          fechaVenta: '',
+          fechaVence: '',
+          precio: 3.50
+        });
+      }
+
+      try {
+        await db.collection('cuentasMaestras').add({
+          servicio: document.getElementById('cta-servicio').value,
+          costo: parseFloat(document.getElementById('cta-costo').value) || 8.00,
+          correo: document.getElementById('cta-correo').value.trim(),
+          clave: document.getElementById('cta-clave').value.trim(),
+          vence: document.getElementById('cta-vence').value,
+          perfiles: perfilesArr,
+          creado: firebase.firestore.FieldValue.serverTimestamp()
+        });
+        formCuenta.reset();
+        generarCamposPerfiles(5);
+      } catch (err) {
+        alert('Error: ' + err.message);
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fa-solid fa-plus-circle"></i> Guardar Cuenta y Activar Perfiles';
+      }
+    });
+
+    window.eliminarCuenta = async function(id) {
+      if (confirm('¿Eliminar esta cuenta completa y sus perfiles?')) {
+        await db.collection('cuentasMaestras').doc(id).delete();
+      }
+    };
+
+    function sincronizar() {
+      if (unsubscribeCuentas) unsubscribeCuentas();
+      unsubscribeCuentas = db.collection('cuentasMaestras').onSnapshot(snap => {
+        cuentasList = [];
+        snap.forEach(doc => cuentasList.push({ id: doc.id, ...doc.data() }));
+        renderCuentas();
+        renderFinanzas();
+      }, err => {
+        console.error("Error sincronizando:", err);
+      });
+    }
+
+    function renderFinanzas() {
+      let ingresos = 0;
+      let costos = 0;
+      const porServicio = {};
+
+      cuentasList.forEach(cta => {
+        costos += parseFloat(cta.costo || 0);
+        const serv = cta.servicio || 'Otro';
+        if (!porServicio[serv]) porServicio[serv] = { clientes: 0, ingresos: 0, costo: 0 };
+        porServicio[serv].costo += parseFloat(cta.costo || 0);
+
+        (cta.perfiles || []).forEach(p => {
+          if (p.vendido) {
+            const precio = parseFloat(p.precio || 3.50);
+            ingresos += precio;
+            porServicio[serv].clientes += 1;
+            porServicio[serv].ingresos += precio;
+          }
+        });
+      });
+
+      const ganancia = ingresos - costos;
+      document.getElementById('fin-ingresos').textContent = `$${ingresos.toFixed(2)}`;
+      document.getElementById('fin-costos').textContent = `$${costos.toFixed(2)}`;
+      const ganEl = document.getElementById('fin-ganancia');
+      ganEl.textContent = `$${ganancia.toFixed(2)}`;
+      ganEl.className = `text-2xl font-bold mt-2 ${ganancia >= 0 ? 'text-blue-400' : 'text-red-400'}`;
+
+      const tabla = document.getElementById('fin-tabla-servicios');
+      tabla.innerHTML = '';
+      Object.keys(porServicio).forEach(s => {
+        const item = porServicio[s];
+        const beneficio = item.ingresos - item.costo;
+        const row = document.createElement('div');
+        row.className = 'py-3 flex items-center justify-between';
+        row.innerHTML = `
+          <div>
+            <span class="font-bold text-gray-200">${s}</span>
+            <p class="text-[11px] text-gray-500">${item.clientes} perfiles activos | Costo prov: $${item.costo.toFixed(2)}</p>
+          </div>
+          <div class="text-right">
+            <span class="font-bold text-gray-100">$${item.ingresos.toFixed(2)}</span>
+            <p class="text-[11px] font-semibold ${beneficio >= 0 ? 'text-green-400' : 'text-red-400'}">
+              Ganancia: $${beneficio.toFixed(2)}
+            </p>
+          </div>
+        `;
+        tabla.appendChild(row);
+      });
+    }
+
+    window.exportarCSV = function() {
+      let csv = "data:text/csv;charset=utf-8,Servicio,CorreoCuenta,Perfil,PIN,Estado,Cliente,WhatsApp,FechaVenta,FechaVence,Precio\n";
+      cuentasList.forEach(cta => {
+        (cta.perfiles || []).forEach(p => {
+          csv += `"${cta.servicio}","${cta.correo}","${p.nombrePerfil}","${p.pin}","${p.vendido ? 'Vendido' : 'Libre'}","${p.clienteNombre || ''}","${p.clienteWa || ''}","${p.fechaVenta || ''}","${p.fechaVence || ''}","${p.precio || 3.50}"\n`;
+        });
+      });
+      const link = document.createElement("a");
+      link.href = encodeURI(csv);
+      link.download = `Inventario_Streaming_${new Date().toISOString().split('T')[0]}.csv`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    };
+
+    // Control de sesión con soporte para recordar sesión
+    auth.onAuthStateChanged((user) => {
+      if (user) {
+        loginScreen.style.display = 'none';
+        appScreen.style.display = 'block';
+        generarCamposPerfiles(5);
+        sincronizar();
+      } else {
+        loginScreen.style.display = 'flex';
+        appScreen.style.display = 'none';
+        if (unsubscribeCuentas) unsubscribeCuentas();
+      }
+    });
+
+    loginForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      loginErrorBox.classList.add('hidden');
+      loginBtn.disabled = true;
+      loginBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Verificando...';
+
+      const email = document.getElementById('login-email').value.trim();
+      const pass = document.getElementById('login-password').value;
+      const recordar = chkRecordar.checked;
+
+      try {
+        const persistencia = recordar 
+          ? firebase.auth.Auth.Persistence.LOCAL 
+          : firebase.auth.Auth.Persistence.SESSION;
+        await auth.setPersistence(persistencia);
+        await auth.signInWithEmailAndPassword(email, pass);
+      } catch (err) {
+        console.error("Error Auth:", err);
+        let mensajeError = err.message;
+        if (err.code === 'auth/wrong-password') {
+          mensajeError = "Contraseña incorrecta. Revisa mayúsculas y minúsculas.";
+        } else if (err.code === 'auth/user-not-found') {
+          mensajeError = "El usuario no existe. Verifica el correo ingresado.";
+        } else if (err.code === 'auth/invalid-credential') {
+          mensajeError = "Credenciales incorrectas. Revisa correo y contraseña.";
+        }
+        loginErrorBox.textContent = mensajeError;
+        loginErrorBox.classList.remove('hidden');
+        alert(mensajeError);
+      } finally {
+        loginBtn.disabled = false;
+        loginBtn.innerHTML = '<i class="fa-solid fa-right-to-bracket"></i> Iniciar Sesión';
+      }
+    });
+
+    logoutBtn.addEventListener('click', () => auth.signOut());
+    buscarCuenta.addEventListener('input', () => renderCuentas());
+  </script>
+</body>
+</html>
