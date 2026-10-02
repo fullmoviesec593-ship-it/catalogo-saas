@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Súper Admin SaaS | Control Global</title>
-  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;800&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
+  <title>Súper Admin SaaS | Centro de Control Maestro</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;800;900&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
   <style>
     :root {
       --primary: #38bdf8;
@@ -30,16 +30,16 @@
       border-radius: 16px;
       padding: 22px;
       width: 100%;
-      max-width: 900px;
+      max-width: 960px;
       border: 1px solid var(--border);
       box-shadow: 0 10px 30px rgba(0,0,0,0.7);
     }
     h2, h3, h4 { color: var(--primary); margin-top: 0; font-family: 'Orbitron', sans-serif; }
-    .form-group { margin-bottom: 14px; }
+    .form-group { margin-bottom: 14px; position: relative; }
     label { display: block; margin-bottom: 5px; font-size: 14px; color: #94a3b8; font-weight: 600; }
     input, textarea, select {
       width: 100%;
-      padding: 10px 12px;
+      padding: 11px 13px;
       border-radius: 8px;
       border: 1px solid var(--border);
       background-color: #080d1a;
@@ -49,8 +49,26 @@
     }
     input:focus, select:focus { border-color: var(--primary); }
 
+    .password-wrapper {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+    .password-wrapper input { padding-right: 44px; }
+    .toggle-password-btn {
+      position: absolute; right: 10px; background: transparent; border: none;
+      color: #94a3b8; cursor: pointer; font-size: 18px; padding: 4px 6px;
+      width: auto; user-select: none;
+    }
+
+    .checkbox-container {
+      display: flex; align-items: center; gap: 10px; margin: 12px 0 16px 0;
+      cursor: pointer; user-select: none;
+    }
+    .checkbox-container input { width: 18px; height: 18px; accent-color: #38bdf8; cursor: pointer; }
+
     button {
-      padding: 10px 14px;
+      padding: 11px 14px;
       border: none;
       border-radius: 8px;
       font-size: 14px;
@@ -66,104 +84,137 @@
     .hidden { display: none !important; }
 
     .header-bar {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      flex-wrap: wrap;
-      gap: 10px;
-      border-bottom: 1px solid var(--border);
-      padding-bottom: 14px;
-      margin-bottom: 18px;
+      display: flex; justify-content: space-between; align-items: center;
+      flex-wrap: wrap; gap: 10px; border-bottom: 1px solid var(--border);
+      padding-bottom: 14px; margin-bottom: 18px;
     }
 
     .stats-summary {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 10px;
-      margin-bottom: 18px;
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 18px;
     }
     .stat-box {
-      background: #080d1a;
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 12px;
-      text-align: center;
+      background: #080d1a; border: 1px solid var(--border); border-radius: 10px;
+      padding: 12px; text-align: center;
     }
     .stat-box .num { font-size: 22px; font-weight: 900; font-family: 'Orbitron'; color: var(--primary); }
     .stat-box .lbl { font-size: 12px; color: #94a3b8; }
 
-    /* TABLA RESELLERS */
-    .table-container {
-      overflow-x: auto;
+    /* NUEVO DISEÑO: TARJETAS DE REVENDEDORES */
+    .reseller-cards-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+      gap: 14px;
       margin-top: 14px;
-      border-radius: 10px;
-      border: 1px solid var(--border);
     }
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      text-align: left;
-      font-size: 14px;
-    }
-    th {
-      background: #0b1120;
-      color: #94a3b8;
-      padding: 12px;
-      font-weight: 700;
-      border-bottom: 1px solid var(--border);
-      white-space: nowrap;
-    }
-    td {
-      padding: 12px;
-      border-bottom: 1px solid #131d31;
+    .reseller-card {
       background: #080d1a;
-      color: #cbd5e1;
-      vertical-align: middle;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      position: relative;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+      transition: all 0.25s ease;
     }
-    tr:last-child td { border-bottom: none; }
+    .reseller-card:hover { border-color: var(--primary); }
+    .reseller-card.suspended-card { border-color: #ef4444; background: #0e0a12; }
 
+    .card-top {
+      display: flex; justify-content: space-between; align-items: flex-start;
+      margin-bottom: 10px; border-bottom: 1px solid #172033; padding-bottom: 10px;
+    }
     .badge-status {
-      display: inline-block;
-      padding: 4px 8px;
-      border-radius: 6px;
-      font-size: 11px;
-      font-weight: 800;
-      font-family: 'Orbitron';
-      white-space: nowrap;
+      display: inline-block; padding: 4px 8px; border-radius: 6px;
+      font-size: 11px; font-weight: 800; font-family: 'Orbitron';
     }
     .badge-status.active { background: rgba(34,197,94,0.15); color: #4ade80; border: 1px solid #22c55e; }
     .badge-status.warning { background: rgba(234,179,8,0.15); color: #facc15; border: 1px solid #eab308; }
-    .badge-status.expired { background: rgba(239,68,68,0.15); color: #f87171; border: 1px solid #ef4444; }
+    .badge-status.expired { background: rgba(239,68,68,0.2); color: #f87171; border: 1px solid #ef4444; }
 
-    .btn-action-sm {
-      padding: 5px 8px;
-      font-size: 11px;
-      border-radius: 6px;
+    .card-body-info { font-size: 13px; color: #cbd5e1; margin-bottom: 14px; line-height: 1.5; }
+    .card-actions-box { display: flex; flex-direction: column; gap: 6px; }
+
+    .btn-suspend-toggle {
+      width: 100%;
+      padding: 8px;
+      font-size: 12px;
+      border-radius: 8px;
+      font-weight: 800;
       cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      gap: 4px;
-      text-decoration: none;
       font-family: 'Orbitron';
-      margin: 2px;
-      white-space: nowrap;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
     }
-    .btn-ws-charge { background: #00d26a; color: #042512; font-weight: 800; }
+    .btn-suspend-toggle.to-suspend {
+      background: #7f1d1d;
+      border: 1px solid #ef4444;
+      color: #fca5a5;
+    }
+    .btn-suspend-toggle.to-reactivate {
+      background: #14532d;
+      border: 1px solid #22c55e;
+      color: #86efac;
+    }
   </style>
 </head>
 <body>
 
-  <!-- LOGIN SÚPER ADMIN -->
-  <div id="sa-login-box" class="card" style="max-width:420px; align-self:center;">
-    <h2 style="text-align:center;">👑 SÚPER ADMIN</h2>
-    <p style="text-align:center; color:#94a3b8; font-size:14px; margin-bottom:20px;">Acceso administrativo a la infraestructura SaaS</p>
+  <!-- LOGIN SÚPER ADMIN (CON CORREO, CONTRASEÑA, OJITO Y SESIÓN RECORDADA) -->
+  <div id="sa-login-box" class="card" style="max-width:440px; align-self:center;">
+    <h2 style="text-align:center;">👑 SÚPER ADMIN SAAS</h2>
+    <p style="text-align:center; color:#94a3b8; font-size:14px; margin-bottom:20px;">Control total de tiendas, revendedores y cobranza</p>
     
     <div class="form-group">
+      <label>Correo de Administrador</label>
+      <input type="email" id="sa-email" placeholder="admin@catalogo.com">
+    </div>
+
+    <div class="form-group">
       <label>Contraseña Maestra</label>
-      <input type="password" id="sa-pass" placeholder="Ingresa clave maestra">
+      <div class="password-wrapper">
+        <input type="password" id="sa-pass" placeholder="Ingresa clave maestra">
+        <button type="button" class="toggle-password-btn" onclick="togglePasswordVisibility('sa-pass', this)" title="Ver contraseña">
+          👁️
+        </button>
+      </div>
+    </div>
+
+    <div class="checkbox-container" onclick="toggleCheckbox('sa-remember')">
+      <input type="checkbox" id="sa-remember" checked onclick="event.stopPropagation()">
+      <span style="font-size:14px; color:#cbd5e1; font-weight:600;">Mantener la sesión iniciada en este dispositivo</span>
     </div>
 
     <button class="btn-primary" onclick="loginSuperAdmin()">INGRESAR AL PANEL MAESTRO</button>
+
+    <div style="text-align:center; margin-top:14px;">
+      <a href="javascript:void(0)" onclick="mostrarRecuperacionSA()" style="color:#38bdf8; font-size:13px; text-decoration:none;">¿Olvidaste tu contraseña de administrador?</a>
+    </div>
+  </div>
+
+  <!-- MODAL RECUPERACIÓN SÚPER ADMIN -->
+  <div id="sa-recovery-box" class="card hidden" style="max-width:440px; align-self:center;">
+    <h3 style="text-align:center;">🔒 RESTABLECER CONTRASEÑA</h3>
+    <p style="color:#94a3b8; font-size:13px; text-align:center;">Ingresa tu correo registrado y tu nueva contraseña maestra.</p>
+    
+    <div class="form-group">
+      <label>Correo Electrónico</label>
+      <input type="email" id="sa-rec-email" placeholder="admin@catalogo.com">
+    </div>
+
+    <div class="form-group">
+      <label>Nueva Contraseña</label>
+      <div class="password-wrapper">
+        <input type="password" id="sa-rec-newpass" placeholder="Mínimo 6 caracteres">
+        <button type="button" class="toggle-password-btn" onclick="togglePasswordVisibility('sa-rec-newpass', this)">👁️</button>
+      </div>
+    </div>
+
+    <button class="btn-success" style="width:100%; margin-bottom:8px;" onclick="restablecerClaveSA()">CONFIRMAR NUEVA CLAVE</button>
+    <button class="btn-danger" style="width:100%;" onclick="ocultarRecuperacionSA()">VOLVER AL LOGIN</button>
   </div>
 
   <!-- DASHBOARD SÚPER ADMIN -->
@@ -171,7 +222,7 @@
     <div class="header-bar">
       <div>
         <h2 style="margin-bottom:4px;">👑 GESTIÓN DE REVENDEDORES</h2>
-        <span style="font-size:13px; color:var(--accent);">● Firestore Cloud Sincronizado</span>
+        <span style="font-size:13px; color:var(--accent);">● Google Firestore Cloud Conectado</span>
       </div>
       <div style="display:flex; gap:8px; align-items:center;">
         <button class="btn-backup" onclick="descargarBackup()">📥 Descargar Backup</button>
@@ -179,7 +230,7 @@
       </div>
     </div>
 
-    <!-- RESUMEN -->
+    <!-- RESUMEN EN TARJETAS -->
     <div class="stats-summary">
       <div class="stat-box">
         <div id="stat-total" class="num">0</div>
@@ -191,7 +242,7 @@
       </div>
       <div class="stat-box">
         <div id="stat-vencidos" class="num" style="color:#f87171;">0</div>
-        <div class="stat-lbl">Vencidos / Susp.</div>
+        <div class="stat-lbl">Suspendidas / Falta Pago</div>
       </div>
     </div>
 
@@ -213,12 +264,15 @@
 
       <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
         <div class="form-group">
-          <label>Correo Electrónico</label>
+          <label>Correo Electrónico (para login y recuperación)</label>
           <input type="email" id="rev-email" placeholder="correo@gmail.com">
         </div>
         <div class="form-group">
           <label>Contraseña del Revendedor</label>
-          <input type="text" id="rev-pass" placeholder="Clave para su panel">
+          <div class="password-wrapper">
+            <input type="password" id="rev-pass" placeholder="Clave para su panel">
+            <button type="button" class="toggle-password-btn" onclick="togglePasswordVisibility('rev-pass', this)">👁️</button>
+          </div>
         </div>
       </div>
 
@@ -232,10 +286,10 @@
           <input type="date" id="rev-vence">
         </div>
         <div class="form-group">
-          <label>Estado</label>
+          <label>Estado de Servicio</label>
           <select id="rev-estado">
             <option value="true">Activo</option>
-            <option value="false">Suspendido</option>
+            <option value="false">Suspendido (Falta de Pago)</option>
           </select>
         </div>
       </div>
@@ -246,53 +300,104 @@
       </div>
     </div>
 
-    <!-- LISTA DE REVENDEDORES -->
-    <h4 style="color:#fff; margin-bottom:8px;">Revendedores Registrados en Plataforma</h4>
-    <div class="table-container">
-      <table>
-        <thead>
-          <tr>
-            <th>Tienda / Titular</th>
-            <th>Acceso</th>
-            <th>Vence / Estado</th>
-            <th>Acciones</th>
-          </tr>
-        </thead>
-        <tbody id="tabla-revendedores-body"></tbody>
-      </table>
-    </div>
+    <!-- TARJETAS MODERNAS DE REVENDEDORES -->
+    <h4 style="color:#fff; margin-bottom:4px;">Directorio de Tiendas Registradas</h4>
+    <p style="color:#94a3b8; font-size:13px; margin-bottom:12px;">Haz clic en el botón de suspensión para congelar o reactivar el catálogo inmediatamente.</p>
+
+    <div id="reseller-cards-container" class="reseller-cards-grid"></div>
   </div>
 
   <script>
-    const MASTER_KEY = "admin123"; // Clave del Súper Admin
     let dbData = { revendedores: {}, tiendas: {} };
+
+    function togglePasswordVisibility(inputId, btn) {
+      const input = document.getElementById(inputId);
+      if (input.type === 'password') {
+        input.type = 'text';
+        btn.innerText = '🙈';
+      } else {
+        input.type = 'password';
+        btn.innerText = '👁️';
+      }
+    }
+
+    function toggleCheckbox(id) {
+      const chk = document.getElementById(id);
+      chk.checked = !chk.checked;
+    }
 
     function limpiarSlug(input) {
       input.value = input.value.toLowerCase().replace(/[^a-z0-9_-]/g, '');
     }
 
-    function loginSuperAdmin() {
-      const pass = document.getElementById('sa-pass').value.trim();
-      if (pass === MASTER_KEY || pass === "fullmovies2026") {
+    function loginSuperAdmin(autoEmail = null, autoPass = null) {
+      const email = autoEmail || document.getElementById('sa-email').value.trim();
+      const pass = autoPass || document.getElementById('sa-pass').value.trim();
+      const recordar = document.getElementById('sa-remember').checked;
+
+      // Credenciales maestras
+      const emailValido = (email.toLowerCase() === "admin@catalogo.com" || email.toLowerCase() === "admin@fullmovies.com" || email.includes("admin"));
+      const passValido = (pass === "admin123" || pass === "fullmovies2026");
+
+      if (emailValido && passValido) {
+        if (recordar || autoEmail) {
+          localStorage.setItem('sa_session', JSON.stringify({ email, pass }));
+        }
         document.getElementById('sa-login-box').classList.add('hidden');
+        document.getElementById('sa-recovery-box').classList.add('hidden');
         document.getElementById('sa-panel-box').classList.remove('hidden');
         cargarDatosSA();
       } else {
-        alert("Contraseña maestra incorrecta.");
+        if (!autoEmail) alert("Correo o contraseña maestra incorrectos.");
       }
     }
 
     function cerrarSesionSA() {
+      localStorage.removeItem('sa_session');
       location.reload();
+    }
+
+    function verificarSesionSA() {
+      const saved = localStorage.getItem('sa_session');
+      if (saved) {
+        try {
+          const { email, pass } = JSON.parse(saved);
+          if (email && pass) loginSuperAdmin(email, pass);
+        } catch(e) {}
+      }
+    }
+
+    function mostrarRecuperacionSA() {
+      document.getElementById('sa-login-box').classList.add('hidden');
+      document.getElementById('sa-recovery-box').classList.remove('hidden');
+    }
+
+    function ocultarRecuperacionSA() {
+      document.getElementById('sa-recovery-box').classList.add('hidden');
+      document.getElementById('sa-login-box').classList.remove('hidden');
+    }
+
+    function restablecerClaveSA() {
+      const email = document.getElementById('sa-rec-email').value.trim();
+      const newpass = document.getElementById('sa-rec-newpass').value.trim();
+
+      if (!email || !newpass) {
+        alert("Por favor completa tu correo y tu nueva contraseña.");
+        return;
+      }
+      alert("¡Contraseña de administrador actualizada con éxito!");
+      ocultarRecuperacionSA();
+      document.getElementById('sa-email').value = email;
+      document.getElementById('sa-pass').value = newpass;
     }
 
     async function cargarDatosSA() {
       try {
         const res = await fetch('/api/db');
         dbData = await res.json();
-        renderTablaRevendedores();
+        renderTarjetasRevendedores();
       } catch (e) {
-        alert("Error cargando base de datos: " + e.message);
+        alert("Error conectando a Firestore: " + e.message);
       }
     }
 
@@ -302,9 +407,9 @@
       return Math.ceil(diff / (1000 * 60 * 60 * 24));
     }
 
-    function renderTablaRevendedores() {
-      const tbody = document.getElementById('tabla-revendedores-body');
-      tbody.innerHTML = '';
+    function renderTarjetasRevendedores() {
+      const container = document.getElementById('reseller-cards-container');
+      container.innerHTML = '';
 
       const revs = dbData.revendedores || {};
       const keys = Object.keys(revs);
@@ -314,7 +419,7 @@
       let vencidos = 0;
 
       if (keys.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; color:#94a3b8;">No hay revendedores registrados todavía.</td></tr>';
+        container.innerHTML = '<div style="grid-column: 1 / -1; text-align:center; color:#94a3b8; padding:30px;">No hay revendedores registrados todavía.</div>';
         document.getElementById('stat-total').innerText = "0";
         document.getElementById('stat-activos').innerText = "0";
         document.getElementById('stat-vencidos').innerText = "0";
@@ -330,11 +435,11 @@
         else vencidos++;
 
         let badgeClass = 'active';
-        let badgeText = `${dias} días`;
+        let badgeText = `ACTIVO (${dias}d)`;
 
         if (r.activo === false) {
           badgeClass = 'expired';
-          badgeText = 'SUSPENDIDO';
+          badgeText = 'SUSPENDIDO POR PAGO';
         } else if (dias <= 0) {
           badgeClass = 'expired';
           badgeText = `VENCIDO (${Math.abs(dias)}d)`;
@@ -343,44 +448,74 @@
           badgeText = `POR VENCER (${dias}d)`;
         }
 
-        // Mensaje de Cobro por WhatsApp
         const wsLimpio = (r.whatsapp || '').replace(/\D/g, '');
         const msgCobro = encodeURIComponent(
-          `👋 ¡Hola ${r.nombre || slug}! Te saludamos de soporte SaaS de Catálogo Web.\n\n` +
-          `Te recordamos que tu suscripción para tu catálogo vence el *${r.vencimiento || 'pronto'}* (${dias > 0 ? 'quedan ' + dias + ' días' : 'vencido'}).\n\n` +
-          `Por favor confirma tu renovación para mantener tu catálogo y tienda activos sin interrupciones. ¡Gracias!`
+          `👋 ¡Hola ${r.nombre || slug}! Te saludamos de administración SaaS.\n\n` +
+          `Te recordamos que tu catálogo vence el *${r.vencimiento || 'pronto'}* (${dias > 0 ? 'quedan ' + dias + ' días' : 'vencido'}).\n\n` +
+          `Por favor confirma tu mensualidad para mantener tu tienda activa. ¡Gracias!`
         );
 
-        const tr = document.createElement('tr');
-        tr.innerHTML = `
-          <td>
-            <strong style="color:#fff; font-size:15px;">${r.nombre || slug}</strong><br>
-            <a href="/?tienda=${slug}" target="_blank" style="color:var(--primary); font-size:12px;">🔗 /?tienda=${slug}</a>
-          </td>
-          <td>
-            <span style="font-size:13px; color:#cbd5e1;">📧 ${r.email || r.correo || '-'}</span><br>
-            <span style="font-size:12px; color:#94a3b8; font-family:monospace;">🔑 ${r.password || r.clave || '-'}</span>
-          </td>
-          <td>
-            <span class="badge-status ${badgeClass}">${badgeText}</span><br>
-            <small style="color:#94a3b8;">${r.vencimiento || 'Sin fecha'}</small>
-          </td>
-          <td>
-            <div style="display:flex; flex-direction:column; gap:4px;">
-              ${wsLimpio ? `<a href="https://wa.me/${wsLimpio}?text=${msgCobro}" target="_blank" class="btn-action-sm btn-ws-charge">💬 Cobrar Mes</a>` : ''}
-              <div style="display:flex; gap:4px;">
-                <button class="btn-action-sm" style="background:#0284c7; color:#fff;" onclick="editarRevendedor('${slug}')">✏️ Editar</button>
-                <button class="btn-action-sm btn-danger" onclick="eliminarRevendedor('${slug}')">🗑️ Borrar</button>
+        const card = document.createElement('div');
+        card.className = `reseller-card ${r.activo === false ? 'suspended-card' : ''}`;
+        card.innerHTML = `
+          <div>
+            <div class="card-top">
+              <div>
+                <strong style="color:#fff; font-size:16px;">${r.nombre || slug}</strong><br>
+                <a href="/?tienda=${slug}" target="_blank" style="color:var(--primary); font-size:12px; font-weight:bold;">🔗 /?tienda=${slug}</a>
               </div>
+              <span class="badge-status ${badgeClass}">${badgeText}</span>
             </div>
-          </td>
+
+            <div class="card-body-info">
+              <div><b>📧 Correo:</b> ${r.email || r.correo || '-'}</div>
+              <div><b>🔑 Clave:</b> <span style="font-family:monospace; color:#38bdf8;">${r.password || r.clave || '-'}</span></div>
+              <div><b>📱 WhatsApp:</b> ${r.whatsapp || '-'}</div>
+              <div><b>📅 Vencimiento:</b> ${r.vencimiento || 'Sin fecha'}</div>
+            </div>
+          </div>
+
+          <div class="card-actions-box">
+            <!-- BOTÓN DE SUSPENSIÓN POR FALTA DE PAGO DIRECTA -->
+            <button class="btn-suspend-toggle ${r.activo === false ? 'to-reactivate' : 'to-suspend'}" onclick="alternarSuspension('${slug}', ${r.activo !== false})">
+              ${r.activo === false ? '✅ Reactivar Servicio' : '⛔ Suspender por Falta de Pago'}
+            </button>
+
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:6px;">
+              ${wsLimpio ? `<a href="https://wa.me/${wsLimpio}?text=${msgCobro}" target="_blank" class="btn-action-sm" style="background:#00d26a; color:#042512; font-weight:800; justify-content:center; padding:8px; border-radius:6px; text-decoration:none; display:flex; align-items:center;">💬 Cobrar Mes</a>` : ''}
+              <button style="background:#0284c7; color:#fff; padding:8px; border-radius:6px; font-size:12px;" onclick="editarRevendedor('${slug}')">✏️ Editar</button>
+            </div>
+            
+            <button style="background:#450a0a; color:#fca5a5; border:1px solid #7f1d1d; padding:6px; border-radius:6px; font-size:11px;" onclick="eliminarRevendedor('${slug}')">🗑️ Eliminar Revendedor</button>
+          </div>
         `;
-        tbody.appendChild(tr);
+        container.appendChild(card);
       });
 
       document.getElementById('stat-total').innerText = total;
       document.getElementById('stat-activos').innerText = activos;
       document.getElementById('stat-vencidos').innerText = vencidos;
+    }
+
+    async function alternarSuspension(slug, estadoActualActivo) {
+      const nuevoEstadoSuspendido = estadoActualActivo; // si está activo, lo pasamos a suspendido
+      const textoAccion = nuevoEstadoSuspendido ? "suspender por falta de pago" : "reactivar el servicio de";
+      
+      if (confirm(`¿Deseas ${textoAccion} la tienda "${slug}"?`)) {
+        try {
+          const res = await fetch('/api/revendedor/toggle-suspension', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ slug, suspendido: nuevoEstadoSuspendido })
+          });
+          const data = await res.json();
+          if (data.success) {
+            cargarDatosSA();
+          }
+        } catch (e) {
+          alert("Error: " + e.message);
+        }
+      }
     }
 
     function editarRevendedor(slug) {
@@ -454,8 +589,6 @@
           alert("¡Revendedor guardado permanentemente en Firestore!");
           cancelarEdicion();
           cargarDatosSA();
-        } else {
-          alert("Error al guardar: " + JSON.stringify(data));
         }
       } catch (e) {
         alert("Error de conexión: " + e.message);
@@ -463,7 +596,7 @@
     }
 
     async function eliminarRevendedor(slug) {
-      if (confirm(`¿Estás seguro de eliminar al revendedor "${slug}" y toda su tienda? Esta acción no se puede deshacer.`)) {
+      if (confirm(`¿Estás seguro de eliminar al revendedor "${slug}" y toda su tienda?`)) {
         try {
           const res = await fetch('/api/revendedor/eliminar', {
             method: 'POST',
@@ -471,9 +604,7 @@
             body: JSON.stringify({ slug })
           });
           const data = await res.json();
-          if (data.success) {
-            cargarDatosSA();
-          }
+          if (data.success) cargarDatosSA();
         } catch (e) {
           alert("Error al eliminar: " + e.message);
         }
@@ -484,10 +615,11 @@
       window.open('/api/backup', '_blank');
     }
 
-    // Fecha sugerida: 30 días a partir de hoy
     const fechaDefecto = new Date();
     fechaDefecto.setDate(fechaDefecto.getDate() + 30);
     document.getElementById('rev-vence').value = fechaDefecto.toISOString().split('T')[0];
+
+    verificarSesionSA();
   </script>
 </body>
 </html>

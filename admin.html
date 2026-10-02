@@ -117,8 +117,8 @@
 </head>
 <body>
 
-  <!-- LOGIN -->
-  <div id="login-section" class="card" style="max-width:440px;">
+  <!-- LOGIN REVENDEDOR -->
+  <div id="login-section" class="card" style="max-width:440px; align-self:center;">
     <h2 style="text-align:center;">💼 PANEL REVENDEDOR</h2>
     <p id="login-submsg" style="text-align:center; color:#94a3b8; font-size:14px; margin-bottom:20px;">Ingresa tus credenciales para gestionar tu catálogo</p>
     
@@ -137,12 +137,40 @@
       </div>
     </div>
 
-    <div class="checkbox-container" onclick="toggleCheckbox()">
+    <div class="checkbox-container" onclick="toggleCheckbox('remember-session')">
       <input type="checkbox" id="remember-session" checked onclick="event.stopPropagation()">
       <span style="font-size:14px; color:#cbd5e1; font-weight:600;">Mantener la sesión iniciada en este dispositivo</span>
     </div>
 
     <button class="btn-primary" onclick="iniciarSesion()">INGRESAR A MI PANEL</button>
+
+    <div style="text-align:center; margin-top:14px;">
+      <a href="javascript:void(0)" onclick="mostrarRecuperacionRev()" style="color:#38bdf8; font-size:13px; text-decoration:none;">¿Olvidaste tu contraseña?</a>
+    </div>
+  </div>
+
+  <!-- RECUPERACIÓN REVENDEDOR -->
+  <div id="recovery-section" class="card hidden" style="max-width:440px; align-self:center;">
+    <h3 style="text-align:center;">🔑 RECUPERAR CONTRASEÑA</h3>
+    <p style="color:#94a3b8; font-size:13px; text-align:center; margin-bottom:16px;">
+      Ingresa el correo electrónico asociado a tu cuenta de revendedor y define tu nueva contraseña.
+    </p>
+
+    <div class="form-group">
+      <label>Correo Registrado</label>
+      <input type="email" id="rec-email" placeholder="tu-correo@gmail.com">
+    </div>
+
+    <div class="form-group">
+      <label>Nueva Contraseña</label>
+      <div class="password-wrapper">
+        <input type="password" id="rec-newpass" placeholder="Tu nueva clave">
+        <button type="button" class="toggle-password-btn" onclick="togglePasswordVisibility('rec-newpass', this)">👁️</button>
+      </div>
+    </div>
+
+    <button class="btn-success" style="width:100%; margin-bottom:8px;" onclick="restablecerClaveRev()">RESTABLECER CONTRASEÑA</button>
+    <button class="btn-danger" style="width:100%;" onclick="ocultarRecuperacionRev()">CANCELAR</button>
   </div>
 
   <!-- DASHBOARD -->
@@ -274,10 +302,7 @@
         <button id="btn-guardar-prod" class="btn-success" onclick="guardarProducto()">AGREGAR / ACTUALIZAR SERVICIO</button>
       </div>
 
-      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-        <h4 style="color:#fff; margin:0;">Mis Servicios Activos</h4>
-        <button style="width:auto; padding:6px 12px; background:#0284c7; color:#fff; font-size:12px;" onclick="cargarCatalogoPredeterminado()">🔄 Cargar Lista Oficial</button>
-      </div>
+      <h4 style="color:#fff;">Mis Servicios Activos</h4>
       <div id="lista-productos"></div>
     </div>
 
@@ -471,39 +496,19 @@
       }
     ];
 
-    const CATALOGO_PREDETERMINADO = [
-      { nombre: "Netflix", sub: "1 mes · Streaming", categoria: "streaming", tag: "POPULAR", precio: "4.25", features: ["1 perfil Ultra HD 4K", "Activación inmediata", "Garantía mensual"], img: "https://images.unsplash.com/photo-1574375927938-d5a98e8ffe85?w=500" },
-      { nombre: "Disney+ ESPN", sub: "1 mes · Streaming", categoria: "streaming", tag: "TOP", precio: "4.00", features: ["Disney, Marvel, Star Wars", "ESPN en vivo", "4K UHD"], img: "https://images.unsplash.com/photo-1607604276583-eef5d076aa5f?w=500" },
-      { nombre: "Disney Standard", sub: "1 mes · Streaming", categoria: "streaming", tag: "", precio: "3.50", features: ["Catálogo completo", "En HD", "Perfil personal"], img: "https://images.unsplash.com/photo-1607604276583-eef5d076aa5f?w=500" },
-      { nombre: "Prime Video", sub: "1 mes · Streaming", categoria: "streaming", tag: "", precio: "3.00", features: ["Películas y series Amazon", "Full HD y 4K", "Perfil propio"], img: "https://images.unsplash.com/photo-1522869635100-9f4c5e86aa37?w=500" },
-      { nombre: "Max (HBO)", sub: "1 mes · Streaming", categoria: "streaming", tag: "POPULAR", precio: "3.00", features: ["Estrenos Warner", "Champions League", "Calidad 4K"], img: "https://images.unsplash.com/photo-1585951237318-9ea5e175b891?w=500" },
-      { nombre: "Crunchyroll", sub: "1 mes · Streaming", categoria: "streaming", tag: "ANIME", precio: "2.50", features: ["Anime sin anuncios", "Simulcast con Japón", "Perfil personal"], img: "https://images.unsplash.com/photo-1563089145-599997674d42?w=500" },
-      { nombre: "ViX+", sub: "1 mes · Streaming", categoria: "streaming", tag: "", precio: "2.50", features: ["Liga mexicana y deportes", "Series y novelas", "En vivo"], img: "https://images.unsplash.com/photo-1517604931442-7e0c8ed2963c?w=500" },
-      { nombre: "Plex", sub: "1 mes · Streaming", categoria: "streaming", tag: "", precio: "2.75", features: ["Cine y estrenos", "Servidor privado 24/7", "Sin caídas"], img: "https://images.unsplash.com/photo-1518173946687-a4c8a383392e?w=500" },
-      { nombre: "Estella TV", sub: "1 mes · IPTV", categoria: "iptv", tag: "EN VIVO", precio: "3.50", features: ["Canales en vivo", "Películas y series", "Calidad HD"], img: "https://images.unsplash.com/photo-1593784991095-a205069470b6?w=500" },
-      { nombre: "IPTV", sub: "1 mes · IPTV", categoria: "iptv", tag: "FÚTBOL", precio: "3.00", features: ["Canales deportivos", "Cable prémium", "Guía EPG"], img: "https://images.unsplash.com/photo-1461151304267-38535e780c79?w=500" },
-      { nombre: "Flujo TV", sub: "1 mes · IPTV", categoria: "iptv", tag: "TOP", precio: "4.00", features: ["Más de 1200 canales", "Fútbol nacional e internacional", "Calidad estable"], img: "https://images.unsplash.com/photo-1593784991095-a205069470b6?w=500" },
-      { nombre: "OLEADA TV", sub: "1 mes · IPTV", categoria: "iptv", tag: "ESTABLE", precio: "3.50", features: ["Canales prémium en vivo", "Programación deportiva", "HD"], img: "https://images.unsplash.com/photo-1522869635100-9f4c5e86aa37?w=500" },
-      { nombre: "Vicky Rakuten", sub: "1 mes · Streaming", categoria: "streaming", tag: "DORAMAS", precio: "3.50", features: ["Doramas y dramas asiáticos", "Subtítulos en español", "HD"], img: "https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=500" },
-      { nombre: "Spotify", sub: "1 mes · Música", categoria: "musica", tag: "TOP", precio: "4.00", features: ["Música sin publicidad", "Descargas offline", "Extreme Audio"], img: "https://images.unsplash.com/photo-1614680376593-902f749f7ffc?w=500" },
-      { nombre: "Deezer", sub: "1 mes · Música", categoria: "musica", tag: "HIFI", precio: "3.00", features: ["Audio HiFi", "Sin anuncios", "Descargas"], img: "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=500" },
-      { nombre: "Windows", sub: "Licencia Permanente · Software", categoria: "software", tag: "OFICIAL", precio: "9.50", features: ["Windows 10 / 11 Pro", "Licencia original permanente", "Activación digital"], img: "https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=500" },
-      { nombre: "Microsoft (Office)", sub: "1 año · Software", categoria: "software", tag: "OFICINA", precio: "8.50", features: ["Word, Excel, PowerPoint", "1 TB OneDrive", "Hasta 5 equipos"], img: "https://images.unsplash.com/photo-1531403009284-440f080d1e12?w=500" },
-      { nombre: "Canva Pro", sub: "Suscripción · Software", categoria: "software", tag: "DISEÑO", precio: "3.99", features: ["Plantillas prémium", "Quitar fondos en 1 clic", "Herramientas IA"], img: "https://images.unsplash.com/photo-1626785774573-4b799315345d?w=500" },
-      { nombre: "CapCut Pro", sub: "1 mes · Software", categoria: "software", tag: "EDICIÓN", precio: "5.99", features: ["Efectos pro", "Subtítulos automáticos", "Exportación 4K 60fps"], img: "https://images.unsplash.com/photo-1574717024653-61fd2cf4d44d?w=500" },
-      { nombre: "ChatGPT Plus", sub: "1 mes · Software", categoria: "software", tag: "IA", precio: "5.75", features: ["GPT-4o sin límites", "DALL·E", "Análisis avanzado de datos"], img: "https://images.unsplash.com/photo-1677442136019-21780ecad995?w=500" },
-      { nombre: "Chatbot WhatsApp", sub: "1 mes · Software", categoria: "software", tag: "VENTAS", precio: "5.00", features: ["Respuestas automáticas 24/7", "Atención sin demora", "Fácil uso"], img: "https://images.unsplash.com/photo-1614680376573-df3480f0c6ff?w=500" },
-      { nombre: "Free Fire", sub: "Recargas · Gaming", categoria: "gaming", tag: "GAMING", precio: "2.00", features: ["Recargas directas por ID", "Entrega inmediata", "Precios mayoristas"], img: "https://images.unsplash.com/photo-1542751371-adc38448a05e?w=500" }
-    ];
-
     function togglePasswordVisibility(inputId, btn) {
       const input = document.getElementById(inputId);
-      input.type = input.type === 'password' ? 'text' : 'password';
-      btn.innerText = input.type === 'password' ? '👁️' : '🙈';
+      if (input.type === 'password') {
+        input.type = 'text';
+        btn.innerText = '🙈';
+      } else {
+        input.type = 'password';
+        btn.innerText = '👁️';
+      }
     }
 
-    function toggleCheckbox() {
-      const chk = document.getElementById('remember-session');
+    function toggleCheckbox(id) {
+      const chk = document.getElementById(id);
       chk.checked = !chk.checked;
     }
 
@@ -559,7 +564,7 @@
           slugActual = foundSlug;
           revendedorActual = revendedores[slugActual];
           if (revendedorActual.activo === false) {
-            alert('Tu cuenta está suspendida. Contacta a soporte.');
+            alert('Tu tienda se encuentra suspendida por falta de pago. Comunícate con soporte.');
             return;
           }
 
@@ -569,12 +574,8 @@
 
           tiendaActual = (db.tiendas && db.tiendas[slugActual]) ? db.tiendas[slugActual] : {};
 
-          // Si la tienda aún no tiene productos propios, inicializar con el catálogo completo
-          if (!tiendaActual.productos || tiendaActual.productos.length === 0) {
-            tiendaActual.productos = JSON.parse(JSON.stringify(CATALOGO_PREDETERMINADO));
-          }
-
           document.getElementById('login-section').classList.add('hidden');
+          document.getElementById('recovery-section').classList.add('hidden');
           document.getElementById('dashboard-section').classList.remove('hidden');
           pintarDashboard();
         } else {
@@ -582,6 +583,45 @@
         }
       } catch (err) {
         alert('Error de conexión con el servidor: ' + err.message);
+      }
+    }
+
+    function mostrarRecuperacionRev() {
+      document.getElementById('login-section').classList.add('hidden');
+      document.getElementById('recovery-section').classList.remove('hidden');
+    }
+
+    function ocultarRecuperacionRev() {
+      document.getElementById('recovery-section').classList.add('hidden');
+      document.getElementById('login-section').classList.remove('hidden');
+    }
+
+    async function restablecerClaveRev() {
+      const email = document.getElementById('rec-email').value.trim();
+      const nuevaPassword = document.getElementById('rec-newpass').value.trim();
+
+      if (!email || !nuevaPassword) {
+        alert("Completa tu correo y la nueva contraseña.");
+        return;
+      }
+
+      try {
+        const res = await fetch('/api/auth/recuperar-password', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, nuevaPassword })
+        });
+        const data = await res.json();
+        if (data.success) {
+          alert("¡Contraseña restablecida con éxito! Ya puedes iniciar sesión con tu nueva clave.");
+          ocultarRecuperacionRev();
+          document.getElementById('email').value = email;
+          document.getElementById('password').value = nuevaPassword;
+        } else {
+          alert("Error: " + data.error);
+        }
+      } catch (e) {
+        alert("Error de conexión: " + e.message);
       }
     }
 
@@ -750,7 +790,7 @@
       btn.innerText = "AGREGAR / ACTUALIZAR SERVICIO";
 
       if (ok) {
-        alert('¡Servicio guardado exitosamente en la nube!');
+        alert('¡Servicio guardado exitosamente en Firestore!');
         document.getElementById('prod-edit-idx').value = "-1";
         document.getElementById('prod-nombre').value = '';
         document.getElementById('prod-precio').value = '';
@@ -760,15 +800,6 @@
         document.getElementById('prod-preview-img').style.display = 'none';
         tempImgBase64 = null;
         renderProductos();
-      }
-    }
-
-    async function cargarCatalogoPredeterminado() {
-      if (confirm('¿Deseas restablecer todos los servicios a la lista oficial de Full Movies EC?')) {
-        tiendaActual.productos = JSON.parse(JSON.stringify(CATALOGO_PREDETERMINADO));
-        await persistirEnNube({ productos: tiendaActual.productos });
-        renderProductos();
-        alert('¡Catálogo oficial cargado con éxito!');
       }
     }
 
@@ -817,7 +848,7 @@
       btn.disabled = false;
       btn.innerText = "GUARDAR CONFIGURACIÓN DE COMBOS";
 
-      if (ok) alert('¡Configuración de combos guardada permanentemente en la nube!');
+      if (ok) alert('¡Configuración de combos guardada en Firestore!');
     }
 
     async function guardarAjustesTienda() {
@@ -844,7 +875,7 @@
       btn.innerText = "GUARDAR AJUSTES DE TIENDA";
 
       if (ok) {
-        alert('¡Datos de la tienda y tema guardados en la nube!');
+        alert('¡Datos de la tienda y tema guardados en Firestore!');
         document.getElementById('dash-title').innerText = nombre;
         if (tempLogoBase64) document.getElementById('dash-logo').src = tempLogoBase64;
       }
@@ -869,7 +900,7 @@
       btn.disabled = false;
       btn.innerText = "GUARDAR TEXTOS DEL CATÁLOGO";
 
-      if (ok) alert('¡Textos guardados en la nube!');
+      if (ok) alert('¡Textos guardados en Firestore!');
     }
 
     async function guardarMetodosPago() {
@@ -884,7 +915,7 @@
       btn.disabled = false;
       btn.innerText = "GUARDAR MÉTODOS DE PAGO";
 
-      if (ok) alert('¡Métodos de pago guardados en la nube!');
+      if (ok) alert('¡Métodos de pago guardados en Firestore!');
     }
 
     function convertirImagenABase64(input, previewId) {

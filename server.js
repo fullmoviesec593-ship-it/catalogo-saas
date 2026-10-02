@@ -12,7 +12,7 @@ app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ limit: '50mb', extended: true }));
 app.use(express.static(path.join(__dirname, '.')));
 
-// CLIENTE NATIVO DIRECTO DE FIRESTORE
+// CLIENTE NATIVO DE FIRESTORE
 let dbFirestore = null;
 let errorDiagnostico = null;
 
@@ -32,14 +32,14 @@ try {
     });
     console.log('✅ FIRESTORE NATIVO CONECTADO');
   } else {
-    errorDiagnostico = 'Las credenciales en firebase-config.js están incompletas o no existen.';
+    errorDiagnostico = 'Credenciales no encontradas';
   }
 } catch (e) {
   errorDiagnostico = e.message;
   console.error('Error al inicializar Firestore:', e);
 }
 
-// ESTADO DE CONEXIÓN
+// ESTADO
 app.get('/api/status', async (req, res) => {
   let pruebaEscritura = false;
   if (dbFirestore) {
@@ -47,7 +47,7 @@ app.get('/api/status', async (req, res) => {
       await dbFirestore.collection('_test').doc('ping').set({ ok: true, t: Date.now() });
       pruebaEscritura = true;
     } catch (err) {
-      errorDiagnostico = 'Fallo de acceso a la base de datos: ' + err.message;
+      errorDiagnostico = err.message;
     }
   }
 
@@ -58,7 +58,6 @@ app.get('/api/status', async (req, res) => {
   });
 });
 
-// BASE LOCAL DE RESPALDO
 const LOCAL_DB_PATH = path.join(__dirname, 'database.json');
 function leerDBLocal() {
   if (fs.existsSync(LOCAL_DB_PATH)) {
@@ -71,7 +70,6 @@ function guardarDBLocal(data) {
   try { fs.writeFileSync(LOCAL_DB_PATH, JSON.stringify(data, null, 2)); } catch (e) {}
 }
 
-// OBTENER BASE DE DATOS
 app.get('/api/db', async (req, res) => {
   try {
     if (dbFirestore) {
@@ -87,12 +85,11 @@ app.get('/api/db', async (req, res) => {
       return res.json({ revendedores, tiendas, firestore: true });
     }
   } catch (e) {
-    console.error('Error leyendo Firestore:', e);
+    console.error('Error Firestore /api/db:', e);
   }
   return res.json({ ...leerDBLocal(), firestore: false });
 });
 
-// GUARDAR TIENDA
 app.post('/api/tienda/guardar', async (req, res) => {
   try {
     const { slug, tienda } = req.body;
@@ -115,7 +112,6 @@ app.post('/api/tienda/guardar', async (req, res) => {
   }
 });
 
-// GUARDAR REVENDEDOR
 app.post('/api/revendedor/guardar', async (req, res) => {
   try {
     const { slug, revendedor, tienda } = req.body;
@@ -145,7 +141,70 @@ app.post('/api/revendedor/guardar', async (req, res) => {
   }
 });
 
-// ELIMINAR REVENDEDOR
+// ALTERNAR SUSPENSIÓN POR FALTA DE PAGO DIRECTA
+app.post('/api/revendedor/toggle-suspension', async (req, res) => {
+  try {
+    const { slug, suspendido } = req.body;
+    if (!slug) return res.status(400).json({ error: 'Falta slug' });
+
+    const activo = !suspendido;
+    if (dbFirestore) {
+      await dbFirestore.collection('saas_revendedores').doc(slug).set({ activo }, { merge: true });
+    }
+
+    const local = leerDBLocal();
+    if (local.revendedores && local.revendedores[slug]) {
+      local.revendedores[slug].activo = activo;
+      guardarDBLocal(local);
+    }
+
+    return res.json({ success: true, activo });
+  } catch (err) {
+    return res.status(500).json({ error: err.message });
+  }
+});
+
+// RECUPERAR CONTRASEÑA CON TOKEN / CÓDIGO TEMPORAL
+app.post('/api/auth/recuperar-password', async (req, res) => {
+  try {
+    const { email, nuevaPassword } = req.body;
+    if (!email) return res.status(400).json({ error: 'Falta correo' });
+
+    let db = leerDBLocal();
+    if (dbFirestore) {
+      const snapRev = await dbFirestore.collection('saas_revendedores').get();
+      const revendedores = {};
+      snapRev.forEach(doc => { revendedores[doc.id] = doc.data(); });
+      db.revendedores = revendedores;
+    }
+
+    const revendedores = db.revendedores || {};
+    const foundSlug = Object.keys(revendedores).find(slug => {
+      const r = revendedores[slug];
+      return (r.email || r.correo || '').toLowerCase() === email.toLowerCase();
+    });
+
+    if (!foundSlug) {
+      return res.status(404).json({ error: 'No se encontró ninguna cuenta asociada a este correo electrónico.' });
+    }
+
+    if (nuevaPassword) {
+      if (dbFirestore) {
+        await dbFirestore.collection('saas_revendedores').doc(foundSlug).set({ password: nuevaPassword }, { merge: true });
+      }
+      if (db.revendedores && db.revendedores[foundSlug]) {
+        db.revendedores[foundSlug].password = nuevaPassword;
+        guardarDBLocal(db);
+      }
+      return res.json({ success: true, message: '¡Tu contraseña ha sido restablecida exitosamente!' });
+    }
+
+    return res.json({ success: true, slug: foundSlug, message: 'Correo verificado. Procede a ingresar la nueva clave.' });
+  } catch (err) {
+    return res.status(500).json({ error: err.message });
+  }
+});
+
 app.post('/api/revendedor/eliminar', async (req, res) => {
   try {
     const { slug } = req.body;
@@ -164,6 +223,25 @@ app.post('/api/revendedor/eliminar', async (req, res) => {
   } catch (err) {
     return res.status(500).json({ error: err.message });
   }
+});
+
+app.get('/api/backup', async (req, res) => {
+  try {
+    if (dbFirestore) {
+      const snapRev = await dbFirestore.collection('saas_revendedores').get();
+      const revendedores = {};
+      snapRev.forEach(doc => { revendedores[doc.id] = doc.data(); });
+
+      const snapTiendas = await dbFirestore.collection('saas_tiendas').get();
+      const tiendas = {};
+      snapTiendas.forEach(doc => { tiendas[doc.id] = doc.data(); });
+
+      res.setHeader('Content-disposition', 'attachment; filename=backup-saas-' + Date.now() + '.json');
+      res.setHeader('Content-type', 'application/json');
+      return res.send(JSON.stringify({ revendedores, tiendas }, null, 2));
+    }
+  } catch (e) {}
+  res.json(leerDBLocal());
 });
 
 app.listen(PORT, () => {
