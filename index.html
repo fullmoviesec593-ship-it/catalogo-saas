@@ -46,6 +46,30 @@
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; -webkit-tap-highlight-color: transparent; }
     body { background-color: var(--bg); color: var(--text-white); min-height: 100vh; padding-bottom: 90px; overflow-x: hidden; }
 
+    /* PANTALLA DE BLOQUEO POR VENCIMIENTO */
+    .locked-screen {
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: #090a0f;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      text-align: center;
+      z-index: 99999;
+    }
+    .locked-card {
+      background: #10131e;
+      border: 1px solid #282f44;
+      border-radius: 20px;
+      padding: 30px 24px;
+      max-width: 440px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.8);
+    }
+    .locked-card h2 { color: #f87171; font-size: 20px; margin-bottom: 12px; }
+    .locked-card p { color: #94a3b8; font-size: 14px; line-height: 1.5; margin-bottom: 20px; }
+
     .navbar {
       display: flex; align-items: center; justify-content: space-between;
       padding: 14px 16px; background: rgba(9, 10, 15, 0.95);
@@ -224,6 +248,21 @@
 </head>
 <body>
 
+  <!-- PANTALLA DE SUSPENSIÓN / VENCIMIENTO SAAS -->
+  <div id="locked-container" class="locked-screen hidden">
+    <div class="locked-card">
+      <div style="font-size: 40px; margin-bottom: 10px;">⚠️</div>
+      <h2>Catálogo en Mantenimiento</h2>
+      <p id="locked-msg">
+        Este catálogo se encuentra temporalmente inactivo por actualización de suscripción.<br><br>
+        Si eres el propietario de esta tienda, por favor comunícate con administración para reactivar tu servicio.
+      </p>
+      <a id="locked-btn-soporte" href="https://wa.me/593982766054" class="btn-pedir" style="justify-content:center; width:100%;">
+        💬 Contactar con Soporte
+      </a>
+    </div>
+  </div>
+
   <nav class="navbar">
     <a href="#" class="brand">
       <img id="nav-logo" class="brand-avatar hidden" src="" alt="L">
@@ -384,6 +423,7 @@
 
   <script>
     let tiendaActiva = null;
+    let revendedorInfo = null;
     let todosLosProductos = [];
     let itemsParaMostrar = [];
     let productosVisibles = [];
@@ -417,250 +457,35 @@
       }
     ];
 
-    // LISTA OFICIAL Y PRECIOS FULL MOVIES EC CON TUS IMÁGENES
     const CATALOGO_OFICIAL_FULLMOVIES = [
-      {
-        nombre: "Netflix",
-        sub: "1 mes · Streaming",
-        categoria: "streaming",
-        tag: "POPULAR",
-        precio: "4.25",
-        features: ["1 perfil Ultra HD 4K", "Activación inmediata", "Soporte y garantía mensual", "Sin caídas"],
-        img: "https://images.unsplash.com/photo-1574375927938-d5a98e8ffe85?w=500"
-      },
-      {
-        nombre: "Disney+ ESPN",
-        sub: "1 mes · Streaming",
-        categoria: "streaming",
-        tag: "TOP",
-        precio: "4.00",
-        features: ["Disney, Marvel, Star Wars", "Deportes ESPN en vivo", "Calidad 4K UHD", "Perfil exclusivo"],
-        img: "https://images.unsplash.com/photo-1607604276583-eef5d076aa5f?w=500"
-      },
-      {
-        nombre: "Disney Standard",
-        sub: "1 mes · Streaming",
-        categoria: "streaming",
-        tag: "",
-        precio: "3.50",
-        features: ["Catálogo Disney completo", "Series y películas en HD", "Perfil personal", "Activación inmediata"],
-        img: "https://images.unsplash.com/photo-1607604276583-eef5d076aa5f?w=500"
-      },
-      {
-        nombre: "Prime Video",
-        sub: "1 mes · Streaming",
-        categoria: "streaming",
-        tag: "",
-        precio: "3.00",
-        features: ["Películas y series Amazon", "Calidad Full HD y 4K", "Activación inmediata", "Perfil propio"],
-        img: "https://images.unsplash.com/photo-1522869635100-9f4c5e86aa37?w=500"
-      },
-      {
-        nombre: "Max (HBO)",
-        sub: "1 mes · Streaming",
-        categoria: "streaming",
-        tag: "POPULAR",
-        precio: "3.00",
-        features: ["Estrenos de cine Warner", "Champions League en vivo", "Calidad 4K UHD", "Perfil personal"],
-        img: "https://images.unsplash.com/photo-1585951237318-9ea5e175b891?w=500"
-      },
-      {
-        nombre: "Crunchyroll",
-        sub: "1 mes · Streaming",
-        categoria: "streaming",
-        tag: "ANIME",
-        precio: "2.50",
-        features: ["Anime en simultáneo con Japón", "Sin anuncios en HD", "Catálogo ilimitado", "Perfil personal"],
-        img: "https://images.unsplash.com/photo-1563089145-599997674d42?w=500"
-      },
-      {
-        nombre: "ViX+",
-        sub: "1 mes · Streaming",
-        categoria: "streaming",
-        tag: "",
-        precio: "2.50",
-        features: ["Liga mexicana y deportes", "Series y novelas en español", "Transmisiones en vivo", "Garantía total"],
-        img: "https://images.unsplash.com/photo-1517604931442-7e0c8ed2963c?w=500"
-      },
-      {
-        nombre: "Plex",
-        sub: "1 mes · Streaming",
-        categoria: "streaming",
-        tag: "",
-        precio: "2.75",
-        features: ["Cine y estrenos en alta calidad", "Biblioteca gigante de películas", "Servidor privado 24/7", "Garantía mensual"],
-        img: "https://images.unsplash.com/photo-1518173946687-a4c8a383392e?w=500"
-      },
-      {
-        nombre: "Estella TV",
-        sub: "1 mes · IPTV",
-        categoria: "iptv",
-        tag: "EN VIVO",
-        precio: "3.50",
-        features: ["Canales en vivo y deportes", "Series y películas actualizadas", "Calidad HD estable", "Entrega inmediata"],
-        img: "https://images.unsplash.com/photo-1593784991095-a205069470b6?w=500"
-      },
-      {
-        nombre: "IPTV",
-        sub: "1 mes · IPTV",
-        categoria: "iptv",
-        tag: "FÚTBOL",
-        precio: "3.00",
-        features: ["Todos los canales deportivos", "Canales de cable prémium", "Guía EPG", "Compatible Smart TV y TV Box"],
-        img: "https://images.unsplash.com/photo-1461151304267-38535e780c79?w=500"
-      },
-      {
-        nombre: "Flujo TV",
-        sub: "1 mes · IPTV",
-        categoria: "iptv",
-        tag: "TOP",
-        precio: "4.00",
-        features: ["Más de 1.200 canales en vivo", "Fútbol nacional e internacional", "Películas y series VOD", "Sin caídas"],
-        img: "https://images.unsplash.com/photo-1593784991095-a205069470b6?w=500"
-      },
-      {
-        nombre: "OLEADA TV",
-        sub: "1 mes · IPTV",
-        categoria: "iptv",
-        tag: "ESTABLE",
-        precio: "3.50",
-        features: ["Canales prémium en vivo", "Programación deportiva exclusiva", "Transmisión en alta definición", "Soporte activo"],
-        img: "https://images.unsplash.com/photo-1522869635100-9f4c5e86aa37?w=500"
-      },
-      {
-        nombre: "Vicky Rakuten",
-        sub: "1 mes · Streaming",
-        categoria: "streaming",
-        tag: "DORAMAS",
-        precio: "3.50",
-        features: ["Doramas y dramas asiáticos", "Subtítulos en español HD", "Acceso sin anuncios", "Garantía mensual"],
-        img: "https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=500"
-      },
-      {
-        nombre: "Spotify",
-        sub: "1 mes · Música",
-        categoria: "musica",
-        tag: "TOP",
-        precio: "4.00",
-        features: ["Música sin publicidad", "Descargas offline", "Calidad Extreme Audio", "A tu propio correo"],
-        img: "https://images.unsplash.com/photo-1614680376593-902f749f7ffc?w=500"
-      },
-      {
-        nombre: "Deezer",
-        sub: "1 mes · Música",
-        categoria: "musica",
-        tag: "HIFI",
-        precio: "3.00",
-        features: ["Audio en alta fidelidad HiFi", "Sin interrupciones", "Descargas para escuchar sin internet", "Activación inmediata"],
-        img: "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=500"
-      },
-      {
-        nombre: "Windows",
-        sub: "Licencia Permanente · Software",
-        categoria: "software",
-        tag: "OFICIAL",
-        precio: "9.50",
-        features: ["Windows 10 / 11 Pro", "Licencia original permanente", "Actualizaciones de por vida", "Activación digital"],
-        img: "https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=500"
-      },
-      {
-        nombre: "Microsoft (Office)",
-        sub: "1 año / Cuenta · Software",
-        categoria: "software",
-        tag: "OFICINA",
-        precio: "8.50",
-        features: ["Word, Excel, PowerPoint", "1 TB de almacenamiento OneDrive", "Hasta 5 dispositivos PC/Móvil", "Licencia original"],
-        img: "https://images.unsplash.com/photo-1531403009284-440f080d1e12?w=500"
-      },
-      {
-        nombre: "Canva Pro",
-        sub: "Suscripción · Software",
-        categoria: "software",
-        tag: "DISEÑO",
-        precio: "3.99",
-        features: ["Plantillas y recursos prémium", "Quitar fondos con 1 clic", "Herramientas de IA", "A tu propio correo"],
-        img: "https://images.unsplash.com/photo-1626785774573-4b799315345d?w=500"
-      },
-      {
-        nombre: "CapCut Pro",
-        sub: "1 mes · Software",
-        categoria: "software",
-        tag: "EDICIÓN",
-        precio: "5.99",
-        features: ["Filtros y efectos pro", "Subtítulos automáticos", "Exportación en 4K 60fps", "Sin marcas de agua"],
-        img: "https://images.unsplash.com/photo-1574717024653-61fd2cf4d44d?w=500"
-      },
-      {
-        nombre: "ChatGPT Plus",
-        sub: "1 mes · Software",
-        categoria: "software",
-        tag: "IA",
-        precio: "5.75",
-        features: ["Acceso a GPT-4o sin límites", "Generación de imágenes DALL·E", "Análisis avanzado de datos", "Navegación web rápida"],
-        img: "https://images.unsplash.com/photo-1677442136019-21780ecad995?w=500"
-      },
-      {
-        nombre: "Chatbot WhatsApp",
-        sub: "1 mes · Software",
-        categoria: "software",
-        tag: "VENTAS",
-        precio: "5.00",
-        features: ["Respuestas automáticas 24/7", "Atención a clientes sin demora", "Configuración sencilla", "Potencia tus ventas"],
-        img: "https://images.unsplash.com/photo-1614680376573-df3480f0c6ff?w=500"
-      },
-      {
-        nombre: "Free Fire",
-        sub: "Diamantes / Recargas · Gaming",
-        categoria: "gaming",
-        tag: "GAMING",
-        precio: "2.00",
-        features: ["Recargas directas por ID", "Entrega inmediata", "Precios mayoristas", "Seguro y garantizado"],
-        img: "https://images.unsplash.com/photo-1542751371-adc38448a05e?w=500"
-      }
+      { nombre: "Netflix", sub: "1 mes · Streaming", categoria: "streaming", tag: "POPULAR", precio: "4.25", features: ["1 perfil Ultra HD 4K", "Activación inmediata", "Soporte y garantía mensual", "Sin caídas"], img: "https://images.unsplash.com/photo-1574375927938-d5a98e8ffe85?w=500" },
+      { nombre: "Disney+ ESPN", sub: "1 mes · Streaming", categoria: "streaming", tag: "TOP", precio: "4.00", features: ["Disney, Marvel, Star Wars", "Deportes ESPN en vivo", "Calidad 4K UHD", "Perfil exclusivo"], img: "https://images.unsplash.com/photo-1607604276583-eef5d076aa5f?w=500" },
+      { nombre: "Disney Standard", sub: "1 mes · Streaming", categoria: "streaming", tag: "", precio: "3.50", features: ["Catálogo Disney completo", "Series y películas en HD", "Perfil personal", "Activación inmediata"], img: "https://images.unsplash.com/photo-1607604276583-eef5d076aa5f?w=500" },
+      { nombre: "Prime Video", sub: "1 mes · Streaming", categoria: "streaming", tag: "", precio: "3.00", features: ["Películas y series Amazon", "Calidad Full HD y 4K", "Activación inmediata", "Perfil propio"], img: "https://images.unsplash.com/photo-1522869635100-9f4c5e86aa37?w=500" },
+      { nombre: "Max (HBO)", sub: "1 mes · Streaming", categoria: "streaming", tag: "POPULAR", precio: "3.00", features: ["Estrenos de cine Warner", "Champions League en vivo", "Calidad 4K UHD", "Perfil personal"], img: "https://images.unsplash.com/photo-1585951237318-9ea5e175b891?w=500" },
+      { nombre: "Crunchyroll", sub: "1 mes · Streaming", categoria: "streaming", tag: "ANIME", precio: "2.50", features: ["Anime en simultáneo con Japón", "Sin anuncios en HD", "Catálogo ilimitado", "Perfil personal"], img: "https://images.unsplash.com/photo-1563089145-599997674d42?w=500" },
+      { nombre: "ViX+", sub: "1 mes · Streaming", categoria: "streaming", tag: "", precio: "2.50", features: ["Liga mexicana y deportes", "Series y novelas en español", "Transmisiones en vivo", "Garantía total"], img: "https://images.unsplash.com/photo-1517604931442-7e0c8ed2963c?w=500" },
+      { nombre: "Plex", sub: "1 mes · Streaming", categoria: "streaming", tag: "", precio: "2.75", features: ["Cine y estrenos en alta calidad", "Biblioteca gigante de películas", "Servidor privado 24/7", "Garantía mensual"], img: "https://images.unsplash.com/photo-1518173946687-a4c8a383392e?w=500" },
+      { nombre: "Estella TV", sub: "1 mes · IPTV", categoria: "iptv", tag: "EN VIVO", precio: "3.50", features: ["Canales en vivo y deportes", "Series y películas actualizadas", "Calidad HD estable", "Entrega inmediata"], img: "https://images.unsplash.com/photo-1593784991095-a205069470b6?w=500" },
+      { nombre: "IPTV", sub: "1 mes · IPTV", categoria: "iptv", tag: "FÚTBOL", precio: "3.00", features: ["Todos los canales deportivos", "Canales de cable prémium", "Guía EPG", "Compatible Smart TV y TV Box"], img: "https://images.unsplash.com/photo-1461151304267-38535e780c79?w=500" },
+      { nombre: "Flujo TV", sub: "1 mes · IPTV", categoria: "iptv", tag: "TOP", precio: "4.00", features: ["Más de 1.200 canales en vivo", "Fútbol nacional e internacional", "Películas y series VOD", "Sin caídas"], img: "https://images.unsplash.com/photo-1593784991095-a205069470b6?w=500" },
+      { nombre: "OLEADA TV", sub: "1 mes · IPTV", categoria: "iptv", tag: "ESTABLE", precio: "3.50", features: ["Canales prémium en vivo", "Programación deportiva exclusiva", "Transmisión en alta definición", "Soporte activo"], img: "https://images.unsplash.com/photo-1522869635100-9f4c5e86aa37?w=500" },
+      { nombre: "Vicky Rakuten", sub: "1 mes · Streaming", categoria: "streaming", tag: "DORAMAS", precio: "3.50", features: ["Doramas y dramas asiáticos", "Subtítulos en español HD", "Acceso sin anuncios", "Garantía mensual"], img: "https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=500" },
+      { nombre: "Spotify", sub: "1 mes · Música", categoria: "musica", tag: "TOP", precio: "4.00", features: ["Música sin publicidad", "Descargas offline", "Calidad Extreme Audio", "A tu propio correo"], img: "https://images.unsplash.com/photo-1614680376593-902f749f7ffc?w=500" },
+      { nombre: "Deezer", sub: "1 mes · Música", categoria: "musica", tag: "HIFI", precio: "3.00", features: ["Audio en alta fidelidad HiFi", "Sin interrupciones", "Descargas para escuchar sin internet", "Activación inmediata"], img: "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=500" },
+      { nombre: "Windows", sub: "Licencia Permanente · Software", categoria: "software", tag: "OFICIAL", precio: "9.50", features: ["Windows 10 / 11 Pro", "Licencia original permanente", "Actualizaciones de por vida", "Activación digital"], img: "https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=500" },
+      { nombre: "Microsoft (Office)", sub: "1 año / Cuenta · Software", categoria: "software", tag: "OFICINA", precio: "8.50", features: ["Word, Excel, PowerPoint", "1 TB de almacenamiento OneDrive", "Hasta 5 dispositivos PC/Móvil", "Licencia original"], img: "https://images.unsplash.com/photo-1531403009284-440f080d1e12?w=500" },
+      { nombre: "Canva Pro", sub: "Suscripción · Software", categoria: "software", tag: "DISEÑO", precio: "3.99", features: ["Plantillas y recursos prémium", "Quitar fondos con 1 clic", "Herramientas de IA", "A tu propio correo"], img: "https://images.unsplash.com/photo-1626785774573-4b799315345d?w=500" },
+      { nombre: "CapCut Pro", sub: "1 mes · Software", categoria: "software", tag: "EDICIÓN", precio: "5.99", features: ["Filtros y efectos pro", "Subtítulos automáticos", "Exportación en 4K 60fps", "Sin marcas de agua"], img: "https://images.unsplash.com/photo-1574717024653-61fd2cf4d44d?w=500" },
+      { nombre: "ChatGPT Plus", sub: "1 mes · Software", categoria: "software", tag: "IA", precio: "5.75", features: ["Acceso a GPT-4o sin límites", "Generación de imágenes DALL·E", "Análisis avanzado de datos", "Navegación web rápida"], img: "https://images.unsplash.com/photo-1677442136019-21780ecad995?w=500" },
+      { nombre: "Chatbot WhatsApp", sub: "1 mes · Software", categoria: "software", tag: "VENTAS", precio: "5.00", features: ["Respuestas automáticas 24/7", "Atención a clientes sin demora", "Configuración sencilla", "Potencia tus ventas"], img: "https://images.unsplash.com/photo-1614680376573-df3480f0c6ff?w=500" },
+      { nombre: "Free Fire", sub: "Diamantes / Recargas · Gaming", categoria: "gaming", tag: "GAMING", precio: "2.00", features: ["Recargas directas por ID", "Entrega inmediata", "Precios mayoristas", "Seguro y garantizado"], img: "https://images.unsplash.com/photo-1542751371-adc38448a05e?w=500" }
     ];
 
-    if ('serviceWorker' in navigator) {
-      window.addEventListener('load', () => {
-        navigator.serviceWorker.register('/sw.js').catch(err => console.log('SW error:', err));
-      });
-    }
-
-    window.addEventListener('beforeinstallprompt', (e) => {
-      e.preventDefault();
-      deferredPrompt = e;
-      const btnInstall = document.getElementById('btn-pwa-install');
-      if (btnInstall) btnInstall.style.display = 'inline-flex';
-    });
-
-    function instalarApp() {
-      if (deferredPrompt) {
-        deferredPrompt.prompt();
-        deferredPrompt.userChoice.then((choiceResult) => {
-          if (choiceResult.outcome === 'accepted') {
-            document.getElementById('btn-pwa-install').style.display = 'none';
-          }
-          deferredPrompt = null;
-        });
-      } else {
-        alert('Para instalar:\n1. Toca los tres puntos (⋮) del navegador.\n2. Elige "Instalar aplicación" o "Agregar a pantalla principal".');
-      }
-    }
-
-    function aplicarTemaVisual(color) {
-      document.body.classList.remove('theme-blue', 'theme-green', 'theme-purple');
-      const meta = document.getElementById('theme-color-meta');
-      if (color === 'blue') {
-        document.body.classList.add('theme-blue');
-        if (meta) meta.content = '#0284c7';
-      } else if (color === 'green') {
-        document.body.classList.add('theme-green');
-        if (meta) meta.content = '#10b981';
-      } else if (color === 'purple') {
-        document.body.classList.add('theme-purple');
-        if (meta) meta.content = '#a855f7';
-      } else {
-        if (meta) meta.content = '#ff6a00';
-      }
+    function calcularDias(vence) {
+      if (!vence) return 999;
+      const diff = new Date(vence) - new Date();
+      return Math.ceil(diff / (1000 * 60 * 60 * 24));
     }
 
     async function cargarTienda() {
@@ -672,9 +497,27 @@
         const db = await res.json();
 
         const tiendas = db.tiendas || {};
+        const revendedores = db.revendedores || {};
+
         if (!tiendaSlug || !tiendas[tiendaSlug]) {
           const keys = Object.keys(tiendas);
           tiendaSlug = keys.length > 0 ? keys[0] : 'bellstream';
+        }
+
+        revendedorInfo = revendedores[tiendaSlug] || null;
+
+        // VERIFICACIÓN DE VENCIMIENTO Y SUSPENSIÓN SAAS
+        if (revendedorInfo) {
+          const diasRestantes = calcularDias(revendedorInfo.vencimiento);
+          if (revendedorInfo.activo === false || diasRestantes <= 0) {
+            document.getElementById('locked-container').classList.remove('hidden');
+            if (revendedorInfo.activo === false) {
+              document.getElementById('locked-msg').innerHTML = "Este catálogo se encuentra actualmente <b>suspendido</b> por administración.<br><br>Para reactivarlo, comunícate con soporte.";
+            } else {
+              document.getElementById('locked-msg').innerHTML = "La suscripción mensual de este catálogo ha <b>expirado</b>.<br><br>Si eres el administrador, comunícate con soporte para renovar tu acceso.";
+            }
+            return;
+          }
         }
 
         tiendaActiva = tiendas[tiendaSlug] || {
@@ -724,7 +567,6 @@
         document.getElementById('hero-btn-ws').href = `https://wa.me/${ws}?text=${baseMsg}`;
         document.getElementById('floating-ws-btn').href = `https://wa.me/${ws}?text=${baseMsg}`;
 
-        // Si la tienda tiene productos guardados úsalos, si no precarga la lista oficial
         const prodsTienda = tiendaActiva.productos || [];
         todosLosProductos = (prodsTienda.length > 0) ? prodsTienda : CATALOGO_OFICIAL_FULLMOVIES;
 
@@ -746,7 +588,24 @@
         verificarDeepLinks();
 
       } catch (e) {
-        console.error("Error al cargar la tienda:", e);
+        console.error("Error cargando tienda:", e);
+      }
+    }
+
+    function aplicarTemaVisual(color) {
+      document.body.classList.remove('theme-blue', 'theme-green', 'theme-purple');
+      const meta = document.getElementById('theme-color-meta');
+      if (color === 'blue') {
+        document.body.classList.add('theme-blue');
+        if (meta) meta.content = '#0284c7';
+      } else if (color === 'green') {
+        document.body.classList.add('theme-green');
+        if (meta) meta.content = '#10b981';
+      } else if (color === 'purple') {
+        document.body.classList.add('theme-purple');
+        if (meta) meta.content = '#a855f7';
+      } else {
+        if (meta) meta.content = '#ff6a00';
       }
     }
 
@@ -760,9 +619,6 @@
         if (cant >= 2) {
           const comboIdx = itemsParaMostrar.findIndex(p => p.isCombo && p.comboCantidad === cant);
           if (comboIdx >= 0) abrirModalComboDirecto(comboIdx);
-        } else if (paramCombo.toLowerCase() === 'duo') {
-          const idx = itemsParaMostrar.findIndex(p => p.isCombo && p.comboCantidad === 2);
-          if (idx >= 0) abrirModalComboDirecto(idx);
         }
       } else if (paramServicio) {
         const idx = itemsParaMostrar.findIndex(p => !p.isCombo && p.nombre.toLowerCase().includes(paramServicio.toLowerCase()));
@@ -795,9 +651,7 @@
       renderGrid(productosVisibles);
     }
 
-    function ejecutarBusqueda() {
-      aplicarFiltros();
-    }
+    function ejecutarBusqueda() { aplicarFiltros(); }
 
     function filtrarCategoria(cat, btn) {
       document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
@@ -859,9 +713,7 @@
           `;
         }
 
-        const actionClick = p.isCombo 
-          ? `abrirModalComboDirecto(${idx})`
-          : `abrirModal(${idx})`;
+        const actionClick = p.isCombo ? `abrirModalComboDirecto(${idx})` : `abrirModal(${idx})`;
 
         const card = document.createElement('div');
         card.className = 'card';
@@ -873,9 +725,7 @@
           <div class="card-body">
             <div class="card-name">${p.nombre}</div>
             <div class="card-duration">${sub}</div>
-            <ul class="card-features">
-              ${featuresHtml}
-            </ul>
+            <ul class="card-features">${featuresHtml}</ul>
             ${priceHtml}
             <button class="btn-buy-ws" onclick="${actionClick}">
               <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49c.08-.14.12-.31.12-.48 0-.55-.45-1-1-1H5.21l-.94-2H1zm16 16c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2z"/></svg>
@@ -892,7 +742,7 @@
       const lineas = texto.split('\n');
       return lineas.map(linea => {
         return linea.replace(/\b(\d{7,22})\b/g, (match) => {
-          return `<span class="copy-num-tag">${match} <button type="button" class="btn-copy-icon" onclick="copiarNumeroIndividual('${match}', this)" title="Copiar número">📋</button></span>`;
+          return `<span class="copy-num-tag">${match} <button type="button" class="btn-copy-icon" onclick="copiarNumeroIndividual('${match}', this)">📋</button></span>`;
         });
       }).join('<br>');
     }
@@ -901,7 +751,7 @@
       const p = productosVisibles[idx];
       const moneda = textosTienda.currency || '$';
       const ws = (tiendaActiva.whatsapp || "593982766054").replace(/\D/g, '');
-      const rawMetodos = tiendaActiva.metodosPago || "🏦 BANCO PICHINCHA / DEUNA / TRANSFERENCIA\nComunícate por WhatsApp para recibir las cuentas bancarias activas de entrega inmediata.";
+      const rawMetodos = tiendaActiva.metodosPago || "🏦 BANCO PICHINCHA / DEUNA / TRANSFERENCIA\nComunícate por WhatsApp para recibir las cuentas activas.";
 
       document.getElementById('modal-service-name').innerText = p.nombre;
       document.getElementById('modal-service-price').innerText = moneda + p.precio;
@@ -916,9 +766,7 @@
       document.getElementById('modal-compra').classList.remove('hidden');
     }
 
-    function cerrarModal() {
-      document.getElementById('modal-compra').classList.add('hidden');
-    }
+    function cerrarModal() { document.getElementById('modal-compra').classList.add('hidden'); }
 
     function abrirModalComboDirecto(idxEnGrid) {
       const combo = productosVisibles[idxEnGrid];
@@ -928,21 +776,18 @@
       comboSeleccionados = [];
 
       document.getElementById('combo-modal-title').innerText = `🔥 ${combo.nombre}`;
-      document.getElementById('combo-modal-instructions').innerText = `Selecciona exactamente ${comboTipoCantidad} servicios de la lista. Recibirás un ${comboPorcentajeDesc}% de descuento automático.`;
+      document.getElementById('combo-modal-instructions').innerText = `Selecciona exactamente ${comboTipoCantidad} servicios. Recibirás un ${comboPorcentajeDesc}% de descuento automático.`;
       document.getElementById('combo-discount-label').innerText = `Descuento Especial (${comboPorcentajeDesc}% OFF):`;
 
-      const rawMetodos = tiendaActiva.metodosPago || "🏦 BANCO PICHINCHA / DEUNA / TRANSFERENCIA\nComunícate por WhatsApp para recibir las cuentas activas.";
+      const rawMetodos = tiendaActiva.metodosPago || "🏦 BANCO PICHINCHA / DEUNA / TRANSFERENCIA";
       document.getElementById('combo-payment-info').innerHTML = formatearMetodosDePagoConBotones(rawMetodos);
 
       renderListaComboItems();
       actualizarCalculoCombo();
-
       document.getElementById('modal-combo-selector').classList.remove('hidden');
     }
 
-    function cerrarModalCombo() {
-      document.getElementById('modal-combo-selector').classList.add('hidden');
-    }
+    function cerrarModalCombo() { document.getElementById('modal-combo-selector').classList.add('hidden'); }
 
     function renderListaComboItems() {
       const container = document.getElementById('combo-items-container');
@@ -1014,7 +859,7 @@
           `💰 *Subtotal:* ${moneda}${subtotal.toFixed(2)}\n` +
           `🎁 *Descuento ${comboPorcentajeDesc}%:* -${moneda}${descuento.toFixed(2)}\n` +
           `✅ *Total a Pagar:* ${moneda}${totalFinal.toFixed(2)}\n\n` +
-          `Adjunto comprobante o espero los datos para completar mi activación inmediata.`;
+          `Adjunto comprobante para mi activación inmediata.`;
 
         btnOrder.href = `https://wa.me/${ws}?text=${encodeURIComponent(textoWs)}`;
       } else {
@@ -1029,17 +874,22 @@
         const iconoOriginal = btn.innerText;
         btn.innerText = "✅";
         btn.style.background = "#22c55e";
-        btn.style.color = "#042f1a";
-        btn.style.borderColor = "#22c55e";
         setTimeout(() => {
           btn.innerText = iconoOriginal;
           btn.style.background = "#1e293b";
-          btn.style.color = "#38bdf8";
-          btn.style.borderColor = "#38bdf8";
         }, 1500);
       }).catch(err => {
         alert("Número: " + numero);
       });
+    }
+
+    function instalarApp() {
+      if (deferredPrompt) {
+        deferredPrompt.prompt();
+        deferredPrompt = null;
+      } else {
+        alert('Toca los tres puntos (⋮) del navegador y selecciona "Instalar aplicación".');
+      }
     }
 
     cargarTienda();
