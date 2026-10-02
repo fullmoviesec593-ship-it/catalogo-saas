@@ -10,6 +10,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Catálogo">
+  <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/3074/3074767.png">
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -46,7 +47,6 @@
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; -webkit-tap-highlight-color: transparent; }
     body { background-color: var(--bg); color: var(--text-white); min-height: 100vh; padding-bottom: 90px; overflow-x: hidden; }
 
-    /* PANTALLA DE BLOQUEO POR VENCIMIENTO */
     .locked-screen {
       position: fixed;
       top: 0; left: 0; width: 100%; height: 100%;
@@ -72,30 +72,42 @@
 
     .navbar {
       display: flex; align-items: center; justify-content: space-between;
-      padding: 14px 16px; background: rgba(9, 10, 15, 0.95);
+      padding: 12px 14px; background: rgba(9, 10, 15, 0.95);
       backdrop-filter: blur(12px); border-bottom: 1px solid rgba(255, 255, 255, 0.06);
       position: sticky; top: 0; z-index: 100;
     }
-    .brand { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+    .brand { display: flex; align-items: center; gap: 8px; text-decoration: none; }
     .brand-avatar {
-      width: 38px; height: 38px; border-radius: 50%;
+      width: 36px; height: 36px; border-radius: 50%;
       background: var(--accent-gradient); color: #fff;
       display: flex; align-items: center; justify-content: center;
       font-weight: 800; font-size: 15px; box-shadow: 0 0 12px var(--glow-accent);
       object-fit: cover;
     }
-    .brand-name { font-size: 16px; font-weight: 800; color: #fff; letter-spacing: -0.2px; }
-    .nav-actions { display: flex; align-items: center; gap: 8px; }
+    .brand-name { font-size: 15px; font-weight: 800; color: #fff; letter-spacing: -0.2px; }
+    .nav-actions { display: flex; align-items: center; gap: 6px; }
 
-    .btn-install-pwa {
-      background: #171b26; border: 1px solid var(--primary-accent);
-      color: var(--primary-accent); padding: 7px 11px; border-radius: 8px;
-      font-size: 12px; font-weight: 800; display: none; align-items: center; gap: 5px; cursor: pointer;
+    /* BOTÓN DESTACADO DESCARGA APK */
+    .btn-download-apk {
+      background: #1e1b4b;
+      border: 1px solid #818cf8;
+      color: #c7d2fe;
+      padding: 7px 11px;
+      border-radius: 8px;
+      font-size: 11px;
+      font-weight: 800;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      cursor: pointer;
+      text-decoration: none;
+      box-shadow: 0 2px 10px rgba(99, 102, 241, 0.25);
     }
+
     .btn-pedir {
-      background: #00d26a; color: #042512; padding: 8px 16px;
-      border-radius: 9px; font-size: 13px; font-weight: 800;
-      text-decoration: none; display: inline-flex; align-items: center; gap: 6px;
+      background: #00d26a; color: #042512; padding: 7px 13px;
+      border-radius: 8px; font-size: 12px; font-weight: 800;
+      text-decoration: none; display: inline-flex; align-items: center; gap: 5px;
       box-shadow: 0 2px 10px rgba(0, 210, 106, 0.35);
     }
 
@@ -107,49 +119,50 @@
     .status-bar-online.offline { background: rgba(245, 158, 11, 0.12); color: #fbbf24; border-bottom: 1px solid rgba(245, 158, 11, 0.25); }
     .status-dot { width: 8px; height: 8px; border-radius: 50%; background: currentColor; box-shadow: 0 0 8px currentColor; }
 
-    .banner-carousel-container { max-width: 680px; margin: 14px auto 0 auto; padding: 0 14px; }
+    .banner-carousel-container { max-width: 680px; margin: 12px auto 0 auto; padding: 0 14px; }
     .banner-slider { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; border-radius: 14px; scrollbar-width: none; gap: 10px; }
     .banner-slider::-webkit-scrollbar { display: none; }
     .banner-slide {
       flex: 0 0 100%; scroll-snap-align: start; background: linear-gradient(135deg, #1c152e 0%, #101426 100%);
-      border: 1px solid var(--glow-accent); border-radius: 14px; padding: 16px 18px;
+      border: 1px solid var(--glow-accent); border-radius: 14px; padding: 14px 16px;
       display: flex; align-items: center; justify-content: space-between; box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5);
     }
-    .banner-text h4 { font-size: 15px; font-weight: 900; color: #fff; margin-bottom: 4px; }
-    .banner-text p { font-size: 12px; color: #94a3b8; }
-    .banner-badge { background: var(--accent-gradient); color: #fff; font-size: 11px; font-weight: 800; padding: 6px 12px; border-radius: 20px; }
+    .banner-text h4 { font-size: 14px; font-weight: 900; color: #fff; margin-bottom: 3px; }
+    .banner-text p { font-size: 11px; color: #94a3b8; }
+    .banner-badge { background: var(--accent-gradient); color: #fff; font-size: 10px; font-weight: 800; padding: 5px 10px; border-radius: 20px; }
 
-    .hero { text-align: center; padding: 24px 16px 16px 16px; max-width: 600px; margin: 0 auto; }
+    .hero { text-align: center; padding: 20px 16px 14px 16px; max-width: 600px; margin: 0 auto; }
     .pill-badge {
       display: inline-flex; align-items: center; background: rgba(255, 255, 255, 0.06);
       border: 1px solid var(--primary-accent); color: var(--primary-accent); font-size: 11px;
-      font-weight: 800; letter-spacing: 0.8px; padding: 4px 14px; border-radius: 20px; margin-bottom: 14px; text-transform: uppercase;
+      font-weight: 800; letter-spacing: 0.8px; padding: 4px 14px; border-radius: 20px; margin-bottom: 12px; text-transform: uppercase;
     }
-    .hero-title { font-size: 28px; font-weight: 900; line-height: 1.15; text-transform: uppercase; letter-spacing: -0.5px; margin-bottom: 8px; }
+    .hero-title { font-size: 26px; font-weight: 900; line-height: 1.15; text-transform: uppercase; letter-spacing: -0.5px; margin-bottom: 8px; }
     .hero-title .highlight { display: block; color: var(--primary-accent); background: var(--accent-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-    .hero-sub { color: var(--text-muted); font-size: 13px; margin-bottom: 18px; line-height: 1.4; }
+    .hero-sub { color: var(--text-muted); font-size: 13px; margin-bottom: 16px; line-height: 1.4; }
 
-    .trust-badges-bar { display: flex; justify-content: center; flex-wrap: wrap; gap: 8px; margin-bottom: 20px; }
-    .trust-pill { background: #111422; border: 1px solid rgba(255, 255, 255, 0.07); padding: 6px 12px; border-radius: 20px; font-size: 11px; font-weight: 700; color: #cbd5e1; }
+    .trust-badges-bar { display: flex; justify-content: center; flex-wrap: wrap; gap: 8px; margin-bottom: 18px; }
+    .trust-pill { background: #111422; border: 1px solid rgba(255, 255, 255, 0.07); padding: 5px 11px; border-radius: 20px; font-size: 11px; font-weight: 700; color: #cbd5e1; }
 
-    .hero-btns { display: flex; justify-content: center; gap: 10px; margin-bottom: 22px; }
-    .btn-hero-ws { background: #00d26a; color: #042512; font-weight: 800; font-size: 13px; padding: 10px 22px; border-radius: 9px; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; }
-    .btn-hero-serv { background: #141722; border: 1px solid #232738; color: #fff; font-weight: 700; font-size: 13px; padding: 10px 18px; border-radius: 9px; text-decoration: none; }
+    .hero-btns { display: flex; justify-content: center; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; }
+    .btn-hero-ws { background: #00d26a; color: #042512; font-weight: 800; font-size: 12px; padding: 9px 18px; border-radius: 8px; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; }
+    .btn-hero-apk { background: #1e1b4b; border: 1px solid #818cf8; color: #c7d2fe; font-weight: 800; font-size: 12px; padding: 9px 16px; border-radius: 8px; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; }
+    .btn-hero-serv { background: #141722; border: 1px solid #232738; color: #fff; font-weight: 700; font-size: 12px; padding: 9px 14px; border-radius: 8px; text-decoration: none; }
 
-    .search-wrapper { max-width: 680px; margin: 0 auto 16px auto; padding: 0 14px; position: relative; }
+    .search-wrapper { max-width: 680px; margin: 0 auto 14px auto; padding: 0 14px; position: relative; }
     .search-input-box {
       width: 100%; background: #10131e; border: 1px solid #23293f; border-radius: 12px;
-      padding: 12px 14px 12px 42px; color: #fff; font-size: 14px; outline: none; transition: all 0.25s;
+      padding: 11px 14px 11px 40px; color: #fff; font-size: 14px; outline: none; transition: all 0.25s;
     }
     .search-input-box:focus { border-color: var(--primary-accent); box-shadow: 0 0 14px var(--glow-accent); }
-    .search-icon { position: absolute; left: 28px; top: 50%; transform: translateY(-50%); color: #64748b; font-size: 16px; }
+    .search-icon { position: absolute; left: 26px; top: 50%; transform: translateY(-50%); color: #64748b; font-size: 15px; }
 
-    .section-header { display: flex; justify-content: space-between; align-items: center; padding: 0 16px; margin-bottom: 14px; max-width: 680px; margin-left: auto; margin-right: auto; }
+    .section-header { display: flex; justify-content: space-between; align-items: center; padding: 0 16px; margin-bottom: 12px; max-width: 680px; margin-left: auto; margin-right: auto; }
     .section-title { font-size: 12px; font-weight: 800; letter-spacing: 0.8px; color: #cbd5e1; display: flex; align-items: center; gap: 6px; }
     .section-title::before { content: ''; display: inline-block; width: 3px; height: 14px; background: var(--primary-accent); border-radius: 2px; }
 
     .tabs { display: flex; gap: 5px; background: #10131d; padding: 3px; border-radius: 8px; border: 1px solid #1f2436; overflow-x: auto; }
-    .tab-btn { background: transparent; border: none; color: #8b92a3; padding: 5px 11px; font-size: 11px; font-weight: 700; border-radius: 6px; cursor: pointer; white-space: nowrap; }
+    .tab-btn { background: transparent; border: none; color: #8b92a3; padding: 5px 10px; font-size: 11px; font-weight: 700; border-radius: 6px; cursor: pointer; white-space: nowrap; }
     .tab-btn.active { background: var(--primary-accent); color: #fff; }
 
     .products-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; padding: 0 14px; max-width: 680px; margin: 0 auto; }
@@ -162,7 +175,7 @@
     }
     .card:hover { border-color: var(--primary-accent); box-shadow: 0 8px 24px var(--glow-accent); transform: translateY(-2px); }
 
-    .card-thumb { position: relative; width: 100%; height: 155px; background: #000; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+    .card-thumb { position: relative; width: 100%; height: 150px; background: #000; display: flex; align-items: center; justify-content: center; overflow: hidden; }
     .card-thumb img { width: 100%; height: 100%; object-fit: cover; }
     .card-tag {
       position: absolute; top: 8px; right: 8px; background: var(--primary-accent); color: #fff;
@@ -184,7 +197,7 @@
 
     .btn-buy-ws {
       background: #00d26a; color: #032412; border: none; border-radius: 9px;
-      padding: 11px 8px; font-size: 13px; font-weight: 800; cursor: pointer;
+      padding: 10px 8px; font-size: 13px; font-weight: 800; cursor: pointer;
       display: flex; align-items: center; justify-content: center; gap: 6px;
       text-decoration: none; width: 100%; box-shadow: 0 2px 10px rgba(0, 210, 106, 0.3);
     }
@@ -248,7 +261,6 @@
 </head>
 <body>
 
-  <!-- PANTALLA DE SUSPENSIÓN / VENCIMIENTO SAAS -->
   <div id="locked-container" class="locked-screen hidden">
     <div class="locked-card">
       <div style="font-size: 40px; margin-bottom: 10px;">⚠️</div>
@@ -270,10 +282,14 @@
       <span id="nav-store-name" class="brand-name">Full Movies EC</span>
     </a>
     <div class="nav-actions">
-      <button id="btn-pwa-install" class="btn-install-pwa" onclick="instalarApp()">📲 Instalar App</button>
+      <!-- BOTÓN DIRECTO DESCARGAR APK -->
+      <button class="btn-download-apk" onclick="abrirModalInstalacionAPK()">
+        📱 Descargar App / APK
+      </button>
+
       <a id="nav-btn-pedir" href="#" target="_blank" class="btn-pedir">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12.04 2c-5.46 0-9.91 4.45-9.91 9.91 0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38c1.45.79 3.08 1.21 4.74 1.21 5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.14-2.9-7.01A9.816 9.816 0 0 0 12.04 2z"/></svg>
-        Pedir ahora
+        Pedir
       </a>
     </div>
   </nav>
@@ -321,6 +337,9 @@
         <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12.04 2c-5.46 0-9.91 4.45-9.91 9.91 0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38c1.45.79 3.08 1.21 4.74 1.21 5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.14-2.9-7.01A9.816 9.816 0 0 0 12.04 2z"/></svg>
         Whatsapp
       </a>
+      <button class="btn-hero-apk" onclick="abrirModalInstalacionAPK()">
+        📲 Instalar App (APK)
+      </button>
       <a href="#catalogo" class="btn-hero-serv">Ver catálogo ↓</a>
     </div>
   </section>
@@ -421,6 +440,39 @@
     </div>
   </div>
 
+  <!-- MODAL EXCLUSIVO DESCARGA APK / APP -->
+  <div id="modal-descargar-apk" class="modal-overlay hidden">
+    <div class="modal-box" style="text-align:center;">
+      <div class="modal-header">
+        <h3>📲 Instalar Aplicación Móvil</h3>
+        <button class="btn-close" onclick="cerrarModalAPK()">✕</button>
+      </div>
+
+      <div style="font-size:45px; margin:10px 0;">🚀</div>
+      <h4 style="color:#fff; margin-bottom:8px;">Lleva el catálogo en tu teléfono</h4>
+      <p style="color:#94a3b8; font-size:13px; line-height:1.5; margin-bottom:18px;">
+        Accede más rápido, recibe actualizaciones automáticas y consulta precios al instante sin usar el navegador.
+      </p>
+
+      <!-- BOTÓN 1: INSTALACIÓN RÁPIDA PWA ANDROID -->
+      <button id="btn-pwa-direct" onclick="ejecutarInstalacionPWA()" style="background:var(--accent-gradient); color:#fff; width:100%; padding:13px; border:none; border-radius:10px; font-weight:800; font-size:14px; cursor:pointer; margin-bottom:10px;">
+        ⚡ INSTALAR DIRECTO EN MI CELULAR
+      </button>
+
+      <!-- BOTÓN 2: DESCARGA DE ARCHIVO APK (SI LA TIENDA CONFIGURÓ UN LINK EXTERNO) -->
+      <a id="btn-custom-apk" href="#" target="_blank" class="hidden" style="background:#1e1b4b; border:1px solid #818cf8; color:#c7d2fe; display:block; width:100%; padding:11px; border-radius:10px; font-weight:800; font-size:13px; text-decoration:none; margin-bottom:12px;">
+        📥 Descargar archivo .APK directo
+      </a>
+
+      <div style="background:#090c14; border:1px solid #1c2235; border-radius:10px; padding:12px; text-align:left; font-size:12px; color:#cbd5e1; line-height:1.6;">
+        <b>💡 Si no se abre la instalación automática:</b><br>
+        1. Toca los tres puntos (<b>⋮</b>) de tu navegador Chrome.<br>
+        2. Selecciona <b>"Agregar a pantalla principal"</b> o <b>"Instalar aplicación"</b>.<br>
+        3. ¡Listo! Se creará el icono oficial en tu teléfono.
+      </div>
+    </div>
+  </div>
+
   <script>
     let tiendaActiva = null;
     let revendedorInfo = null;
@@ -435,6 +487,45 @@
     let comboTipoCantidad = 2;
     let comboPorcentajeDesc = 10;
     let comboSeleccionados = [];
+
+    // REGISTRO DE SERVICE WORKER
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/sw.js').catch(() => {});
+      });
+    }
+
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      deferredPrompt = e;
+    });
+
+    function abrirModalInstalacionAPK() {
+      if (tiendaActiva && tiendaActiva.apkUrl) {
+        const btnApk = document.getElementById('btn-custom-apk');
+        btnApk.href = tiendaActiva.apkUrl;
+        btnApk.classList.remove('hidden');
+      }
+      document.getElementById('modal-descargar-apk').classList.remove('hidden');
+    }
+
+    function cerrarModalAPK() {
+      document.getElementById('modal-descargar-apk').classList.add('hidden');
+    }
+
+    function ejecutarInstalacionPWA() {
+      if (deferredPrompt) {
+        deferredPrompt.prompt();
+        deferredPrompt.userChoice.then((choiceResult) => {
+          if (choiceResult.outcome === 'accepted') {
+            cerrarModalAPK();
+          }
+          deferredPrompt = null;
+        });
+      } else {
+        alert("Para instalar en tu teléfono:\n\n1. Toca el menú (⋮) arriba a la derecha de tu navegador Chrome.\n2. Presiona 'Instalar aplicación' o 'Agregar a la pantalla principal'.\n\n¡Se instalará con su icono oficial en segundos!");
+      }
+    }
 
     const COMBOS_DEFAULT = [
       {
@@ -506,7 +597,6 @@
 
         revendedorInfo = revendedores[tiendaSlug] || null;
 
-        // VERIFICACIÓN DE VENCIMIENTO Y SUSPENSIÓN SAAS
         if (revendedorInfo) {
           const diasRestantes = calcularDias(revendedorInfo.vencimiento);
           if (revendedorInfo.activo === false || diasRestantes <= 0) {
@@ -881,15 +971,6 @@
       }).catch(err => {
         alert("Número: " + numero);
       });
-    }
-
-    function instalarApp() {
-      if (deferredPrompt) {
-        deferredPrompt.prompt();
-        deferredPrompt = null;
-      } else {
-        alert('Toca los tres puntos (⋮) del navegador y selecciona "Instalar aplicación".');
-      }
     }
 
     cargarTienda();
