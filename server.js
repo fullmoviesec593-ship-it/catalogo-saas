@@ -15,35 +15,37 @@ app.use(express.static(path.join(__dirname, '.')));
 let dbFirestore = null;
 try {
   const admin = require('firebase-admin');
-  if (process.env.FIREBASE_SERVICE_ACCOUNT) {
-    let serviceAccount;
-    try {
-      serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
-    } catch (parseErr) {
-      console.error('❌ Error al parsear FIREBASE_SERVICE_ACCOUNT JSON:', parseErr.message);
-    }
-
-    if (serviceAccount && !admin.apps.length) {
-      admin.initializeApp({
-        credential: admin.credential.cert(serviceAccount)
-      });
-      dbFirestore = admin.firestore();
-      console.log('✅ [FIRESTORE CONECTADO]: Los datos se guardan permanentemente en la nube de Google.');
-    }
+  
+  // 1. Ruta oficial de Secret Files en Render
+  const secretPath = '/etc/secrets/firebase-key.json';
+  
+  if (fs.existsSync(secretPath) && !admin.apps.length) {
+    const serviceAccount = require(secretPath);
+    admin.initializeApp({
+      credential: admin.credential.cert(serviceAccount)
+    });
+    dbFirestore = admin.firestore();
+    console.log('✅ [FIRESTORE CONECTADO VÍA SECRET FILE EN RENDER]');
   } else if (fs.existsSync('./firebase-key.json') && !admin.apps.length) {
     const serviceAccount = require('./firebase-key.json');
     admin.initializeApp({
       credential: admin.credential.cert(serviceAccount)
     });
     dbFirestore = admin.firestore();
-    console.log('✅ [FIRESTORE CONECTADO VÍA ARCHIVO]: firebase-key.json activo.');
+    console.log('✅ [FIRESTORE CONECTADO VÍA LOCAL]');
+  } else if (process.env.FIREBASE_SERVICE_ACCOUNT && !admin.apps.length) {
+    let creds = process.env.FIREBASE_SERVICE_ACCOUNT;
+    if (typeof creds === 'string') {
+      creds = JSON.parse(creds);
+    }
+    admin.initializeApp({
+      credential: admin.credential.cert(creds)
+    });
+    dbFirestore = admin.firestore();
+    console.log('✅ [FIRESTORE CONECTADO VÍA ENV VAR]');
   }
 } catch (e) {
-  console.error('⚠️ [ALERTA] Error iniciando Firebase Admin:', e.message);
-}
-
-if (!dbFirestore) {
-  console.warn('⚠️ [ATENCIÓN] Firestore NO está conectado. Si estás en Render, asegúrate de configurar la Environment Variable FIREBASE_SERVICE_ACCOUNT.');
+  console.error('❌ Error iniciando Firebase Admin:', e.message);
 }
 
 const LOCAL_DB_PATH = path.join(__dirname, 'database.json');
@@ -57,12 +59,10 @@ function leerDBLocal() {
 function guardarDBLocal(data) {
   try {
     fs.writeFileSync(LOCAL_DB_PATH, JSON.stringify(data, null, 2));
-  } catch (e) {
-    console.error('Error guardando en archivo local:', e.message);
-  }
+  } catch (e) {}
 }
 
-// ESTADO DEL SERVIDOR Y FIRESTORE
+// ESTADO DE CONEXIÓN
 app.get('/api/status', (req, res) => {
   res.json({
     firestoreConectado: !!dbFirestore,
@@ -70,7 +70,7 @@ app.get('/api/status', (req, res) => {
   });
 });
 
-// OBTENER BASE DE DATOS COMPLETA
+// OBTENER TODOS LOS DATOS
 app.get('/api/db', async (req, res) => {
   try {
     if (dbFirestore) {
@@ -82,18 +82,16 @@ app.get('/api/db', async (req, res) => {
       const tiendas = {};
       snapTiendas.forEach(doc => { tiendas[doc.id] = doc.data(); });
 
-      // Respaldar en copia local por si acaso
       guardarDBLocal({ revendedores, tiendas });
-
       return res.json({ revendedores, tiendas, firestore: true });
     }
   } catch (e) {
-    console.error('❌ Error leyendo Firestore /api/db:', e.message);
+    console.error('Error leyendo Firestore:', e.message);
   }
   return res.json({ ...leerDBLocal(), firestore: false });
 });
 
-// GUARDAR / ACTUALIZAR TIENDA
+// GUARDAR TIENDA (PERSISTENCIA TOTAL)
 app.post('/api/tienda/guardar', async (req, res) => {
   try {
     const { slug, tienda } = req.body;
@@ -112,12 +110,11 @@ app.post('/api/tienda/guardar', async (req, res) => {
 
     return res.json({ success: true, guardadoNube });
   } catch (err) {
-    console.error('Error en /api/tienda/guardar:', err.message);
     return res.status(500).json({ error: err.message });
   }
 });
 
-// GUARDAR / ACTUALIZAR REVENDEDOR
+// GUARDAR REVENDEDOR
 app.post('/api/revendedor/guardar', async (req, res) => {
   try {
     const { slug, revendedor, tienda } = req.body;
@@ -143,7 +140,6 @@ app.post('/api/revendedor/guardar', async (req, res) => {
 
     return res.json({ success: true, guardadoNube });
   } catch (err) {
-    console.error('Error en /api/revendedor/guardar:', err.message);
     return res.status(500).json({ error: err.message });
   }
 });
@@ -169,26 +165,6 @@ app.post('/api/revendedor/eliminar', async (req, res) => {
   }
 });
 
-// DESCARGAR BACKUP EN JSON DIRECTO
-app.get('/api/backup', async (req, res) => {
-  try {
-    if (dbFirestore) {
-      const snapRev = await dbFirestore.collection('saas_revendedores').get();
-      const revendedores = {};
-      snapRev.forEach(doc => { revendedores[doc.id] = doc.data(); });
-
-      const snapTiendas = await dbFirestore.collection('saas_tiendas').get();
-      const tiendas = {};
-      snapTiendas.forEach(doc => { tiendas[doc.id] = doc.data(); });
-
-      res.setHeader('Content-disposition', 'attachment; filename=backup-saas-' + Date.now() + '.json');
-      res.setHeader('Content-type', 'application/json');
-      return res.send(JSON.stringify({ revendedores, tiendas }, null, 2));
-    }
-  } catch (e) {}
-  res.json(leerDBLocal());
-});
-
 app.listen(PORT, () => {
-  console.log(`🚀 Servidor SaaS en ejecución permanente en el puerto ${PORT}`);
+  console.log(`🚀 Servidor SaaS ejecutándose en puerto ${PORT}`);
 });
