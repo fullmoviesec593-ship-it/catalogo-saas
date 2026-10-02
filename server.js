@@ -2,6 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const path = require('path');
 const fs = require('fs');
+const { Firestore } = require('@google-cloud/firestore');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -11,42 +12,53 @@ app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ limit: '50mb', extended: true }));
 app.use(express.static(path.join(__dirname, '.')));
 
-// CONEXIÓN DIRECTA Y ROBUSTA A FIRESTORE
+// CLIENTE NATIVO DIRECTO DE FIRESTORE
 let dbFirestore = null;
 let errorDiagnostico = null;
 
 try {
-  const admin = require('firebase-admin');
-  
+  let creds = null;
   if (fs.existsSync('./firebase-config.js')) {
-    const creds = require('./firebase-config.js');
-    
-    // Verificación segura de inicialización sin evaluar .length de undefined
-    const appsActivas = admin.apps || [];
-    const appFirebase = appsActivas.length > 0 
-      ? appsActivas[0] 
-      : admin.initializeApp({
-          credential: admin.credential.cert(creds)
-        });
+    creds = require('./firebase-config.js');
+  }
 
-    dbFirestore = admin.firestore(appFirebase);
-    console.log('✅ FIRESTORE CONECTADO EXITOSAMENTE');
+  if (creds && creds.project_id && creds.client_email && creds.private_key) {
+    dbFirestore = new Firestore({
+      projectId: creds.project_id,
+      credentials: {
+        client_email: creds.client_email,
+        private_key: creds.private_key
+      }
+    });
+    console.log('✅ FIRESTORE NATIVO CONECTADO');
   } else {
-    errorDiagnostico = 'No se encontró el archivo firebase-config.js';
+    errorDiagnostico = 'Las credenciales en firebase-config.js están incompletas o no existen.';
   }
 } catch (e) {
   errorDiagnostico = e.message;
-  console.error('Error cargando Firebase:', e);
+  console.error('Error al inicializar Firestore:', e);
 }
 
-app.get('/api/status', (req, res) => {
+// ESTADO DE CONEXIÓN
+app.get('/api/status', async (req, res) => {
+  let pruebaEscritura = false;
+  if (dbFirestore) {
+    try {
+      await dbFirestore.collection('_test').doc('ping').set({ ok: true, t: Date.now() });
+      pruebaEscritura = true;
+    } catch (err) {
+      errorDiagnostico = 'Fallo de acceso a la base de datos: ' + err.message;
+    }
+  }
+
   res.json({
-    firestoreConectado: !!dbFirestore,
-    diagnostico: dbFirestore ? "Conectado y protegido" : errorDiagnostico,
+    firestoreConectado: !!dbFirestore && pruebaEscritura,
+    diagnostico: (dbFirestore && pruebaEscritura) ? "Conectado y escribiendo con éxito en Google Cloud" : errorDiagnostico,
     timestamp: new Date().toISOString()
   });
 });
 
+// BASE LOCAL DE RESPALDO
 const LOCAL_DB_PATH = path.join(__dirname, 'database.json');
 function leerDBLocal() {
   if (fs.existsSync(LOCAL_DB_PATH)) {
@@ -59,6 +71,7 @@ function guardarDBLocal(data) {
   try { fs.writeFileSync(LOCAL_DB_PATH, JSON.stringify(data, null, 2)); } catch (e) {}
 }
 
+// OBTENER BASE DE DATOS
 app.get('/api/db', async (req, res) => {
   try {
     if (dbFirestore) {
@@ -74,11 +87,12 @@ app.get('/api/db', async (req, res) => {
       return res.json({ revendedores, tiendas, firestore: true });
     }
   } catch (e) {
-    console.error('Error Firestore /api/db:', e);
+    console.error('Error leyendo Firestore:', e);
   }
   return res.json({ ...leerDBLocal(), firestore: false });
 });
 
+// GUARDAR TIENDA
 app.post('/api/tienda/guardar', async (req, res) => {
   try {
     const { slug, tienda } = req.body;
@@ -101,6 +115,7 @@ app.post('/api/tienda/guardar', async (req, res) => {
   }
 });
 
+// GUARDAR REVENDEDOR
 app.post('/api/revendedor/guardar', async (req, res) => {
   try {
     const { slug, revendedor, tienda } = req.body;
@@ -130,6 +145,7 @@ app.post('/api/revendedor/guardar', async (req, res) => {
   }
 });
 
+// ELIMINAR REVENDEDOR
 app.post('/api/revendedor/eliminar', async (req, res) => {
   try {
     const { slug } = req.body;
