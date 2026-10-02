@@ -11,19 +11,28 @@ app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ limit: '50mb', extended: true }));
 app.use(express.static(path.join(__dirname, '.')));
 
-// CONEXIÓN DIRECTA A FIRESTORE
+// CONEXIÓN DIRECTA Y ROBUSTA A FIRESTORE
 let dbFirestore = null;
 let errorDiagnostico = null;
 
 try {
   const admin = require('firebase-admin');
-  if (fs.existsSync('./firebase-config.js') && !admin.apps.length) {
+  
+  if (fs.existsSync('./firebase-config.js')) {
     const creds = require('./firebase-config.js');
-    admin.initializeApp({
-      credential: admin.credential.cert(creds)
-    });
-    dbFirestore = admin.firestore();
-    console.log('✅ FIRESTORE CONECTADO Y BLINDADO');
+    
+    // Verificación segura de inicialización sin evaluar .length de undefined
+    const appsActivas = admin.apps || [];
+    const appFirebase = appsActivas.length > 0 
+      ? appsActivas[0] 
+      : admin.initializeApp({
+          credential: admin.credential.cert(creds)
+        });
+
+    dbFirestore = admin.firestore(appFirebase);
+    console.log('✅ FIRESTORE CONECTADO EXITOSAMENTE');
+  } else {
+    errorDiagnostico = 'No se encontró el archivo firebase-config.js';
   }
 } catch (e) {
   errorDiagnostico = e.message;
