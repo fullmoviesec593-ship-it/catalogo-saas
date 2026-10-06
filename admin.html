@@ -219,6 +219,11 @@
           </select>
         </div>
 
+        <div class="form-group">
+          <label>Link Directo de Descarga APK (Opcional - Google Drive / MediaFire)</label>
+          <input type="text" id="shop-apk" placeholder="https://mi-link-de-descarga.com/app.apk">
+        </div>
+
         <div class="form-group" style="background:#111625; padding:12px; border-radius:10px; border:1px solid #1e293b;">
           <label style="color:#fff; margin-bottom:8px;">Color / Tema Visual de tu Marca</label>
           <input type="hidden" id="shop-tema" value="orange">
@@ -479,32 +484,15 @@
     let tempComboImgs = [null, null, null];
 
     const COMBOS_DEFAULT = [
-      {
-        activo: true, comboCantidad: 2, descuento: 10,
-        nombre: "Combo Dúo (2 Servicios)", sub: "A tu elección · 10% OFF",
-        img: "https://images.unsplash.com/photo-1578328819058-b69f3a3b0f6b?w=600"
-      },
-      {
-        activo: true, comboCantidad: 3, descuento: 10,
-        nombre: "Combo Trío (3 Servicios)", sub: "A tu elección · 10% OFF",
-        img: "https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=600"
-      },
-      {
-        activo: true, comboCantidad: 4, descuento: 10,
-        nombre: "Combo Cuádruple (4 Servicios)", sub: "A tu elección · 10% OFF",
-        img: "https://images.unsplash.com/photo-1594909122845-11baa439b7bf?w=600"
-      }
+      { activo: true, comboCantidad: 2, descuento: 10, nombre: "Combo Dúo (2 Servicios)", sub: "A tu elección · 10% OFF", img: "https://images.unsplash.com/photo-1578328819058-b69f3a3b0f6b?w=600" },
+      { activo: true, comboCantidad: 3, descuento: 10, nombre: "Combo Trío (3 Servicios)", sub: "A tu elección · 10% OFF", img: "https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=600" },
+      { activo: true, comboCantidad: 4, descuento: 10, nombre: "Combo Cuádruple (4 Servicios)", sub: "A tu elección · 10% OFF", img: "https://images.unsplash.com/photo-1594909122845-11baa439b7bf?w=600" }
     ];
 
     function togglePasswordVisibility(inputId, btn) {
       const input = document.getElementById(inputId);
-      if (input.type === 'password') {
-        input.type = 'text';
-        btn.innerText = '🙈';
-      } else {
-        input.type = 'password';
-        btn.innerText = '👁️';
-      }
+      input.type = input.type === 'password' ? 'text' : 'password';
+      btn.innerText = input.type === 'password' ? '👁️' : '🙈';
     }
 
     function toggleCheckbox(id) {
@@ -535,13 +523,13 @@
       const dias = calcularDias(revendedorActual.vencimiento);
       if (revendedorActual.activo === false || dias <= 0) {
         tag.className = 'badge-dias red';
-        tag.innerText = dias <= 0 ? `⛔ SERVICIO VENCIDO (${Math.abs(dias)}d)` : '⛔ CUENTA SUSPENDIDA';
+        tag.innerText = dias <= 0 ? `⛔ VENCIDO (${Math.abs(dias)}d)` : '⛔ SUSPENDIDA';
       } else if (dias <= 5) {
         tag.className = 'badge-dias yellow';
-        tag.innerText = `⏳ TE QUEDAN ${dias} DÍAS`;
+        tag.innerText = `⏳ QUEDAN ${dias} DÍAS`;
       } else {
         tag.className = 'badge-dias green';
-        tag.innerText = `✨ TE QUEDAN ${dias} DÍAS`;
+        tag.innerText = `✨ QUEDAN ${dias} DÍAS`;
       }
     }
 
@@ -573,6 +561,7 @@
           }
 
           tiendaActual = (db.tiendas && db.tiendas[slugActual]) ? db.tiendas[slugActual] : {};
+          if (!Array.isArray(tiendaActual.productos)) tiendaActual.productos = [];
 
           document.getElementById('login-section').classList.add('hidden');
           document.getElementById('recovery-section').classList.add('hidden');
@@ -665,6 +654,7 @@
       document.getElementById('shop-nombre').value = tiendaActual.nombre || revendedorActual.nombre || '';
       document.getElementById('shop-whatsapp').value = tiendaActual.whatsapp || revendedorActual.whatsapp || '';
       document.getElementById('shop-payments').value = tiendaActual.metodosPago || '';
+      document.getElementById('shop-apk').value = tiendaActual.apkUrl || '';
 
       seleccionarTema(tiendaActual.tema || 'orange');
       document.getElementById('shop-status-online').value = tiendaActual.estadoAtencion || 'online';
@@ -764,8 +754,13 @@
       const tag = document.getElementById('prod-tag').value.trim();
       const rawFeatures = document.getElementById('prod-features').value.trim();
 
+      if (!slugActual) {
+        alert('Sesión no válida. Por favor, recarga y vuelve a iniciar sesión.');
+        return;
+      }
+
       if (!nombre || !precio) {
-        alert('Nombre y precio son obligatorios.');
+        alert('El nombre y el precio son obligatorios.');
         return;
       }
 
@@ -776,7 +771,7 @@
       const sub = `1 mes · ${categoria.charAt(0).toUpperCase() + categoria.slice(1)}`;
       const img = tempImgBase64 || (idx >= 0 && tiendaActual.productos[idx].img) || 'https://images.unsplash.com/photo-1522869635100-9f4c5e86aa37?w=500';
 
-      if (!tiendaActual.productos) tiendaActual.productos = [];
+      if (!Array.isArray(tiendaActual.productos)) tiendaActual.productos = [];
       const nuevoObj = { nombre, sub, categoria, tag, precio, features, img };
 
       if (idx >= 0) {
@@ -790,7 +785,7 @@
       btn.innerText = "AGREGAR / ACTUALIZAR SERVICIO";
 
       if (ok) {
-        alert('¡Servicio guardado exitosamente en Firestore!');
+        alert('✅ ¡Servicio guardado exitosamente en Firestore!');
         document.getElementById('prod-edit-idx').value = "-1";
         document.getElementById('prod-nombre').value = '';
         document.getElementById('prod-precio').value = '';
@@ -857,6 +852,7 @@
       const whatsapp = document.getElementById('shop-whatsapp').value.trim();
       const tema = document.getElementById('shop-tema').value;
       const estadoAtencion = document.getElementById('shop-status-online').value;
+      const apkUrl = document.getElementById('shop-apk').value.trim();
 
       if (!nombre || !whatsapp) {
         alert('Nombre y WhatsApp son obligatorios.');
@@ -866,7 +862,7 @@
       btn.disabled = true;
       btn.innerText = "⏳ GUARDANDO...";
 
-      const payload = { nombre, whatsapp, tema, estadoAtencion };
+      const payload = { nombre, whatsapp, tema, estadoAtencion, apkUrl };
       if (tempLogoBase64) payload.logo = tempLogoBase64;
 
       tiendaActual = { ...tiendaActual, ...payload };
@@ -918,6 +914,7 @@
       if (ok) alert('¡Métodos de pago guardados en Firestore!');
     }
 
+    // COMPRESIÓN SEGURA DE IMAGEN EN BASE64
     function convertirImagenABase64(input, previewId) {
       if (input.files && input.files[0]) {
         const file = input.files[0];
@@ -926,13 +923,15 @@
           const img = new Image();
           img.onload = function() {
             const canvas = document.createElement('canvas');
-            const MAX_WIDTH = 480;
-            const scaleSize = MAX_WIDTH / img.width;
-            canvas.width = (img.width > MAX_WIDTH) ? MAX_WIDTH : img.width;
-            canvas.height = (img.width > MAX_WIDTH) ? (img.height * scaleSize) : img.height;
+            const MAX_WIDTH = 480; 
+            const scaleSize = (img.width > MAX_WIDTH) ? (MAX_WIDTH / img.width) : 1;
+            canvas.width = img.width * scaleSize;
+            canvas.height = img.height * scaleSize;
+            
             const ctx = canvas.getContext('2d');
             ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-            const b64 = canvas.toDataURL('image/jpeg', 0.80);
+            // Calidad 0.70 para garantizar envío ligero a Firestore
+            const b64 = canvas.toDataURL('image/jpeg', 0.70); 
 
             const prev = document.getElementById(previewId);
             prev.src = b64;
@@ -951,6 +950,7 @@
     }
 
     async function persistirEnNube(datosParciales) {
+      if (!slugActual) return false;
       try {
         const res = await fetch('/api/tienda/guardar', {
           method: 'POST',
