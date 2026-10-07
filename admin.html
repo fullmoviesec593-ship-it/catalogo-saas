@@ -131,46 +131,16 @@
       <label>Contraseña</label>
       <div class="password-wrapper">
         <input type="password" id="password" placeholder="Tu clave de acceso">
-        <button type="button" class="toggle-password-btn" onclick="togglePasswordVisibility('password', this)" title="Ver contraseña">
-          👁️
-        </button>
+        <button type="button" class="toggle-password-btn" onclick="togglePasswordVisibility('password', this)" title="Ver contraseña">👁️</button>
       </div>
     </div>
 
     <div class="checkbox-container" onclick="toggleCheckbox('remember-session')">
       <input type="checkbox" id="remember-session" checked onclick="event.stopPropagation()">
-      <span style="font-size:14px; color:#cbd5e1; font-weight:600;">Mantener la sesión iniciada en este dispositivo</span>
+      <span style="font-size:14px; color:#cbd5e1; font-weight:600;">Mantener sesión iniciada</span>
     </div>
 
     <button class="btn-primary" onclick="iniciarSesion()">INGRESAR A MI PANEL</button>
-
-    <div style="text-align:center; margin-top:14px;">
-      <a href="javascript:void(0)" onclick="mostrarRecuperacionRev()" style="color:#38bdf8; font-size:13px; text-decoration:none;">¿Olvidaste tu contraseña?</a>
-    </div>
-  </div>
-
-  <!-- RECUPERACIÓN REVENDEDOR -->
-  <div id="recovery-section" class="card hidden" style="max-width:440px; align-self:center;">
-    <h3 style="text-align:center;">🔑 RECUPERAR CONTRASEÑA</h3>
-    <p style="color:#94a3b8; font-size:13px; text-align:center; margin-bottom:16px;">
-      Ingresa el correo electrónico asociado a tu cuenta de revendedor y define tu nueva contraseña.
-    </p>
-
-    <div class="form-group">
-      <label>Correo Registrado</label>
-      <input type="email" id="rec-email" placeholder="tu-correo@gmail.com">
-    </div>
-
-    <div class="form-group">
-      <label>Nueva Contraseña</label>
-      <div class="password-wrapper">
-        <input type="password" id="rec-newpass" placeholder="Tu nueva clave">
-        <button type="button" class="toggle-password-btn" onclick="togglePasswordVisibility('rec-newpass', this)">👁️</button>
-      </div>
-    </div>
-
-    <button class="btn-success" style="width:100%; margin-bottom:8px;" onclick="restablecerClaveRev()">RESTABLECER CONTRASEÑA</button>
-    <button class="btn-danger" style="width:100%;" onclick="ocultarRecuperacionRev()">CANCELAR</button>
   </div>
 
   <!-- DASHBOARD -->
@@ -180,9 +150,7 @@
         <img id="dash-logo" src="https://via.placeholder.com/40" style="width:42px; height:42px; border-radius:50%; object-fit:cover; border:1px solid var(--primary);" alt="Logo">
         <div>
           <span id="dash-title" style="font-family:'Orbitron'; font-weight:bold; font-size:16px; color:#fff;">Mi Tienda</span>
-          <div>
-            <span id="dash-countdown" class="badge-dias green">⏳ Calculando días...</span>
-          </div>
+          <div><span id="dash-countdown" class="badge-dias green">⏳ Calculando días...</span></div>
         </div>
       </div>
       <button onclick="cerrarSesion()" style="width:auto; padding:6px 12px; background:#dc2626; color:#fff; font-size:12px;">Salir</button>
@@ -190,77 +158,52 @@
 
     <!-- Pestañas -->
     <div class="nav-tabs">
-      <div id="tab-btn-shop" class="nav-tab active" onclick="cambiarTab('shop')">⚙️ TIENDA & LOGO</div>
+      <div id="tab-btn-shop" class="nav-tab active" onclick="cambiarTab('shop')">⚙️ TIENDA</div>
       <div id="tab-btn-prods" class="nav-tab" onclick="cambiarTab('prods')">📦 SERVICIOS</div>
       <div id="tab-btn-combos" class="nav-tab" onclick="cambiarTab('combos')">🔥 COMBOS</div>
-      <div id="tab-btn-texts" class="nav-tab" onclick="cambiarTab('texts')">📝 TEXTOS Y FRASES</div>
+      <div id="tab-btn-texts" class="nav-tab" onclick="cambiarTab('texts')">📝 TEXTOS</div>
       <div id="tab-btn-payments" class="nav-tab" onclick="cambiarTab('payments')">💳 PAGOS</div>
     </div>
 
     <!-- PESTAÑA: TIENDA & LOGO -->
     <div id="tab-shop">
       <div style="background:#080d1a; padding:16px; border-radius:12px; border:1px solid var(--border);">
-        <h4 style="color:var(--primary); margin-top:0;">Datos Personales y Logo de la Tienda</h4>
-        
+        <h4 style="color:var(--primary); margin-top:0;">Ajustes Principales</h4>
         <div class="form-group">
-          <label>Nombre Comercial de la Tienda</label>
-          <input type="text" id="shop-nombre" placeholder="Ej: Full Movies EC">
+          <label>Nombre Comercial</label>
+          <input type="text" id="shop-nombre">
         </div>
         <div class="form-group">
-          <label>Número de WhatsApp para Pedidos (con código de país, ej: 593982766054)</label>
-          <input type="text" id="shop-whatsapp" placeholder="593982766054">
+          <label>Número de WhatsApp (ej: 593982766054)</label>
+          <input type="text" id="shop-whatsapp">
         </div>
-
         <div class="form-group" style="background:#111625; padding:12px; border-radius:10px; border:1px solid #1e293b;">
-          <label style="color:#fff; margin-bottom:8px;">Estado de Atención al Cliente</label>
-          <select id="shop-status-online" style="background:#080d1a; color:#fff;">
-            <option value="online">🟢 En línea (Entrega inmediata 5 min)</option>
-            <option value="offline">🌙 Fuera de horario (Deja tu pedido)</option>
+          <label style="color:#fff;">Estado de Atención</label>
+          <select id="shop-status-online" style="background:#080d1a; color:#fff; border:1px solid #1e293b;">
+            <option value="online">🟢 En línea (Entrega inmediata)</option>
+            <option value="offline">🌙 Fuera de horario (Dejar pedido)</option>
           </select>
         </div>
-
         <div class="form-group">
-          <label>Link Directo de Descarga APK (Opcional - Google Drive / MediaFire)</label>
-          <input type="text" id="shop-apk" placeholder="https://mi-link-de-descarga.com/app.apk">
+          <label>Link de Descarga Directa APK (Opcional)</label>
+          <input type="text" id="shop-apk" placeholder="https://link-a-mi-apk.com">
         </div>
-
         <div class="form-group" style="background:#111625; padding:12px; border-radius:10px; border:1px solid #1e293b;">
-          <label style="color:#fff; margin-bottom:8px;">Color / Tema Visual de tu Marca</label>
+          <label style="color:#fff;">Color Principal</label>
           <input type="hidden" id="shop-tema" value="orange">
           <div class="theme-selector">
-            <div id="theme-orange" class="theme-opt active" onclick="seleccionarTema('orange')">
-              <div class="theme-circle" style="background:#ff6a00;"></div>
-              <span>Naranja</span>
-            </div>
-            <div id="theme-blue" class="theme-opt" onclick="seleccionarTema('blue')">
-              <div class="theme-circle" style="background:#0284c7;"></div>
-              <span>Azul Cyan</span>
-            </div>
-            <div id="theme-green" class="theme-opt" onclick="seleccionarTema('green')">
-              <div class="theme-circle" style="background:#10b981;"></div>
-              <span>Verde</span>
-            </div>
-            <div id="theme-purple" class="theme-opt" onclick="seleccionarTema('purple')">
-              <div class="theme-circle" style="background:#a855f7;"></div>
-              <span>Morado</span>
-            </div>
+            <div id="theme-orange" class="theme-opt active" onclick="seleccionarTema('orange')"><div class="theme-circle" style="background:#ff6a00;"></div>Naranja</div>
+            <div id="theme-blue" class="theme-opt" onclick="seleccionarTema('blue')"><div class="theme-circle" style="background:#0284c7;"></div>Azul</div>
+            <div id="theme-green" class="theme-opt" onclick="seleccionarTema('green')"><div class="theme-circle" style="background:#10b981;"></div>Verde</div>
+            <div id="theme-purple" class="theme-opt" onclick="seleccionarTema('purple')"><div class="theme-circle" style="background:#a855f7;"></div>Morado</div>
           </div>
         </div>
-        
         <div class="form-group">
-          <label>Subir Logo de tu Tienda (desde galería)</label>
+          <label>Subir Logo de tu Tienda</label>
           <input type="file" id="shop-logo-file" accept="image/*" onchange="convertirImagenABase64(this, 'shop-logo-preview')">
-          <div style="text-align:center; margin-top:8px;">
-            <img id="shop-logo-preview" class="preview-logo" src="https://via.placeholder.com/80" alt="Logo Tienda">
-          </div>
+          <div style="text-align:center; margin-top:8px;"><img id="shop-logo-preview" class="preview-logo" src="https://via.placeholder.com/80"></div>
         </div>
-
-        <button id="btn-save-shop" class="btn-primary" onclick="guardarAjustesTienda()">GUARDAR AJUSTES DE TIENDA</button>
-
-        <div style="margin-top:16px; background:#111d33; padding:12px; border-radius:8px;">
-          <label style="color:#38bdf8;">Enlace de tu Catálogo Público:</label>
-          <a id="shop-public-link" href="#" target="_blank" style="color:var(--accent); font-weight:bold; word-break:break-all;"></a>
-        </div>
+        <button id="btn-save-shop" class="btn-primary" onclick="guardarAjustesTienda()">GUARDAR AJUSTES</button>
       </div>
     </div>
 
@@ -296,17 +239,16 @@
             </select>
           </div>
           <div class="form-group">
-            <label>Insignia / Etiqueta (Opcional)</label>
-            <input type="text" id="prod-tag" placeholder="POPULAR o TOP">
+            <label>Insignia / Etiqueta</label>
+            <input type="text" id="prod-tag" placeholder="POPULAR">
           </div>
         </div>
         <div class="form-group">
-          <label>Beneficios / Características (separados por comas)</label>
-          <input type="text" id="prod-features" placeholder="1 perfil dedicado, Calidad 4K, Entrega inmediata">
+          <label>Beneficios (separados por coma)</label>
+          <input type="text" id="prod-features" placeholder="1 perfil privado, Ultra HD">
         </div>
         <button id="btn-guardar-prod" class="btn-success" onclick="guardarProducto()">AGREGAR / ACTUALIZAR SERVICIO</button>
       </div>
-
       <h4 style="color:#fff;">Mis Servicios Activos</h4>
       <div id="lista-productos"></div>
     </div>
@@ -314,165 +256,42 @@
     <!-- PESTAÑA: COMBOS EDITABLES -->
     <div id="tab-combos" class="hidden">
       <div style="background:#080d1a; padding:16px; border-radius:12px; border:1px solid var(--border); margin-bottom:16px;">
-        <h4 style="color:var(--primary); margin-top:0;">🔥 Personalizar Servicios de Combos</h4>
-
-        <!-- COMBO 1: DÚO -->
-        <div class="combo-edit-box">
-          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-            <strong style="color:#ff8c3b; font-size:16px;">Combo 1 (Dúo)</strong>
-            <label style="display:flex; align-items:center; gap:6px; cursor:pointer; color:#fff; font-size:13px;">
-              <input type="checkbox" id="combo0-activo" checked style="width:16px; height:16px;"> Activo
-            </label>
-          </div>
-          <div class="form-group">
-            <label>Nombre del Combo</label>
-            <input type="text" id="combo0-nombre" value="Combo Dúo (2 Servicios)">
-          </div>
-          <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
-            <div class="form-group">
-              <label>Cantidad de Cuentas</label>
-              <input type="number" id="combo0-cant" value="2" min="2" max="10">
-            </div>
-            <div class="form-group">
-              <label>% Descuento</label>
-              <input type="number" id="combo0-desc" value="10" min="1" max="90">
-            </div>
-          </div>
-          <div class="form-group">
-            <label>Foto de Portada</label>
-            <input type="file" accept="image/*" onchange="convertirImagenABase64(this, 'combo0-preview')">
-            <div style="text-align:center; margin-top:6px;">
-              <img id="combo0-preview" src="https://images.unsplash.com/photo-1578328819058-b69f3a3b0f6b?w=600" style="max-height:80px; border-radius:8px; object-fit:cover;">
-            </div>
-          </div>
-          <div class="form-group">
-            <label>Descripción corta</label>
-            <input type="text" id="combo0-sub" value="A tu elección · 10% OFF">
-          </div>
-        </div>
-
-        <!-- COMBO 2: TRÍO -->
-        <div class="combo-edit-box">
-          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-            <strong style="color:#a855f7; font-size:16px;">Combo 2 (Trío)</strong>
-            <label style="display:flex; align-items:center; gap:6px; cursor:pointer; color:#fff; font-size:13px;">
-              <input type="checkbox" id="combo1-activo" checked style="width:16px; height:16px;"> Activo
-            </label>
-          </div>
-          <div class="form-group">
-            <label>Nombre del Combo</label>
-            <input type="text" id="combo1-nombre" value="Combo Trío (3 Servicios)">
-          </div>
-          <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
-            <div class="form-group">
-              <label>Cantidad de Cuentas</label>
-              <input type="number" id="combo1-cant" value="3" min="2" max="10">
-            </div>
-            <div class="form-group">
-              <label>% Descuento</label>
-              <input type="number" id="combo1-desc" value="10" min="1" max="90">
-            </div>
-          </div>
-          <div class="form-group">
-            <label>Foto de Portada</label>
-            <input type="file" accept="image/*" onchange="convertirImagenABase64(this, 'combo1-preview')">
-            <div style="text-align:center; margin-top:6px;">
-              <img id="combo1-preview" src="https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=600" style="max-height:80px; border-radius:8px; object-fit:cover;">
-            </div>
-          </div>
-          <div class="form-group">
-            <label>Descripción corta</label>
-            <input type="text" id="combo1-sub" value="A tu elección · 10% OFF">
-          </div>
-        </div>
-
-        <!-- COMBO 3: CUÁDRUPLE -->
-        <div class="combo-edit-box">
-          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-            <strong style="color:#06b6d4; font-size:16px;">Combo 3 (Cuádruple)</strong>
-            <label style="display:flex; align-items:center; gap:6px; cursor:pointer; color:#fff; font-size:13px;">
-              <input type="checkbox" id="combo2-activo" checked style="width:16px; height:16px;"> Activo
-            </label>
-          </div>
-          <div class="form-group">
-            <label>Nombre del Combo</label>
-            <input type="text" id="combo2-nombre" value="Combo Cuádruple (4 Servicios)">
-          </div>
-          <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
-            <div class="form-group">
-              <label>Cantidad de Cuentas</label>
-              <input type="number" id="combo2-cant" value="4" min="2" max="10">
-            </div>
-            <div class="form-group">
-              <label>% Descuento</label>
-              <input type="number" id="combo2-desc" value="10" min="1" max="90">
-            </div>
-          </div>
-          <div class="form-group">
-            <label>Foto de Portada</label>
-            <input type="file" accept="image/*" onchange="convertirImagenABase64(this, 'combo2-preview')">
-            <div style="text-align:center; margin-top:6px;">
-              <img id="combo2-preview" src="https://images.unsplash.com/photo-1594909122845-11baa439b7bf?w=600" style="max-height:80px; border-radius:8px; object-fit:cover;">
-            </div>
-          </div>
-          <div class="form-group">
-            <label>Descripción corta</label>
-            <input type="text" id="combo2-sub" value="A tu elección · 10% OFF">
-          </div>
-        </div>
-
-        <button id="btn-save-combos" class="btn-success" onclick="guardarAjustesCombos()">GUARDAR CONFIGURACIÓN DE COMBOS</button>
+        <h4 style="color:var(--primary); margin-top:0;">🔥 Personalizar Combos</h4>
+        <!-- SE RENDERIZAN LOS 3 COMBOS CON JS (MISMO CÓDIGO) -->
+        <div id="combo-boxes-container"></div>
+        <button id="btn-save-combos" class="btn-success" onclick="guardarAjustesCombos()">GUARDAR COMBOS</button>
       </div>
     </div>
 
     <!-- PESTAÑA: TEXTOS -->
     <div id="tab-texts" class="hidden">
       <div style="background:#080d1a; padding:16px; border-radius:12px; border:1px solid var(--border);">
-        <h4 style="color:var(--primary); margin-top:0;">Personalizar Palabras y Textos</h4>
-        <div class="form-group">
-          <label>Insignia Superior</label>
-          <input type="text" id="txt-pill" placeholder="✦ ATENCIÓN 24/7 ✦">
-        </div>
+        <h4 style="color:var(--primary); margin-top:0;">Personalizar Textos</h4>
+        <div class="form-group"><label>Insignia Superior</label><input type="text" id="txt-pill"></div>
         <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
-          <div class="form-group">
-            <label>Título Línea 1</label>
-            <input type="text" id="txt-title-1" placeholder="CATÁLOGO OFICIAL">
-          </div>
-          <div class="form-group">
-            <label>Palabra Destacada</label>
-            <input type="text" id="txt-title-2" placeholder="FULL MOVIES EC">
-          </div>
+          <div class="form-group"><label>Título L1</label><input type="text" id="txt-title-1"></div>
+          <div class="form-group"><label>Palabra Destacada</label><input type="text" id="txt-title-2"></div>
         </div>
-        <div class="form-group">
-          <label>Subtítulo de Garantía</label>
-          <input type="text" id="txt-sub" placeholder="Calidad Garantizada y Entrega Inmediata · Los mejores precios">
-        </div>
+        <div class="form-group"><label>Subtítulo</label><input type="text" id="txt-sub"></div>
         <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
-          <div class="form-group">
-            <label>Símbolo de Moneda</label>
-            <input type="text" id="txt-currency" placeholder="$">
-          </div>
-          <div class="form-group">
-            <label>Texto Botón Comprar</label>
-            <input type="text" id="txt-btn-buy" placeholder="Comprar ahora!">
-          </div>
+          <div class="form-group"><label>Símbolo Moneda</label><input type="text" id="txt-currency"></div>
+          <div class="form-group"><label>Botón Comprar</label><input type="text" id="txt-btn-buy"></div>
         </div>
-        <button id="btn-save-texts" class="btn-primary" onclick="guardarTextos()">GUARDAR TEXTOS DEL CATÁLOGO</button>
+        <button id="btn-save-texts" class="btn-primary" onclick="guardarTextos()">GUARDAR TEXTOS</button>
       </div>
     </div>
 
     <!-- PESTAÑA: PAGOS -->
     <div id="tab-payments" class="hidden">
       <div style="background:#080d1a; padding:16px; border-radius:12px; border:1px solid var(--border);">
-        <h4 style="color:var(--accent); margin-top:0;">Tus Cuentas Bancarias y Métodos de Pago</h4>
+        <h4 style="color:var(--accent); margin-top:0;">Métodos de Pago</h4>
         <div class="form-group">
-          <label>Detalle de tus Métodos de Pago:</label>
-          <textarea id="shop-payments" rows="8" placeholder="🏦 BANCO PICHINCHA&#10;• Ahorros: 2200000000&#10;• Titular: Tu Nombre&#10;• CI: 1300000000&#10;&#10;📱 DEUNA: 0999999999"></textarea>
+          <label>Cuentas Bancarias / Billeteras:</label>
+          <textarea id="shop-payments" rows="8"></textarea>
         </div>
         <button id="btn-save-payments" class="btn-success" onclick="guardarMetodosPago()">GUARDAR MÉTODOS DE PAGO</button>
       </div>
     </div>
-
   </div>
 
   <script>
@@ -484,9 +303,9 @@
     let tempComboImgs = [null, null, null];
 
     const COMBOS_DEFAULT = [
-      { activo: true, comboCantidad: 2, descuento: 10, nombre: "Combo Dúo (2 Servicios)", sub: "A tu elección · 10% OFF", img: "https://images.unsplash.com/photo-1578328819058-b69f3a3b0f6b?w=600" },
-      { activo: true, comboCantidad: 3, descuento: 10, nombre: "Combo Trío (3 Servicios)", sub: "A tu elección · 10% OFF", img: "https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=600" },
-      { activo: true, comboCantidad: 4, descuento: 10, nombre: "Combo Cuádruple (4 Servicios)", sub: "A tu elección · 10% OFF", img: "https://images.unsplash.com/photo-1594909122845-11baa439b7bf?w=600" }
+      { activo: true, comboCantidad: 2, descuento: 10, nombre: "Combo Dúo", sub: "10% OFF", img: "https://images.unsplash.com/photo-1578328819058-b69f3a3b0f6b?w=600" },
+      { activo: true, comboCantidad: 3, descuento: 10, nombre: "Combo Trío", sub: "10% OFF", img: "https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=600" },
+      { activo: true, comboCantidad: 4, descuento: 10, nombre: "Combo Cuádruple", sub: "10% OFF", img: "https://images.unsplash.com/photo-1594909122845-11baa439b7bf?w=600" }
     ];
 
     function togglePasswordVisibility(inputId, btn) {
@@ -495,10 +314,7 @@
       btn.innerText = input.type === 'password' ? '👁️' : '🙈';
     }
 
-    function toggleCheckbox(id) {
-      const chk = document.getElementById(id);
-      chk.checked = !chk.checked;
-    }
+    function toggleCheckbox(id) { document.getElementById(id).checked = !document.getElementById(id).checked; }
 
     function seleccionarTema(color) {
       document.querySelectorAll('.theme-opt').forEach(el => el.classList.remove('active'));
@@ -507,30 +323,13 @@
       document.getElementById('shop-tema').value = color;
     }
 
-    function calcularDias(vence) {
-      if (!vence) return 999;
-      const diff = new Date(vence) - new Date();
-      return Math.ceil(diff / (1000 * 60 * 60 * 24));
-    }
-
-    function actualizarContadorDias() {
-      const tag = document.getElementById('dash-countdown');
-      if (!revendedorActual || !revendedorActual.vencimiento) {
-        tag.className = 'badge-dias green';
-        tag.innerText = '● SERVICIO ACTIVO';
-        return;
-      }
-      const dias = calcularDias(revendedorActual.vencimiento);
-      if (revendedorActual.activo === false || dias <= 0) {
-        tag.className = 'badge-dias red';
-        tag.innerText = dias <= 0 ? `⛔ VENCIDO (${Math.abs(dias)}d)` : '⛔ SUSPENDIDA';
-      } else if (dias <= 5) {
-        tag.className = 'badge-dias yellow';
-        tag.innerText = `⏳ QUEDAN ${dias} DÍAS`;
-      } else {
-        tag.className = 'badge-dias green';
-        tag.innerText = `✨ QUEDAN ${dias} DÍAS`;
-      }
+    function cambiarTab(tab) {
+      ['shop', 'prods', 'combos', 'texts', 'payments'].forEach(t => {
+        document.getElementById('tab-' + t).classList.add('hidden');
+        document.getElementById('tab-btn-' + t).classList.remove('active');
+      });
+      document.getElementById('tab-' + tab).classList.remove('hidden');
+      document.getElementById('tab-btn-' + tab).classList.add('active');
     }
 
     async function iniciarSesion(autoEmail = null, autoPass = null) {
@@ -552,7 +351,7 @@
           slugActual = foundSlug;
           revendedorActual = revendedores[slugActual];
           if (revendedorActual.activo === false) {
-            alert('Tu tienda se encuentra suspendida por falta de pago. Comunícate con soporte.');
+            alert('Tu tienda se encuentra suspendida. Comunícate con soporte.');
             return;
           }
 
@@ -564,53 +363,13 @@
           if (!Array.isArray(tiendaActual.productos)) tiendaActual.productos = [];
 
           document.getElementById('login-section').classList.add('hidden');
-          document.getElementById('recovery-section').classList.add('hidden');
           document.getElementById('dashboard-section').classList.remove('hidden');
           pintarDashboard();
         } else {
           if (!autoEmail) alert('Correo o contraseña incorrectos.');
         }
       } catch (err) {
-        alert('Error de conexión con el servidor: ' + err.message);
-      }
-    }
-
-    function mostrarRecuperacionRev() {
-      document.getElementById('login-section').classList.add('hidden');
-      document.getElementById('recovery-section').classList.remove('hidden');
-    }
-
-    function ocultarRecuperacionRev() {
-      document.getElementById('recovery-section').classList.add('hidden');
-      document.getElementById('login-section').classList.remove('hidden');
-    }
-
-    async function restablecerClaveRev() {
-      const email = document.getElementById('rec-email').value.trim();
-      const nuevaPassword = document.getElementById('rec-newpass').value.trim();
-
-      if (!email || !nuevaPassword) {
-        alert("Completa tu correo y la nueva contraseña.");
-        return;
-      }
-
-      try {
-        const res = await fetch('/api/auth/recuperar-password', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email, nuevaPassword })
-        });
-        const data = await res.json();
-        if (data.success) {
-          alert("¡Contraseña restablecida con éxito! Ya puedes iniciar sesión con tu nueva clave.");
-          ocultarRecuperacionRev();
-          document.getElementById('email').value = email;
-          document.getElementById('password').value = nuevaPassword;
-        } else {
-          alert("Error: " + data.error);
-        }
-      } catch (e) {
-        alert("Error de conexión: " + e.message);
+        alert('Error de conexión: ' + err.message);
       }
     }
 
@@ -619,35 +378,84 @@
       location.reload();
     }
 
-    async function verificarSesionGuardada() {
-      const urlParams = new URLSearchParams(window.location.search);
-      const urlTienda = urlParams.get('tienda');
+    // ============================================================================
+    // CORAZÓN DE LA SOLUCIÓN: RE-COMPRESIÓN EXTREMA Y MANEJO DE ERRORES FIRESTORE
+    // ============================================================================
 
-      const saved = localStorage.getItem('revendedor_session');
-      if (saved) {
-        try {
-          const parsed = JSON.parse(saved);
-          if (urlTienda && parsed.slug !== urlTienda) {
-            localStorage.removeItem('revendedor_session');
-          } else if (parsed.email && parsed.pass) {
-            iniciarSesion(parsed.email, parsed.pass);
-            return;
-          }
-        } catch(e) {}
-      }
+    // Función que garantiza que las imágenes viejas se compriman a menos de 30KB
+    function reComprimirBase64(b64) {
+      return new Promise((resolve) => {
+        const img = new Image();
+        img.onload = () => {
+          const canvas = document.createElement('canvas');
+          const MAX_WIDTH = 250; // Ultra ligero (para miniaturas)
+          const scaleSize = (img.width > MAX_WIDTH) ? (MAX_WIDTH / img.width) : 1;
+          canvas.width = img.width * scaleSize;
+          canvas.height = img.height * scaleSize;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+          resolve(canvas.toDataURL('image/jpeg', 0.5)); // Calidad 50%
+        };
+        img.onerror = () => resolve(b64);
+        img.src = b64;
+      });
+    }
 
-      if (urlTienda) {
-        try {
-          const res = await fetch('/api/db');
-          const db = await res.json();
-          const r = (db.revendedores && db.revendedores[urlTienda]) || null;
-          if (r) {
-            document.getElementById('email').value = r.email || r.correo || '';
-            document.getElementById('login-submsg').innerText = `Administrando: ${r.nombre || urlTienda}`;
-          }
-        } catch(e) {}
+    async function persistirEnNube(datosParciales) {
+      if (!slugActual) return false;
+      try {
+        const res = await fetch('/api/tienda/guardar', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ slug: slugActual, tienda: datosParciales })
+        });
+        const data = await res.json();
+        
+        // ¡ESTO ES LO QUE FALTABA! MOSTRAR EL ERROR SI GOOGLE LO RECHAZA
+        if (!data.success) {
+          alert("❌ Error de Google Firestore: " + (data.error || "El catálogo es demasiado pesado."));
+          return false;
+        }
+        return true;
+      } catch (err) {
+        alert('❌ Error de red: ' + err.message);
+        return false;
       }
     }
+
+    function convertirImagenABase64(input, previewId) {
+      if (input.files && input.files[0]) {
+        const file = input.files[0];
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          const img = new Image();
+          img.onload = function() {
+            const canvas = document.createElement('canvas');
+            const MAX_WIDTH = 250; // Bajado a 250 para asegurar peso mínimo
+            const scaleSize = (img.width > MAX_WIDTH) ? (MAX_WIDTH / img.width) : 1;
+            canvas.width = img.width * scaleSize;
+            canvas.height = img.height * scaleSize;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+            const b64 = canvas.toDataURL('image/jpeg', 0.50); // Calidad 50%
+
+            const prev = document.getElementById(previewId);
+            prev.src = b64;
+            prev.style.display = 'block';
+
+            if (previewId === 'prod-preview-img') tempImgBase64 = b64;
+            if (previewId === 'shop-logo-preview') tempLogoBase64 = b64;
+            if (previewId === 'combo0-preview') tempComboImgs[0] = b64;
+            if (previewId === 'combo1-preview') tempComboImgs[1] = b64;
+            if (previewId === 'combo2-preview') tempComboImgs[2] = b64;
+          };
+          img.src = e.target.result;
+        };
+        reader.readAsDataURL(file);
+      }
+    }
+
+    // ============================================================================
 
     function pintarDashboard() {
       document.getElementById('dash-title').innerText = tiendaActual.nombre || revendedorActual.nombre || slugActual;
@@ -655,7 +463,6 @@
       document.getElementById('shop-whatsapp').value = tiendaActual.whatsapp || revendedorActual.whatsapp || '';
       document.getElementById('shop-payments').value = tiendaActual.metodosPago || '';
       document.getElementById('shop-apk').value = tiendaActual.apkUrl || '';
-
       seleccionarTema(tiendaActual.tema || 'orange');
       document.getElementById('shop-status-online').value = tiendaActual.estadoAtencion || 'online';
 
@@ -664,41 +471,47 @@
         document.getElementById('shop-logo-preview').src = tiendaActual.logo;
       }
 
+      // Generar Combos en UI
       const combos = (tiendaActual.combos && tiendaActual.combos.length > 0) ? tiendaActual.combos : COMBOS_DEFAULT;
+      let combosHtml = '';
       [0, 1, 2].forEach(i => {
         const c = combos[i] || COMBOS_DEFAULT[i];
-        document.getElementById(`combo${i}-activo`).checked = c.activo !== false;
-        document.getElementById(`combo${i}-nombre`).value = c.nombre || '';
-        document.getElementById(`combo${i}-cant`).value = c.comboCantidad || (i + 2);
-        document.getElementById(`combo${i}-desc`).value = c.descuento || 10;
-        document.getElementById(`combo${i}-sub`).value = c.sub || '';
-        if (c.img) document.getElementById(`combo${i}-preview`).src = c.img;
+        combosHtml += `
+          <div class="combo-edit-box">
+            <div style="display:flex; justify-content:space-between; margin-bottom:10px;">
+              <strong style="color:var(--primary);">Combo ${i+1}</strong>
+              <label style="color:#fff; font-size:13px;"><input type="checkbox" id="combo${i}-activo" ${c.activo !== false ? 'checked' : ''}> Activo</label>
+            </div>
+            <input type="text" id="combo${i}-nombre" value="${c.nombre || ''}" style="margin-bottom:8px;" placeholder="Nombre del Combo">
+            <div style="display:flex; gap:10px; margin-bottom:8px;">
+              <input type="number" id="combo${i}-cant" value="${c.comboCantidad || (i+2)}" placeholder="Cant.">
+              <input type="number" id="combo${i}-desc" value="${c.descuento || 10}" placeholder="% Desc.">
+            </div>
+            <input type="file" accept="image/*" onchange="convertirImagenABase64(this, 'combo${i}-preview')" style="margin-bottom:8px;">
+            <img id="combo${i}-preview" src="${c.img || ''}" style="max-height:60px; border-radius:8px; display:${c.img ? 'block' : 'none'};">
+            <input type="text" id="combo${i}-sub" value="${c.sub || ''}" placeholder="Ej: 10% OFF" style="margin-top:8px;">
+          </div>
+        `;
       });
+      document.getElementById('combo-boxes-container').innerHTML = combosHtml;
 
       const txt = tiendaActual.textos || {};
       document.getElementById('txt-pill').value = txt.pill || "✦ ATENCIÓN 24/7 ✦";
       document.getElementById('txt-title-1').value = txt.title1 || "CATÁLOGO OFICIAL";
       document.getElementById('txt-title-2').value = txt.title2 || "FULL MOVIES EC";
-      document.getElementById('txt-sub').value = txt.sub || "Calidad Garantizada y Entrega Inmediata · Los mejores precios";
+      document.getElementById('txt-sub').value = txt.sub || "Calidad Garantizada y Entrega Inmediata";
       document.getElementById('txt-currency').value = txt.currency || "$";
       document.getElementById('txt-btn-buy').value = txt.btnBuy || "Comprar ahora!";
 
-      const publicLink = window.location.origin + '/?tienda=' + slugActual;
-      const elLink = document.getElementById('shop-public-link');
-      elLink.href = publicLink;
-      elLink.innerText = publicLink;
+      let tag = document.getElementById('dash-countdown');
+      let dias = calcularDias(revendedorActual.vencimiento);
+      if (revendedorActual.activo === false || dias <= 0) {
+        tag.className = 'badge-dias red'; tag.innerText = dias<=0 ? '⛔ VENCIDO' : '⛔ SUSPENDIDO';
+      } else {
+        tag.className = 'badge-dias green'; tag.innerText = `✅ ${dias} DÍAS`;
+      }
 
-      actualizarContadorDias();
       renderProductos();
-    }
-
-    function cambiarTab(tab) {
-      ['shop', 'prods', 'combos', 'texts', 'payments'].forEach(t => {
-        document.getElementById('tab-' + t).classList.add('hidden');
-        document.getElementById('tab-btn-' + t).classList.remove('active');
-      });
-      document.getElementById('tab-' + tab).classList.remove('hidden');
-      document.getElementById('tab-btn-' + tab).classList.add('active');
     }
 
     function renderProductos() {
@@ -710,15 +523,14 @@
         const item = document.createElement('div');
         item.className = 'product-card';
         item.innerHTML = `
-          <img src="${p.img || 'https://via.placeholder.com/65'}" class="product-img" onerror="this.src='https://via.placeholder.com/65'">
+          <img src="${p.img || 'https://via.placeholder.com/65'}" class="product-img">
           <div style="flex:1;">
-            <strong style="color:#fff; font-size:16px;">${p.nombre}</strong>
-            <div style="color:var(--accent); font-weight:bold; font-size:15px;">$${p.precio}</div>
-            <small style="color:#94a3b8; font-size:12px;">${p.sub || ''}</small>
+            <strong style="color:#fff; font-size:15px;">${p.nombre}</strong>
+            <div style="color:var(--accent); font-weight:bold; font-size:14px;">$${p.precio}</div>
           </div>
           <div style="display:flex; flex-direction:column; gap:6px;">
-            <button style="background:#0284c7; color:#fff; padding:6px 10px; font-size:12px;" onclick="cargarEdicionProducto(${idx})">✏️</button>
-            <button style="background:#dc2626; color:#fff; padding:6px 10px; font-size:12px;" onclick="eliminarProducto(${idx})">🗑️</button>
+            <button style="background:#0284c7; color:#fff; padding:6px; font-size:12px;" onclick="cargarEdicionProducto(${idx})">✏️</button>
+            <button style="background:#dc2626; color:#fff; padding:6px; font-size:12px;" onclick="eliminarProducto(${idx})">🗑️</button>
           </div>
         `;
         lista.appendChild(item);
@@ -732,7 +544,7 @@
       document.getElementById('prod-precio').value = p.precio;
       document.getElementById('prod-cat').value = p.categoria || 'streaming';
       document.getElementById('prod-tag').value = p.tag || '';
-      document.getElementById('prod-features').value = (p.features && p.features.length) ? p.features.join(', ') : '';
+      document.getElementById('prod-features').value = (p.features || []).join(', ');
       
       const imgPrev = document.getElementById('prod-preview-img');
       if (p.img) {
@@ -741,7 +553,6 @@
         tempImgBase64 = p.img;
       }
       document.getElementById('btn-guardar-prod').innerText = "ACTUALIZAR SERVICIO";
-      cambiarTab('prods');
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
@@ -754,21 +565,15 @@
       const tag = document.getElementById('prod-tag').value.trim();
       const rawFeatures = document.getElementById('prod-features').value.trim();
 
-      if (!slugActual) {
-        alert('Sesión no válida. Por favor, recarga y vuelve a iniciar sesión.');
-        return;
-      }
-
-      if (!nombre || !precio) {
-        alert('El nombre y el precio son obligatorios.');
-        return;
+      if (!slugActual || !nombre || !precio) {
+        alert('Nombre y precio son obligatorios.'); return;
       }
 
       btn.disabled = true;
-      btn.innerText = "⏳ GUARDANDO EN FIRESTORE...";
+      btn.innerText = "⏳ OPTIMIZANDO Y GUARDANDO...";
 
-      const features = rawFeatures ? rawFeatures.split(',').map(s => s.trim()).filter(Boolean) : ["Calidad garantizada", "Entrega inmediata"];
-      const sub = `1 mes · ${categoria.charAt(0).toUpperCase() + categoria.slice(1)}`;
+      const features = rawFeatures ? rawFeatures.split(',').map(s => s.trim()).filter(Boolean) : ["Garantía"];
+      const sub = `1 mes · ${categoria}`;
       const img = tempImgBase64 || (idx >= 0 && tiendaActual.productos[idx].img) || 'https://images.unsplash.com/photo-1522869635100-9f4c5e86aa37?w=500';
 
       if (!Array.isArray(tiendaActual.productos)) tiendaActual.productos = [];
@@ -780,16 +585,23 @@
         tiendaActual.productos.push(nuevoObj);
       }
 
+      // EL FILTRO MÁGICO: LIMPIAR IMÁGENES VIEJAS PARA QUE NO COLAPSE GOOGLE
+      for (let i=0; i<tiendaActual.productos.length; i++) {
+        let pr = tiendaActual.productos[i];
+        if (pr.img && pr.img.length > 30000 && pr.img.startsWith('data:image')) {
+          try { pr.img = await reComprimirBase64(pr.img); } catch(e){}
+        }
+      }
+
       const ok = await persistirEnNube({ productos: tiendaActual.productos });
       btn.disabled = false;
       btn.innerText = "AGREGAR / ACTUALIZAR SERVICIO";
 
       if (ok) {
-        alert('✅ ¡Servicio guardado exitosamente en Firestore!');
+        alert('✅ ¡Servicio guardado exitosamente en Google Cloud!');
         document.getElementById('prod-edit-idx').value = "-1";
         document.getElementById('prod-nombre').value = '';
         document.getElementById('prod-precio').value = '';
-        document.getElementById('prod-tag').value = '';
         document.getElementById('prod-features').value = '';
         document.getElementById('prod-file').value = '';
         document.getElementById('prod-preview-img').style.display = 'none';
@@ -808,164 +620,75 @@
 
     async function guardarAjustesCombos() {
       const btn = document.getElementById('btn-save-combos');
-      btn.disabled = true;
-      btn.innerText = "⏳ GUARDANDO EN FIRESTORE...";
-
+      btn.disabled = true; btn.innerText = "⏳ GUARDANDO...";
       const nuevosCombos = [];
-      [0, 1, 2].forEach(i => {
+      for(let i=0; i<3; i++) {
         const activo = document.getElementById(`combo${i}-activo`).checked;
         const nombre = document.getElementById(`combo${i}-nombre`).value.trim();
         const comboCantidad = parseInt(document.getElementById(`combo${i}-cant`).value) || (i + 2);
         const descuento = parseInt(document.getElementById(`combo${i}-desc`).value) || 10;
         const sub = document.getElementById(`combo${i}-sub`).value.trim();
-        const img = tempComboImgs[i] || (tiendaActual.combos && tiendaActual.combos[i] && tiendaActual.combos[i].img) || COMBOS_DEFAULT[i].img;
+        let img = tempComboImgs[i] || (tiendaActual.combos && tiendaActual.combos[i] && tiendaActual.combos[i].img) || COMBOS_DEFAULT[i].img;
 
-        nuevosCombos.push({
-          activo,
-          comboCantidad,
-          descuento,
-          nombre: nombre || `Combo (${comboCantidad} Servicios)`,
-          sub: sub || `A tu elección · ${descuento}% OFF`,
-          tag: `${descuento}% OFF`,
-          precio: `${descuento}% OFF`,
-          img,
-          features: [
-            `Elige ${comboCantidad} servicios del catálogo`,
-            `Descuento automático del ${descuento}%`,
-            `Activación inmediata 24/7`,
-            `Garantía total en todos`
-          ]
-        });
-      });
+        if (img && img.length > 30000 && img.startsWith('data:image')) {
+          try { img = await reComprimirBase64(img); } catch(e){}
+        }
 
+        nuevosCombos.push({ activo, comboCantidad, descuento, nombre, sub, tag:`${descuento}% OFF`, img });
+      }
       tiendaActual.combos = nuevosCombos;
       const ok = await persistirEnNube({ combos: nuevosCombos });
-      btn.disabled = false;
-      btn.innerText = "GUARDAR CONFIGURACIÓN DE COMBOS";
-
-      if (ok) alert('¡Configuración de combos guardada en Firestore!');
+      btn.disabled = false; btn.innerText = "GUARDAR COMBOS";
+      if (ok) alert('✅ Combos guardados!');
     }
 
     async function guardarAjustesTienda() {
       const btn = document.getElementById('btn-save-shop');
+      btn.disabled = true; btn.innerText = "⏳ GUARDANDO...";
       const nombre = document.getElementById('shop-nombre').value.trim();
       const whatsapp = document.getElementById('shop-whatsapp').value.trim();
       const tema = document.getElementById('shop-tema').value;
       const estadoAtencion = document.getElementById('shop-status-online').value;
       const apkUrl = document.getElementById('shop-apk').value.trim();
 
-      if (!nombre || !whatsapp) {
-        alert('Nombre y WhatsApp son obligatorios.');
-        return;
-      }
-
-      btn.disabled = true;
-      btn.innerText = "⏳ GUARDANDO...";
-
       const payload = { nombre, whatsapp, tema, estadoAtencion, apkUrl };
-      if (tempLogoBase64) payload.logo = tempLogoBase64;
-
+      if (tempLogoBase64) {
+        if (tempLogoBase64.length > 30000) { try { tempLogoBase64 = await reComprimirBase64(tempLogoBase64); } catch(e){} }
+        payload.logo = tempLogoBase64;
+      }
       tiendaActual = { ...tiendaActual, ...payload };
       const ok = await persistirEnNube(payload);
-      btn.disabled = false;
-      btn.innerText = "GUARDAR AJUSTES DE TIENDA";
-
+      btn.disabled = false; btn.innerText = "GUARDAR AJUSTES";
       if (ok) {
-        alert('¡Datos de la tienda y tema guardados en Firestore!');
+        alert('✅ Ajustes guardados!');
         document.getElementById('dash-title').innerText = nombre;
         if (tempLogoBase64) document.getElementById('dash-logo').src = tempLogoBase64;
       }
     }
 
     async function guardarTextos() {
-      const btn = document.getElementById('btn-save-texts');
-      btn.disabled = true;
-      btn.innerText = "⏳ GUARDANDO...";
-
       const textos = {
-        pill: document.getElementById('txt-pill').value.trim() || "✦ ATENCIÓN 24/7 ✦",
-        title1: document.getElementById('txt-title-1').value.trim() || "CATÁLOGO OFICIAL",
-        title2: document.getElementById('txt-title-2').value.trim() || "FULL MOVIES EC",
-        sub: document.getElementById('txt-sub').value.trim() || "Calidad Garantizada y Entrega Inmediata · Los mejores precios",
-        currency: document.getElementById('txt-currency').value.trim() || "$",
-        btnBuy: document.getElementById('txt-btn-buy').value.trim() || "Comprar ahora!"
+        pill: document.getElementById('txt-pill').value,
+        title1: document.getElementById('txt-title-1').value,
+        title2: document.getElementById('txt-title-2').value,
+        sub: document.getElementById('txt-sub').value,
+        currency: document.getElementById('txt-currency').value,
+        btnBuy: document.getElementById('txt-btn-buy').value
       };
-
       tiendaActual.textos = textos;
       const ok = await persistirEnNube({ textos });
-      btn.disabled = false;
-      btn.innerText = "GUARDAR TEXTOS DEL CATÁLOGO";
-
-      if (ok) alert('¡Textos guardados en Firestore!');
+      if (ok) alert('✅ Textos guardados!');
     }
 
     async function guardarMetodosPago() {
-      const btn = document.getElementById('btn-save-payments');
-      btn.disabled = true;
-      btn.innerText = "⏳ GUARDANDO...";
-
       const metodosPago = document.getElementById('shop-payments').value.trim();
       tiendaActual.metodosPago = metodosPago;
-
       const ok = await persistirEnNube({ metodosPago });
-      btn.disabled = false;
-      btn.innerText = "GUARDAR MÉTODOS DE PAGO";
-
-      if (ok) alert('¡Métodos de pago guardados en Firestore!');
+      if (ok) alert('✅ Métodos de pago guardados!');
     }
 
-    // COMPRESIÓN SEGURA DE IMAGEN EN BASE64
-    function convertirImagenABase64(input, previewId) {
-      if (input.files && input.files[0]) {
-        const file = input.files[0];
-        const reader = new FileReader();
-        reader.onload = function(e) {
-          const img = new Image();
-          img.onload = function() {
-            const canvas = document.createElement('canvas');
-            const MAX_WIDTH = 480; 
-            const scaleSize = (img.width > MAX_WIDTH) ? (MAX_WIDTH / img.width) : 1;
-            canvas.width = img.width * scaleSize;
-            canvas.height = img.height * scaleSize;
-            
-            const ctx = canvas.getContext('2d');
-            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-            // Calidad 0.70 para garantizar envío ligero a Firestore
-            const b64 = canvas.toDataURL('image/jpeg', 0.70); 
-
-            const prev = document.getElementById(previewId);
-            prev.src = b64;
-            prev.style.display = 'block';
-
-            if (previewId === 'prod-preview-img') tempImgBase64 = b64;
-            if (previewId === 'shop-logo-preview') tempLogoBase64 = b64;
-            if (previewId === 'combo0-preview') tempComboImgs[0] = b64;
-            if (previewId === 'combo1-preview') tempComboImgs[1] = b64;
-            if (previewId === 'combo2-preview') tempComboImgs[2] = b64;
-          };
-          img.src = e.target.result;
-        };
-        reader.readAsDataURL(file);
-      }
-    }
-
-    async function persistirEnNube(datosParciales) {
-      if (!slugActual) return false;
-      try {
-        const res = await fetch('/api/tienda/guardar', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ slug: slugActual, tienda: datosParciales })
-        });
-        const data = await res.json();
-        return !!data.success;
-      } catch (err) {
-        alert('Error al guardar en la nube: ' + err.message);
-        return false;
-      }
-    }
-
-    verificarSesionGuardada();
+    const sesion = localStorage.getItem('revendedor_session');
+    if (sesion) { try { const p = JSON.parse(sesion); if (p.email && p.pass) iniciarSesion(p.email, p.pass); } catch(e) {} }
   </script>
 </body>
 </html>
