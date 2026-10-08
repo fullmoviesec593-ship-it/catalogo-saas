@@ -121,10 +121,9 @@
       </div>
     </div>
 
-    <!-- PESTAÑA: CLIENTES (CRM CON FILTROS, BUSCADOR Y RESPALDO) -->
+    <!-- PESTAÑA: CLIENTES -->
     <div id="tab-clients" class="hidden">
       
-      <!-- BOTÓN DE BACKUP (RESPALDO JSON) -->
       <div style="display:flex; justify-content:space-between; align-items:center; background:#080d1a; padding:12px 14px; border-radius:12px; border:1px solid var(--border); margin-bottom:16px;">
         <div>
           <strong style="color:#fff; font-size:13px; display:block;">💾 Respaldo en la Nube</strong>
@@ -183,7 +182,6 @@
         <button id="btn-cancel-cliente" class="hidden btn-danger" onclick="cancelarEdicionCliente()" style="margin-top:6px;">CANCELAR EDICIÓN</button>
       </div>
 
-      <!-- BUSCADOR Y FILTROS RÁPIDOS -->
       <div style="margin-bottom:14px;">
         <input type="text" id="cli-buscador" placeholder="🔍 Buscar cliente o servicio..." oninput="renderClientes()" style="margin-bottom:8px;">
         <div style="display:flex; gap:6px; overflow-x:auto; padding-bottom:4px;">
@@ -308,6 +306,19 @@
     const TPL_DEFAULT_COBRO = "Hola {cliente}, te recordamos que tu servicio de {servicio}\nCorreo: {correo}\nPerfil: {perfil}\nvence en {dias} día(s), el {vence}.\nValor: ${precio}\n\nPaga aquí: {link_pago}\nGracias por confiar en nosotros.";
     const TPL_DEFAULT_RENOVACION = "🎉 ¡Hola {cliente}, tu renovación de {servicio} fue exitosa! 🎉\n\n📧 Correo: {correo}\n🔒 Contraseña: {contraseña}\n👤 Perfil: {perfil}\n📅 Nueva fecha de vencimiento: {vence}\n\nGracias por tu preferencia en {negocio}.";
     const TPL_DEFAULT_ACTUALIZACION = "🔄 ¡Hola {cliente}, actualizamos los datos de acceso de tu servicio de {servicio}!\n\n📧 Correo: {correo}\n🔒 Contraseña: {contraseña}\n👤 Perfil: {perfil}\n\nCualquier novedad nos avisas.";
+
+    function obtenerEstiloServicio(nombreServicio) {
+      const n = (nombreServicio || '').toLowerCase();
+      if (n.includes('netflix')) return { bg: '#E50914', label: 'NFL' };
+      if (n.includes('disney')) return { bg: '#0063E5', label: 'DIS' };
+      if (n.includes('max') || n.includes('hbo')) return { bg: '#7928CA', label: 'MAX' };
+      if (n.includes('prime') || n.includes('amazon')) return { bg: '#00A8E1', label: 'PRI' };
+      if (n.includes('paramount')) return { bg: '#0064FF', label: 'PAR' };
+      if (n.includes('spotify')) return { bg: '#1DB954', label: 'SPT' };
+      if (n.includes('youtube')) return { bg: '#FF0000', label: 'YT' };
+      if (n.includes('iptv')) return { bg: '#0284c7', label: 'IPTV' };
+      return { bg: '#334155', label: (nombreServicio || 'SV').substring(0,3).toUpperCase() };
+    }
 
     function toggleMenu() { document.getElementById('nav-menu').classList.toggle('show-menu'); document.getElementById('menu-backdrop').classList.toggle('show'); }
     function cambiarTab(tab) {
@@ -519,7 +530,7 @@
     }
 
     // ==========================================
-    // LÓGICA DE CRM CON BUSCADOR Y FILTROS
+    // LÓGICA DE CRM CON COLORES POR PLATAFORMA
     // ==========================================
     function procesarPlantilla(textoTpl, c, diffDays) {
       const linkPago = tiendaActual.payLink ? tiendaActual.payLink : 'nuestras cuentas del catálogo.';
@@ -567,14 +578,12 @@
 
       const hoy = new Date(); hoy.setHours(0,0,0,0);
 
-      // Filtrar y ordenar
       const filtrados = clientes.map((c, i) => ({...c, originalIndex: i})).filter(c => {
         const textoBusqueda = `${c.nombre} ${c.servicio} ${c.correo}`.toLowerCase();
         const coincideBusqueda = !query || textoBusqueda.includes(query);
         
         if (!coincideBusqueda) return false;
 
-        // Calcular días
         const partes = c.vence.split('-');
         const fechaVencimiento = new Date(partes[0], partes[1] - 1, partes[2]);
         const diffDays = Math.ceil((fechaVencimiento - hoy) / (1000 * 60 * 60 * 24));
@@ -582,7 +591,7 @@
         if (filtroActualCRM === 'activos') return diffDays >= 0;
         if (filtroActualCRM === 'hoy') return diffDays === 0;
         if (filtroActualCRM === 'vencidos') return diffDays < 0;
-        return true; // todos
+        return true;
       }).sort((a, b) => new Date(a.vence) - new Date(b.vence));
 
       document.getElementById('cli-count').innerText = `${filtrados.length} de ${clientes.length} Total`;
@@ -602,7 +611,7 @@
         else if (diffDays === 0) { color = '#ef4444'; estado = 'Vence HOY'; }
         else if (diffDays <= 3) { color = '#eab308'; estado = `Vence en ${diffDays} días`; }
 
-        const inicialesServicio = (c.servicio || 'SV').substring(0, 3).toUpperCase();
+        const estiloServicio = obtenerEstiloServicio(c.servicio);
 
         const tplBienvenida = (tiendaActual.plantillas && tiendaActual.plantillas.bienvenida) ? tiendaActual.plantillas.bienvenida : TPL_DEFAULT_BIENVENIDA;
         const tplCobro = (tiendaActual.plantillas && tiendaActual.plantillas.cobro) ? tiendaActual.plantillas.cobro : TPL_DEFAULT_COBRO;
@@ -625,33 +634,38 @@
         const card = document.createElement('div');
         card.style = `background:#080d1a; border:1px solid ${color}40; border-radius:12px; margin-bottom:12px; overflow:hidden;`;
         card.innerHTML = `
-          <div onclick="toggleExpandirTarjeta('${cardId}')" style="padding:12px 14px; display:flex; align-items:center; justify-content:space-between; cursor:pointer; background:#0f172a;">
-            <div style="display:flex; align-items:center; gap:12px;">
-              <div style="width:40px; height:40px; border-radius:8px; background:linear-gradient(135deg, #0284c7, #0369a1); color:#fff; display:flex; align-items:center; justify-content:center; font-weight:900; font-size:12px;">${inicialesServicio}</div>
-              <div>
-                <strong style="color:#fff; font-size:15px; display:block;">${c.nombre}</strong>
-                <span style="color:#94a3b8; font-size:12px;">${c.correo || 'Sin correo'} • 🔑 ${c.pass || 'Sin clave'}</span>
+          <!-- MINIATURA CON COLOR OFICIAL DE PLATAFORMA -->
+          <div onclick="toggleExpandirTarjeta('${cardId}')" style="padding:12px 14px; display:flex; align-items:center; justify-content:space-between; cursor:pointer; background:#0f172a; gap:10px;">
+            <div style="display:flex; align-items:center; gap:10px; min-width:0; flex:1;">
+              <div style="width:38px; height:38px; border-radius:8px; background:${estiloServicio.bg}; color:#fff; display:flex; align-items:center; justify-content:center; font-weight:900; font-size:10px; flex-shrink:0; box-shadow:0 0 8px ${estiloServicio.bg}80;">${estiloServicio.label}</div>
+              <div style="min-width:0; flex:1;">
+                <strong style="color:#fff; font-size:14px; display:block; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${c.nombre}</strong>
+                <div style="color:#94a3b8; font-size:11px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">📧 ${c.correo || 'Sin correo'}</div>
+                <div style="color:#cbd5e1; font-size:11px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">🔑 ${c.pass || 'Sin clave'}</div>
               </div>
             </div>
-            <div style="text-align:right;">
+            <div style="text-align:right; flex-shrink:0;">
               <span style="background:${color}20; color:${color}; font-size:10px; font-weight:800; padding:3px 7px; border-radius:6px; display:inline-block; margin-bottom:4px;">${estado}</span>
-              <div style="font-size:11px; color:#64748b;">Tocar para ver ▾</div>
+              <div style="font-size:10px; color:#64748b;">Tocar ▾</div>
             </div>
           </div>
 
+          <!-- DETALLE EXPANDIBLE -->
           <div id="${cardId}" class="hidden" style="padding:16px; border-top:1px solid #1e293b; background:#070a12;">
+            <div style="font-size:12px; color:var(--primary); font-weight:bold; margin-bottom:10px;">📦 Servicio: ${c.servicio || 'N/A'}</div>
+            
             <div style="display:flex; flex-direction:column; gap:8px; margin-bottom:14px;">
               <div style="display:flex; justify-content:space-between; align-items:center; background:#0f172a; padding:10px 12px; border-radius:8px; border:1px solid #1e293b;">
-                <div style="font-size:13px; color:#94a3b8;">Correo: <b style="color:#fff; display:block;">${c.correo || 'N/A'}</b></div>
-                <button onclick="copiarTexto('${c.correo || ''}')" style="background:#1e293b; color:#38bdf8; border:none; width:34px; height:34px; border-radius:6px; cursor:pointer;">📋</button>
+                <div style="font-size:13px; color:#94a3b8; word-break:break-all; padding-right:8px;">Correo: <b style="color:#fff; display:block;">${c.correo || 'N/A'}</b></div>
+                <button onclick="copiarTexto('${c.correo || ''}')" style="background:#1e293b; color:#38bdf8; border:none; width:34px; height:34px; border-radius:6px; cursor:pointer; flex-shrink:0;">📋</button>
               </div>
               <div style="display:flex; justify-content:space-between; align-items:center; background:#0f172a; padding:10px 12px; border-radius:8px; border:1px solid #1e293b;">
-                <div style="font-size:13px; color:#94a3b8;">Contraseña: <b style="color:#fff; display:block;">${c.pass || 'N/A'}</b></div>
-                <button onclick="copiarTexto('${c.pass || ''}')" style="background:#1e293b; color:#38bdf8; border:none; width:34px; height:34px; border-radius:6px; cursor:pointer;">📋</button>
+                <div style="font-size:13px; color:#94a3b8; word-break:break-all; padding-right:8px;">Contraseña: <b style="color:#fff; display:block;">${c.pass || 'N/A'}</b></div>
+                <button onclick="copiarTexto('${c.pass || ''}')" style="background:#1e293b; color:#38bdf8; border:none; width:34px; height:34px; border-radius:6px; cursor:pointer; flex-shrink:0;">📋</button>
               </div>
               <div style="display:flex; justify-content:space-between; align-items:center; background:#0f172a; padding:10px 12px; border-radius:8px; border:1px solid #1e293b;">
-                <div style="font-size:13px; color:#94a3b8;">Perfil / PIN: <b style="color:#fff; display:block;">${c.notas || 'N/A'}</b></div>
-                <button onclick="copiarTexto('${c.notas || ''}')" style="background:#1e293b; color:#38bdf8; border:none; width:34px; height:34px; border-radius:6px; cursor:pointer;">📋</button>
+                <div style="font-size:13px; color:#94a3b8; word-break:break-all; padding-right:8px;">Perfil / PIN: <b style="color:#fff; display:block;">${c.notas || 'N/A'}</b></div>
+                <button onclick="copiarTexto('${c.notas || ''}')" style="background:#1e293b; color:#38bdf8; border:none; width:34px; height:34px; border-radius:6px; cursor:pointer; flex-shrink:0;">📋</button>
               </div>
             </div>
 
@@ -844,7 +858,7 @@
     }
     async function guardarAjustesTienda() {
       const btn = document.getElementById('btn-save-shop'); btn.disabled = true; btn.innerText = "⏳ GUARDANDO...";
-      const payload = { nombre: document.getElementById('shop-nombre').value.trim(), whatsapp: document.getElementById('shop-whatsapp').value.trim(), tema: document.getElementById('shop-tema').value, estadoAtencion: document.getElementById('shop-status-online').value, apkUrl: document.getElementById('shop-apk').value.trim() };
+      const payload = { nombre: document.getElementById('shop-nombre').value.trim(), whatsapp: document.getElementById('shop-whatsapp').value.trim(), tema: document.getElementById('shop-tema').value, estadoAtencion: document.getElementById('shop-status-online').value, apkUrl: document.getElementById('shop-apk'].value.trim() };
       if (tempLogoBase64) { if (tempLogoBase64.length > 30000) { try { tempLogoBase64 = await reComprimirBase64(tempLogoBase64); } catch(e){} } payload.logo = tempLogoBase64; }
       tiendaActual = { ...tiendaActual, ...payload }; const ok = await persistirEnNube(payload); btn.disabled = false; btn.innerText = "GUARDAR AJUSTES"; if (ok) { alert('✅ Guardado!'); document.getElementById('dash-title').innerText = payload.nombre; if (tempLogoBase64) document.getElementById('dash-logo').src = tempLogoBase64; }
     }
