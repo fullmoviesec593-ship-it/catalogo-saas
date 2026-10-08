@@ -877,7 +877,7 @@
     }
     async function guardarAjustesTienda() {
       const btn = document.getElementById('btn-save-shop'); btn.disabled = true; btn.innerText = "⏳ GUARDANDO...";
-      const payload = { nombre: document.getElementById('shop-nombre').value.trim(), whatsapp: document.getElementById('shop-whatsapp').value.trim(), tema: document.getElementById('shop-tema').value, estadoAtencion: document.getElementById('shop-status-online').value, apkUrl: document.getElementById('shop-apk'].value.trim() };
+      const payload = { nombre: document.getElementById('shop-nombre').value.trim(), whatsapp: document.getElementById('shop-whatsapp').value.trim(), tema: document.getElementById('shop-tema').value, estadoAtencion: document.getElementById('shop-status-online').value, apkUrl: document.getElementById('shop-apk').value.trim() };
       if (tempLogoBase64) { if (tempLogoBase64.length > 30000) { try { tempLogoBase64 = await reComprimirBase64(tempLogoBase64); } catch(e){} } payload.logo = tempLogoBase64; }
       tiendaActual = { ...tiendaActual, ...payload }; const ok = await persistirEnNube(payload); btn.disabled = false; btn.innerText = "GUARDAR AJUSTES"; if (ok) { alert('✅ Guardado!'); document.getElementById('dash-title').innerText = payload.nombre; if (tempLogoBase64) document.getElementById('dash-logo').src = tempLogoBase64; }
     }
