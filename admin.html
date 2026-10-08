@@ -530,7 +530,7 @@
     }
 
     // ==========================================
-    // LÓGICA DE CRM CON COLORES POR PLATAFORMA
+    // LÓGICA DE CRM
     // ==========================================
     function procesarPlantilla(textoTpl, c, diffDays) {
       const linkPago = tiendaActual.payLink ? tiendaActual.payLink : 'nuestras cuentas del catálogo.';
@@ -634,7 +634,6 @@
         const card = document.createElement('div');
         card.style = `background:#080d1a; border:1px solid ${color}40; border-radius:12px; margin-bottom:12px; overflow:hidden;`;
         card.innerHTML = `
-          <!-- MINIATURA CON COLOR OFICIAL DE PLATAFORMA -->
           <div onclick="toggleExpandirTarjeta('${cardId}')" style="padding:12px 14px; display:flex; align-items:center; justify-content:space-between; cursor:pointer; background:#0f172a; gap:10px;">
             <div style="display:flex; align-items:center; gap:10px; min-width:0; flex:1;">
               <div style="width:38px; height:38px; border-radius:8px; background:${estiloServicio.bg}; color:#fff; display:flex; align-items:center; justify-content:center; font-weight:900; font-size:10px; flex-shrink:0; box-shadow:0 0 8px ${estiloServicio.bg}80;">${estiloServicio.label}</div>
@@ -650,7 +649,6 @@
             </div>
           </div>
 
-          <!-- DETALLE EXPANDIBLE -->
           <div id="${cardId}" class="hidden" style="padding:16px; border-top:1px solid #1e293b; background:#070a12;">
             <div style="font-size:12px; color:var(--primary); font-weight:bold; margin-bottom:10px;">📦 Servicio: ${c.servicio || 'N/A'}</div>
             
