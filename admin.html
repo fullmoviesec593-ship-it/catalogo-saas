@@ -25,26 +25,12 @@
     .btn-danger { background: #dc2626; color: #fff; }
     .hidden { display: none !important; }
     
-    /* MENÚ DESPLEGABLE MEJORADO */
     .btn-menu-toggle { background: transparent; border: none; color: var(--primary); font-size: 26px; cursor: pointer; padding: 0; line-height: 1; display:flex; align-items:center; justify-content:center; width:30px; height:30px; }
-    .nav-tabs { 
-      display: none; flex-direction: column; gap: 8px; 
-      position: absolute; top: 75px; left: 16px; z-index: 1000; 
-      background: #0f172a; padding: 12px; border-radius: 12px; 
-      border: 1px solid var(--border); width: 230px; 
-      box-shadow: 0 15px 40px rgba(0,0,0,0.9);
-    }
+    .nav-tabs { display: none; flex-direction: column; gap: 8px; position: absolute; top: 75px; left: 16px; z-index: 1000; background: #0f172a; padding: 12px; border-radius: 12px; border: 1px solid var(--border); width: 230px; box-shadow: 0 15px 40px rgba(0,0,0,0.9); }
     .nav-tabs.show-menu { display: flex; }
-    .nav-tab { 
-      text-align: left; padding: 12px 14px; background: #080d1a; 
-      border-radius: 8px; cursor: pointer; font-size: 14px; font-weight: bold; 
-      color: #94a3b8; border: 1px solid transparent; 
-    }
+    .nav-tab { text-align: left; padding: 12px 14px; background: #080d1a; border-radius: 8px; cursor: pointer; font-size: 14px; font-weight: bold; color: #94a3b8; border: 1px solid transparent; }
     .nav-tab.active { background: #1e293b; color: var(--primary); border-color: var(--primary); }
-    .menu-backdrop { 
-      display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
-      background: rgba(0,0,0,0.6); z-index: 999; backdrop-filter: blur(2px);
-    }
+    .menu-backdrop { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 999; backdrop-filter: blur(2px); }
     .menu-backdrop.show { display: block; }
 
     .product-card { background: #080d1a; border: 1px solid var(--border); border-radius: 12px; padding: 14px; margin-bottom: 12px; display: flex; gap: 14px; align-items: center; }
@@ -64,59 +50,72 @@
 </head>
 <body>
 
-  <!-- LOGIN -->
   <div id="login-section" class="card" style="max-width:440px; align-self:center;">
     <h2 style="text-align:center;">💼 PANEL REVENDEDOR</h2>
     <p id="login-submsg" style="text-align:center; color:#94a3b8; font-size:14px; margin-bottom:20px;">Ingresa tus credenciales para gestionar tu catálogo</p>
     <div class="form-group"><label>Correo Electrónico</label><input type="email" id="email" placeholder="tu-correo@gmail.com"></div>
-    <div class="form-group">
-      <label>Contraseña</label>
-      <div class="password-wrapper">
-        <input type="password" id="password" placeholder="Tu clave de acceso">
-        <button type="button" class="toggle-password-btn" onclick="togglePasswordVisibility('password', this)">👁️</button>
-      </div>
-    </div>
-    <div class="checkbox-container" onclick="toggleCheckbox('remember-session')">
-      <input type="checkbox" id="remember-session" checked onclick="event.stopPropagation()">
-      <span style="font-size:14px; color:#cbd5e1; font-weight:600;">Mantener sesión iniciada</span>
-    </div>
+    <div class="form-group"><label>Contraseña</label><div class="password-wrapper"><input type="password" id="password" placeholder="Tu clave de acceso"><button type="button" class="toggle-password-btn" onclick="togglePasswordVisibility('password', this)">👁️</button></div></div>
+    <div class="checkbox-container" onclick="toggleCheckbox('remember-session')"><input type="checkbox" id="remember-session" checked onclick="event.stopPropagation()"><span style="font-size:14px; color:#cbd5e1; font-weight:600;">Mantener sesión iniciada</span></div>
     <button class="btn-primary" onclick="iniciarSesion()">INGRESAR A MI PANEL</button>
   </div>
 
-  <!-- DASHBOARD -->
   <div id="dashboard-section" class="card hidden">
-    
-    <!-- FONDO OSCURO PARA CERRAR EL MENÚ TOCANDO AFUERA -->
     <div id="menu-backdrop" class="menu-backdrop" onclick="toggleMenu()"></div>
-
-    <!-- CABECERA PRINCIPAL REESTRUCTURADA (NO SE AMONTONA) -->
     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px; border-bottom:1px solid var(--border); padding-bottom:12px;">
-      
-      <!-- IZQUIERDA: Botón Hamburguesa y Logo -->
       <div style="display:flex; align-items:center; gap:8px; flex-shrink:0;">
         <button class="btn-menu-toggle" onclick="toggleMenu()">☰</button>
         <img id="dash-logo" src="https://via.placeholder.com/40" style="width:36px; height:36px; border-radius:50%; object-fit:cover; border:1px solid var(--primary);">
       </div>
-
-      <!-- CENTRO: Título y Días (Text-overflow previene que baje de línea) -->
       <div style="flex:1; min-width:0; padding:0 8px; display:flex; flex-direction:column; justify-content:center;">
         <span id="dash-title" style="font-family:'Orbitron'; font-weight:bold; font-size:14px; color:#fff; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; line-height:1.2; margin-bottom:4px;">Mi Tienda</span>
         <div><span id="dash-countdown" class="badge-dias green" style="font-size:10px; padding:3px 6px;">⏳ Calculando...</span></div>
       </div>
-
-      <!-- DERECHA: Botón de Salida Fijo -->
       <button onclick="cerrarSesion()" style="width:auto; padding:6px 10px; background:#dc2626; color:#fff; font-size:12px; font-weight:bold; flex-shrink:0; border-radius:6px;">Salir</button>
-      
     </div>
 
-    <!-- MENÚ LATERAL DESPLEGABLE -->
+    <!-- MENÚ LATERAL -->
     <div id="nav-menu" class="nav-tabs">
       <div id="tab-btn-shop" class="nav-tab active" onclick="cambiarTab('shop')">⚙️ TIENDA</div>
       <div id="tab-btn-prods" class="nav-tab" onclick="cambiarTab('prods')">📦 SERVICIOS</div>
       <div id="tab-btn-combos" class="nav-tab" onclick="cambiarTab('combos')">🔥 COMBOS</div>
       <div id="tab-btn-texts" class="nav-tab" onclick="cambiarTab('texts')">📝 TEXTOS</div>
       <div id="tab-btn-payments" class="nav-tab" onclick="cambiarTab('payments')">💳 PAGOS</div>
+      <div id="tab-btn-clients" class="nav-tab" onclick="cambiarTab('clients')" style="color:#eab308; border-color:#eab308;">👥 CLIENTES (CRM)</div>
       <div id="tab-btn-stats" class="nav-tab" onclick="cambiarTab('stats')" style="color:#22c55e; border-color:#22c55e;">📊 ESTADÍSTICAS</div>
+    </div>
+
+    <!-- PESTAÑA: CLIENTES (NUEVA) -->
+    <div id="tab-clients" class="hidden">
+      <div style="background:#080d1a; padding:16px; border-radius:12px; border:1px solid var(--border); margin-bottom:20px;">
+        <h4 style="color:var(--accent); margin-top:0;">➕ Registrar Nuevo Cliente</h4>
+        <p style="font-size:11px; color:#94a3b8; margin-bottom:12px;">El sistema te avisará 3 días antes de que se venza su servicio.</p>
+        
+        <div class="form-group">
+          <label>Nombre del Cliente</label>
+          <input type="text" id="cli-nombre" placeholder="Ej: Carlos Mendoza">
+        </div>
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+          <div class="form-group">
+            <label>WhatsApp (con código país)</label>
+            <input type="number" id="cli-ws" placeholder="593999999999">
+          </div>
+          <div class="form-group">
+            <label>Fecha de Vencimiento</label>
+            <input type="date" id="cli-vence">
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Servicio Adquirido</label>
+          <input type="text" id="cli-servicio" placeholder="Ej: Netflix 1 Pantalla">
+        </div>
+        <button class="btn-success" onclick="guardarCliente()">GUARDAR CLIENTE</button>
+      </div>
+
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
+        <h4 style="color:#fff; margin:0;">Directorio de Clientes</h4>
+        <span id="cli-count" style="font-size:12px; font-weight:bold; background:#1e293b; color:#cbd5e1; padding:4px 10px; border-radius:10px;">0 Total</span>
+      </div>
+      <div id="lista-clientes"></div>
     </div>
 
     <!-- PESTAÑA: ESTADISTICAS -->
@@ -125,19 +124,11 @@
         <h4 style="color:var(--primary); margin-top:0;">📊 Rendimiento de Ventas</h4>
         <p style="font-size:12px; color:#94a3b8; margin-bottom:14px;">Mide cuántas personas entran a tu tienda y hacen clic en pedir.</p>
         <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-bottom:16px;">
-          <div style="background:#111625; padding:16px; border-radius:10px; text-align:center; border:1px solid #1e293b;">
-            <div style="font-size:26px; font-weight:900; color:#38bdf8; font-family:'Orbitron';" id="stat-vistas">0</div>
-            <div style="font-size:12px; color:#94a3b8; margin-top:4px;">Visitas al Catálogo</div>
-          </div>
-          <div style="background:#111625; padding:16px; border-radius:10px; text-align:center; border:1px solid #1e293b;">
-            <div style="font-size:26px; font-weight:900; color:#22c55e; font-family:'Orbitron';" id="stat-clics">0</div>
-            <div style="font-size:12px; color:#94a3b8; margin-top:4px;">Clics de Compra</div>
-          </div>
+          <div style="background:#111625; padding:16px; border-radius:10px; text-align:center; border:1px solid #1e293b;"><div style="font-size:26px; font-weight:900; color:#38bdf8; font-family:'Orbitron';" id="stat-vistas">0</div><div style="font-size:12px; color:#94a3b8; margin-top:4px;">Visitas al Catálogo</div></div>
+          <div style="background:#111625; padding:16px; border-radius:10px; text-align:center; border:1px solid #1e293b;"><div style="font-size:26px; font-weight:900; color:#22c55e; font-family:'Orbitron';" id="stat-clics">0</div><div style="font-size:12px; color:#94a3b8; margin-top:4px;">Clics de Compra</div></div>
         </div>
         <h5 style="color:#fff; margin-bottom:8px;">Top de Servicios más solicitados:</h5>
-        <div id="stat-top-list" style="background:#111625; border-radius:10px; padding:12px; border:1px solid #1e293b; color:#cbd5e1; font-size:13px;">
-          (Aún no hay datos suficientes)
-        </div>
+        <div id="stat-top-list" style="background:#111625; border-radius:10px; padding:12px; border:1px solid #1e293b; color:#cbd5e1; font-size:13px;">(Aún no hay datos)</div>
       </div>
     </div>
 
@@ -149,10 +140,7 @@
         <div class="form-group"><label>WhatsApp (ej: 593982766054)</label><input type="text" id="shop-whatsapp"></div>
         <div class="form-group" style="background:#111625; padding:12px; border-radius:10px; border:1px solid #1e293b;">
           <label style="color:#fff;">Estado de Atención</label>
-          <select id="shop-status-online" style="background:#080d1a; color:#fff; border:1px solid #1e293b;">
-            <option value="online">🟢 En línea (Entrega inmediata)</option>
-            <option value="offline">🌙 Fuera de horario (Dejar pedido)</option>
-          </select>
+          <select id="shop-status-online" style="background:#080d1a; color:#fff; border:1px solid #1e293b;"><option value="online">🟢 En línea (Entrega inmediata)</option><option value="offline">🌙 Fuera de horario (Dejar pedido)</option></select>
         </div>
         <div class="form-group"><label>Link de Descarga Directa APK (Opcional)</label><input type="text" id="shop-apk"></div>
         <div class="form-group" style="background:#111625; padding:12px; border-radius:10px; border:1px solid #1e293b;">
@@ -165,11 +153,7 @@
             <div id="theme-purple" class="theme-opt" onclick="seleccionarTema('purple')"><div class="theme-circle" style="background:#a855f7;"></div>Morado</div>
           </div>
         </div>
-        <div class="form-group">
-          <label>Subir Logo</label>
-          <input type="file" id="shop-logo-file" accept="image/*" onchange="convertirImagenABase64(this, 'shop-logo-preview')">
-          <div style="text-align:center; margin-top:8px;"><img id="shop-logo-preview" class="preview-logo" src="https://via.placeholder.com/80"></div>
-        </div>
+        <div class="form-group"><label>Subir Logo</label><input type="file" id="shop-logo-file" accept="image/*" onchange="convertirImagenABase64(this, 'shop-logo-preview')"><div style="text-align:center; margin-top:8px;"><img id="shop-logo-preview" class="preview-logo" src="https://via.placeholder.com/80"></div></div>
         <button id="btn-save-shop" class="btn-primary" onclick="guardarAjustesTienda()">GUARDAR AJUSTES</button>
         <div style="margin-top:16px; background:#111d33; padding:12px; border-radius:8px;">
           <label style="color:#38bdf8; font-size:13px; font-weight:bold; display:block; margin-bottom:4px;">Enlace de tu Catálogo Público:</label>
@@ -184,97 +168,45 @@
         <h4 style="color:var(--accent); margin-top:0;">➕ Agregar / Editar Servicio</h4>
         <input type="hidden" id="prod-edit-idx" value="-1">
         <div class="form-group"><label>Nombre del Servicio</label><input type="text" id="prod-nombre"></div>
-        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
-          <div class="form-group"><label>Precio</label><input type="text" id="prod-precio"></div>
-          <div class="form-group"><label>Subir Imagen</label><input type="file" id="prod-file" accept="image/*" onchange="convertirImagenABase64(this, 'prod-preview-img')"></div>
-        </div>
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;"><div class="form-group"><label>Precio</label><input type="text" id="prod-precio"></div><div class="form-group"><label>Subir Imagen</label><input type="file" id="prod-file" accept="image/*" onchange="convertirImagenABase64(this, 'prod-preview-img')"></div></div>
         <img id="prod-preview-img" src="" style="max-height:80px; border-radius:6px; margin-bottom:10px; display:none;">
-        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
-          <div class="form-group">
-            <label>Categoría</label>
-            <select id="prod-cat">
-              <option value="streaming">Streaming</option><option value="iptv">IPTV</option><option value="musica">Música</option><option value="software">Software</option><option value="gaming">Gaming</option>
-            </select>
-          </div>
-          <div class="form-group"><label>Insignia</label><input type="text" id="prod-tag" placeholder="POPULAR"></div>
-        </div>
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;"><div class="form-group"><label>Categoría</label><select id="prod-cat"><option value="streaming">Streaming</option><option value="iptv">IPTV</option><option value="musica">Música</option><option value="software">Software</option><option value="gaming">Gaming</option></select></div><div class="form-group"><label>Insignia</label><input type="text" id="prod-tag" placeholder="POPULAR"></div></div>
         <div class="form-group"><label>Beneficios (separados por coma)</label><input type="text" id="prod-features"></div>
         <button id="btn-guardar-prod" class="btn-success" onclick="guardarProducto()">AGREGAR / ACTUALIZAR SERVICIO</button>
       </div>
-      <h4 style="color:#fff;">Mis Servicios Activos</h4>
-      <div id="lista-productos"></div>
+      <h4 style="color:#fff;">Mis Servicios Activos</h4><div id="lista-productos"></div>
     </div>
 
     <!-- PESTAÑA: COMBOS -->
     <div id="tab-combos" class="hidden">
-      <div style="background:#080d1a; padding:16px; border-radius:12px; border:1px solid var(--border); margin-bottom:16px;">
-        <h4 style="color:var(--primary); margin-top:0;">🔥 Personalizar Combos</h4>
-        <div id="combo-boxes-container"></div>
-        <button id="btn-save-combos" class="btn-success" onclick="guardarAjustesCombos()">GUARDAR COMBOS</button>
-      </div>
+      <div style="background:#080d1a; padding:16px; border-radius:12px; border:1px solid var(--border); margin-bottom:16px;"><h4 style="color:var(--primary); margin-top:0;">🔥 Personalizar Combos</h4><div id="combo-boxes-container"></div><button id="btn-save-combos" class="btn-success" onclick="guardarAjustesCombos()">GUARDAR COMBOS</button></div>
     </div>
 
     <!-- PESTAÑA: TEXTOS -->
     <div id="tab-texts" class="hidden">
-      <div style="background:#080d1a; padding:16px; border-radius:12px; border:1px solid var(--border);">
-        <h4 style="color:var(--primary); margin-top:0;">Personalizar Textos</h4>
-        <div class="form-group"><label>Insignia Superior</label><input type="text" id="txt-pill"></div>
-        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
-          <div class="form-group"><label>Título L1</label><input type="text" id="txt-title-1"></div>
-          <div class="form-group"><label>Palabra Destacada</label><input type="text" id="txt-title-2"></div>
-        </div>
-        <div class="form-group"><label>Subtítulo</label><input type="text" id="txt-sub"></div>
-        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
-          <div class="form-group"><label>Símbolo Moneda</label><input type="text" id="txt-currency"></div>
-          <div class="form-group"><label>Botón Comprar</label><input type="text" id="txt-btn-buy"></div>
-        </div>
-        <button id="btn-save-texts" class="btn-primary" onclick="guardarTextos()">GUARDAR TEXTOS</button>
-      </div>
+      <div style="background:#080d1a; padding:16px; border-radius:12px; border:1px solid var(--border);"><h4 style="color:var(--primary); margin-top:0;">Personalizar Textos</h4><div class="form-group"><label>Insignia Superior</label><input type="text" id="txt-pill"></div><div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;"><div class="form-group"><label>Título L1</label><input type="text" id="txt-title-1"></div><div class="form-group"><label>Palabra Destacada</label><input type="text" id="txt-title-2"></div></div><div class="form-group"><label>Subtítulo</label><input type="text" id="txt-sub"></div><div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;"><div class="form-group"><label>Símbolo Moneda</label><input type="text" id="txt-currency"></div><div class="form-group"><label>Botón Comprar</label><input type="text" id="txt-btn-buy"></div></div><button id="btn-save-texts" class="btn-primary" onclick="guardarTextos()">GUARDAR TEXTOS</button></div>
     </div>
 
     <!-- PESTAÑA: PAGOS -->
     <div id="tab-payments" class="hidden">
-      
       <div style="background:#080d1a; padding:16px; border-radius:12px; border:1px solid var(--border);">
         <h4 style="color:var(--accent); margin-top:0;">💳 Configuración de Pagos</h4>
         <p style="font-size:12px; color:#94a3b8; margin-bottom:14px;">Configura cuentas bancarias locales (Pichincha, Guayaquil, DeUna) o enlaces de pago LATAM.</p>
-        
-        <div class="form-group">
-          <label>Cuentas Bancarias / Billeteras (Texto manual)</label>
-          <textarea id="shop-payments" rows="6" placeholder="🏦 BANCO PICHINCHA
-Cuenta Ahorros: 22000000
-Titular: Juan Pérez
-
-📱 DeUna: 0999999999"></textarea>
-        </div>
-
+        <div class="form-group"><label>Cuentas Bancarias / Billeteras (Texto manual)</label><textarea id="shop-payments" rows="6"></textarea></div>
         <div style="background:#111625; padding:12px; border-radius:10px; border:1px solid #1e293b; margin-bottom:14px;">
           <h5 style="color:var(--primary); margin-top:0; margin-bottom:8px;">🔗 Enlace de Pago Directo (Opcional)</h5>
           <p style="font-size:11px; color:#94a3b8; margin-bottom:10px;">Usa esto si tienes un link de cobro directo (PayPal.me, Binance Pay, Stripe).</p>
-          <div class="form-group">
-            <label>Texto del Botón (Ej: Pagar con Binance)</label>
-            <input type="text" id="shop-pay-btn" placeholder="Ej: Pagar en Línea">
-          </div>
-          <div class="form-group">
-            <label>Link de Pago (URL)</label>
-            <input type="text" id="shop-pay-link" placeholder="https://...">
-          </div>
+          <div class="form-group"><label>Texto del Botón (Ej: Pagar con Binance)</label><input type="text" id="shop-pay-btn" placeholder="Ej: Pagar en Línea"></div>
+          <div class="form-group"><label>Link de Pago (URL)</label><input type="text" id="shop-pay-link" placeholder="https://..."></div>
         </div>
-
         <button id="btn-save-payments" class="btn-success" onclick="guardarMetodosPago()">GUARDAR MÉTODOS DE PAGO</button>
       </div>
-
     </div>
   </div>
 
   <script>
     if ('serviceWorker' in navigator) { navigator.serviceWorker.getRegistrations().then(r => r.forEach(reg => reg.unregister())); }
-
-    function calcularDias(vence) {
-      if (!vence) return 999;
-      const diff = new Date(vence) - new Date();
-      return Math.ceil(diff / (1000 * 60 * 60 * 24));
-    }
+    function calcularDias(vence) { if (!vence) return 999; const diff = new Date(vence) - new Date(); return Math.ceil(diff / (1000 * 60 * 60 * 24)); }
 
     let revendedorActual = null; let slugActual = null; let tiendaActual = {};
     let tempImgBase64 = null; let tempLogoBase64 = null; let tempComboImgs = [null, null, null];
@@ -284,60 +216,41 @@ Titular: Juan Pérez
       { activo: true, comboCantidad: 4, descuento: 10, nombre: "Combo Cuádruple", sub: "10% OFF", img: "https://images.unsplash.com/photo-1594909122845-11baa439b7bf?w=600" }
     ];
 
-    function toggleMenu() {
-      document.getElementById('nav-menu').classList.toggle('show-menu');
-      document.getElementById('menu-backdrop').classList.toggle('show');
-    }
-
+    function toggleMenu() { document.getElementById('nav-menu').classList.toggle('show-menu'); document.getElementById('menu-backdrop').classList.toggle('show'); }
     function cambiarTab(tab) {
-      ['shop', 'prods', 'combos', 'texts', 'payments', 'stats'].forEach(t => {
-        document.getElementById('tab-' + t).classList.add('hidden');
-        document.getElementById('tab-btn-' + t).classList.remove('active');
-      });
-      document.getElementById('tab-' + tab).classList.remove('hidden');
-      document.getElementById('tab-btn-' + tab).classList.add('active');
-      document.getElementById('nav-menu').classList.remove('show-menu');
-      document.getElementById('menu-backdrop').classList.remove('show');
+      ['shop', 'prods', 'combos', 'texts', 'payments', 'stats', 'clients'].forEach(t => { document.getElementById('tab-' + t).classList.add('hidden'); document.getElementById('tab-btn-' + t).classList.remove('active'); });
+      document.getElementById('tab-' + tab).classList.remove('hidden'); document.getElementById('tab-btn-' + tab).classList.add('active');
+      document.getElementById('nav-menu').classList.remove('show-menu'); document.getElementById('menu-backdrop').classList.remove('show');
     }
-
     function togglePasswordVisibility(id, btn) { const el = document.getElementById(id); el.type = el.type === 'password' ? 'text' : 'password'; btn.innerText = el.type === 'password' ? '👁️' : '🙈'; }
     function toggleCheckbox(id) { document.getElementById(id).checked = !document.getElementById(id).checked; }
     function seleccionarTema(color) { document.querySelectorAll('.theme-opt').forEach(el => el.classList.remove('active')); const sel = document.getElementById('theme-' + color); if (sel) sel.classList.add('active'); document.getElementById('shop-tema').value = color; }
     
     async function iniciarSesion(autoEmail = null, autoPass = null) {
-      const email = autoEmail || document.getElementById('email').value.trim();
-      const pass = autoPass || document.getElementById('password').value.trim();
-      const recordar = document.getElementById('remember-session').checked;
+      const email = autoEmail || document.getElementById('email').value.trim(); const pass = autoPass || document.getElementById('password').value.trim(); const recordar = document.getElementById('remember-session').checked;
       try {
         const res = await fetch('/api/db'); const db = await res.json();
-        const foundSlug = Object.keys(db.revendedores || {}).find(slug => {
-          const r = db.revendedores[slug]; return (r.email === email || r.correo === email) && (r.password === pass || r.clave === pass);
-        });
+        const foundSlug = Object.keys(db.revendedores || {}).find(slug => { const r = db.revendedores[slug]; return (r.email === email || r.correo === email) && (r.password === pass || r.clave === pass); });
         if (foundSlug) {
           slugActual = foundSlug; revendedorActual = db.revendedores[slugActual];
           if (revendedorActual.activo === false) { alert('Tienda suspendida.'); return; }
           if (recordar || autoEmail) localStorage.setItem('revendedor_session', JSON.stringify({ slug: slugActual, email, pass }));
           tiendaActual = (db.tiendas && db.tiendas[slugActual]) ? db.tiendas[slugActual] : {};
           if (!Array.isArray(tiendaActual.productos)) tiendaActual.productos = [];
-          document.getElementById('login-section').classList.add('hidden');
-          document.getElementById('dashboard-section').classList.remove('hidden');
-          pintarDashboard();
+          if (!Array.isArray(tiendaActual.clientes)) tiendaActual.clientes = [];
+          document.getElementById('login-section').classList.add('hidden'); document.getElementById('dashboard-section').classList.remove('hidden'); pintarDashboard();
         } else { if (!autoEmail) alert('Correo o contraseña incorrectos.'); }
       } catch (err) { alert('Error: ' + err.message); }
     }
-
     function cerrarSesion() { localStorage.removeItem('revendedor_session'); location.reload(); }
 
     function reComprimirBase64(b64) {
       return new Promise((resolve) => {
-        const img = new Image();
-        img.onload = () => {
+        const img = new Image(); img.onload = () => {
           const canvas = document.createElement('canvas'); const MAX_WIDTH = 250; const scale = (img.width > MAX_WIDTH) ? (MAX_WIDTH / img.width) : 1;
           canvas.width = img.width * scale; canvas.height = img.height * scale;
-          const ctx = canvas.getContext('2d'); ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-          resolve(canvas.toDataURL('image/jpeg', 0.5));
-        };
-        img.onerror = () => resolve(b64); img.src = b64;
+          const ctx = canvas.getContext('2d'); ctx.drawImage(img, 0, 0, canvas.width, canvas.height); resolve(canvas.toDataURL('image/jpeg', 0.5));
+        }; img.onerror = () => resolve(b64); img.src = b64;
       });
     }
 
@@ -345,28 +258,19 @@ Titular: Juan Pérez
       if (!slugActual) return false;
       try {
         const res = await fetch('/api/tienda/guardar', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ slug: slugActual, tienda: datosParciales }) });
-        const data = await res.json();
-        if (!data.success) { alert("❌ Error Firestore."); return false; }
-        return true;
+        const data = await res.json(); if (!data.success) { alert("❌ Error Firestore."); return false; } return true;
       } catch (err) { alert('❌ Error red.'); return false; }
     }
 
     function convertirImagenABase64(input, previewId) {
       if (input.files && input.files[0]) {
-        const reader = new FileReader();
-        reader.onload = function(e) {
-          const img = new Image();
-          img.onload = function() {
+        const reader = new FileReader(); reader.onload = function(e) {
+          const img = new Image(); img.onload = function() {
             const canvas = document.createElement('canvas'); const MAX_WIDTH = 250; const scale = (img.width > MAX_WIDTH) ? (MAX_WIDTH / img.width) : 1;
             canvas.width = img.width * scale; canvas.height = img.height * scale;
             const ctx = canvas.getContext('2d'); ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-            const b64 = canvas.toDataURL('image/jpeg', 0.50);
-            const prev = document.getElementById(previewId); prev.src = b64; prev.style.display = 'block';
-            if (previewId === 'prod-preview-img') tempImgBase64 = b64;
-            if (previewId === 'shop-logo-preview') tempLogoBase64 = b64;
-            if (previewId === 'combo0-preview') tempComboImgs[0] = b64;
-            if (previewId === 'combo1-preview') tempComboImgs[1] = b64;
-            if (previewId === 'combo2-preview') tempComboImgs[2] = b64;
+            const b64 = canvas.toDataURL('image/jpeg', 0.50); const prev = document.getElementById(previewId); prev.src = b64; prev.style.display = 'block';
+            if (previewId === 'prod-preview-img') tempImgBase64 = b64; if (previewId === 'shop-logo-preview') tempLogoBase64 = b64; if (previewId === 'combo0-preview') tempComboImgs[0] = b64; if (previewId === 'combo1-preview') tempComboImgs[1] = b64; if (previewId === 'combo2-preview') tempComboImgs[2] = b64;
           }; img.src = e.target.result;
         }; reader.readAsDataURL(input.files[0]);
       }
@@ -374,17 +278,13 @@ Titular: Juan Pérez
 
     async function cargarEstadisticas() {
       try {
-        const res = await fetch("/api/stats/" + slugActual);
-        const data = await res.json();
-        document.getElementById("stat-vistas").innerText = data.vistas || 0;
-        document.getElementById("stat-clics").innerText = data.clics || 0;
+        const res = await fetch("/api/stats/" + slugActual); const data = await res.json();
+        document.getElementById("stat-vistas").innerText = data.vistas || 0; document.getElementById("stat-clics").innerText = data.clics || 0;
         const topList = document.getElementById("stat-top-list");
         if (data.top && Object.keys(data.top).length > 0) {
           const sorted = Object.entries(data.top).sort((a,b) => b[1] - a[1]);
           topList.innerHTML = sorted.map(item => `<div style="display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid #1e293b;"><span>${item[0]}</span><strong style="color:var(--primary);">${item[1]} pedidos</strong></div>`).join("");
-        } else {
-          topList.innerHTML = "(Aún no hay datos suficientes)";
-        }
+        } else { topList.innerHTML = "(Aún no hay datos suficientes)"; }
       } catch(e) {}
     }
 
@@ -416,12 +316,109 @@ Titular: Juan Pérez
       if (revendedorActual.activo === false || dias <= 0) { tag.className = 'badge-dias red'; tag.innerText = dias<=0 ? '⛔ VENCIDO' : '⛔ SUSPENDIDO'; }
       else { tag.className = 'badge-dias green'; tag.innerText = `✅ ${dias} DÍAS`; }
 
-      renderProductos();
-      cargarEstadisticas();
       const publicLink = window.location.origin + "/?tienda=" + slugActual;
       const elLink = document.getElementById("shop-public-link");
       if (elLink) { elLink.href = publicLink; elLink.innerText = publicLink; }
+
+      renderProductos();
+      cargarEstadisticas();
+      renderClientes();
     }
+
+    // ==========================================
+    // LÓGICA DEL MINI-CRM (CLIENTES)
+    // ==========================================
+    function renderClientes() {
+      const lista = document.getElementById('lista-clientes');
+      lista.innerHTML = '';
+      const clientes = tiendaActual.clientes || [];
+      document.getElementById('cli-count').innerText = `${clientes.length} Total`;
+      
+      if (clientes.length === 0) {
+        lista.innerHTML = '<div style="text-align:center; color:#94a3b8; padding:30px; border:1px dashed #1e293b; border-radius:12px;">No tienes clientes registrados.</div>';
+        return;
+      }
+
+      // Ordenar por los que están más próximos a vencer
+      const clientesOrdenados = clientes.map((c, i) => ({...c, originalIndex: i})).sort((a, b) => new Date(a.vence) - new Date(b.vence));
+
+      clientesOrdenados.forEach((c) => {
+        const hoy = new Date(); hoy.setHours(0,0,0,0);
+        
+        // Compensación de zona horaria para inputs type="date"
+        const partes = c.vence.split('-');
+        const fechaVencimiento = new Date(partes[0], partes[1] - 1, partes[2]);
+        
+        const diffTime = fechaVencimiento - hoy;
+        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+        
+        let color = '#22c55e'; // Verde (Sano)
+        let estado = `Vence en ${diffDays} días`;
+        
+        if (diffDays < 0) { color = '#ef4444'; estado = `Vencido hace ${Math.abs(diffDays)} d.`; }
+        else if (diffDays === 0) { color = '#ef4444'; estado = 'Vence HOY'; }
+        else if (diffDays <= 3) { color = '#eab308'; estado = `Vence en ${diffDays} días`; }
+
+        const metodoRenovacion = tiendaActual.payLink ? tiendaActual.payLink : 'nuestras cuentas bancarias.';
+        const txtMsg = `¡Hola ${c.nombre}! 👋 Te saludamos de ${tiendaActual.nombre}. Te recordamos que tu servicio de *${c.servicio}* vence el *${c.vence}*.\n\n¿Deseas renovarlo para no perder el acceso?\n\nPuedes pagar rápido aquí: ${metodoRenovacion}`;
+        const wsLimpio = c.ws.replace(/\D/g,'');
+        const wsLink = `https://wa.me/${wsLimpio}?text=${encodeURIComponent(txtMsg)}`;
+
+        const card = document.createElement('div');
+        card.style = `background:#080d1a; border:1px solid ${color}30; border-left:5px solid ${color}; border-radius:12px; padding:14px; margin-bottom:12px;`;
+        card.innerHTML = `
+          <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:8px;">
+            <div>
+              <strong style="color:#fff; font-size:16px; display:block;">${c.nombre}</strong>
+              <span style="color:#94a3b8; font-size:13px;">📱 ${c.ws}</span>
+            </div>
+            <span style="background:${color}20; color:${color}; font-size:11px; font-weight:800; padding:4px 8px; border-radius:6px;">${estado}</span>
+          </div>
+          <div style="color:var(--primary); font-size:14px; font-weight:bold; margin-bottom:12px;">📦 ${c.servicio}</div>
+          <div style="display:flex; gap:8px;">
+            <a href="${wsLink}" target="_blank" style="flex:1; background:#00d26a; color:#032412; padding:10px; border-radius:8px; text-align:center; font-weight:800; font-size:12px; text-decoration:none; display:flex; align-items:center; justify-content:center; gap:4px;">💬 RECORDAR COBRO</a>
+            <button onclick="eliminarCliente(${c.originalIndex})" style="background:#1e293b; color:#ef4444; border:1px solid #ef4444; padding:8px 14px; font-size:14px; border-radius:8px; width:auto; font-weight:bold;">✕</button>
+          </div>
+        `;
+        lista.appendChild(card);
+      });
+    }
+
+    async function guardarCliente() {
+      const nombre = document.getElementById('cli-nombre').value.trim();
+      const ws = document.getElementById('cli-ws').value.trim();
+      const vence = document.getElementById('cli-vence').value;
+      const servicio = document.getElementById('cli-servicio').value.trim();
+
+      if(!nombre || !ws || !vence || !servicio) { alert("Completa todos los campos del cliente."); return; }
+      
+      const btn = event.target;
+      btn.disabled = true; btn.innerText = "⏳ GUARDANDO...";
+      
+      if (!Array.isArray(tiendaActual.clientes)) tiendaActual.clientes = [];
+      tiendaActual.clientes.push({ nombre, ws, vence, servicio });
+      
+      const ok = await persistirEnNube({ clientes: tiendaActual.clientes });
+      btn.disabled = false; btn.innerText = "GUARDAR CLIENTE";
+      
+      if (ok) {
+        document.getElementById('cli-nombre').value = '';
+        document.getElementById('cli-ws').value = '';
+        document.getElementById('cli-vence').value = '';
+        document.getElementById('cli-servicio').value = '';
+        renderClientes();
+        alert('✅ ¡Cliente registrado con éxito en tu agenda!');
+      }
+    }
+
+    async function eliminarCliente(idx) {
+      if (confirm('¿Estás seguro de eliminar a este cliente del registro?')) { 
+        tiendaActual.clientes.splice(idx, 1); 
+        await persistirEnNube({ clientes: tiendaActual.clientes }); 
+        renderClientes(); 
+      }
+    }
+    // ==========================================
 
     function renderProductos() {
       const lista = document.getElementById('lista-productos'); lista.innerHTML = '';
@@ -472,10 +469,12 @@ Titular: Juan Pérez
       tiendaActual = { ...tiendaActual, ...payload }; const ok = await persistirEnNube(payload); btn.disabled = false; btn.innerText = "GUARDAR AJUSTES"; if (ok) { alert('✅ Guardado!'); document.getElementById('dash-title').innerText = payload.nombre; if (tempLogoBase64) document.getElementById('dash-logo').src = tempLogoBase64; }
     }
     async function guardarTextos() { const textos = { pill: document.getElementById('txt-pill').value, title1: document.getElementById('txt-title-1').value, title2: document.getElementById('txt-title-2').value, sub: document.getElementById('txt-sub').value, currency: document.getElementById('txt-currency').value, btnBuy: document.getElementById('txt-btn-buy').value }; tiendaActual.textos = textos; const ok = await persistirEnNube({ textos }); if (ok) alert('✅ Guardado!'); }
-    async function guardarMetodosPago() { tiendaActual.metodosPago = document.getElementById('shop-payments').value.trim();
+    async function guardarMetodosPago() {
+      tiendaActual.metodosPago = document.getElementById('shop-payments').value.trim();
       tiendaActual.payBtn = document.getElementById('shop-pay-btn').value.trim();
       tiendaActual.payLink = document.getElementById('shop-pay-link').value.trim();
-      if (await persistirEnNube({ metodosPago: tiendaActual.metodosPago, payBtn: tiendaActual.payBtn, payLink: tiendaActual.payLink })) alert('✅ Guardado!'); }
+      if (await persistirEnNube({ metodosPago: tiendaActual.metodosPago, payBtn: tiendaActual.payBtn, payLink: tiendaActual.payLink })) alert('✅ Guardado!');
+    }
 
     const sesion = localStorage.getItem('revendedor_session'); if (sesion) { try { const p = JSON.parse(sesion); if (p.email && p.pass) iniciarSesion(p.email, p.pass); } catch(e) {} }
   </script>
