@@ -103,6 +103,7 @@
       <div style="display:flex; justify-content:space-between; margin-bottom:12px;"><h3 id="modal-title" style="color:#fff;">Detalles</h3><button class="btn-close" onclick="document.getElementById('modal-compra').classList.add('hidden')">✕</button></div>
       <div style="display:flex; justify-content:space-between; margin-bottom:8px;"><span id="modal-service-name" style="color:#fff; font-weight:bold;">Servicio</span><span id="modal-service-price" style="color:var(--primary-accent); font-weight:bold;">$0.00</span></div>
       <div id="modal-payment-info" style="background:#080a11; padding:14px; border-radius:10px; color:#cbd5e1; font-size:13px; line-height:1.6; margin:10px 0;"></div>
+      <div id="modal-extra-buttons"></div>
       <a id="btn-confirm-paid" href="#" target="_blank" style="display:block; background:#00d26a; color:#032412; padding:12px; border-radius:10px; text-align:center; font-weight:bold; text-decoration:none; margin-top:8px;">✅ YA PAGUÉ (ENVIAR COMPROBANTE)</a>
       <a id="btn-confirm-info" href="#" target="_blank" style="display:block; background:#171b28; border:1px solid #293046; color:#38bdf8; padding:12px; border-radius:10px; text-align:center; font-weight:bold; text-decoration:none; margin-top:8px;">💬 MÁS INFORMACIÓN</a>
     </div>
@@ -119,6 +120,7 @@
         <div style="display:flex; justify-content:space-between; color:#fff; font-size:16px; font-weight:bold; border-top:1px solid #1c243a; padding-top:6px; margin-top:6px;"><span>Total:</span><span id="combo-total-final" style="color:var(--primary-accent);">$0.00</span></div>
       </div>
       <div id="combo-payment-info" style="background:#080a11; padding:14px; border-radius:10px; color:#cbd5e1; font-size:13px; line-height:1.6; margin:10px 0;"></div>
+      <div id="combo-extra-buttons"></div>
       <a id="btn-combo-order" href="#" target="_blank" style="display:block; background:#00d26a; color:#032412; padding:12px; border-radius:10px; text-align:center; font-weight:bold; text-decoration:none; margin-top:8px;">🛒 ORDENAR POR WHATSAPP</a>
     </div>
   </div>
@@ -238,6 +240,14 @@
       const p = itemsParaMostrar[idx]; const ws = (tiendaActiva.whatsapp || "593982766054").replace(/\D/g, '');
       document.getElementById('modal-service-name').innerText = p.nombre; document.getElementById('modal-service-price').innerText = tiendaActiva.moneda + p.precio;
       document.getElementById('modal-payment-info').innerHTML = formatearCuentas(tiendaActiva.metodosPago);
+
+      // BOTÓN DE PAGO DIRECTO
+      let extra = '';
+      if (tiendaActiva.payLink) {
+        extra = '<a href="' + tiendaActiva.payLink + '" target="_blank" onclick="registrarEstadistica('clic', '' + p.nombre + '')" style="display:block; background:var(--accent-gradient); color:#fff; padding:12px; border-radius:10px; text-align:center; font-weight:bold; text-decoration:none; margin-top:8px;">💳 ' + (tiendaActiva.payBtn || 'PAGAR EN LÍNEA') + '</a>';
+      }
+      document.getElementById('modal-extra-buttons').innerHTML = extra;
+
       
       const btnPaid = document.getElementById('btn-confirm-paid'); const btnInfo = document.getElementById('btn-confirm-info');
       btnPaid.href = `https://wa.me/${ws}?text=${encodeURIComponent(`¡Hola! Pagué mi servicio: *${p.nombre}* (${tiendaActiva.moneda}${p.precio}). Adjunto comprobante.`)}`;
@@ -253,6 +263,13 @@
       comboActualConfig = itemsParaMostrar[idx]; comboSeleccionados = [];
       document.getElementById('combo-modal-title').innerText = comboActualConfig.nombre;
       document.getElementById('combo-payment-info').innerHTML = formatearCuentas(tiendaActiva.metodosPago);
+
+      let extraCombo = '';
+      if (tiendaActiva.payLink) {
+        extraCombo = '<a href="' + tiendaActiva.payLink + '" target="_blank" onclick="registrarEstadistica('clic', '' + comboActualConfig.nombre + '')" style="display:block; background:var(--accent-gradient); color:#fff; padding:12px; border-radius:10px; text-align:center; font-weight:bold; text-decoration:none; margin-top:8px;">💳 ' + (tiendaActiva.payBtn || 'PAGAR EN LÍNEA') + '</a>';
+      }
+      document.getElementById('combo-extra-buttons').innerHTML = extraCombo;
+
       renderListaComboItems(); actualizarCalculoCombo();
       document.getElementById('modal-combo-selector').classList.remove('hidden');
     }
