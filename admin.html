@@ -25,8 +25,8 @@
     .btn-danger { background: #dc2626; color: #fff; }
     .hidden { display: none !important; }
     
-    /* NUEVO DISEÑO DEL MENÚ DESPLEGABLE */
-    .btn-menu-toggle { background: transparent; border: none; color: var(--primary); font-size: 28px; cursor: pointer; padding: 0 5px; line-height: 1; }
+    /* MENÚ DESPLEGABLE MEJORADO */
+    .btn-menu-toggle { background: transparent; border: none; color: var(--primary); font-size: 26px; cursor: pointer; padding: 0; line-height: 1; display:flex; align-items:center; justify-content:center; width:30px; height:30px; }
     .nav-tabs { 
       display: none; flex-direction: column; gap: 8px; 
       position: absolute; top: 75px; left: 16px; z-index: 1000; 
@@ -46,7 +46,6 @@
       background: rgba(0,0,0,0.6); z-index: 999; backdrop-filter: blur(2px);
     }
     .menu-backdrop.show { display: block; }
-    /* FIN NUEVO DISEÑO */
 
     .product-card { background: #080d1a; border: 1px solid var(--border); border-radius: 12px; padding: 14px; margin-bottom: 12px; display: flex; gap: 14px; align-items: center; }
     .product-img { width: 65px; height: 65px; border-radius: 8px; object-fit: cover; border: 1px solid #334155; }
@@ -90,18 +89,24 @@
     <!-- FONDO OSCURO PARA CERRAR EL MENÚ TOCANDO AFUERA -->
     <div id="menu-backdrop" class="menu-backdrop" onclick="toggleMenu()"></div>
 
-    <!-- CABECERA PRINCIPAL CON MENÚ HAMBURGUESA -->
-    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px; border-bottom:1px solid var(--border); padding-bottom:12px; gap:8px;">
-      <div style="display:flex; align-items:center; gap:12px;">
-        <!-- BOTÓN DE 3 RAYITAS -->
+    <!-- CABECERA PRINCIPAL REESTRUCTURADA (NO SE AMONTONA) -->
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px; border-bottom:1px solid var(--border); padding-bottom:12px;">
+      
+      <!-- IZQUIERDA: Botón Hamburguesa y Logo -->
+      <div style="display:flex; align-items:center; gap:8px; flex-shrink:0;">
         <button class="btn-menu-toggle" onclick="toggleMenu()">☰</button>
-        <img id="dash-logo" src="https://via.placeholder.com/40" style="width:42px; height:42px; border-radius:50%; object-fit:cover; border:1px solid var(--primary);">
-        <div>
-          <span id="dash-title" style="font-family:'Orbitron'; font-weight:bold; font-size:16px; color:#fff;">Mi Tienda</span>
-          <div><span id="dash-countdown" class="badge-dias green">⏳ Calculando días...</span></div>
-        </div>
+        <img id="dash-logo" src="https://via.placeholder.com/40" style="width:36px; height:36px; border-radius:50%; object-fit:cover; border:1px solid var(--primary);">
       </div>
-      <button onclick="cerrarSesion()" style="width:auto; padding:6px 12px; background:#dc2626; color:#fff; font-size:12px;">Salir</button>
+
+      <!-- CENTRO: Título y Días (Text-overflow previene que baje de línea) -->
+      <div style="flex:1; min-width:0; padding:0 8px; display:flex; flex-direction:column; justify-content:center;">
+        <span id="dash-title" style="font-family:'Orbitron'; font-weight:bold; font-size:14px; color:#fff; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; line-height:1.2; margin-bottom:4px;">Mi Tienda</span>
+        <div><span id="dash-countdown" class="badge-dias green" style="font-size:10px; padding:3px 6px;">⏳ Calculando...</span></div>
+      </div>
+
+      <!-- DERECHA: Botón de Salida Fijo -->
+      <button onclick="cerrarSesion()" style="width:auto; padding:6px 10px; background:#dc2626; color:#fff; font-size:12px; font-weight:bold; flex-shrink:0; border-radius:6px;">Salir</button>
+      
     </div>
 
     <!-- MENÚ LATERAL DESPLEGABLE -->
@@ -253,7 +258,6 @@
       { activo: true, comboCantidad: 4, descuento: 10, nombre: "Combo Cuádruple", sub: "10% OFF", img: "https://images.unsplash.com/photo-1594909122845-11baa439b7bf?w=600" }
     ];
 
-    // FUNCIONES DEL MENÚ DESPLEGABLE
     function toggleMenu() {
       document.getElementById('nav-menu').classList.toggle('show-menu');
       document.getElementById('menu-backdrop').classList.toggle('show');
@@ -266,8 +270,6 @@
       });
       document.getElementById('tab-' + tab).classList.remove('hidden');
       document.getElementById('tab-btn-' + tab).classList.add('active');
-      
-      // Auto-cerrar el menú tras seleccionar
       document.getElementById('nav-menu').classList.remove('show-menu');
       document.getElementById('menu-backdrop').classList.remove('show');
     }
