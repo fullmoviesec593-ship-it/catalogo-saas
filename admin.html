@@ -16,9 +16,12 @@
     label { display: block; margin-bottom: 4px; font-size: 13px; color: #94a3b8; font-weight: 600; }
     input, textarea, select { width: 100%; padding: 10px 12px; border-radius: 8px; border: 1px solid var(--border); background-color: #080d1a; color: #fff; font-size: 14px; outline: none; }
     input:focus, textarea:focus { border-color: var(--primary); }
-    .password-wrapper { position: relative; display: flex; align-items: center; }
-    .password-wrapper input { padding-right: 44px; }
-    .toggle-password-btn { position: absolute; right: 10px; background: transparent; border: none; color: #94a3b8; cursor: pointer; font-size: 18px; padding: 4px 6px; }
+    
+    /* CORRECCIÓN DEL INPUT DE CONTRASEÑA */
+    .password-wrapper { position: relative; display: block; width: 100%; }
+    .password-wrapper input { width: 100%; padding-right: 45px; }
+    .toggle-password-btn { position: absolute; right: 5px; top: 50%; transform: translateY(-50%); background: transparent; border: none; color: #94a3b8; cursor: pointer; font-size: 20px; width: 35px; height: 35px; display: flex; align-items: center; justify-content: center; z-index: 10; }
+    
     button { width: 100%; padding: 12px; border: none; border-radius: 8px; font-size: 15px; font-weight: 700; cursor: pointer; font-family: 'Orbitron', sans-serif; transition: 0.2s; }
     .btn-primary { background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%); color: #fff; }
     .btn-success { background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%); color: #042f1a; }
@@ -61,7 +64,13 @@
     <h2 style="text-align:center;">💼 PANEL REVENDEDOR</h2>
     <p id="login-submsg" style="text-align:center; color:#94a3b8; font-size:14px; margin-bottom:20px;">Ingresa tus credenciales para gestionar tu catálogo</p>
     <div class="form-group"><label>Correo Electrónico</label><input type="email" id="email" placeholder="tu-correo@gmail.com"></div>
-    <div class="form-group"><label>Contraseña</label><div class="password-wrapper"><input type="password" id="password" placeholder="Tu clave de acceso"><button type="button" class="toggle-password-btn" onclick="togglePasswordVisibility('password', this)">👁️</button></div></div>
+    <div class="form-group">
+      <label>Contraseña</label>
+      <div class="password-wrapper">
+        <input type="password" id="password" placeholder="Tu clave de acceso">
+        <button type="button" class="toggle-password-btn" onclick="togglePasswordVisibility('password', this)">👁️</button>
+      </div>
+    </div>
     <div class="checkbox-container" onclick="toggleCheckbox('remember-session')"><input type="checkbox" id="remember-session" checked onclick="event.stopPropagation()"><span style="font-size:14px; color:#cbd5e1; font-weight:600;">Mantener sesión iniciada</span></div>
     <button class="btn-primary" onclick="iniciarSesion()">INGRESAR A MI PANEL</button>
   </div>
