@@ -397,24 +397,45 @@
     }
 
     async function iniciarSesion(autoEmail = null, autoPass = null) {
-      const email = autoEmail || document.getElementById('email').value.trim(); const pass = autoPass || document.getElementById('password').value.trim(); const recordar = document.getElementById('remember-session').checked;
+      const email = autoEmail || document.getElementById('email').value.trim(); 
+      const pass = autoPass || document.getElementById('password').value.trim(); 
+      const recordar = document.getElementById('remember-session').checked;
+      
+      if (!email || !pass) {
+        alert('Por favor ingresa correo y contraseña.');
+        return;
+      }
+
       try {
-        const res = await fetch('/api/db'); const db = await res.json();
-        const foundSlug = Object.keys(db.revendedores || {}).find(slug => { const r = db.revendedores[slug]; return (r.email === email || r.correo === email) && (r.password === pass || r.clave === pass); });
+        const res = await fetch('/api/db'); 
+        const db = await res.json();
+        const foundSlug = Object.keys(db.revendedores || {}).find(slug => { 
+          const r = db.revendedores[slug]; 
+          return (r.email === email || r.correo === email) && (r.password === pass || r.clave === pass); 
+        });
+
         if (foundSlug) {
-          slugActual = foundSlug; revendedorActual = db.revendedores[slugActual];
+          slugActual = foundSlug; 
+          revendedorActual = db.revendedores[slugActual];
           if (revendedorActual.activo === false) { alert('Tienda suspendida.'); return; }
           if (recordar || autoEmail) localStorage.setItem('revendedor_session', JSON.stringify({ slug: slugActual, email, pass }));
           tiendaActual = (db.tiendas && db.tiendas[slugActual]) ? db.tiendas[slugActual] : {};
           if (!Array.isArray(tiendaActual.productos)) tiendaActual.productos = [];
           if (!Array.isArray(tiendaActual.clientes)) tiendaActual.clientes = [];
-          document.getElementById('login-section').classList.add('hidden'); document.getElementById('dashboard-section').classList.remove('hidden'); 
+          
+          document.getElementById('login-section').classList.add('hidden'); 
+          document.getElementById('dashboard-section').classList.remove('hidden'); 
           pintarDashboard();
           poblarSelectServicios();
           inicializarFechasFormulario();
-        } else { if (!autoEmail) alert('Correo o contraseña incorrectos.'); }
-      } catch (err) { alert('Error: ' + err.message); }
+        } else { 
+          if (!autoEmail) alert('Correo o contraseña incorrectos.'); 
+        }
+      } catch (err) { 
+        alert('Error de conexión: ' + err.message); 
+      }
     }
+
     function cerrarSesion() { localStorage.removeItem('revendedor_session'); location.reload(); }
 
     function reComprimirBase64(b64) {
