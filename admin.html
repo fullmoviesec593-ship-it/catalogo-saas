@@ -12,9 +12,9 @@
     body { background-color: var(--bg); color: #f8fafc; margin: 0; padding: 16px; display: flex; justify-content: center; min-height: 100vh; }
     .card { background: var(--card-bg); border-radius: 16px; padding: 22px; width: 100%; max-width: 680px; border: 1px solid var(--border); box-shadow: 0 10px 30px rgba(0,0,0,0.7); position: relative; }
     h2, h3, h4, h5 { color: var(--primary); margin-top: 0; font-family: 'Orbitron', sans-serif; }
-    .form-group { margin-bottom: 14px; position: relative; }
-    label { display: block; margin-bottom: 5px; font-size: 14px; color: #94a3b8; font-weight: 600; }
-    input, textarea, select { width: 100%; padding: 12px 14px; border-radius: 8px; border: 1px solid var(--border); background-color: #080d1a; color: #fff; font-size: 15px; outline: none; }
+    .form-group { margin-bottom: 12px; position: relative; }
+    label { display: block; margin-bottom: 4px; font-size: 13px; color: #94a3b8; font-weight: 600; }
+    input, textarea, select { width: 100%; padding: 10px 12px; border-radius: 8px; border: 1px solid var(--border); background-color: #080d1a; color: #fff; font-size: 14px; outline: none; }
     input:focus, textarea:focus { border-color: var(--primary); }
     .password-wrapper { position: relative; display: flex; align-items: center; }
     .password-wrapper input { padding-right: 44px; }
@@ -46,6 +46,10 @@
     .badge-dias.red { background: rgba(239, 68, 68, 0.2); color: #f87171; border: 1px solid #ef4444; }
     .checkbox-container { display: flex; align-items: center; gap: 10px; margin: 14px 0 18px 0; cursor: pointer; user-select: none; }
     .checkbox-container input { width: 18px; height: 18px; accent-color: #38bdf8; }
+    
+    .tipo-selector { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px; }
+    .tipo-btn { background: #080d1a; border: 1px solid var(--border); color: #94a3b8; padding: 10px; text-align: center; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 13px; }
+    .tipo-btn.active { background: rgba(34, 197, 94, 0.15); border-color: var(--accent); color: var(--accent); }
   </style>
 </head>
 <body>
@@ -84,31 +88,55 @@
       <div id="tab-btn-stats" class="nav-tab" onclick="cambiarTab('stats')" style="color:#22c55e; border-color:#22c55e;">📊 ESTADÍSTICAS</div>
     </div>
 
-    <!-- PESTAÑA: CLIENTES (NUEVA) -->
+    <!-- PESTAÑA: CLIENTES (CRM PROFESIONAL) -->
     <div id="tab-clients" class="hidden">
       <div style="background:#080d1a; padding:16px; border-radius:12px; border:1px solid var(--border); margin-bottom:20px;">
-        <h4 style="color:var(--accent); margin-top:0;">➕ Registrar Nuevo Cliente</h4>
-        <p style="font-size:11px; color:#94a3b8; margin-bottom:12px;">El sistema te avisará 3 días antes de que se venza su servicio.</p>
+        <h4 style="color:var(--accent); margin-top:0;">➕ Nuevo Registro / Perfil</h4>
         
-        <div class="form-group">
-          <label>Nombre del Cliente</label>
-          <input type="text" id="cli-nombre" placeholder="Ej: Carlos Mendoza">
+        <!-- TIPO DE VENTA -->
+        <label>Tipo de Venta</label>
+        <div class="tipo-selector">
+          <div id="tipo-perfil" class="tipo-btn active" onclick="seleccionarTipo('Perfil')">PERFIL</div>
+          <div id="tipo-cuenta" class="tipo-btn" onclick="seleccionarTipo('Cuenta Completa')">CUENTA COMPLETA</div>
         </div>
+        <input type="hidden" id="cli-tipo" value="Perfil">
+
         <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
-          <div class="form-group">
-            <label>WhatsApp (con código país)</label>
-            <input type="number" id="cli-ws" placeholder="593999999999">
-          </div>
-          <div class="form-group">
-            <label>Fecha de Vencimiento</label>
-            <input type="date" id="cli-vence">
-          </div>
+          <div class="form-group"><label>Nombre del Cliente</label><input type="text" id="cli-nombre" placeholder="Ej: Carlos Mendoza"></div>
+          <div class="form-group"><label>WhatsApp (con país)</label><input type="number" id="cli-ws" placeholder="593999999999"></div>
         </div>
+
         <div class="form-group">
-          <label>Servicio Adquirido</label>
-          <input type="text" id="cli-servicio" placeholder="Ej: Netflix 1 Pantalla">
+          <label>Servicio del Catálogo</label>
+          <select id="cli-servicio" onchange="autocompletarPrecio()"><option value="">Selecciona un servicio...</option></select>
         </div>
-        <button class="btn-success" onclick="guardarCliente()">GUARDAR CLIENTE</button>
+
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+          <div class="form-group"><label>Correo o Usuario *</label><input type="text" id="cli-correo" placeholder="correo@gmail.com"></div>
+          <div class="form-group"><label>Contraseña</label><input type="text" id="cli-pass" placeholder="Clave de cuenta"></div>
+        </div>
+
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+          <div class="form-group"><label>Estado</label><select id="cli-estado"><option value="ACTIVA">ACTIVA</option><option value="SUSPENDIDA">SUSPENDIDA</option><option value="VENCIDA">VENCIDA</option></select></div>
+          <div class="form-group"><label>Costo / Precio ($)</label><input type="number" id="cli-costo" placeholder="10"></div>
+        </div>
+
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+          <div class="form-group"><label>Fecha de Inicio</label><input type="date" id="cli-inicio" onchange="calcularVencimientoAutomatico()"></div>
+          <div class="form-group"><label>Duración (Días)</label><input type="number" id="cli-dias" value="30" oninput="calcularVencimientoAutomatico()"></div>
+        </div>
+
+        <div class="form-group">
+          <label>Fecha de Vencimiento (Calculada)</label>
+          <input type="date" id="cli-vence" style="border-color:var(--accent); font-weight:bold; color:var(--accent);">
+        </div>
+
+        <div class="form-group">
+          <label>Notas / Perfil / Pantalla</label>
+          <input type="text" id="cli-notas" placeholder="Ej: Perfil 3 o PIN 1234">
+        </div>
+
+        <button class="btn-success" onclick="guardarCliente()" style="margin-top:6px;">GUARDAR REGISTRO</button>
       </div>
 
       <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
@@ -226,6 +254,56 @@
     function toggleCheckbox(id) { document.getElementById(id).checked = !document.getElementById(id).checked; }
     function seleccionarTema(color) { document.querySelectorAll('.theme-opt').forEach(el => el.classList.remove('active')); const sel = document.getElementById('theme-' + color); if (sel) sel.classList.add('active'); document.getElementById('shop-tema').value = color; }
     
+    function seleccionarTipo(tipo) {
+      document.getElementById('tipo-perfil').classList.remove('active');
+      document.getElementById('tipo-cuenta').classList.remove('active');
+      if (tipo === 'Perfil') document.getElementById('tipo-perfil').classList.add('active');
+      else document.getElementById('tipo-cuenta').classList.add('active');
+      document.getElementById('cli-tipo').value = tipo;
+    }
+
+    function inicializarFechasFormulario() {
+      const hoy = new Date().toISOString().split('T')[0];
+      const inputInicio = document.getElementById('cli-inicio');
+      if (inputInicio && !inputInicio.value) {
+        inputInicio.value = hoy;
+        calcularVencimientoAutomatico();
+      }
+    }
+
+    function calcularVencimientoAutomatico() {
+      const inicioStr = document.getElementById('cli-inicio').value;
+      const dias = parseInt(document.getElementById('cli-dias').value) || 30;
+      if (!inicioStr) return;
+      const partes = inicioStr.split('-');
+      const fecha = new Date(partes[0], partes[1] - 1, partes[2]);
+      fecha.setDate(fecha.getDate() + dias);
+      const yyyy = fecha.getFullYear();
+      const mm = String(fecha.getMonth() + 1).padStart(2, '0');
+      const dd = String(fecha.getDate()).padStart(2, '0');
+      document.getElementById('cli-vence').value = `${yyyy}-${mm}-${dd}`;
+    }
+
+    function poblarSelectServicios() {
+      const select = document.getElementById('cli-servicio');
+      select.innerHTML = '<option value="">Selecciona un servicio...</option>';
+      (tiendaActual.productos || []).forEach(p => {
+        const opt = document.createElement('option');
+        opt.value = p.nombre;
+        opt.setAttribute('data-precio', p.precio);
+        opt.innerText = `${p.nombre} ($${p.precio})`;
+        select.appendChild(opt);
+      });
+    }
+
+    function autocompletarPrecio() {
+      const select = document.getElementById('cli-servicio');
+      const opt = select.options[select.selectedIndex];
+      if (opt && opt.getAttribute('data-precio')) {
+        document.getElementById('cli-costo').value = opt.getAttribute('data-precio');
+      }
+    }
+
     async function iniciarSesion(autoEmail = null, autoPass = null) {
       const email = autoEmail || document.getElementById('email').value.trim(); const pass = autoPass || document.getElementById('password').value.trim(); const recordar = document.getElementById('remember-session').checked;
       try {
@@ -238,7 +316,10 @@
           tiendaActual = (db.tiendas && db.tiendas[slugActual]) ? db.tiendas[slugActual] : {};
           if (!Array.isArray(tiendaActual.productos)) tiendaActual.productos = [];
           if (!Array.isArray(tiendaActual.clientes)) tiendaActual.clientes = [];
-          document.getElementById('login-section').classList.add('hidden'); document.getElementById('dashboard-section').classList.remove('hidden'); pintarDashboard();
+          document.getElementById('login-section').classList.add('hidden'); document.getElementById('dashboard-section').classList.remove('hidden'); 
+          pintarDashboard();
+          poblarSelectServicios();
+          inicializarFechasFormulario();
         } else { if (!autoEmail) alert('Correo o contraseña incorrectos.'); }
       } catch (err) { alert('Error: ' + err.message); }
     }
@@ -326,7 +407,7 @@
     }
 
     // ==========================================
-    // LÓGICA DEL MINI-CRM (CLIENTES)
+    // LÓGICA DEL CRM PRO (FORMULARIO EXACTO)
     // ==========================================
     function renderClientes() {
       const lista = document.getElementById('lista-clientes');
@@ -339,44 +420,47 @@
         return;
       }
 
-      // Ordenar por los que están más próximos a vencer
       const clientesOrdenados = clientes.map((c, i) => ({...c, originalIndex: i})).sort((a, b) => new Date(a.vence) - new Date(b.vence));
 
       clientesOrdenados.forEach((c) => {
         const hoy = new Date(); hoy.setHours(0,0,0,0);
-        
-        // Compensación de zona horaria para inputs type="date"
         const partes = c.vence.split('-');
         const fechaVencimiento = new Date(partes[0], partes[1] - 1, partes[2]);
+        const diffDays = Math.ceil((fechaVencimiento - hoy) / (1000 * 60 * 60 * 24));
         
-        const diffTime = fechaVencimiento - hoy;
-        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-        
-        let color = '#22c55e'; // Verde (Sano)
-        let estado = `Vence en ${diffDays} días`;
-        
+        let color = '#22c55e'; let estado = `Vence en ${diffDays} días`;
         if (diffDays < 0) { color = '#ef4444'; estado = `Vencido hace ${Math.abs(diffDays)} d.`; }
         else if (diffDays === 0) { color = '#ef4444'; estado = 'Vence HOY'; }
         else if (diffDays <= 3) { color = '#eab308'; estado = `Vence en ${diffDays} días`; }
 
         const metodoRenovacion = tiendaActual.payLink ? tiendaActual.payLink : 'nuestras cuentas bancarias.';
-        const txtMsg = `¡Hola ${c.nombre}! 👋 Te saludamos de ${tiendaActual.nombre}. Te recordamos que tu servicio de *${c.servicio}* vence el *${c.vence}*.\n\n¿Deseas renovarlo para no perder el acceso?\n\nPuedes pagar rápido aquí: ${metodoRenovacion}`;
-        const wsLimpio = c.ws.replace(/\D/g,'');
-        const wsLink = `https://wa.me/${wsLimpio}?text=${encodeURIComponent(txtMsg)}`;
+        const txtMsg = `¡Hola ${c.nombre}! 👋 Te saludamos de ${tiendaActual.nombre}. Te recordamos que tu servicio de *${c.servicio}* (${c.tipo}) vence el *${c.vence}*.\n\n📧 Usuario: ${c.correo || 'N/A'}\n🔑 Clave: ${c.pass || 'N/A'}\n📌 Detalle: ${c.notas || 'N/A'}\n\n¿Deseas renovarlo?\nPaga aquí: ${metodoRenovacion}`;
+        const wsLink = `https://wa.me/${c.ws.replace(/\D/g,'')}?text=${encodeURIComponent(txtMsg)}`;
 
         const card = document.createElement('div');
         card.style = `background:#080d1a; border:1px solid ${color}30; border-left:5px solid ${color}; border-radius:12px; padding:14px; margin-bottom:12px;`;
         card.innerHTML = `
-          <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:8px;">
+          <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:6px;">
             <div>
-              <strong style="color:#fff; font-size:16px; display:block;">${c.nombre}</strong>
-              <span style="color:#94a3b8; font-size:13px;">📱 ${c.ws}</span>
+              <span style="font-size:10px; background:#1e293b; color:var(--primary); padding:2px 6px; border-radius:4px; font-weight:bold;">${c.tipo || 'Perfil'}</span>
+              <strong style="color:#fff; font-size:16px; display:block; margin-top:2px;">${c.nombre}</strong>
+              <span style="color:#94a3b8; font-size:12px;">📱 ${c.ws}</span>
             </div>
-            <span style="background:${color}20; color:${color}; font-size:11px; font-weight:800; padding:4px 8px; border-radius:6px;">${estado}</span>
+            <span style="background:${color}20; color:${color}; font-size:11px; font-weight:800; padding:3px 8px; border-radius:6px;">${estado}</span>
           </div>
-          <div style="color:var(--primary); font-size:14px; font-weight:bold; margin-bottom:12px;">📦 ${c.servicio}</div>
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+            <div style="color:var(--accent); font-size:14px; font-weight:bold;">📦 ${c.servicio}</div>
+            <div style="color:#38bdf8; font-weight:bold; font-size:14px;">$${c.costo || '0.00'}</div>
+          </div>
+          <div style="background:#111625; padding:8px 10px; border-radius:8px; font-size:12px; color:#cbd5e1; margin-bottom:10px; border:1px solid #1e293b;">
+            <div><b>Usuario/Correo:</b> ${c.correo || 'N/A'}</div>
+            <div><b>Contraseña:</b> ${c.pass || 'N/A'}</div>
+            <div><b>Estado:</b> <span style="color:var(--accent);">${c.estado || 'ACTIVA'}</span></div>
+            <div><b>Vencimiento:</b> ${c.vence}</div>
+            ${c.notas ? `<div><b>Notas:</b> ${c.notas}</div>` : ''}
+          </div>
           <div style="display:flex; gap:8px;">
-            <a href="${wsLink}" target="_blank" style="flex:1; background:#00d26a; color:#032412; padding:10px; border-radius:8px; text-align:center; font-weight:800; font-size:12px; text-decoration:none; display:flex; align-items:center; justify-content:center; gap:4px;">💬 RECORDAR COBRO</a>
+            <a href="${wsLink}" target="_blank" style="flex:1; background:#00d26a; color:#032412; padding:10px; border-radius:8px; text-align:center; font-weight:800; font-size:12px; text-decoration:none; display:flex; align-items:center; justify-content:center; gap:4px;">💬 RECORDAR COBRO (WHATSAPP)</a>
             <button onclick="eliminarCliente(${c.originalIndex})" style="background:#1e293b; color:#ef4444; border:1px solid #ef4444; padding:8px 14px; font-size:14px; border-radius:8px; width:auto; font-weight:bold;">✕</button>
           </div>
         `;
@@ -385,34 +469,41 @@
     }
 
     async function guardarCliente() {
+      const tipo = document.getElementById('cli-tipo').value;
       const nombre = document.getElementById('cli-nombre').value.trim();
       const ws = document.getElementById('cli-ws').value.trim();
+      const servicio = document.getElementById('cli-servicio').value;
+      const correo = document.getElementById('cli-correo').value.trim();
+      const pass = document.getElementById('cli-pass').value.trim();
+      const estado = document.getElementById('cli-estado').value;
+      const costo = document.getElementById('cli-costo').value.trim();
+      const inicio = document.getElementById('cli-inicio').value;
+      const dias = document.getElementById('cli-dias').value;
       const vence = document.getElementById('cli-vence').value;
-      const servicio = document.getElementById('cli-servicio').value.trim();
+      const notas = document.getElementById('cli-notas').value.trim();
 
-      if(!nombre || !ws || !vence || !servicio) { alert("Completa todos los campos del cliente."); return; }
+      if(!nombre || !ws || !servicio || !correo || !vence) { alert("Por favor completa Nombre, WhatsApp, Servicio, Correo y Vencimiento."); return; }
       
-      const btn = event.target;
-      btn.disabled = true; btn.innerText = "⏳ GUARDANDO...";
+      const btn = event.target; btn.disabled = true; btn.innerText = "⏳ GUARDANDO...";
       
       if (!Array.isArray(tiendaActual.clientes)) tiendaActual.clientes = [];
-      tiendaActual.clientes.push({ nombre, ws, vence, servicio });
+      tiendaActual.clientes.push({ tipo, nombre, ws, servicio, correo, pass, estado, costo, inicio, dias, vence, notas });
       
       const ok = await persistirEnNube({ clientes: tiendaActual.clientes });
-      btn.disabled = false; btn.innerText = "GUARDAR CLIENTE";
+      btn.disabled = false; btn.innerText = "GUARDAR REGISTRO";
       
       if (ok) {
-        document.getElementById('cli-nombre').value = '';
-        document.getElementById('cli-ws').value = '';
-        document.getElementById('cli-vence').value = '';
-        document.getElementById('cli-servicio').value = '';
-        renderClientes();
-        alert('✅ ¡Cliente registrado con éxito en tu agenda!');
+        document.getElementById('cli-nombre').value = ''; document.getElementById('cli-ws').value = '';
+        document.getElementById('cli-correo').value = ''; document.getElementById('cli-pass').value = '';
+        document.getElementById('cli-costo').value = ''; document.getElementById('cli-notas').value = '';
+        inicializarFechasFormulario();
+        renderClientes(); 
+        alert('✅ ¡Cliente registrado con éxito en el CRM!');
       }
     }
 
     async function eliminarCliente(idx) {
-      if (confirm('¿Estás seguro de eliminar a este cliente del registro?')) { 
+      if (confirm('¿Eliminar cliente del registro?')) { 
         tiendaActual.clientes.splice(idx, 1); 
         await persistirEnNube({ clientes: tiendaActual.clientes }); 
         renderClientes(); 
@@ -427,6 +518,7 @@
         item.innerHTML = `<img src="${p.img || 'https://via.placeholder.com/65'}" class="product-img"><div style="flex:1;"><strong style="color:#fff; font-size:15px;">${p.nombre}</strong><div style="color:var(--accent); font-weight:bold; font-size:14px;">$${p.precio}</div></div><div style="display:flex; flex-direction:column; gap:6px;"><button style="background:#0284c7; color:#fff; padding:6px; font-size:12px;" onclick="cargarEdicionProducto(${idx})">✏️</button><button style="background:#dc2626; color:#fff; padding:6px; font-size:12px;" onclick="eliminarProducto(${idx})">🗑️</button></div>`;
         lista.appendChild(item);
       });
+      poblarSelectServicios();
     }
 
     function cargarEdicionProducto(idx) {
@@ -449,10 +541,10 @@
       for (let i=0; i<tiendaActual.productos.length; i++) { let pr = tiendaActual.productos[i]; if (pr.img && pr.img.length > 30000 && pr.img.startsWith('data:image')) { try { pr.img = await reComprimirBase64(pr.img); } catch(e){} } }
       const ok = await persistirEnNube({ productos: tiendaActual.productos });
       btn.disabled = false; btn.innerText = "AGREGAR / ACTUALIZAR SERVICIO";
-      if (ok) { alert('✅ Guardado!'); document.getElementById('prod-edit-idx').value = "-1"; document.getElementById('prod-nombre').value = ''; document.getElementById('prod-precio').value = ''; document.getElementById('prod-features').value = ''; document.getElementById('prod-preview-img').style.display = 'none'; tempImgBase64 = null; renderProductos(); }
+      if (ok) { alert('✅ Guardado!'); document.getElementById('prod-edit-idx').value = "-1"; document.getElementById('prod-nombre').value = ''; document.getElementById('prod-precio').value = ''; document.getElementById('prod-features').value = ''; document.getElementById('prod-preview-img').style.display = 'none'; tempImgBase64 = null; renderProductos(); poblarSelectServicios(); }
     }
 
-    async function eliminarProducto(idx) { if (confirm('¿Eliminar servicio?')) { tiendaActual.productos.splice(idx, 1); await persistirEnNube({ productos: tiendaActual.productos }); renderProductos(); } }
+    async function eliminarProducto(idx) { if (confirm('¿Eliminar servicio?')) { tiendaActual.productos.splice(idx, 1); await persistirEnNube({ productos: tiendaActual.productos }); renderProductos(); poblarSelectServicios(); } }
     async function guardarAjustesCombos() {
       const btn = document.getElementById('btn-save-combos'); btn.disabled = true; btn.innerText = "⏳ GUARDANDO..."; const nuevosCombos = [];
       for(let i=0; i<3; i++) {
