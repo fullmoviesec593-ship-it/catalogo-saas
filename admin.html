@@ -51,6 +51,8 @@
     .tipo-btn.active { background: rgba(34, 197, 94, 0.15); border-color: var(--accent); color: var(--accent); }
     .var-chip { background: #111625; border: 1px solid #1e293b; color: var(--primary); padding: 6px 10px; border-radius: 6px; font-size: 12px; font-weight: bold; cursor: pointer; text-align: left; }
     .var-chip:hover { border-color: var(--primary); background: #18223b; }
+    .filtro-btn { background: #111625; border: 1px solid #1e293b; color: #94a3b8; padding: 6px 10px; border-radius: 6px; font-size: 11px; font-weight: bold; cursor: pointer; white-space: nowrap; }
+    .filtro-btn.active { background: var(--primary); color: #070a12; border-color: var(--primary); }
   </style>
 </head>
 <body>
@@ -119,8 +121,18 @@
       </div>
     </div>
 
-    <!-- PESTAÑA: CLIENTES (CRM CON TARJETAS COLAPSADAS / DETALLE EXPANDIBLE) -->
+    <!-- PESTAÑA: CLIENTES (CRM CON FILTROS, BUSCADOR Y RESPALDO) -->
     <div id="tab-clients" class="hidden">
+      
+      <!-- BOTÓN DE BACKUP (RESPALDO JSON) -->
+      <div style="display:flex; justify-content:space-between; align-items:center; background:#080d1a; padding:12px 14px; border-radius:12px; border:1px solid var(--border); margin-bottom:16px;">
+        <div>
+          <strong style="color:#fff; font-size:13px; display:block;">💾 Respaldo en la Nube</strong>
+          <span style="font-size:11px; color:#94a3b8;">Descarga un archivo con todos tus datos</span>
+        </div>
+        <button onclick="descargarRespaldoJSON()" style="width:auto; background:#1e293b; color:var(--primary); border:1px solid var(--primary); padding:8px 12px; font-size:12px; border-radius:8px;">📥 Descargar Backup</button>
+      </div>
+
       <div style="background:#080d1a; padding:16px; border-radius:12px; border:1px solid var(--border); margin-bottom:20px;">
         <h4 id="form-cli-title" style="color:var(--accent); margin-top:0;">➕ Nuevo Registro / Perfil</h4>
         <input type="hidden" id="cli-edit-index" value="-1">
@@ -169,6 +181,17 @@
 
         <button id="btn-save-cliente" class="btn-success" onclick="guardarCliente()" style="margin-top:6px;">GUARDAR REGISTRO</button>
         <button id="btn-cancel-cliente" class="hidden btn-danger" onclick="cancelarEdicionCliente()" style="margin-top:6px;">CANCELAR EDICIÓN</button>
+      </div>
+
+      <!-- BUSCADOR Y FILTROS RÁPIDOS -->
+      <div style="margin-bottom:14px;">
+        <input type="text" id="cli-buscador" placeholder="🔍 Buscar cliente o servicio..." oninput="renderClientes()" style="margin-bottom:8px;">
+        <div style="display:flex; gap:6px; overflow-x:auto; padding-bottom:4px;">
+          <button id="filtro-todos" class="filtro-btn active" onclick="filtrarClientes('todos', this)">Todos</button>
+          <button id="filtro-activos" class="filtro-btn" onclick="filtrarClientes('activos', this)">🟢 Activos</button>
+          <button id="filtro-hoy" class="filtro-btn" onclick="filtrarClientes('hoy', this)">⚠️ Vencen Hoy</button>
+          <button id="filtro-vencidos" class="filtro-btn" onclick="filtrarClientes('vencidos', this)">🔴 Vencidos</button>
+        </div>
       </div>
 
       <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
@@ -265,11 +288,16 @@
   </div>
 
   <script>
-    if ('serviceWorker' in navigator) { navigator.serviceWorker.getRegistrations().then(r => r.forEach(reg => reg.unregister())); }
+    if ('serviceWorker' in navigator) { 
+      navigator.serviceWorker.register('/sw.js').catch(()=>{}); 
+    }
+
     function calcularDias(vence) { if (!vence) return 999; const diff = new Date(vence) - new Date(); return Math.ceil(diff / (1000 * 60 * 60 * 24)); }
 
     let revendedorActual = null; let slugActual = null; let tiendaActual = {};
     let tempImgBase64 = null; let tempLogoBase64 = null; let tempComboImgs = [null, null, null];
+    let filtroActualCRM = 'todos';
+
     const COMBOS_DEFAULT = [
       { activo: true, comboCantidad: 2, descuento: 10, nombre: "Combo Dúo", sub: "10% OFF", img: "https://images.unsplash.com/photo-1578328819058-b69f3a3b0f6b?w=600" },
       { activo: true, comboCantidad: 3, descuento: 10, nombre: "Combo Trío", sub: "10% OFF", img: "https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=600" },
@@ -410,6 +438,16 @@
       }
     }
 
+    function descargarRespaldoJSON() {
+      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(tiendaActual, null, 2));
+      const downloadAnchor = document.createElement('a');
+      downloadAnchor.setAttribute("href", dataStr);
+      downloadAnchor.setAttribute("download", `backup_crm_${slugActual}_${Date.now()}.json`);
+      document.body.appendChild(downloadAnchor);
+      downloadAnchor.click();
+      downloadAnchor.remove();
+    }
+
     async function cargarEstadisticas() {
       try {
         const res = await fetch("/api/stats/" + slugActual); const data = await res.json();
@@ -481,7 +519,7 @@
     }
 
     // ==========================================
-    // LÓGICA DE TARJETAS EXPANDIBLES (CRM REFERENCIA)
+    // LÓGICA DE CRM CON BUSCADOR Y FILTROS
     // ==========================================
     function procesarPlantilla(textoTpl, c, diffDays) {
       const linkPago = tiendaActual.payLink ? tiendaActual.payLink : 'nuestras cuentas del catálogo.';
@@ -514,21 +552,47 @@
       });
     }
 
+    function filtrarClientes(tipoFiltro, btn) {
+      filtroActualCRM = tipoFiltro;
+      document.querySelectorAll('.filtro-btn').forEach(b => b.classList.remove('active'));
+      if (btn) btn.classList.add('active');
+      renderClientes();
+    }
+
     function renderClientes() {
       const lista = document.getElementById('lista-clientes');
       lista.innerHTML = '';
       const clientes = tiendaActual.clientes || [];
-      document.getElementById('cli-count').innerText = `${clientes.length} Total`;
+      const query = (document.getElementById('cli-buscador')?.value || '').toLowerCase().trim();
+
+      const hoy = new Date(); hoy.setHours(0,0,0,0);
+
+      // Filtrar y ordenar
+      const filtrados = clientes.map((c, i) => ({...c, originalIndex: i})).filter(c => {
+        const textoBusqueda = `${c.nombre} ${c.servicio} ${c.correo}`.toLowerCase();
+        const coincideBusqueda = !query || textoBusqueda.includes(query);
+        
+        if (!coincideBusqueda) return false;
+
+        // Calcular días
+        const partes = c.vence.split('-');
+        const fechaVencimiento = new Date(partes[0], partes[1] - 1, partes[2]);
+        const diffDays = Math.ceil((fechaVencimiento - hoy) / (1000 * 60 * 60 * 24));
+
+        if (filtroActualCRM === 'activos') return diffDays >= 0;
+        if (filtroActualCRM === 'hoy') return diffDays === 0;
+        if (filtroActualCRM === 'vencidos') return diffDays < 0;
+        return true; // todos
+      }).sort((a, b) => new Date(a.vence) - new Date(b.vence));
+
+      document.getElementById('cli-count').innerText = `${filtrados.length} de ${clientes.length} Total`;
       
-      if (clientes.length === 0) {
-        lista.innerHTML = '<div style="text-align:center; color:#94a3b8; padding:30px; border:1px dashed #1e293b; border-radius:12px;">No tienes clientes registrados.</div>';
+      if (filtrados.length === 0) {
+        lista.innerHTML = '<div style="text-align:center; color:#94a3b8; padding:30px; border:1px dashed #1e293b; border-radius:12px;">No se encontraron clientes.</div>';
         return;
       }
 
-      const clientesOrdenados = clientes.map((c, i) => ({...c, originalIndex: i})).sort((a, b) => new Date(a.vence) - new Date(b.vence));
-
-      clientesOrdenados.forEach((c) => {
-        const hoy = new Date(); hoy.setHours(0,0,0,0);
+      filtrados.forEach((c) => {
         const partes = c.vence.split('-');
         const fechaVencimiento = new Date(partes[0], partes[1] - 1, partes[2]);
         const diffDays = Math.ceil((fechaVencimiento - hoy) / (1000 * 60 * 60 * 24));
@@ -538,7 +602,6 @@
         else if (diffDays === 0) { color = '#ef4444'; estado = 'Vence HOY'; }
         else if (diffDays <= 3) { color = '#eab308'; estado = `Vence en ${diffDays} días`; }
 
-        // Iniciales o logo del servicio para la parte izquierda
         const inicialesServicio = (c.servicio || 'SV').substring(0, 3).toUpperCase();
 
         const tplBienvenida = (tiendaActual.plantillas && tiendaActual.plantillas.bienvenida) ? tiendaActual.plantillas.bienvenida : TPL_DEFAULT_BIENVENIDA;
@@ -562,7 +625,6 @@
         const card = document.createElement('div');
         card.style = `background:#080d1a; border:1px solid ${color}40; border-radius:12px; margin-bottom:12px; overflow:hidden;`;
         card.innerHTML = `
-          <!-- MINIATURA (TARJETA PEQUEÑA Clickeable) -->
           <div onclick="toggleExpandirTarjeta('${cardId}')" style="padding:12px 14px; display:flex; align-items:center; justify-content:space-between; cursor:pointer; background:#0f172a;">
             <div style="display:flex; align-items:center; gap:12px;">
               <div style="width:40px; height:40px; border-radius:8px; background:linear-gradient(135deg, #0284c7, #0369a1); color:#fff; display:flex; align-items:center; justify-content:center; font-weight:900; font-size:12px;">${inicialesServicio}</div>
@@ -577,10 +639,7 @@
             </div>
           </div>
 
-          <!-- DETALLE EXPANDIBLE (Exacto a la Referencia) -->
           <div id="${cardId}" class="hidden" style="padding:16px; border-top:1px solid #1e293b; background:#070a12;">
-            
-            <!-- Bloque Credenciales con Botones de Copiar -->
             <div style="display:flex; flex-direction:column; gap:8px; margin-bottom:14px;">
               <div style="display:flex; justify-content:space-between; align-items:center; background:#0f172a; padding:10px 12px; border-radius:8px; border:1px solid #1e293b;">
                 <div style="font-size:13px; color:#94a3b8;">Correo: <b style="color:#fff; display:block;">${c.correo || 'N/A'}</b></div>
@@ -596,7 +655,6 @@
               </div>
             </div>
 
-            <!-- Bloque de Fechas -->
             <div style="display:grid; grid-template-columns: 1fr 1fr; gap:8px; margin-bottom:8px;">
               <div style="background:#0f172a; padding:10px; border-radius:8px; border:1px solid #1e293b;">
                 <div style="font-size:10px; color:#94a3b8; font-weight:bold;">INICIO</div>
@@ -612,7 +670,6 @@
               <div style="font-size:16px; color:${color}; font-weight:900; font-family:'Orbitron';">${diffDays >= 0 ? diffDays + ' días' : 'VENCIDO'}</div>
             </div>
 
-            <!-- Botones de Acción (Referencia Exacta) -->
             <div style="display:flex; flex-direction:column; gap:8px;">
               <a href="${linkBienvenida}" target="_blank" style="background:#4f46e5; color:#fff; padding:11px; border-radius:8px; text-align:center; font-weight:bold; font-size:13px; text-decoration:none; display:block;">👤 Enviar datos</a>
               
