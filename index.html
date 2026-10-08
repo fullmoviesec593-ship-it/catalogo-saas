@@ -102,8 +102,14 @@
     <div class="modal-box">
       <div style="display:flex; justify-content:space-between; margin-bottom:12px;"><h3 id="modal-title" style="color:#fff;">Detalles</h3><button class="btn-close" onclick="document.getElementById('modal-compra').classList.add('hidden')">✕</button></div>
       <div style="display:flex; justify-content:space-between; margin-bottom:8px;"><span id="modal-service-name" style="color:#fff; font-weight:bold;">Servicio</span><span id="modal-service-price" style="color:var(--primary-accent); font-weight:bold;">$0.00</span></div>
+      
+      <!-- INFO PAGOS (Cuentas manuales) -->
       <div id="modal-payment-info" style="background:#080a11; padding:14px; border-radius:10px; color:#cbd5e1; font-size:13px; line-height:1.6; margin:10px 0;"></div>
+      
+      <!-- BOTÓN EXTRA DE PAGO DIRECTO -->
       <div id="modal-extra-buttons"></div>
+
+      <!-- BOTONES DE WHATSAPP -->
       <a id="btn-confirm-paid" href="#" target="_blank" style="display:block; background:#00d26a; color:#032412; padding:12px; border-radius:10px; text-align:center; font-weight:bold; text-decoration:none; margin-top:8px;">✅ YA PAGUÉ (ENVIAR COMPROBANTE)</a>
       <a id="btn-confirm-info" href="#" target="_blank" style="display:block; background:#171b28; border:1px solid #293046; color:#38bdf8; padding:12px; border-radius:10px; text-align:center; font-weight:bold; text-decoration:none; margin-top:8px;">💬 MÁS INFORMACIÓN</a>
     </div>
@@ -119,13 +125,18 @@
         <div style="display:flex; justify-content:space-between; color:#22c55e; font-size:13px;"><span>Descuento:</span><span id="combo-discount">-$0.00</span></div>
         <div style="display:flex; justify-content:space-between; color:#fff; font-size:16px; font-weight:bold; border-top:1px solid #1c243a; padding-top:6px; margin-top:6px;"><span>Total:</span><span id="combo-total-final" style="color:var(--primary-accent);">$0.00</span></div>
       </div>
+      
+      <!-- INFO PAGOS (Cuentas manuales) -->
       <div id="combo-payment-info" style="background:#080a11; padding:14px; border-radius:10px; color:#cbd5e1; font-size:13px; line-height:1.6; margin:10px 0;"></div>
+      
+      <!-- BOTÓN EXTRA DE PAGO DIRECTO COMBO -->
       <div id="combo-extra-buttons"></div>
+
+      <!-- BOTONES DE WHATSAPP -->
       <a id="btn-combo-order" href="#" target="_blank" style="display:block; background:#00d26a; color:#032412; padding:12px; border-radius:10px; text-align:center; font-weight:bold; text-decoration:none; margin-top:8px;">🛒 ORDENAR POR WHATSAPP</a>
     </div>
   </div>
 
-  <!-- MODAL APK -->
   <div id="modal-descargar-apk" class="modal-overlay hidden">
     <div class="modal-box" style="text-align:center;">
       <div style="display:flex; justify-content:space-between;"><h3 style="color:#fff;">📲 Instalar App</h3><button class="btn-close" onclick="document.getElementById('modal-descargar-apk').classList.add('hidden')">✕</button></div>
@@ -239,15 +250,16 @@
     function abrirModal(idx) {
       const p = itemsParaMostrar[idx]; const ws = (tiendaActiva.whatsapp || "593982766054").replace(/\D/g, '');
       document.getElementById('modal-service-name').innerText = p.nombre; document.getElementById('modal-service-price').innerText = tiendaActiva.moneda + p.precio;
+      
+      // Mostrar cuenta bancaria
       document.getElementById('modal-payment-info').innerHTML = formatearCuentas(tiendaActiva.metodosPago);
-
-      // BOTÓN DE PAGO DIRECTO
-      let extra = '';
+      
+      // Mostrar botón de pago directo si existe
+      let extraHTML = '';
       if (tiendaActiva.payLink) {
-        extra = '<a href="' + tiendaActiva.payLink + '" target="_blank" onclick="registrarEstadistica('clic', '' + p.nombre + '')" style="display:block; background:var(--accent-gradient); color:#fff; padding:12px; border-radius:10px; text-align:center; font-weight:bold; text-decoration:none; margin-top:8px;">💳 ' + (tiendaActiva.payBtn || 'PAGAR EN LÍNEA') + '</a>';
+        extraHTML = `<a href="${tiendaActiva.payLink}" target="_blank" onclick="registrarEstadistica('clic', '${p.nombre}')" style="display:block; background:var(--accent-gradient); color:#fff; padding:12px; border-radius:10px; text-align:center; font-weight:bold; text-decoration:none; margin-top:8px;">💳 ${tiendaActiva.payBtn || 'PAGAR EN LÍNEA'}</a>`;
       }
-      document.getElementById('modal-extra-buttons').innerHTML = extra;
-
+      document.getElementById('modal-extra-buttons').innerHTML = extraHTML;
       
       const btnPaid = document.getElementById('btn-confirm-paid'); const btnInfo = document.getElementById('btn-confirm-info');
       btnPaid.href = `https://wa.me/${ws}?text=${encodeURIComponent(`¡Hola! Pagué mi servicio: *${p.nombre}* (${tiendaActiva.moneda}${p.precio}). Adjunto comprobante.`)}`;
@@ -262,13 +274,16 @@
     function abrirModalCombo(idx) {
       comboActualConfig = itemsParaMostrar[idx]; comboSeleccionados = [];
       document.getElementById('combo-modal-title').innerText = comboActualConfig.nombre;
+      
+      // Mostrar cuenta bancaria
       document.getElementById('combo-payment-info').innerHTML = formatearCuentas(tiendaActiva.metodosPago);
 
-      let extraCombo = '';
+      // Mostrar botón de pago directo si existe
+      let extraComboHTML = '';
       if (tiendaActiva.payLink) {
-        extraCombo = '<a href="' + tiendaActiva.payLink + '" target="_blank" onclick="registrarEstadistica('clic', '' + comboActualConfig.nombre + '')" style="display:block; background:var(--accent-gradient); color:#fff; padding:12px; border-radius:10px; text-align:center; font-weight:bold; text-decoration:none; margin-top:8px;">💳 ' + (tiendaActiva.payBtn || 'PAGAR EN LÍNEA') + '</a>';
+        extraComboHTML = `<a href="${tiendaActiva.payLink}" target="_blank" onclick="registrarEstadistica('clic', '${comboActualConfig.nombre}')" style="display:block; background:var(--accent-gradient); color:#fff; padding:12px; border-radius:10px; text-align:center; font-weight:bold; text-decoration:none; margin-top:8px;">💳 ${tiendaActiva.payBtn || 'PAGAR EN LÍNEA'}</a>`;
       }
-      document.getElementById('combo-extra-buttons').innerHTML = extraCombo;
+      document.getElementById('combo-extra-buttons').innerHTML = extraComboHTML;
 
       renderListaComboItems(); actualizarCalculoCombo();
       document.getElementById('modal-combo-selector').classList.remove('hidden');
