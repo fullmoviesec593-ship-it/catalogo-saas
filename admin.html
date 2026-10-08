@@ -90,26 +90,16 @@
       <div id="tab-btn-stats" class="nav-tab" onclick="cambiarTab('stats')" style="color:#22c55e; border-color:#22c55e;">📊 ESTADÍSTICAS</div>
     </div>
 
-    <!-- PESTAÑA: EDITOR DE MENSAJES (CON VARIABLES A UN TOQUE) -->
+    <!-- PESTAÑA: EDITOR DE MENSAJES -->
     <div id="tab-msg" class="hidden">
       <div style="background:#080d1a; padding:16px; border-radius:12px; border:1px solid var(--border);">
         <h4 style="color:var(--primary); margin-top:0;">💬 Editor de Plantillas</h4>
         <p style="font-size:12px; color:#94a3b8; margin-bottom:14px;">Toca cualquier variable abajo para insertarla automáticamente en el campo que estés editando.</p>
         
-        <div class="form-group">
-          <label>1. Plantilla de Bienvenida (Nuevos datos)</label>
-          <textarea id="tpl-bienvenida" rows="4"></textarea>
-        </div>
-
-        <div class="form-group">
-          <label>2. Plantilla de Cobro (Recordatorio de pago)</label>
-          <textarea id="tpl-cobro" rows="4"></textarea>
-        </div>
-
-        <div class="form-group">
-          <label>3. Plantilla de Renovación Exitosa</label>
-          <textarea id="tpl-renovacion" rows="4"></textarea>
-        </div>
+        <div class="form-group"><label>1. Plantilla de Bienvenida (Nuevos datos)</label><textarea id="tpl-bienvenida" rows="4"></textarea></div>
+        <div class="form-group"><label>2. Plantilla de Cobro (Recordatorio de pago)</label><textarea id="tpl-cobro" rows="4"></textarea></div>
+        <div class="form-group"><label>3. Plantilla de Renovación Exitosa</label><textarea id="tpl-renovacion" rows="4"></textarea></div>
+        <div class="form-group"><label>4. Plantilla de Actualización de Datos</label><textarea id="tpl-actualizacion" rows="4"></textarea></div>
 
         <label style="color:var(--primary); margin-top:10px; margin-bottom:6px; display:block;">Toca para insertar variable:</label>
         <div style="display:grid; grid-template-columns: repeat(2, 1fr); gap:6px; margin-bottom:16px;">
@@ -129,7 +119,7 @@
       </div>
     </div>
 
-    <!-- PESTAÑA: CLIENTES (CRM CON EDICIÓN Y RENOVACIÓN RÁPIDA) -->
+    <!-- PESTAÑA: CLIENTES (CRM CON TARJETAS COLAPSADAS / DETALLE EXPANDIBLE) -->
     <div id="tab-clients" class="hidden">
       <div style="background:#080d1a; padding:16px; border-radius:12px; border:1px solid var(--border); margin-bottom:20px;">
         <h4 id="form-cli-title" style="color:var(--accent); margin-top:0;">➕ Nuevo Registro / Perfil</h4>
@@ -289,6 +279,7 @@
     const TPL_DEFAULT_BIENVENIDA = "👋 Hola Estimado/a {cliente} 👋\nLe enviamos la información de su suscripción a nuestro servicio de streaming:\n{servicio}\n\n📧 Correo: {correo}\n🔒 Contraseña: {contraseña}\n👤 Perfil / PIN: {perfil}\n📅 Vence el: {vence}\n\nGracias por su compra en {negocio}.";
     const TPL_DEFAULT_COBRO = "Hola {cliente}, te recordamos que tu servicio de {servicio}\nCorreo: {correo}\nPerfil: {perfil}\nvence en {dias} día(s), el {vence}.\nValor: ${precio}\n\nPaga aquí: {link_pago}\nGracias por confiar en nosotros.";
     const TPL_DEFAULT_RENOVACION = "🎉 ¡Hola {cliente}, tu renovación de {servicio} fue exitosa! 🎉\n\n📧 Correo: {correo}\n🔒 Contraseña: {contraseña}\n👤 Perfil: {perfil}\n📅 Nueva fecha de vencimiento: {vence}\n\nGracias por tu preferencia en {negocio}.";
+    const TPL_DEFAULT_ACTUALIZACION = "🔄 ¡Hola {cliente}, actualizamos los datos de acceso de tu servicio de {servicio}!\n\n📧 Correo: {correo}\n🔒 Contraseña: {contraseña}\n👤 Perfil: {perfil}\n\nCualquier novedad nos avisas.";
 
     function toggleMenu() { document.getElementById('nav-menu').classList.toggle('show-menu'); document.getElementById('menu-backdrop').classList.toggle('show'); }
     function cambiarTab(tab) {
@@ -444,6 +435,7 @@
       document.getElementById('tpl-bienvenida').value = plantillas.bienvenida || TPL_DEFAULT_BIENVENIDA;
       document.getElementById('tpl-cobro').value = plantillas.cobro || TPL_DEFAULT_COBRO;
       document.getElementById('tpl-renovacion').value = plantillas.renovacion || TPL_DEFAULT_RENOVACION;
+      document.getElementById('tpl-actualizacion').value = plantillas.actualizacion || TPL_DEFAULT_ACTUALIZACION;
 
       seleccionarTema(tiendaActual.tema || 'orange');
       document.getElementById('shop-status-online').value = tiendaActual.estadoAtencion || 'online';
@@ -478,16 +470,18 @@
       const bienvenida = document.getElementById('tpl-bienvenida').value.trim();
       const cobro = document.getElementById('tpl-cobro').value.trim();
       const renovacion = document.getElementById('tpl-renovacion').value.trim();
+      const actualizacion = document.getElementById('tpl-actualizacion').value.trim();
       if(!tiendaActual.plantillas) tiendaActual.plantillas = {};
       tiendaActual.plantillas.bienvenida = bienvenida;
       tiendaActual.plantillas.cobro = cobro;
       tiendaActual.plantillas.renovacion = renovacion;
+      tiendaActual.plantillas.actualizacion = actualizacion;
       const ok = await persistirEnNube({ plantillas: tiendaActual.plantillas });
       if(ok) alert('✅ ¡Plantillas de mensajes guardadas!');
     }
 
     // ==========================================
-    // LÓGICA DEL CRM PRO (EDICIÓN Y RENOVACIÓN)
+    // LÓGICA DE TARJETAS EXPANDIBLES (CRM REFERENCIA)
     // ==========================================
     function procesarPlantilla(textoTpl, c, diffDays) {
       const linkPago = tiendaActual.payLink ? tiendaActual.payLink : 'nuestras cuentas del catálogo.';
@@ -503,6 +497,21 @@
         .replace(/{precio}/g, c.costo || '0.00')
         .replace(/{negocio}/g, tiendaActual.nombre || 'Nuestra Tienda')
         .replace(/{link_pago}/g, linkPago);
+    }
+
+    function toggleExpandirTarjeta(cardId) {
+      const detalle = document.getElementById(cardId);
+      if (detalle.classList.contains('hidden')) {
+        detalle.classList.remove('hidden');
+      } else {
+        detalle.classList.add('hidden');
+      }
+    }
+
+    function copiarTexto(texto) {
+      navigator.clipboard.writeText(texto).then(() => {
+        alert('📋 ¡Copiado al portapapeles!');
+      });
     }
 
     function renderClientes() {
@@ -529,52 +538,100 @@
         else if (diffDays === 0) { color = '#ef4444'; estado = 'Vence HOY'; }
         else if (diffDays <= 3) { color = '#eab308'; estado = `Vence en ${diffDays} días`; }
 
+        // Iniciales o logo del servicio para la parte izquierda
+        const inicialesServicio = (c.servicio || 'SV').substring(0, 3).toUpperCase();
+
         const tplBienvenida = (tiendaActual.plantillas && tiendaActual.plantillas.bienvenida) ? tiendaActual.plantillas.bienvenida : TPL_DEFAULT_BIENVENIDA;
         const tplCobro = (tiendaActual.plantillas && tiendaActual.plantillas.cobro) ? tiendaActual.plantillas.cobro : TPL_DEFAULT_COBRO;
         const tplRenovacion = (tiendaActual.plantillas && tiendaActual.plantillas.renovacion) ? tiendaActual.plantillas.renovacion : TPL_DEFAULT_RENOVACION;
+        const tplActualizacion = (tiendaActual.plantillas && tiendaActual.plantillas.actualizacion) ? tiendaActual.plantillas.actualizacion : TPL_DEFAULT_ACTUALIZACION;
 
         const textoBienvenida = procesarPlantilla(tplBienvenida, c, diffDays);
         const textoCobro = procesarPlantilla(tplCobro, c, diffDays);
         const textoRenovacion = procesarPlantilla(tplRenovacion, c, diffDays);
+        const textoActualizacion = procesarPlantilla(tplActualizacion, c, diffDays);
 
         const wsLimpio = c.ws.replace(/\D/g,'');
         const linkBienvenida = `https://wa.me/${wsLimpio}?text=${encodeURIComponent(textoBienvenida)}`;
         const linkCobro = `https://wa.me/${wsLimpio}?text=${encodeURIComponent(textoCobro)}`;
         const linkRenovacion = `https://wa.me/${wsLimpio}?text=${encodeURIComponent(textoRenovacion)}`;
+        const linkActualizacion = `https://wa.me/${wsLimpio}?text=${encodeURIComponent(textoActualizacion)}`;
+
+        const cardId = `detalle-cliente-${c.originalIndex}`;
 
         const card = document.createElement('div');
-        card.style = `background:#080d1a; border:1px solid ${color}30; border-left:5px solid ${color}; border-radius:12px; padding:14px; margin-bottom:12px;`;
+        card.style = `background:#080d1a; border:1px solid ${color}40; border-radius:12px; margin-bottom:12px; overflow:hidden;`;
         card.innerHTML = `
-          <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:6px;">
-            <div>
-              <span style="font-size:10px; background:#1e293b; color:var(--primary); padding:2px 6px; border-radius:4px; font-weight:bold;">${c.tipo || 'Perfil'}</span>
-              <strong style="color:#fff; font-size:16px; display:block; margin-top:2px;">${c.nombre}</strong>
-              <span style="color:#94a3b8; font-size:12px;">📱 ${c.ws}</span>
+          <!-- MINIATURA (TARJETA PEQUEÑA Clickeable) -->
+          <div onclick="toggleExpandirTarjeta('${cardId}')" style="padding:12px 14px; display:flex; align-items:center; justify-content:space-between; cursor:pointer; background:#0f172a;">
+            <div style="display:flex; align-items:center; gap:12px;">
+              <div style="width:40px; height:40px; border-radius:8px; background:linear-gradient(135deg, #0284c7, #0369a1); color:#fff; display:flex; align-items:center; justify-content:center; font-weight:900; font-size:12px;">${inicialesServicio}</div>
+              <div>
+                <strong style="color:#fff; font-size:15px; display:block;">${c.nombre}</strong>
+                <span style="color:#94a3b8; font-size:12px;">${c.correo || 'Sin correo'} • 🔑 ${c.pass || 'Sin clave'}</span>
+              </div>
             </div>
-            <span style="background:${color}20; color:${color}; font-size:11px; font-weight:800; padding:3px 8px; border-radius:6px;">${estado}</span>
-          </div>
-          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
-            <div style="color:var(--accent); font-size:14px; font-weight:bold;">📦 ${c.servicio}</div>
-            <div style="color:#38bdf8; font-weight:bold; font-size:14px;">$${c.costo || '0.00'}</div>
-          </div>
-          <div style="background:#111625; padding:8px 10px; border-radius:8px; font-size:12px; color:#cbd5e1; margin-bottom:10px; border:1px solid #1e293b;">
-            <div><b>Usuario/Correo:</b> ${c.correo || 'N/A'}</div>
-            <div><b>Contraseña:</b> ${c.pass || 'N/A'}</div>
-            <div><b>Estado:</b> <span style="color:var(--accent);">${c.estado || 'ACTIVA'}</span></div>
-            <div><b>Vencimiento:</b> ${c.vence}</div>
-            ${c.notas ? `<div><b>Notas:</b> ${c.notas}</div>` : ''}
-          </div>
-          <div style="display:flex; flex-direction:column; gap:6px;">
-            <div style="display:flex; gap:6px;">
-              <a href="${linkBienvenida}" target="_blank" style="flex:1; background:#0284c7; color:#fff; padding:8px; border-radius:8px; text-align:center; font-weight:800; font-size:11px; text-decoration:none;">🚀 BIENVENIDA</a>
-              <a href="${linkCobro}" target="_blank" style="flex:1; background:#eab308; color:#042f1a; padding:8px; border-radius:8px; text-align:center; font-weight:800; font-size:11px; text-decoration:none;">💬 COBRO</a>
-              <a href="${linkRenovacion}" target="_blank" style="flex:1; background:#8b5cf6; color:#fff; padding:8px; border-radius:8px; text-align:center; font-weight:800; font-size:11px; text-decoration:none;">🎉 RENOVACIÓN</a>
+            <div style="text-align:right;">
+              <span style="background:${color}20; color:${color}; font-size:10px; font-weight:800; padding:3px 7px; border-radius:6px; display:inline-block; margin-bottom:4px;">${estado}</span>
+              <div style="font-size:11px; color:#64748b;">Tocar para ver ▾</div>
             </div>
-            <div style="display:flex; gap:6px; margin-top:2px;">
-              <button onclick="renovarClientePor30Dias(${c.originalIndex})" style="flex:1; background:#22c55e; color:#042f1a; border:none; padding:8px; border-radius:8px; font-size:11px; font-weight:bold;">🔄 +30 DÍAS</button>
-              <button onclick="cargarEdicionCliente(${c.originalIndex})" style="background:#1e293b; color:#38bdf8; border:1px solid #38bdf8; padding:8px 12px; font-size:11px; border-radius:8px; width:auto; font-weight:bold;">✏️ EDITAR</button>
-              <button onclick="eliminarCliente(${c.originalIndex})" style="background:#1e293b; color:#ef4444; border:1px solid #ef4444; padding:8px 12px; font-size:11px; border-radius:8px; width:auto; font-weight:bold;">✕</button>
+          </div>
+
+          <!-- DETALLE EXPANDIBLE (Exacto a la Referencia) -->
+          <div id="${cardId}" class="hidden" style="padding:16px; border-top:1px solid #1e293b; background:#070a12;">
+            
+            <!-- Bloque Credenciales con Botones de Copiar -->
+            <div style="display:flex; flex-direction:column; gap:8px; margin-bottom:14px;">
+              <div style="display:flex; justify-content:space-between; align-items:center; background:#0f172a; padding:10px 12px; border-radius:8px; border:1px solid #1e293b;">
+                <div style="font-size:13px; color:#94a3b8;">Correo: <b style="color:#fff; display:block;">${c.correo || 'N/A'}</b></div>
+                <button onclick="copiarTexto('${c.correo || ''}')" style="background:#1e293b; color:#38bdf8; border:none; width:34px; height:34px; border-radius:6px; cursor:pointer;">📋</button>
+              </div>
+              <div style="display:flex; justify-content:space-between; align-items:center; background:#0f172a; padding:10px 12px; border-radius:8px; border:1px solid #1e293b;">
+                <div style="font-size:13px; color:#94a3b8;">Contraseña: <b style="color:#fff; display:block;">${c.pass || 'N/A'}</b></div>
+                <button onclick="copiarTexto('${c.pass || ''}')" style="background:#1e293b; color:#38bdf8; border:none; width:34px; height:34px; border-radius:6px; cursor:pointer;">📋</button>
+              </div>
+              <div style="display:flex; justify-content:space-between; align-items:center; background:#0f172a; padding:10px 12px; border-radius:8px; border:1px solid #1e293b;">
+                <div style="font-size:13px; color:#94a3b8;">Perfil / PIN: <b style="color:#fff; display:block;">${c.notas || 'N/A'}</b></div>
+                <button onclick="copiarTexto('${c.notas || ''}')" style="background:#1e293b; color:#38bdf8; border:none; width:34px; height:34px; border-radius:6px; cursor:pointer;">📋</button>
+              </div>
             </div>
+
+            <!-- Bloque de Fechas -->
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:8px; margin-bottom:8px;">
+              <div style="background:#0f172a; padding:10px; border-radius:8px; border:1px solid #1e293b;">
+                <div style="font-size:10px; color:#94a3b8; font-weight:bold;">INICIO</div>
+                <div style="font-size:12px; color:#fff; font-weight:bold; margin-top:2px;">${c.inicio || 'N/A'}</div>
+              </div>
+              <div style="background:#0f172a; padding:10px; border-radius:8px; border:1px solid #1e293b;">
+                <div style="font-size:10px; color:#94a3b8; font-weight:bold;">VENCE</div>
+                <div style="font-size:12px; color:#fff; font-weight:bold; margin-top:2px;">${c.vence}</div>
+              </div>
+            </div>
+            <div style="background:#0f172a; padding:10px; border-radius:8px; border:1px solid #1e293b; margin-bottom:14px; text-align:center;">
+              <div style="font-size:10px; color:#94a3b8; font-weight:bold;">RESTAN</div>
+              <div style="font-size:16px; color:${color}; font-weight:900; font-family:'Orbitron';">${diffDays >= 0 ? diffDays + ' días' : 'VENCIDO'}</div>
+            </div>
+
+            <!-- Botones de Acción (Referencia Exacta) -->
+            <div style="display:flex; flex-direction:column; gap:8px;">
+              <a href="${linkBienvenida}" target="_blank" style="background:#4f46e5; color:#fff; padding:11px; border-radius:8px; text-align:center; font-weight:bold; font-size:13px; text-decoration:none; display:block;">👤 Enviar datos</a>
+              
+              <div style="display:grid; grid-template-columns: 1fr 1fr; gap:8px;">
+                <button onclick="renovarClientePor30Dias(${c.originalIndex})" style="background:#1e293b; color:#38bdf8; border:1px solid #38bdf8; padding:11px; border-radius:8px; font-weight:bold; font-size:12px;">🔄 Renovar (+30d)</button>
+                <a href="${linkCobro}" target="_blank" style="background:#1e293b; color:#eab308; border:1px solid #eab308; padding:11px; border-radius:8px; text-align:center; font-weight:bold; font-size:12px; text-decoration:none; display:flex; align-items:center; justify-content:center;">⏰ Recordatorio</a>
+              </div>
+
+              <div style="display:grid; grid-template-columns: 1fr 1fr; gap:8px;">
+                <a href="${linkRenovacion}" target="_blank" style="background:#1e293b; color:#22c55e; border:1px solid #22c55e; padding:11px; border-radius:8px; text-align:center; font-weight:bold; font-size:12px; text-decoration:none; display:flex; align-items:center; justify-content:center;">💬 Mensaje renovación</a>
+                <a href="${linkActualizacion}" target="_blank" style="background:#1e293b; color:#a855f7; border:1px solid #a855f7; padding:11px; border-radius:8px; text-align:center; font-weight:bold; font-size:12px; text-decoration:none; display:flex; align-items:center; justify-content:center;">⇄ Actualizar datos</a>
+              </div>
+
+              <div style="display:grid; grid-template-columns: 1fr 1fr; gap:8px; margin-top:4px;">
+                <button onclick="cargarEdicionCliente(${c.originalIndex})" style="background:#0284c7; color:#fff; border:none; padding:10px; border-radius:8px; font-weight:bold; font-size:12px;">✏️ Editar venta</button>
+                <button onclick="eliminarCliente(${c.originalIndex})" style="background:#dc2626; color:#fff; border:none; padding:10px; border-radius:8px; font-weight:bold; font-size:12px;">🗑️ Eliminar</button>
+              </div>
+            </div>
+
           </div>
         `;
         lista.appendChild(card);
@@ -636,8 +693,8 @@
       document.getElementById('cli-vence').value = c.vence || '';
       document.getElementById('cli-notas').value = c.notas || '';
 
-      document.getElementById('form-cli-title').innerText = "✏️ Editar Cliente / Perfil";
-      document.getElementById('btn-save-cliente').innerText = "ACTUALIZAR REGISTRO";
+      document.getElementById('form-cli-title').innerText = "✏️ Editar Venta";
+      document.getElementById('btn-save-cliente').innerText = "ACTUALIZAR VENTA";
       document.getElementById('btn-cancel-cliente').classList.remove('hidden');
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
@@ -720,13 +777,13 @@
 
     async function eliminarProducto(idx) { if (confirm('¿Eliminar servicio?')) { tiendaActual.productos.splice(idx, 1); await persistirEnNube({ productos: tiendaActual.productos }); renderProductos(); poblarSelectServicios(); } }
     async function guardarAjustesCombos() {
-      const btn = document.getElementById('btn-save-combos'); btn.disabled = true; btn.innerText = "⏳ GUARDANDO..."; const nuevosCombos = [];
+      const btn = document.getElementById('btn-save-combos'); btn.disabled = true; btn.innerText = "⏳ GUARDANDO..."; const novosCombos = [];
       for(let i=0; i<3; i++) {
         let img = tempComboImgs[i] || (tiendaActual.combos && tiendaActual.combos[i] && tiendaActual.combos[i].img) || COMBOS_DEFAULT[i].img;
         if (img && img.length > 30000 && img.startsWith('data:image')) { try { img = await reComprimirBase64(img); } catch(e){} }
-        nuevosCombos.push({ activo: document.getElementById(`combo${i}-activo`).checked, comboCantidad: parseInt(document.getElementById(`combo${i}-cant`).value) || (i + 2), descuento: parseInt(document.getElementById(`combo${i}-desc`).value) || 10, nombre: document.getElementById(`combo${i}-nombre`).value.trim(), sub: document.getElementById(`combo${i}-sub`).value.trim(), tag:`${parseInt(document.getElementById(`combo${i}-desc`).value) || 10}% OFF`, img });
+        novosCombos.push({ activo: document.getElementById(`combo${i}-activo`).checked, comboCantidad: parseInt(document.getElementById(`combo${i}-cant`).value) || (i + 2), descuento: parseInt(document.getElementById(`combo${i}-desc`).value) || 10, nombre: document.getElementById(`combo${i}-nombre`).value.trim(), sub: document.getElementById(`combo${i}-sub`).value.trim(), tag:`${parseInt(document.getElementById(`combo${i}-desc`).value) || 10}% OFF`, img });
       }
-      tiendaActual.combos = nuevosCombos; const ok = await persistirEnNube({ combos: nuevosCombos }); btn.disabled = false; btn.innerText = "GUARDAR COMBOS"; if (ok) alert('✅ Guardado!');
+      tiendaActual.combos = novosCombos; const ok = await persistirEnNube({ combos: novosCombos }); btn.disabled = false; btn.innerText = "GUARDAR COMBOS"; if (ok) alert('✅ Guardado!');
     }
     async function guardarAjustesTienda() {
       const btn = document.getElementById('btn-save-shop'); btn.disabled = true; btn.innerText = "⏳ GUARDANDO...";
