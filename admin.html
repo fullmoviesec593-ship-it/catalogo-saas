@@ -49,6 +49,8 @@
     .tipo-selector { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px; }
     .tipo-btn { background: #080d1a; border: 1px solid var(--border); color: #94a3b8; padding: 10px; text-align: center; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 13px; }
     .tipo-btn.active { background: rgba(34, 197, 94, 0.15); border-color: var(--accent); color: var(--accent); }
+    .var-chip { background: #111625; border: 1px solid #1e293b; color: var(--primary); padding: 6px 10px; border-radius: 6px; font-size: 12px; font-weight: bold; cursor: pointer; text-align: left; }
+    .var-chip:hover { border-color: var(--primary); background: #18223b; }
   </style>
 </head>
 <body>
@@ -88,34 +90,51 @@
       <div id="tab-btn-stats" class="nav-tab" onclick="cambiarTab('stats')" style="color:#22c55e; border-color:#22c55e;">📊 ESTADÍSTICAS</div>
     </div>
 
-    <!-- PESTAÑA: EDITOR DE MENSAJES (PLANTILLAS) -->
+    <!-- PESTAÑA: EDITOR DE MENSAJES (CON VARIABLES A UN TOQUE) -->
     <div id="tab-msg" class="hidden">
       <div style="background:#080d1a; padding:16px; border-radius:12px; border:1px solid var(--border);">
-        <h4 style="color:var(--primary); margin-top:0;">💬 Editor de Plantillas WhatsApp</h4>
-        <p style="font-size:12px; color:#94a3b8; margin-bottom:14px;">Personaliza el texto que se enviará automáticamente al dar clic en recordar o enviar datos.</p>
+        <h4 style="color:var(--primary); margin-top:0;">💬 Editor de Plantillas</h4>
+        <p style="font-size:12px; color:#94a3b8; margin-bottom:14px;">Toca cualquier variable abajo para insertarla automáticamente en el campo que estés editando.</p>
         
         <div class="form-group">
-          <label>Plantilla 1: Envío de Datos (Bienvenida)</label>
-          <textarea id="tpl-bienvenida" rows="6"></textarea>
+          <label>1. Plantilla de Bienvenida (Nuevos datos)</label>
+          <textarea id="tpl-bienvenida" rows="4"></textarea>
         </div>
 
         <div class="form-group">
-          <label>Plantilla 2: Recordatorio de Pago (Cobro)</label>
-          <textarea id="tpl-cobro" rows="6"></textarea>
+          <label>2. Plantilla de Cobro (Recordatorio de pago)</label>
+          <textarea id="tpl-cobro" rows="4"></textarea>
         </div>
 
-        <div style="background:#111625; padding:10px; border-radius:8px; font-size:11px; color:#94a3b8; margin-bottom:14px;">
-          <b>Variables disponibles:</b> {cliente}, {servicio}, {correo}, {contraseña}, {perfil}, {pin}, {vence}, {dias}, {precio}, {negocio}
+        <div class="form-group">
+          <label>3. Plantilla de Renovación Exitosa</label>
+          <textarea id="tpl-renovacion" rows="4"></textarea>
+        </div>
+
+        <label style="color:var(--primary); margin-top:10px; margin-bottom:6px; display:block;">Toca para insertar variable:</label>
+        <div style="display:grid; grid-template-columns: repeat(2, 1fr); gap:6px; margin-bottom:16px;">
+          <button type="button" class="var-chip" onclick="insertarVariable('{cliente}')">{cliente}</button>
+          <button type="button" class="var-chip" onclick="insertarVariable('{servicio}')">{servicio}</button>
+          <button type="button" class="var-chip" onclick="insertarVariable('{correo}')">{correo}</button>
+          <button type="button" class="var-chip" onclick="insertarVariable('{contraseña}')">{contraseña}</button>
+          <button type="button" class="var-chip" onclick="insertarVariable('{perfil}')">{perfil}</button>
+          <button type="button" class="var-chip" onclick="insertarVariable('{vence}')">{vence}</button>
+          <button type="button" class="var-chip" onclick="insertarVariable('{dias}')">{dias}</button>
+          <button type="button" class="var-chip" onclick="insertarVariable('{precio}')">{precio}</button>
+          <button type="button" class="var-chip" onclick="insertarVariable('{negocio}')">{negocio}</button>
+          <button type="button" class="var-chip" onclick="insertarVariable('{link_pago}')">{link_pago}</button>
         </div>
 
         <button class="btn-success" onclick="guardarPlantillas()">GUARDAR PLANTILLAS</button>
       </div>
     </div>
 
-    <!-- PESTAÑA: CLIENTES (CRM PROFESIONAL) -->
+    <!-- PESTAÑA: CLIENTES (CRM CON EDICIÓN Y RENOVACIÓN RÁPIDA) -->
     <div id="tab-clients" class="hidden">
       <div style="background:#080d1a; padding:16px; border-radius:12px; border:1px solid var(--border); margin-bottom:20px;">
-        <h4 style="color:var(--accent); margin-top:0;">➕ Nuevo Registro / Perfil</h4>
+        <h4 id="form-cli-title" style="color:var(--accent); margin-top:0;">➕ Nuevo Registro / Perfil</h4>
+        <input type="hidden" id="cli-edit-index" value="-1">
+        
         <label>Tipo de Venta</label>
         <div class="tipo-selector">
           <div id="tipo-perfil" class="tipo-btn active" onclick="seleccionarTipo('Perfil')">PERFIL</div>
@@ -158,7 +177,8 @@
           <input type="text" id="cli-notas" placeholder="Ej: Perfil 3 o PIN 1234">
         </div>
 
-        <button class="btn-success" onclick="guardarCliente()" style="margin-top:6px;">GUARDAR REGISTRO</button>
+        <button id="btn-save-cliente" class="btn-success" onclick="guardarCliente()" style="margin-top:6px;">GUARDAR REGISTRO</button>
+        <button id="btn-cancel-cliente" class="hidden btn-danger" onclick="cancelarEdicionCliente()" style="margin-top:6px;">CANCELAR EDICIÓN</button>
       </div>
 
       <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
@@ -268,6 +288,7 @@
 
     const TPL_DEFAULT_BIENVENIDA = "👋 Hola Estimado/a {cliente} 👋\nLe enviamos la información de su suscripción a nuestro servicio de streaming:\n{servicio}\n\n📧 Correo: {correo}\n🔒 Contraseña: {contraseña}\n👤 Perfil / PIN: {perfil}\n📅 Vence el: {vence}\n\nGracias por su compra en {negocio}.";
     const TPL_DEFAULT_COBRO = "Hola {cliente}, te recordamos que tu servicio de {servicio}\nCorreo: {correo}\nPerfil: {perfil}\nvence en {dias} día(s), el {vence}.\nValor: ${precio}\n\nPaga aquí: {link_pago}\nGracias por confiar en nosotros.";
+    const TPL_DEFAULT_RENOVACION = "🎉 ¡Hola {cliente}, tu renovación de {servicio} fue exitosa! 🎉\n\n📧 Correo: {correo}\n🔒 Contraseña: {contraseña}\n👤 Perfil: {perfil}\n📅 Nueva fecha de vencimiento: {vence}\n\nGracias por tu preferencia en {negocio}.";
 
     function toggleMenu() { document.getElementById('nav-menu').classList.toggle('show-menu'); document.getElementById('menu-backdrop').classList.toggle('show'); }
     function cambiarTab(tab) {
@@ -285,6 +306,22 @@
       if (tipo === 'Perfil') document.getElementById('tipo-perfil').classList.add('active');
       else document.getElementById('tipo-cuenta').classList.add('active');
       document.getElementById('cli-tipo').value = tipo;
+    }
+
+    function insertarVariable(variable) {
+      const activeTextarea = document.activeElement;
+      if (activeTextarea && activeTextarea.tagName === 'TEXTAREA') {
+        const start = activeTextarea.selectionStart;
+        const end = activeTextarea.selectionEnd;
+        const text = activeTextarea.value;
+        activeTextarea.value = text.substring(0, start) + variable + text.substring(end);
+        activeTextarea.focus();
+        activeTextarea.selectionStart = activeTextarea.selectionEnd = start + variable.length;
+      } else {
+        const tpl = document.getElementById('tpl-bienvenida');
+        tpl.value += variable;
+        tpl.focus();
+      }
     }
 
     function inicializarFechasFormulario() {
@@ -406,6 +443,7 @@
       const plantillas = tiendaActual.plantillas || {};
       document.getElementById('tpl-bienvenida').value = plantillas.bienvenida || TPL_DEFAULT_BIENVENIDA;
       document.getElementById('tpl-cobro').value = plantillas.cobro || TPL_DEFAULT_COBRO;
+      document.getElementById('tpl-renovacion').value = plantillas.renovacion || TPL_DEFAULT_RENOVACION;
 
       seleccionarTema(tiendaActual.tema || 'orange');
       document.getElementById('shop-status-online').value = tiendaActual.estadoAtencion || 'online';
@@ -439,15 +477,17 @@
     async function guardarPlantillas() {
       const bienvenida = document.getElementById('tpl-bienvenida').value.trim();
       const cobro = document.getElementById('tpl-cobro').value.trim();
+      const renovacion = document.getElementById('tpl-renovacion').value.trim();
       if(!tiendaActual.plantillas) tiendaActual.plantillas = {};
       tiendaActual.plantillas.bienvenida = bienvenida;
       tiendaActual.plantillas.cobro = cobro;
+      tiendaActual.plantillas.renovacion = renovacion;
       const ok = await persistirEnNube({ plantillas: tiendaActual.plantillas });
       if(ok) alert('✅ ¡Plantillas de mensajes guardadas!');
     }
 
     // ==========================================
-    // LÓGICA DE WHATSAPP CON PLANTILLAS DINÁMICAS
+    // LÓGICA DEL CRM PRO (EDICIÓN Y RENOVACIÓN)
     // ==========================================
     function procesarPlantilla(textoTpl, c, diffDays) {
       const linkPago = tiendaActual.payLink ? tiendaActual.payLink : 'nuestras cuentas del catálogo.';
@@ -491,13 +531,16 @@
 
         const tplBienvenida = (tiendaActual.plantillas && tiendaActual.plantillas.bienvenida) ? tiendaActual.plantillas.bienvenida : TPL_DEFAULT_BIENVENIDA;
         const tplCobro = (tiendaActual.plantillas && tiendaActual.plantillas.cobro) ? tiendaActual.plantillas.cobro : TPL_DEFAULT_COBRO;
+        const tplRenovacion = (tiendaActual.plantillas && tiendaActual.plantillas.renovacion) ? tiendaActual.plantillas.renovacion : TPL_DEFAULT_RENOVACION;
 
         const textoBienvenida = procesarPlantilla(tplBienvenida, c, diffDays);
         const textoCobro = procesarPlantilla(tplCobro, c, diffDays);
+        const textoRenovacion = procesarPlantilla(tplRenovacion, c, diffDays);
 
         const wsLimpio = c.ws.replace(/\D/g,'');
         const linkBienvenida = `https://wa.me/${wsLimpio}?text=${encodeURIComponent(textoBienvenida)}`;
         const linkCobro = `https://wa.me/${wsLimpio}?text=${encodeURIComponent(textoCobro)}`;
+        const linkRenovacion = `https://wa.me/${wsLimpio}?text=${encodeURIComponent(textoRenovacion)}`;
 
         const card = document.createElement('div');
         card.style = `background:#080d1a; border:1px solid ${color}30; border-left:5px solid ${color}; border-radius:12px; padding:14px; margin-bottom:12px;`;
@@ -522,10 +565,15 @@
             ${c.notas ? `<div><b>Notas:</b> ${c.notas}</div>` : ''}
           </div>
           <div style="display:flex; flex-direction:column; gap:6px;">
-            <a href="${linkBienvenida}" target="_blank" style="background:#0284c7; color:#fff; padding:9px; border-radius:8px; text-align:center; font-weight:800; font-size:12px; text-decoration:none; display:flex; align-items:center; justify-content:center; gap:4px;">🚀 ENVIAR DATOS (BIENVENIDA)</a>
             <div style="display:flex; gap:6px;">
-              <a href="${linkCobro}" target="_blank" style="flex:1; background:#00d26a; color:#032412; padding:9px; border-radius:8px; text-align:center; font-weight:800; font-size:12px; text-decoration:none; display:flex; align-items:center; justify-content:center; gap:4px;">💬 RECORDAR COBRO</a>
-              <button onclick="eliminarCliente(${c.originalIndex})" style="background:#1e293b; color:#ef4444; border:1px solid #ef4444; padding:8px 12px; font-size:14px; border-radius:8px; width:auto; font-weight:bold;">✕</button>
+              <a href="${linkBienvenida}" target="_blank" style="flex:1; background:#0284c7; color:#fff; padding:8px; border-radius:8px; text-align:center; font-weight:800; font-size:11px; text-decoration:none;">🚀 BIENVENIDA</a>
+              <a href="${linkCobro}" target="_blank" style="flex:1; background:#eab308; color:#042f1a; padding:8px; border-radius:8px; text-align:center; font-weight:800; font-size:11px; text-decoration:none;">💬 COBRO</a>
+              <a href="${linkRenovacion}" target="_blank" style="flex:1; background:#8b5cf6; color:#fff; padding:8px; border-radius:8px; text-align:center; font-weight:800; font-size:11px; text-decoration:none;">🎉 RENOVACIÓN</a>
+            </div>
+            <div style="display:flex; gap:6px; margin-top:2px;">
+              <button onclick="renovarClientePor30Dias(${c.originalIndex})" style="flex:1; background:#22c55e; color:#042f1a; border:none; padding:8px; border-radius:8px; font-size:11px; font-weight:bold;">🔄 +30 DÍAS</button>
+              <button onclick="cargarEdicionCliente(${c.originalIndex})" style="background:#1e293b; color:#38bdf8; border:1px solid #38bdf8; padding:8px 12px; font-size:11px; border-radius:8px; width:auto; font-weight:bold;">✏️ EDITAR</button>
+              <button onclick="eliminarCliente(${c.originalIndex})" style="background:#1e293b; color:#ef4444; border:1px solid #ef4444; padding:8px 12px; font-size:11px; border-radius:8px; width:auto; font-weight:bold;">✕</button>
             </div>
           </div>
         `;
@@ -534,6 +582,7 @@
     }
 
     async function guardarCliente() {
+      const editIdx = parseInt(document.getElementById('cli-edit-index').value);
       const tipo = document.getElementById('cli-tipo').value;
       const nombre = document.getElementById('cli-nombre').value.trim();
       const ws = document.getElementById('cli-ws').value.trim();
@@ -552,18 +601,78 @@
       const btn = event.target; btn.disabled = true; btn.innerText = "⏳ GUARDANDO...";
       
       if (!Array.isArray(tiendaActual.clientes)) tiendaActual.clientes = [];
-      tiendaActual.clientes.push({ tipo, nombre, ws, servicio, correo, pass, estado, costo, inicio, dias, vence, notas });
+      
+      const objCliente = { tipo, nombre, ws, servicio, correo, pass, estado, costo, inicio, dias, vence, notas };
+      
+      if (editIdx >= 0) {
+        tiendaActual.clientes[editIdx] = objCliente;
+      } else {
+        tiendaActual.clientes.push(objCliente);
+      }
       
       const ok = await persistirEnNube({ clientes: tiendaActual.clientes });
-      btn.disabled = false; btn.innerText = "GUARDAR REGISTRO";
+      btn.disabled = false; 
       
       if (ok) {
-        document.getElementById('cli-nombre').value = ''; document.getElementById('cli-ws').value = '';
-        document.getElementById('cli-correo').value = ''; document.getElementById('cli-pass').value = '';
-        document.getElementById('cli-costo').value = ''; document.getElementById('cli-notas').value = '';
-        inicializarFechasFormulario();
+        cancelarEdicionCliente();
         renderClientes(); 
-        alert('✅ ¡Cliente registrado con éxito en el CRM!');
+        alert('✅ ¡Cliente guardado con éxito!');
+      }
+    }
+
+    function cargarEdicionCliente(idx) {
+      const c = tiendaActual.clientes[idx];
+      document.getElementById('cli-edit-index').value = idx;
+      seleccionarTipo(c.tipo || 'Perfil');
+      document.getElementById('cli-nombre').value = c.nombre || '';
+      document.getElementById('cli-ws').value = c.ws || '';
+      document.getElementById('cli-servicio').value = c.servicio || '';
+      document.getElementById('cli-correo').value = c.correo || '';
+      document.getElementById('cli-pass').value = c.pass || '';
+      document.getElementById('cli-estado').value = c.estado || 'ACTIVA';
+      document.getElementById('cli-costo').value = c.costo || '';
+      document.getElementById('cli-inicio').value = c.inicio || new Date().toISOString().split('T')[0];
+      document.getElementById('cli-dias').value = c.dias || 30;
+      document.getElementById('cli-vence').value = c.vence || '';
+      document.getElementById('cli-notas').value = c.notas || '';
+
+      document.getElementById('form-cli-title').innerText = "✏️ Editar Cliente / Perfil";
+      document.getElementById('btn-save-cliente').innerText = "ACTUALIZAR REGISTRO";
+      document.getElementById('btn-cancel-cliente').classList.remove('hidden');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function cancelarEdicionCliente() {
+      document.getElementById('cli-edit-index').value = "-1";
+      document.getElementById('cli-nombre').value = ''; document.getElementById('cli-ws').value = '';
+      document.getElementById('cli-correo').value = ''; document.getElementById('cli-pass').value = '';
+      document.getElementById('cli-costo').value = ''; document.getElementById('cli-notas').value = '';
+      inicializarFechasFormulario();
+      document.getElementById('form-cli-title').innerText = "➕ Nuevo Registro / Perfil";
+      document.getElementById('btn-save-cliente').innerText = "GUARDAR REGISTRO";
+      document.getElementById('btn-cancel-cliente').classList.add('hidden');
+    }
+
+    async function renovarClientePor30Dias(idx) {
+      const c = tiendaActual.clientes[idx];
+      let baseDate = new Date();
+      if (c.vence) {
+        const p = c.vence.split('-');
+        const vDate = new Date(p[0], p[1] - 1, p[2]);
+        if (vDate > baseDate) baseDate = vDate;
+      }
+      baseDate.setDate(baseDate.getDate() + 30);
+      const yyyy = baseDate.getFullYear();
+      const mm = String(baseDate.getMonth() + 1).padStart(2, '0');
+      const dd = String(baseDate.getDate()).padStart(2, '0');
+      
+      c.vence = `${yyyy}-${mm}-${dd}`;
+      c.estado = 'ACTIVA';
+      
+      const ok = await persistirEnNube({ clientes: tiendaActual.clientes });
+      if (ok) {
+        renderClientes();
+        alert(`✅ ¡Servicio renovado por 30 días más! Nuevo vencimiento: ${c.vence}`);
       }
     }
 
