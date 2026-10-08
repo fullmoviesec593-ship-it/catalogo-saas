@@ -1,3 +1,7 @@
 node_modules
 .vercel
 database.json
+bot-ventas/firebase-key.json
+bot-ventas/firebase-key.json
+bot-ventas/
+backups/

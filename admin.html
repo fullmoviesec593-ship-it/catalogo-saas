@@ -3,143 +3,65 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
   <title>Panel Revendedor | Control Total</title>
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;800&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
   <style>
-    :root {
-      --primary: #38bdf8;
-      --accent: #22c55e;
-      --bg: #070a12;
-      --card-bg: #0f172a;
-      --border: #1e293b;
-      --alert-red: #ef4444;
-      --alert-yellow: #eab308;
-    }
+    :root { --primary: #38bdf8; --accent: #22c55e; --bg: #070a12; --card-bg: #0f172a; --border: #1e293b; }
     * { box-sizing: border-box; font-family: 'Rajdhani', sans-serif; }
-    body {
-      background-color: var(--bg);
-      color: #f8fafc;
-      margin: 0;
-      padding: 16px;
-      display: flex;
-      justify-content: center;
-      min-height: 100vh;
-    }
-    .card {
-      background: var(--card-bg);
-      border-radius: 16px;
-      padding: 22px;
-      width: 100%;
-      max-width: 680px;
-      border: 1px solid var(--border);
-      box-shadow: 0 10px 30px rgba(0,0,0,0.7);
-    }
+    body { background-color: var(--bg); color: #f8fafc; margin: 0; padding: 16px; display: flex; justify-content: center; min-height: 100vh; }
+    .card { background: var(--card-bg); border-radius: 16px; padding: 22px; width: 100%; max-width: 680px; border: 1px solid var(--border); box-shadow: 0 10px 30px rgba(0,0,0,0.7); }
     h2, h3, h4 { color: var(--primary); margin-top: 0; font-family: 'Orbitron', sans-serif; }
     .form-group { margin-bottom: 14px; position: relative; }
     label { display: block; margin-bottom: 5px; font-size: 14px; color: #94a3b8; font-weight: 600; }
-    input, textarea, select {
-      width: 100%;
-      padding: 12px 14px;
-      border-radius: 8px;
-      border: 1px solid var(--border);
-      background-color: #080d1a;
-      color: #fff;
-      font-size: 15px;
-      outline: none;
-    }
+    input, textarea, select { width: 100%; padding: 12px 14px; border-radius: 8px; border: 1px solid var(--border); background-color: #080d1a; color: #fff; font-size: 15px; outline: none; }
     input:focus, textarea:focus { border-color: var(--primary); }
-
-    .password-wrapper {
-      position: relative;
-      display: flex;
-      align-items: center;
-    }
+    .password-wrapper { position: relative; display: flex; align-items: center; }
     .password-wrapper input { padding-right: 44px; }
-    .toggle-password-btn {
-      position: absolute; right: 10px; background: transparent; border: none;
-      color: #94a3b8; cursor: pointer; font-size: 18px; padding: 4px 6px;
-      width: auto; user-select: none;
-    }
-
-    button {
-      width: 100%; padding: 12px; border: none; border-radius: 8px;
-      font-size: 15px; font-weight: 700; cursor: pointer;
-      font-family: 'Orbitron', sans-serif; transition: 0.2s;
-    }
+    .toggle-password-btn { position: absolute; right: 10px; background: transparent; border: none; color: #94a3b8; cursor: pointer; font-size: 18px; padding: 4px 6px; }
+    button { width: 100%; padding: 12px; border: none; border-radius: 8px; font-size: 15px; font-weight: 700; cursor: pointer; font-family: 'Orbitron', sans-serif; transition: 0.2s; }
     .btn-primary { background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%); color: #fff; }
     .btn-success { background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%); color: #042f1a; }
     .btn-danger { background: #dc2626; color: #fff; }
     .hidden { display: none !important; }
     .nav-tabs { display: flex; gap: 6px; margin-bottom: 20px; border-bottom: 1px solid var(--border); padding-bottom: 10px; overflow-x: auto; }
-    .nav-tab {
-      flex: 1; padding: 10px 8px; text-align: center; background: #080d1a;
-      border-radius: 8px; cursor: pointer; font-size: 12px; font-weight: bold;
-      color: #94a3b8; white-space: nowrap;
-    }
+    .nav-tab { flex: 1; padding: 10px 8px; text-align: center; background: #080d1a; border-radius: 8px; cursor: pointer; font-size: 12px; font-weight: bold; color: #94a3b8; white-space: nowrap; }
     .nav-tab.active { background: #1e293b; color: var(--primary); border: 1px solid var(--primary); }
-    .product-card {
-      background: #080d1a; border: 1px solid var(--border); border-radius: 12px;
-      padding: 14px; margin-bottom: 12px; display: flex; gap: 14px; align-items: center;
-    }
+    .product-card { background: #080d1a; border: 1px solid var(--border); border-radius: 12px; padding: 14px; margin-bottom: 12px; display: flex; gap: 14px; align-items: center; }
     .product-img { width: 65px; height: 65px; border-radius: 8px; object-fit: cover; border: 1px solid #334155; }
     .preview-logo { width: 75px; height: 75px; border-radius: 50%; object-fit: cover; border: 2px solid var(--primary); margin: 8px 0; }
-
-    .combo-edit-box {
-      background: #080d1a; border: 1px solid var(--border); border-radius: 12px;
-      padding: 16px; margin-bottom: 18px;
-    }
-
+    .combo-edit-box { background: #080d1a; border: 1px solid var(--border); border-radius: 12px; padding: 16px; margin-bottom: 18px; }
     .theme-selector { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-top: 6px; }
-    @media (max-width: 480px) { .theme-selector { grid-template-columns: repeat(2, 1fr); } }
-    .theme-opt {
-      border: 2px solid #1e293b; border-radius: 10px; padding: 10px 6px; text-align: center;
-      cursor: pointer; font-size: 12px; font-weight: bold; background: #080d1a;
-      display: flex; flex-direction: column; align-items: center; gap: 6px; transition: all 0.2s;
-    }
+    .theme-opt { border: 2px solid #1e293b; border-radius: 10px; padding: 10px 6px; text-align: center; cursor: pointer; font-size: 12px; font-weight: bold; background: #080d1a; display: flex; flex-direction: column; align-items: center; gap: 6px; transition: all 0.2s; }
     .theme-circle { width: 22px; height: 22px; border-radius: 50%; border: 2px solid #fff; }
     .theme-opt.active { border-color: #fff; box-shadow: 0 0 12px rgba(255,255,255,0.3); }
-
-    .badge-dias {
-      display: inline-flex; align-items: center; gap: 5px;
-      font-family: 'Orbitron', sans-serif; font-size: 11px; font-weight: 800;
-      padding: 4px 9px; border-radius: 6px; letter-spacing: 0.5px;
-    }
+    .badge-dias { display: inline-flex; align-items: center; gap: 5px; font-family: 'Orbitron', sans-serif; font-size: 11px; font-weight: 800; padding: 4px 9px; border-radius: 6px; }
     .badge-dias.green { background: rgba(34, 197, 94, 0.15); color: #4ade80; border: 1px solid #22c55e; }
-    .badge-dias.yellow { background: rgba(234, 179, 8, 0.18); color: #facc15; border: 1px solid #eab308; }
     .badge-dias.red { background: rgba(239, 68, 68, 0.2); color: #f87171; border: 1px solid #ef4444; }
-
-    .checkbox-container {
-      display: flex; align-items: center; gap: 10px; margin: 14px 0 18px 0;
-      cursor: pointer; user-select: none;
-    }
-    .checkbox-container input { width: 18px; height: 18px; accent-color: #38bdf8; cursor: pointer; }
+    .checkbox-container { display: flex; align-items: center; gap: 10px; margin: 14px 0 18px 0; cursor: pointer; user-select: none; }
+    .checkbox-container input { width: 18px; height: 18px; accent-color: #38bdf8; }
   </style>
 </head>
 <body>
 
-  <!-- LOGIN REVENDEDOR -->
+  <!-- LOGIN -->
   <div id="login-section" class="card" style="max-width:440px; align-self:center;">
-    <h2 style="text-align:center;">💼 PANEL REVENDEDOR</h2>
+    <h2 style="text-align:center;">💼 PANEL REVENDEDOR <span style="font-size:12px; color:#22c55e;">v2.0</span></h2>
     <p id="login-submsg" style="text-align:center; color:#94a3b8; font-size:14px; margin-bottom:20px;">Ingresa tus credenciales para gestionar tu catálogo</p>
-    
-    <div class="form-group">
-      <label>Correo Electrónico</label>
-      <input type="email" id="email" placeholder="tu-correo@gmail.com">
-    </div>
-    
+    <div class="form-group"><label>Correo Electrónico</label><input type="email" id="email" placeholder="tu-correo@gmail.com"></div>
     <div class="form-group">
       <label>Contraseña</label>
       <div class="password-wrapper">
         <input type="password" id="password" placeholder="Tu clave de acceso">
-        <button type="button" class="toggle-password-btn" onclick="togglePasswordVisibility('password', this)" title="Ver contraseña">👁️</button>
+        <button type="button" class="toggle-password-btn" onclick="togglePasswordVisibility('password', this)">👁️</button>
       </div>
     </div>
-
     <div class="checkbox-container" onclick="toggleCheckbox('remember-session')">
       <input type="checkbox" id="remember-session" checked onclick="event.stopPropagation()">
       <span style="font-size:14px; color:#cbd5e1; font-weight:600;">Mantener sesión iniciada</span>
     </div>
-
     <button class="btn-primary" onclick="iniciarSesion()">INGRESAR A MI PANEL</button>
   </div>
 
@@ -147,9 +69,10 @@
   <div id="dashboard-section" class="card hidden">
     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px; border-bottom:1px solid var(--border); padding-bottom:12px; gap:8px;">
       <div style="display:flex; align-items:center; gap:10px;">
-        <img id="dash-logo" src="https://via.placeholder.com/40" style="width:42px; height:42px; border-radius:50%; object-fit:cover; border:1px solid var(--primary);" alt="Logo">
+        <img id="dash-logo" src="https://via.placeholder.com/40" style="width:42px; height:42px; border-radius:50%; object-fit:cover; border:1px solid var(--primary);">
         <div>
           <span id="dash-title" style="font-family:'Orbitron'; font-weight:bold; font-size:16px; color:#fff;">Mi Tienda</span>
+          <span style="color:#22c55e; font-size:10px; font-weight:bold; margin-left:4px;">v2.0</span>
           <div><span id="dash-countdown" class="badge-dias green">⏳ Calculando días...</span></div>
         </div>
       </div>
@@ -165,18 +88,12 @@
       <div id="tab-btn-payments" class="nav-tab" onclick="cambiarTab('payments')">💳 PAGOS</div>
     </div>
 
-    <!-- PESTAÑA: TIENDA & LOGO -->
+    <!-- PESTAÑA: TIENDA -->
     <div id="tab-shop">
       <div style="background:#080d1a; padding:16px; border-radius:12px; border:1px solid var(--border);">
         <h4 style="color:var(--primary); margin-top:0;">Ajustes Principales</h4>
-        <div class="form-group">
-          <label>Nombre Comercial</label>
-          <input type="text" id="shop-nombre">
-        </div>
-        <div class="form-group">
-          <label>Número de WhatsApp (ej: 593982766054)</label>
-          <input type="text" id="shop-whatsapp">
-        </div>
+        <div class="form-group"><label>Nombre Comercial</label><input type="text" id="shop-nombre"></div>
+        <div class="form-group"><label>WhatsApp (ej: 593982766054)</label><input type="text" id="shop-whatsapp"></div>
         <div class="form-group" style="background:#111625; padding:12px; border-radius:10px; border:1px solid #1e293b;">
           <label style="color:#fff;">Estado de Atención</label>
           <select id="shop-status-online" style="background:#080d1a; color:#fff; border:1px solid #1e293b;">
@@ -184,10 +101,7 @@
             <option value="offline">🌙 Fuera de horario (Dejar pedido)</option>
           </select>
         </div>
-        <div class="form-group">
-          <label>Link de Descarga Directa APK (Opcional)</label>
-          <input type="text" id="shop-apk" placeholder="https://link-a-mi-apk.com">
-        </div>
+        <div class="form-group"><label>Link de Descarga Directa APK (Opcional)</label><input type="text" id="shop-apk"></div>
         <div class="form-group" style="background:#111625; padding:12px; border-radius:10px; border:1px solid #1e293b;">
           <label style="color:#fff;">Color Principal</label>
           <input type="hidden" id="shop-tema" value="orange">
@@ -199,7 +113,7 @@
           </div>
         </div>
         <div class="form-group">
-          <label>Subir Logo de tu Tienda</label>
+          <label>Subir Logo</label>
           <input type="file" id="shop-logo-file" accept="image/*" onchange="convertirImagenABase64(this, 'shop-logo-preview')">
           <div style="text-align:center; margin-top:8px;"><img id="shop-logo-preview" class="preview-logo" src="https://via.placeholder.com/80"></div>
         </div>
@@ -212,19 +126,10 @@
       <div style="background:#080d1a; padding:16px; border-radius:12px; border:1px solid var(--border); margin-bottom:20px;">
         <h4 style="color:var(--accent); margin-top:0;">➕ Agregar / Editar Servicio</h4>
         <input type="hidden" id="prod-edit-idx" value="-1">
-        <div class="form-group">
-          <label>Nombre del Servicio</label>
-          <input type="text" id="prod-nombre" placeholder="Ej: Netflix">
-        </div>
+        <div class="form-group"><label>Nombre del Servicio</label><input type="text" id="prod-nombre"></div>
         <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
-          <div class="form-group">
-            <label>Precio</label>
-            <input type="text" id="prod-precio" placeholder="4.25">
-          </div>
-          <div class="form-group">
-            <label>Subir Imagen</label>
-            <input type="file" id="prod-file" accept="image/*" onchange="convertirImagenABase64(this, 'prod-preview-img')">
-          </div>
+          <div class="form-group"><label>Precio</label><input type="text" id="prod-precio"></div>
+          <div class="form-group"><label>Subir Imagen</label><input type="file" id="prod-file" accept="image/*" onchange="convertirImagenABase64(this, 'prod-preview-img')"></div>
         </div>
         <img id="prod-preview-img" src="" style="max-height:80px; border-radius:6px; margin-bottom:10px; display:none;">
         <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
@@ -238,26 +143,19 @@
               <option value="gaming">Gaming</option>
             </select>
           </div>
-          <div class="form-group">
-            <label>Insignia / Etiqueta</label>
-            <input type="text" id="prod-tag" placeholder="POPULAR">
-          </div>
+          <div class="form-group"><label>Insignia</label><input type="text" id="prod-tag" placeholder="POPULAR"></div>
         </div>
-        <div class="form-group">
-          <label>Beneficios (separados por coma)</label>
-          <input type="text" id="prod-features" placeholder="1 perfil privado, Ultra HD">
-        </div>
+        <div class="form-group"><label>Beneficios (separados por coma)</label><input type="text" id="prod-features"></div>
         <button id="btn-guardar-prod" class="btn-success" onclick="guardarProducto()">AGREGAR / ACTUALIZAR SERVICIO</button>
       </div>
       <h4 style="color:#fff;">Mis Servicios Activos</h4>
       <div id="lista-productos"></div>
     </div>
 
-    <!-- PESTAÑA: COMBOS EDITABLES -->
+    <!-- PESTAÑA: COMBOS -->
     <div id="tab-combos" class="hidden">
       <div style="background:#080d1a; padding:16px; border-radius:12px; border:1px solid var(--border); margin-bottom:16px;">
         <h4 style="color:var(--primary); margin-top:0;">🔥 Personalizar Combos</h4>
-        <!-- SE RENDERIZAN LOS 3 COMBOS CON JS (MISMO CÓDIGO) -->
         <div id="combo-boxes-container"></div>
         <button id="btn-save-combos" class="btn-success" onclick="guardarAjustesCombos()">GUARDAR COMBOS</button>
       </div>
@@ -295,12 +193,27 @@
   </div>
 
   <script>
-    let revendedorActual = null;
-    let slugActual = null;
-    let tiendaActual = {};
-    let tempImgBase64 = null;
-    let tempLogoBase64 = null;
-    let tempComboImgs = [null, null, null];
+    // ==========================================
+    // DESTRUCTOR DE CACHÉ PWA (Obliga a actualizar)
+    // ==========================================
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.getRegistrations().then(function(registrations) {
+        for(let registration of registrations) { registration.unregister(); }
+      });
+    }
+
+    // ==========================================
+    // FUNCIÓN MATEMÁTICA RESTAURADA (La que faltaba)
+    // ==========================================
+    function calcularDias(vence) {
+      if (!vence) return 999;
+      const diff = new Date(vence) - new Date();
+      return Math.ceil(diff / (1000 * 60 * 60 * 24));
+    }
+    // ==========================================
+
+    let revendedorActual = null; let slugActual = null; let tiendaActual = {};
+    let tempImgBase64 = null; let tempLogoBase64 = null; let tempComboImgs = [null, null, null];
 
     const COMBOS_DEFAULT = [
       { activo: true, comboCantidad: 2, descuento: 10, nombre: "Combo Dúo", sub: "10% OFF", img: "https://images.unsplash.com/photo-1578328819058-b69f3a3b0f6b?w=600" },
@@ -313,16 +226,13 @@
       input.type = input.type === 'password' ? 'text' : 'password';
       btn.innerText = input.type === 'password' ? '👁️' : '🙈';
     }
-
     function toggleCheckbox(id) { document.getElementById(id).checked = !document.getElementById(id).checked; }
-
     function seleccionarTema(color) {
       document.querySelectorAll('.theme-opt').forEach(el => el.classList.remove('active'));
       const sel = document.getElementById('theme-' + color);
       if (sel) sel.classList.add('active');
       document.getElementById('shop-tema').value = color;
     }
-
     function cambiarTab(tab) {
       ['shop', 'prods', 'combos', 'texts', 'payments'].forEach(t => {
         document.getElementById('tab-' + t).classList.add('hidden');
@@ -336,126 +246,73 @@
       const email = autoEmail || document.getElementById('email').value.trim();
       const pass = autoPass || document.getElementById('password').value.trim();
       const recordar = document.getElementById('remember-session').checked;
-
       try {
         const res = await fetch('/api/db');
         const db = await res.json();
-        const revendedores = db.revendedores || {};
-
-        const foundSlug = Object.keys(revendedores).find(slug => {
-          const r = revendedores[slug];
+        const foundSlug = Object.keys(db.revendedores || {}).find(slug => {
+          const r = db.revendedores[slug];
           return (r.email === email || r.correo === email) && (r.password === pass || r.clave === pass);
         });
-
         if (foundSlug) {
-          slugActual = foundSlug;
-          revendedorActual = revendedores[slugActual];
-          if (revendedorActual.activo === false) {
-            alert('Tu tienda se encuentra suspendida. Comunícate con soporte.');
-            return;
-          }
-
-          if (recordar || autoEmail) {
-            localStorage.setItem('revendedor_session', JSON.stringify({ slug: slugActual, email, pass }));
-          }
-
+          slugActual = foundSlug; revendedorActual = db.revendedores[slugActual];
+          if (revendedorActual.activo === false) { alert('Tienda suspendida.'); return; }
+          if (recordar || autoEmail) localStorage.setItem('revendedor_session', JSON.stringify({ slug: slugActual, email, pass }));
           tiendaActual = (db.tiendas && db.tiendas[slugActual]) ? db.tiendas[slugActual] : {};
           if (!Array.isArray(tiendaActual.productos)) tiendaActual.productos = [];
-
           document.getElementById('login-section').classList.add('hidden');
           document.getElementById('dashboard-section').classList.remove('hidden');
           pintarDashboard();
-        } else {
-          if (!autoEmail) alert('Correo o contraseña incorrectos.');
-        }
-      } catch (err) {
-        alert('Error de conexión: ' + err.message);
-      }
+        } else { if (!autoEmail) alert('Correo o contraseña incorrectos.'); }
+      } catch (err) { alert('Error: ' + err.message); }
     }
 
-    function cerrarSesion() {
-      localStorage.removeItem('revendedor_session');
-      location.reload();
-    }
+    function cerrarSesion() { localStorage.removeItem('revendedor_session'); location.reload(); }
 
-    // ============================================================================
-    // CORAZÓN DE LA SOLUCIÓN: RE-COMPRESIÓN EXTREMA Y MANEJO DE ERRORES FIRESTORE
-    // ============================================================================
-
-    // Función que garantiza que las imágenes viejas se compriman a menos de 30KB
     function reComprimirBase64(b64) {
       return new Promise((resolve) => {
         const img = new Image();
         img.onload = () => {
           const canvas = document.createElement('canvas');
-          const MAX_WIDTH = 250; // Ultra ligero (para miniaturas)
-          const scaleSize = (img.width > MAX_WIDTH) ? (MAX_WIDTH / img.width) : 1;
-          canvas.width = img.width * scaleSize;
-          canvas.height = img.height * scaleSize;
-          const ctx = canvas.getContext('2d');
-          ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-          resolve(canvas.toDataURL('image/jpeg', 0.5)); // Calidad 50%
+          const MAX_WIDTH = 250; const scaleSize = (img.width > MAX_WIDTH) ? (MAX_WIDTH / img.width) : 1;
+          canvas.width = img.width * scaleSize; canvas.height = img.height * scaleSize;
+          const ctx = canvas.getContext('2d'); ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+          resolve(canvas.toDataURL('image/jpeg', 0.5));
         };
-        img.onerror = () => resolve(b64);
-        img.src = b64;
+        img.onerror = () => resolve(b64); img.src = b64;
       });
     }
 
     async function persistirEnNube(datosParciales) {
       if (!slugActual) return false;
       try {
-        const res = await fetch('/api/tienda/guardar', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ slug: slugActual, tienda: datosParciales })
-        });
+        const res = await fetch('/api/tienda/guardar', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ slug: slugActual, tienda: datosParciales }) });
         const data = await res.json();
-        
-        // ¡ESTO ES LO QUE FALTABA! MOSTRAR EL ERROR SI GOOGLE LO RECHAZA
-        if (!data.success) {
-          alert("❌ Error de Google Firestore: " + (data.error || "El catálogo es demasiado pesado."));
-          return false;
-        }
+        if (!data.success) { alert("❌ Error Firestore: " + (data.error || "Muy pesado.")); return false; }
         return true;
-      } catch (err) {
-        alert('❌ Error de red: ' + err.message);
-        return false;
-      }
+      } catch (err) { alert('❌ Error red: ' + err.message); return false; }
     }
 
     function convertirImagenABase64(input, previewId) {
       if (input.files && input.files[0]) {
-        const file = input.files[0];
-        const reader = new FileReader();
+        const file = input.files[0]; const reader = new FileReader();
         reader.onload = function(e) {
           const img = new Image();
           img.onload = function() {
             const canvas = document.createElement('canvas');
-            const MAX_WIDTH = 250; // Bajado a 250 para asegurar peso mínimo
-            const scaleSize = (img.width > MAX_WIDTH) ? (MAX_WIDTH / img.width) : 1;
-            canvas.width = img.width * scaleSize;
-            canvas.height = img.height * scaleSize;
-            const ctx = canvas.getContext('2d');
-            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-            const b64 = canvas.toDataURL('image/jpeg', 0.50); // Calidad 50%
-
-            const prev = document.getElementById(previewId);
-            prev.src = b64;
-            prev.style.display = 'block';
-
+            const MAX_WIDTH = 250; const scaleSize = (img.width > MAX_WIDTH) ? (MAX_WIDTH / img.width) : 1;
+            canvas.width = img.width * scaleSize; canvas.height = img.height * scaleSize;
+            const ctx = canvas.getContext('2d'); ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+            const b64 = canvas.toDataURL('image/jpeg', 0.50);
+            const prev = document.getElementById(previewId); prev.src = b64; prev.style.display = 'block';
             if (previewId === 'prod-preview-img') tempImgBase64 = b64;
             if (previewId === 'shop-logo-preview') tempLogoBase64 = b64;
             if (previewId === 'combo0-preview') tempComboImgs[0] = b64;
             if (previewId === 'combo1-preview') tempComboImgs[1] = b64;
             if (previewId === 'combo2-preview') tempComboImgs[2] = b64;
-          };
-          img.src = e.target.result;
-        };
-        reader.readAsDataURL(file);
+          }; img.src = e.target.result;
+        }; reader.readAsDataURL(file);
       }
     }
-
-    // ============================================================================
 
     function pintarDashboard() {
       document.getElementById('dash-title').innerText = tiendaActual.nombre || revendedorActual.nombre || slugActual;
@@ -471,25 +328,18 @@
         document.getElementById('shop-logo-preview').src = tiendaActual.logo;
       }
 
-      // Generar Combos en UI
       const combos = (tiendaActual.combos && tiendaActual.combos.length > 0) ? tiendaActual.combos : COMBOS_DEFAULT;
       let combosHtml = '';
       [0, 1, 2].forEach(i => {
         const c = combos[i] || COMBOS_DEFAULT[i];
         combosHtml += `
           <div class="combo-edit-box">
-            <div style="display:flex; justify-content:space-between; margin-bottom:10px;">
-              <strong style="color:var(--primary);">Combo ${i+1}</strong>
-              <label style="color:#fff; font-size:13px;"><input type="checkbox" id="combo${i}-activo" ${c.activo !== false ? 'checked' : ''}> Activo</label>
-            </div>
-            <input type="text" id="combo${i}-nombre" value="${c.nombre || ''}" style="margin-bottom:8px;" placeholder="Nombre del Combo">
-            <div style="display:flex; gap:10px; margin-bottom:8px;">
-              <input type="number" id="combo${i}-cant" value="${c.comboCantidad || (i+2)}" placeholder="Cant.">
-              <input type="number" id="combo${i}-desc" value="${c.descuento || 10}" placeholder="% Desc.">
-            </div>
+            <div style="display:flex; justify-content:space-between; margin-bottom:10px;"><strong style="color:var(--primary);">Combo ${i+1}</strong><label style="color:#fff; font-size:13px;"><input type="checkbox" id="combo${i}-activo" ${c.activo !== false ? 'checked' : ''}> Activo</label></div>
+            <input type="text" id="combo${i}-nombre" value="${c.nombre || ''}" style="margin-bottom:8px;">
+            <div style="display:flex; gap:10px; margin-bottom:8px;"><input type="number" id="combo${i}-cant" value="${c.comboCantidad || (i+2)}"><input type="number" id="combo${i}-desc" value="${c.descuento || 10}"></div>
             <input type="file" accept="image/*" onchange="convertirImagenABase64(this, 'combo${i}-preview')" style="margin-bottom:8px;">
             <img id="combo${i}-preview" src="${c.img || ''}" style="max-height:60px; border-radius:8px; display:${c.img ? 'block' : 'none'};">
-            <input type="text" id="combo${i}-sub" value="${c.sub || ''}" placeholder="Ej: 10% OFF" style="margin-top:8px;">
+            <input type="text" id="combo${i}-sub" value="${c.sub || ''}" style="margin-top:8px;">
           </div>
         `;
       });
@@ -510,24 +360,17 @@
       } else {
         tag.className = 'badge-dias green'; tag.innerText = `✅ ${dias} DÍAS`;
       }
-
       renderProductos();
     }
 
     function renderProductos() {
-      const lista = document.getElementById('lista-productos');
-      lista.innerHTML = '';
+      const lista = document.getElementById('lista-productos'); lista.innerHTML = '';
       const productos = tiendaActual.productos || [];
-
       productos.forEach((p, idx) => {
-        const item = document.createElement('div');
-        item.className = 'product-card';
+        const item = document.createElement('div'); item.className = 'product-card';
         item.innerHTML = `
           <img src="${p.img || 'https://via.placeholder.com/65'}" class="product-img">
-          <div style="flex:1;">
-            <strong style="color:#fff; font-size:15px;">${p.nombre}</strong>
-            <div style="color:var(--accent); font-weight:bold; font-size:14px;">$${p.precio}</div>
-          </div>
+          <div style="flex:1;"><strong style="color:#fff; font-size:15px;">${p.nombre}</strong><div style="color:var(--accent); font-weight:bold; font-size:14px;">$${p.precio}</div></div>
           <div style="display:flex; flex-direction:column; gap:6px;">
             <button style="background:#0284c7; color:#fff; padding:6px; font-size:12px;" onclick="cargarEdicionProducto(${idx})">✏️</button>
             <button style="background:#dc2626; color:#fff; padding:6px; font-size:12px;" onclick="eliminarProducto(${idx})">🗑️</button>
@@ -539,152 +382,71 @@
 
     function cargarEdicionProducto(idx) {
       const p = tiendaActual.productos[idx];
-      document.getElementById('prod-edit-idx').value = idx;
-      document.getElementById('prod-nombre').value = p.nombre;
-      document.getElementById('prod-precio').value = p.precio;
-      document.getElementById('prod-cat').value = p.categoria || 'streaming';
-      document.getElementById('prod-tag').value = p.tag || '';
-      document.getElementById('prod-features').value = (p.features || []).join(', ');
-      
-      const imgPrev = document.getElementById('prod-preview-img');
-      if (p.img) {
-        imgPrev.src = p.img;
-        imgPrev.style.display = 'block';
-        tempImgBase64 = p.img;
-      }
-      document.getElementById('btn-guardar-prod').innerText = "ACTUALIZAR SERVICIO";
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      document.getElementById('prod-edit-idx').value = idx; document.getElementById('prod-nombre').value = p.nombre; document.getElementById('prod-precio').value = p.precio;
+      document.getElementById('prod-cat').value = p.categoria || 'streaming'; document.getElementById('prod-tag').value = p.tag || ''; document.getElementById('prod-features').value = (p.features || []).join(', ');
+      if (p.img) { document.getElementById('prod-preview-img').src = p.img; document.getElementById('prod-preview-img').style.display = 'block'; tempImgBase64 = p.img; }
+      document.getElementById('btn-guardar-prod').innerText = "ACTUALIZAR SERVICIO"; window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
     async function guardarProducto() {
-      const btn = document.getElementById('btn-guardar-prod');
-      const idx = parseInt(document.getElementById('prod-edit-idx').value);
-      const nombre = document.getElementById('prod-nombre').value.trim();
-      const precio = document.getElementById('prod-precio').value.trim();
-      const categoria = document.getElementById('prod-cat').value;
-      const tag = document.getElementById('prod-tag').value.trim();
+      const btn = document.getElementById('btn-guardar-prod'); const idx = parseInt(document.getElementById('prod-edit-idx').value);
+      const nombre = document.getElementById('prod-nombre').value.trim(); const precio = document.getElementById('prod-precio').value.trim();
+      const categoria = document.getElementById('prod-cat').value; const tag = document.getElementById('prod-tag').value.trim();
       const rawFeatures = document.getElementById('prod-features').value.trim();
+      if (!slugActual || !nombre || !precio) { alert('Faltan datos.'); return; }
 
-      if (!slugActual || !nombre || !precio) {
-        alert('Nombre y precio son obligatorios.'); return;
-      }
-
-      btn.disabled = true;
-      btn.innerText = "⏳ OPTIMIZANDO Y GUARDANDO...";
-
+      btn.disabled = true; btn.innerText = "⏳ OPTIMIZANDO Y GUARDANDO...";
       const features = rawFeatures ? rawFeatures.split(',').map(s => s.trim()).filter(Boolean) : ["Garantía"];
-      const sub = `1 mes · ${categoria}`;
-      const img = tempImgBase64 || (idx >= 0 && tiendaActual.productos[idx].img) || 'https://images.unsplash.com/photo-1522869635100-9f4c5e86aa37?w=500';
-
+      const sub = `1 mes · ${categoria}`; const img = tempImgBase64 || (idx >= 0 && tiendaActual.productos[idx].img) || 'https://images.unsplash.com/photo-1522869635100-9f4c5e86aa37?w=500';
       if (!Array.isArray(tiendaActual.productos)) tiendaActual.productos = [];
       const nuevoObj = { nombre, sub, categoria, tag, precio, features, img };
+      if (idx >= 0) tiendaActual.productos[idx] = nuevoObj; else tiendaActual.productos.push(nuevoObj);
 
-      if (idx >= 0) {
-        tiendaActual.productos[idx] = nuevoObj;
-      } else {
-        tiendaActual.productos.push(nuevoObj);
-      }
-
-      // EL FILTRO MÁGICO: LIMPIAR IMÁGENES VIEJAS PARA QUE NO COLAPSE GOOGLE
       for (let i=0; i<tiendaActual.productos.length; i++) {
         let pr = tiendaActual.productos[i];
-        if (pr.img && pr.img.length > 30000 && pr.img.startsWith('data:image')) {
-          try { pr.img = await reComprimirBase64(pr.img); } catch(e){}
-        }
+        if (pr.img && pr.img.length > 30000 && pr.img.startsWith('data:image')) { try { pr.img = await reComprimirBase64(pr.img); } catch(e){} }
       }
-
       const ok = await persistirEnNube({ productos: tiendaActual.productos });
-      btn.disabled = false;
-      btn.innerText = "AGREGAR / ACTUALIZAR SERVICIO";
-
+      btn.disabled = false; btn.innerText = "AGREGAR / ACTUALIZAR SERVICIO";
       if (ok) {
-        alert('✅ ¡Servicio guardado exitosamente en Google Cloud!');
-        document.getElementById('prod-edit-idx').value = "-1";
-        document.getElementById('prod-nombre').value = '';
-        document.getElementById('prod-precio').value = '';
-        document.getElementById('prod-features').value = '';
-        document.getElementById('prod-file').value = '';
-        document.getElementById('prod-preview-img').style.display = 'none';
-        tempImgBase64 = null;
-        renderProductos();
+        alert('✅ Guardado en la nube!');
+        document.getElementById('prod-edit-idx').value = "-1"; document.getElementById('prod-nombre').value = ''; document.getElementById('prod-precio').value = '';
+        document.getElementById('prod-features').value = ''; document.getElementById('prod-file').value = ''; document.getElementById('prod-preview-img').style.display = 'none';
+        tempImgBase64 = null; renderProductos();
       }
     }
 
     async function eliminarProducto(idx) {
-      if (confirm('¿Deseas eliminar este servicio de tu catálogo?')) {
-        tiendaActual.productos.splice(idx, 1);
-        await persistirEnNube({ productos: tiendaActual.productos });
-        renderProductos();
-      }
+      if (confirm('¿Eliminar servicio?')) { tiendaActual.productos.splice(idx, 1); await persistirEnNube({ productos: tiendaActual.productos }); renderProductos(); }
     }
-
     async function guardarAjustesCombos() {
-      const btn = document.getElementById('btn-save-combos');
-      btn.disabled = true; btn.innerText = "⏳ GUARDANDO...";
+      const btn = document.getElementById('btn-save-combos'); btn.disabled = true; btn.innerText = "⏳ GUARDANDO...";
       const nuevosCombos = [];
       for(let i=0; i<3; i++) {
-        const activo = document.getElementById(`combo${i}-activo`).checked;
-        const nombre = document.getElementById(`combo${i}-nombre`).value.trim();
-        const comboCantidad = parseInt(document.getElementById(`combo${i}-cant`).value) || (i + 2);
-        const descuento = parseInt(document.getElementById(`combo${i}-desc`).value) || 10;
-        const sub = document.getElementById(`combo${i}-sub`).value.trim();
-        let img = tempComboImgs[i] || (tiendaActual.combos && tiendaActual.combos[i] && tiendaActual.combos[i].img) || COMBOS_DEFAULT[i].img;
-
-        if (img && img.length > 30000 && img.startsWith('data:image')) {
-          try { img = await reComprimirBase64(img); } catch(e){}
-        }
-
+        const activo = document.getElementById(`combo${i}-activo`).checked; const nombre = document.getElementById(`combo${i}-nombre`).value.trim();
+        const comboCantidad = parseInt(document.getElementById(`combo${i}-cant`).value) || (i + 2); const descuento = parseInt(document.getElementById(`combo${i}-desc`).value) || 10;
+        const sub = document.getElementById(`combo${i}-sub`).value.trim(); let img = tempComboImgs[i] || (tiendaActual.combos && tiendaActual.combos[i] && tiendaActual.combos[i].img) || COMBOS_DEFAULT[i].img;
+        if (img && img.length > 30000 && img.startsWith('data:image')) { try { img = await reComprimirBase64(img); } catch(e){} }
         nuevosCombos.push({ activo, comboCantidad, descuento, nombre, sub, tag:`${descuento}% OFF`, img });
       }
-      tiendaActual.combos = nuevosCombos;
-      const ok = await persistirEnNube({ combos: nuevosCombos });
-      btn.disabled = false; btn.innerText = "GUARDAR COMBOS";
-      if (ok) alert('✅ Combos guardados!');
+      tiendaActual.combos = nuevosCombos; const ok = await persistirEnNube({ combos: nuevosCombos });
+      btn.disabled = false; btn.innerText = "GUARDAR COMBOS"; if (ok) alert('✅ Guardado!');
     }
-
     async function guardarAjustesTienda() {
-      const btn = document.getElementById('btn-save-shop');
-      btn.disabled = true; btn.innerText = "⏳ GUARDANDO...";
-      const nombre = document.getElementById('shop-nombre').value.trim();
-      const whatsapp = document.getElementById('shop-whatsapp').value.trim();
-      const tema = document.getElementById('shop-tema').value;
-      const estadoAtencion = document.getElementById('shop-status-online').value;
-      const apkUrl = document.getElementById('shop-apk').value.trim();
-
-      const payload = { nombre, whatsapp, tema, estadoAtencion, apkUrl };
-      if (tempLogoBase64) {
-        if (tempLogoBase64.length > 30000) { try { tempLogoBase64 = await reComprimirBase64(tempLogoBase64); } catch(e){} }
-        payload.logo = tempLogoBase64;
-      }
-      tiendaActual = { ...tiendaActual, ...payload };
-      const ok = await persistirEnNube(payload);
-      btn.disabled = false; btn.innerText = "GUARDAR AJUSTES";
-      if (ok) {
-        alert('✅ Ajustes guardados!');
-        document.getElementById('dash-title').innerText = nombre;
-        if (tempLogoBase64) document.getElementById('dash-logo').src = tempLogoBase64;
-      }
+      const btn = document.getElementById('btn-save-shop'); btn.disabled = true; btn.innerText = "⏳ GUARDANDO...";
+      const nombre = document.getElementById('shop-nombre').value.trim(); const whatsapp = document.getElementById('shop-whatsapp').value.trim();
+      const payload = { nombre, whatsapp, tema: document.getElementById('shop-tema').value, estadoAtencion: document.getElementById('shop-status-online').value, apkUrl: document.getElementById('shop-apk').value.trim() };
+      if (tempLogoBase64) { if (tempLogoBase64.length > 30000) { try { tempLogoBase64 = await reComprimirBase64(tempLogoBase64); } catch(e){} } payload.logo = tempLogoBase64; }
+      tiendaActual = { ...tiendaActual, ...payload }; const ok = await persistirEnNube(payload);
+      btn.disabled = false; btn.innerText = "GUARDAR AJUSTES"; if (ok) { alert('✅ Guardado!'); document.getElementById('dash-title').innerText = nombre; if (tempLogoBase64) document.getElementById('dash-logo').src = tempLogoBase64; }
     }
-
     async function guardarTextos() {
-      const textos = {
-        pill: document.getElementById('txt-pill').value,
-        title1: document.getElementById('txt-title-1').value,
-        title2: document.getElementById('txt-title-2').value,
-        sub: document.getElementById('txt-sub').value,
-        currency: document.getElementById('txt-currency').value,
-        btnBuy: document.getElementById('txt-btn-buy').value
-      };
-      tiendaActual.textos = textos;
-      const ok = await persistirEnNube({ textos });
-      if (ok) alert('✅ Textos guardados!');
+      const textos = { pill: document.getElementById('txt-pill').value, title1: document.getElementById('txt-title-1').value, title2: document.getElementById('txt-title-2').value, sub: document.getElementById('txt-sub').value, currency: document.getElementById('txt-currency').value, btnBuy: document.getElementById('txt-btn-buy').value };
+      tiendaActual.textos = textos; const ok = await persistirEnNube({ textos }); if (ok) alert('✅ Guardado!');
     }
-
     async function guardarMetodosPago() {
-      const metodosPago = document.getElementById('shop-payments').value.trim();
-      tiendaActual.metodosPago = metodosPago;
-      const ok = await persistirEnNube({ metodosPago });
-      if (ok) alert('✅ Métodos de pago guardados!');
+      tiendaActual.metodosPago = document.getElementById('shop-payments').value.trim();
+      if (await persistirEnNube({ metodosPago: tiendaActual.metodosPago })) alert('✅ Guardado!');
     }
 
     const sesion = localStorage.getItem('revendedor_session');
