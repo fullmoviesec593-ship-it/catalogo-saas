@@ -44,8 +44,6 @@
     .card-body-info { font-size: 13px; color: #cbd5e1; margin-bottom: 14px; line-height: 1.5; }
     .card-actions-box { display: flex; flex-direction: column; gap: 6px; }
     .btn-suspend-toggle { width: 100%; padding: 8px; font-size: 12px; border-radius: 8px; font-weight: 800; cursor: pointer; font-family: 'Orbitron'; display: flex; align-items: center; justify-content: center; gap: 6px; }
-    .btn-suspend-toggle.to-suspend { background: #7f1d1d; border: 1px solid #ef4444; color: #fca5a5; }
-    .btn-suspend-toggle.to-reactivate { background: #14532d; border: 1px solid #22c55e; color: #86efac; }
     .btn-copy-access { background: #1e293b; border: 1px solid #38bdf8; color: #38bdf8; padding: 7px; border-radius: 6px; font-size: 12px; font-weight: 800; cursor: pointer; font-family: 'Orbitron'; display: flex; align-items: center; justify-content: center; gap: 6px; width: 100%; transition: all 0.2s; }
   </style>
 </head>
@@ -178,37 +176,37 @@
       keys.forEach(slug => {
         const r = revs[slug]; const dias = calcularDias(r.vencimiento); const estaActivo = r.activo !== false && dias > 0;
         if (estaActivo) activos++; else vencidos++;
-        let badgeClass = 'active'; let badgeText = \`ACTIVO (\${dias}d)\`;
-        if (r.activo === false) { badgeClass = 'expired'; badgeText = 'SUSPENDIDO'; } else if (dias <= 0) { badgeClass = 'expired'; badgeText = \`VENCIDO (\${Math.abs(dias)}d)\`; } else if (dias <= 5) { badgeClass = 'warning'; badgeText = \`POR VENCER (\${dias}d)\`; }
+        let badgeClass = 'active'; let badgeText = `ACTIVO (${dias}d)`;
+        if (r.activo === false) { badgeClass = 'expired'; badgeText = 'SUSPENDIDO'; } else if (dias <= 0) { badgeClass = 'expired'; badgeText = `VENCIDO (${Math.abs(dias)}d)`; } else if (dias <= 5) { badgeClass = 'warning'; badgeText = `POR VENCER (${dias}d)`; }
         
         const proBadge = r.gestorPremium ? '<div class="badge-pro">🌟 GESTOR PRO</div>' : '';
 
-        const card = document.createElement('div'); card.className = \`reseller-card \${r.activo === false ? 'suspended-card' : ''}\`;
-        card.innerHTML = \`
+        const card = document.createElement('div'); card.className = `reseller-card ${r.activo === false ? 'suspended-card' : ''}`;
+        card.innerHTML = `
           <div>
             <div class="card-top">
               <div>
-                <strong style="color:#fff; font-size:16px;">\${r.nombre || slug}</strong><br>
-                <a href="/?tienda=\${slug}" target="_blank" style="color:var(--primary); font-size:12px; font-weight:bold;">🔗 /?tienda=\${slug}</a>
-                \${proBadge}
+                <strong style="color:#fff; font-size:16px;">${r.nombre || slug}</strong><br>
+                <a href="/?tienda=${slug}" target="_blank" style="color:var(--primary); font-size:12px; font-weight:bold;">🔗 /?tienda=${slug}</a>
+                ${proBadge}
               </div>
-              <span class="badge-status \${badgeClass}">\${badgeText}</span>
+              <span class="badge-status ${badgeClass}">${badgeText}</span>
             </div>
             <div class="card-body-info">
-              <div><b>📧 Correo:</b> \${r.email || r.correo || '-'}</div>
-              <div><b>🔑 Clave:</b> <span style="font-family:monospace; color:#38bdf8;">\${r.password || r.clave || '-'}</span></div>
+              <div><b>📧 Correo:</b> ${r.email || r.correo || '-'}</div>
+              <div><b>🔑 Clave:</b> <span style="font-family:monospace; color:#38bdf8;">${r.password || r.clave || '-'}</span></div>
             </div>
           </div>
           <div class="card-actions-box">
-            <button class="btn-copy-access" onclick="copiarDatosAcceso('\${slug}', this)">📋 Copiar Accesos WhatsApp</button>
+            <button class="btn-copy-access" onclick="copiarDatosAcceso('${slug}', this)">📋 Copiar Accesos WhatsApp</button>
             <div style="display:flex; gap:6px; margin-top:4px;">
-              <button onclick="editarRevendedor('\${slug}')" style="background:#1e293b; color:#cbd5e1; border:1px solid #334155; flex:1; font-size:11px; padding:6px; border-radius:6px;">✏️ Editar</button>
-              <button onclick="suspenderReactivar('\${slug}')" style="\${r.activo === false ? 'background:#14532d; color:#86efac; border:1px solid #22c55e;' : 'background:#7f1d1d; color:#fca5a5; border:1px solid #ef4444;'} flex:1; font-size:11px; padding:6px; border-radius:6px; cursor:pointer; font-weight:bold;">
-                \${r.activo === false ? '🟢 Reactivar' : '⛔ Suspender'}
+              <button onclick="editarRevendedor('${slug}')" style="background:#1e293b; color:#cbd5e1; border:1px solid #334155; flex:1; font-size:11px; padding:6px; border-radius:6px;">✏️ Editar</button>
+              <button onclick="suspenderReactivar('${slug}')" style="${r.activo === false ? 'background:#14532d; color:#86efac; border:1px solid #22c55e;' : 'background:#7f1d1d; color:#fca5a5; border:1px solid #ef4444;'} flex:1; font-size:11px; padding:6px; border-radius:6px; cursor:pointer; font-weight:bold;">
+                ${r.activo === false ? '🟢 Reactivar' : '⛔ Suspender'}
               </button>
             </div>
           </div>
-        \`;
+        `;
         container.appendChild(card);
       });
       document.getElementById('stat-total').innerText = total; document.getElementById('stat-activos').innerText = activos; document.getElementById('stat-vencidos').innerText = vencidos;
