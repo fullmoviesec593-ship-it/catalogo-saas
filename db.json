@@ -1,6 +1,34 @@
 {
   "superadmin": {
+    "email": "fullmoviesec593@gmail.com",
     "correo": "fullmoviesec593@gmail.com",
-    "password": "admin123"
+    "usuario": "fullmoviesec593@gmail.com",
+    "password": "admin123",
+    "clave": "admin123",
+    "pass": "admin123"
+  },
+  "admin": {
+    "email": "fullmoviesec593@gmail.com",
+    "correo": "fullmoviesec593@gmail.com",
+    "usuario": "fullmoviesec593@gmail.com",
+    "password": "admin123",
+    "clave": "admin123",
+    "pass": "admin123"
+  },
+  "superAdmin": {
+    "email": "fullmoviesec593@gmail.com",
+    "correo": "fullmoviesec593@gmail.com",
+    "usuario": "fullmoviesec593@gmail.com",
+    "password": "admin123",
+    "clave": "admin123",
+    "pass": "admin123"
+  },
+  "config": {
+    "email": "fullmoviesec593@gmail.com",
+    "correo": "fullmoviesec593@gmail.com",
+    "usuario": "fullmoviesec593@gmail.com",
+    "password": "admin123",
+    "clave": "admin123",
+    "pass": "admin123"
   }
 }
