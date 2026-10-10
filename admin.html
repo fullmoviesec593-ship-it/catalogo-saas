@@ -1262,7 +1262,7 @@ window.renderGestorPro = function() {
         window.pintarDashboard = function() {
             try { oldPintar(); } catch(e){}
             const bG = document.getElementById('tab-btn-gestor-pro');
-            if(bG && window.revendedorActual) { bG.style.display = window.revendedorActual.gestorPremium ? 'block' : 'none'; }
+            if(bG && window.revendedorActual) { bG.style.display = 'block'; }
             if(typeof window.renderGestor === 'function') window.renderGestor();
         };
         window.gestorHookedDash = true;
