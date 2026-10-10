@@ -980,6 +980,204 @@
 
     verificarSesionGuardada();
   </script>
+
+<!-- INYECCION_GESTOR_PRO_V3 -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<style>
+.btn-hamburguesa { background: transparent; border: none; color: #38bdf8; font-size: 28px; cursor: pointer; margin-right: 12px; display: flex; align-items: center; justify-content: center; }
+.menu-flotante { display: none !important; flex-direction: column !important; position: absolute; top: 75px; left: 16px; background: #0f172a; padding: 15px; border-radius: 12px; border: 1px solid #1e293b; z-index: 1000; box-shadow: 0 15px 40px rgba(0,0,0,0.9); width: 240px; }
+.menu-flotante.show { display: flex !important; }
+.menu-flotante > div, .menu-flotante > button { margin-bottom: 8px; width: 100%; text-align: left; padding: 12px 14px; background: #080d1a; border-radius: 8px; font-weight: bold; color: #94a3b8; border: 1px solid transparent; }
+.backdrop { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.6); z-index: 999; backdrop-filter: blur(2px); }
+.backdrop.show { display: block; }
+.gestor-header { background: linear-gradient(135deg, #ca8a04 0%, #854d0e 100%); padding: 16px; border-radius: 12px; margin-bottom: 16px; }
+.gestor-title { margin: 0; color: #fff; font-size: 18px; display: flex; align-items: center; gap: 8px; font-family: 'Orbitron', sans-serif;}
+.gestor-tabs-nav { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 8px; margin-bottom: 16px; }
+.gestor-sub-tab { background: #0f172a; border: 1px solid #1e293b; color: #94a3b8; padding: 8px 16px; border-radius: 8px; font-size: 13px; font-weight: bold; cursor: pointer; white-space: nowrap; }
+.gestor-sub-tab.active { background: #1e293b; color: #eab308; border-color: #eab308; }
+.gestor-import-box { border: 2px dashed #334155; padding: 24px; text-align: center; border-radius: 12px; background: #080d1a; margin-top: 16px; cursor: pointer; }
+.g-card { background: #080d1a; border: 1px solid #1e293b; border-radius: 12px; padding: 14px; margin-bottom: 12px; position: relative; }
+</style>
+
+<div id="tab-gestor" class="hidden" style="display:none;">
+    <div class="gestor-header">
+        <h3 class="gestor-title">👑 Gestor de Inventario Pro</h3>
+        <p style="margin: 4px 0 0 0; color: #fef08a; font-size: 12px;">Control total de Clientes, Perfiles, Cuentas y Finanzas</p>
+    </div>
+    <div class="gestor-tabs-nav">
+        <div id="g-tab-btn-inicio" class="gestor-sub-tab active" onclick="cambiarSubTabGestor('inicio')">Inicio</div>
+        <div id="g-tab-btn-clientes" class="gestor-sub-tab" onclick="cambiarSubTabGestor('clientes')">Directorio</div>
+        <div id="g-tab-btn-herramientas" class="gestor-sub-tab" onclick="cambiarSubTabGestor('herramientas')">Importar</div>
+    </div>
+    <div id="g-tab-inicio">
+        <h4 style="color:#fff; margin-top:0;">Ventas Activas</h4>
+        <input type="text" id="g-buscador" placeholder="🔍 Buscar cliente o servicio..." style="width:100%; padding:10px; margin-bottom:12px; border-radius:8px; border:1px solid #1e293b; background:#080d1a; color:#fff;" oninput="renderGestorPro()">
+        <div id="g-lista-ventas"></div>
+    </div>
+    <div id="g-tab-clientes" style="display:none;">
+        <h4 style="color:#fff; margin-top:0;">Directorio de Clientes</h4>
+        <div id="g-lista-clientes"></div>
+    </div>
+    <div id="g-tab-herramientas" style="display:none;">
+        <h4 style="color:#fff; margin-top:0;">Migración de Datos</h4>
+        <input type="file" id="excel-upload" accept=".xlsx, .xls, .csv" style="display:none;" onchange="procesarArchivoExcelReal(event)">
+        <div class="gestor-import-box" onclick="document.getElementById('excel-upload').click()">
+            <div style="font-size:30px; margin-bottom:10px;">📄</div><strong style="color:#fff;">Toca aquí para subir tu archivo Excel</strong>
+        </div>
+    </div>
+</div>
+
+<script>
+setTimeout(() => {
+    const dash = document.getElementById('dashboard-section');
+    const tGestor = document.getElementById('tab-gestor');
+    if(dash && tGestor && tGestor.parentElement !== dash) dash.appendChild(tGestor);
+
+    // Identificar el menú horizontal original que tienes ahora
+    let originalMenu = document.querySelector('.nav-tabs') || document.querySelector('[style*="overflow-x: auto"]') || document.querySelector('[style*="overflow-x:auto"]') || document.querySelector('.menu-container');
+    
+    if (originalMenu) {
+        originalMenu.classList.add('menu-flotante');
+        
+        // Crear el botón hamburguesa
+        const topHeader = dash.querySelector('div:first-child');
+        if (topHeader && !document.querySelector('.btn-hamburguesa')) {
+            const btnHam = document.createElement('button');
+            btnHam.className = 'btn-hamburguesa';
+            btnHam.innerHTML = '☰';
+            topHeader.insertBefore(btnHam, topHeader.firstChild);
+            
+            // Fondo oscuro para cuando se abre el menú
+            const bdrop = document.createElement('div');
+            bdrop.className = 'backdrop';
+            document.body.appendChild(bdrop);
+
+            btnHam.onclick = () => { originalMenu.classList.toggle('show'); bdrop.classList.toggle('show'); };
+            bdrop.onclick = () => { originalMenu.classList.remove('show'); bdrop.classList.remove('show'); };
+            
+            if(typeof window.cambiarTab === 'function') {
+                const oldCambiar = window.cambiarTab;
+                window.cambiarTab = function(tabId) {
+                    oldCambiar(tabId);
+                    originalMenu.classList.remove('show'); bdrop.classList.remove('show');
+                    
+                    if(tabId === 'gestor') {
+                        // Ocultar todos tus modulos originales
+                        document.querySelectorAll('[id^="tab-"]').forEach(el => { 
+                            if(el.id !== 'tab-btn-gestor' && el.id !== 'tab-gestor') { el.style.display = 'none'; el.classList.add('hidden'); } 
+                        });
+                        tGestor.style.display = 'block'; tGestor.classList.remove('hidden');
+                    } else {
+                        // Ocultar gestor si seleccionas Tienda/Servicios/etc
+                        tGestor.style.display = 'none'; tGestor.classList.add('hidden');
+                        const act = document.getElementById('tab-' + tabId);
+                        if(act) { act.style.display = 'block'; act.classList.remove('hidden'); }
+                    }
+                };
+            }
+        }
+
+        // Insertar botón Gestor Pro dorado en tu menú
+        if (!document.getElementById('tab-btn-gestor')) {
+            const btnGestor = document.createElement('div');
+            btnGestor.id = 'tab-btn-gestor';
+            btnGestor.innerHTML = '👑 GESTOR PRO';
+            btnGestor.style.cssText = 'background: linear-gradient(90deg, #422006 0%, #1e293b 100%); color:#facc15; border: 1px solid #ca8a04; cursor:pointer; margin-top:10px; display:none; padding: 12px; border-radius: 8px;';
+            btnGestor.onclick = () => window.cambiarTab('gestor');
+            originalMenu.appendChild(btnGestor);
+        }
+    }
+}, 500);
+
+if(typeof window.pintarDashboard === 'function' && !window.pdAumentado) {
+    const oldPd = window.pintarDashboard;
+    window.pintarDashboard = function() {
+        oldPd();
+        const b = document.getElementById('tab-btn-gestor');
+        if(b) {
+            if(window.revendedorActual && window.revendedorActual.gestorPremium) b.style.display = 'block';
+            else b.style.display = 'none';
+        }
+        if(typeof renderGestorPro === 'function') renderGestorPro();
+    };
+    window.pdAumentado = true;
+}
+
+function cambiarSubTabGestor(sub) {
+    ['inicio','clientes','herramientas'].forEach(s => {
+        const el = document.getElementById('g-tab-' + s);
+        const b = document.getElementById('g-tab-btn-' + s);
+        if(el) el.style.display = 'none';
+        if(b) b.classList.remove('active');
+    });
+    document.getElementById('g-tab-' + sub).style.display = 'block';
+    document.getElementById('g-tab-btn-' + sub).classList.add('active');
+}
+
+function calcDiasG(v) {
+    if(!v) return 0;
+    let d = v; if(v.includes('/')) { let p = v.split('/'); if(p.length===3) d = `${p[2]}-${p[1].padStart(2,'0')}-${p[0].padStart(2,'0')}`; }
+    const f = new Date(d); const h = new Date(); h.setHours(0,0,0,0);
+    return Math.ceil((f-h)/(1000*60*60*24)) || 0;
+}
+
+async function procesarArchivoExcelReal(event) {
+    const file = event.target.files[0]; if(!file) return;
+    alert("⏳ IMPORTANDO EXCEL A LA NUBE...\nPresiona aceptar y espera el mensaje de éxito.");
+    const reader = new FileReader();
+    reader.onload = async function(e) {
+        try {
+            const data = new Uint8Array(e.target.result);
+            const workbook = XLSX.read(data, { type: 'array' });
+            const sheet = workbook.Sheets[workbook.SheetNames[0]];
+            const json = XLSX.utils.sheet_to_json(sheet, { defval: "" });
+            let arr = [];
+            json.forEach((r, i) => {
+                if(!r['Cliente'] && !r['Correo/Usuario']) return;
+                arr.push({ id:'imp_'+Date.now()+'_'+i, cliente:String(r['Cliente']||'Sin nombre').trim(), whatsapp:String(r['WhatsApp']||'').trim(), servicio:String(r['Servicio']||'').trim(), tipo:String(r['Tipo']||'PERFIL').trim(), correo:String(r['Correo/Usuario']||'').trim(), pass:String(r['Contraseña']||'').trim(), perfil:String(r['Perfil']||'').trim(), pin:String(r['PIN']||'').trim(), vence:String(r['Fecha vencimiento']||'').trim() });
+            });
+            window.tiendaActual.gestorProData = arr;
+            if(window.persistirEnNube) {
+                const ok = await window.persistirEnNube({ gestorProData: arr });
+                if(ok) { alert(`✅ ¡ÉXITO! Se guardaron ${arr.length} clientes.`); renderGestorPro(); cambiarSubTabGestor('inicio'); }
+            }
+        } catch(err) { alert('Error: ' + err.message); }
+    };
+    reader.readAsArrayBuffer(file);
+}
+
+function renderGestorPro() {
+    const lVentas = document.getElementById('g-lista-ventas');
+    const lDir = document.getElementById('g-lista-clientes');
+    if(!lVentas || !lDir) return;
+    lVentas.innerHTML = ''; lDir.innerHTML = '';
+    const q = (document.getElementById('g-buscador')?document.getElementById('g-buscador').value:'').toLowerCase().trim();
+    let dat = window.tiendaActual.gestorProData || [];
+    if(dat.length===0) { lVentas.innerHTML='<p style="color:#94a3b8;text-align:center;">Sube tu Excel en la pestaña Importar.</p>'; return; }
+    
+    dat.forEach(d => {
+        if(q && !(d.cliente+' '+d.servicio+' '+d.correo).toLowerCase().includes(q)) return;
+        let dias = calcDiasG(d.vence); let col = '#22c55e'; let td = dias+' Días';
+        if(dias<0){ col='#ef4444'; td='VENCIDO'; }else if(dias===0){ col='#eab308'; td='HOY'; }
+        let w = (d.whatsapp||'').replace(/D/g,''); let msg = `https://wa.me/${w}?text=Hola ${encodeURIComponent(d.cliente)}, tus accesos: Correo:${d.correo} Clave:${d.pass} Perfil:${d.perfil} PIN:${d.pin}`;
+        
+        lVentas.innerHTML += `<div class="g-card">
+            <div class="g-card-top"><div class="g-card-title">${d.cliente}</div><div style="color:${col}; font-weight:900; font-family:'Orbitron';">${td}</div></div>
+            <div class="g-card-servicio">${d.servicio} (${d.tipo})</div>
+            <div class="g-card-info">📧 <b style="color:#cbd5e1">${d.correo||'N/A'}</b></div>
+            <div class="g-card-info">🔑 <b style="color:#cbd5e1">${d.pass||'N/A'}</b></div>
+            <div class="g-card-info">👤 Perfil: <b style="color:#cbd5e1">${d.perfil||'-'}</b> | PIN: <b style="color:#cbd5e1">${d.pin||'-'}</b></div>
+            <div style="display:flex; gap:8px; margin-top:12px;">
+                <a href="${msg}" target="_blank" style="flex:1; background:#1e293b; color:#38bdf8; border:1px solid #38bdf8; padding:8px; border-radius:6px; font-weight:bold; font-size:12px; text-decoration:none; text-align:center;">👤 Enviar Datos</a>
+            </div></div>`;
+            
+        lDir.innerHTML += `<div style="background:#0f172a; border-left:4px solid #38bdf8; padding:12px; margin-bottom:8px; border-radius:6px; display:flex; justify-content:space-between; align-items:center;">
+            <div><strong style="color:#fff;">${d.cliente}</strong><div style="color:#94a3b8; font-size:12px; margin-top:4px;">WA: ${d.whatsapp||'Sin número'}</div></div>
+            <a href="https://wa.me/${w}" target="_blank" style="background:#22c55e; color:#fff; text-decoration:none; padding:6px 12px; border-radius:6px; font-weight:bold; font-size:12px;">💬 Chat</a></div>`;
+    });
+}
+</script>
+
 </body>
 </html>
 
