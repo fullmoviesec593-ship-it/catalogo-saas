@@ -1356,5 +1356,211 @@ window.renderGestorPro = function() {
     };
 })();
 </script>
+
+<!-- LOGICA_GESTOR_PRO -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script>
+// Función para cambiar entre Inicio, Directorio e Importar
+window.cambiarSubTabGestor = function(sub) {
+    ['inicio', 'clientes', 'herramientas'].forEach(s => {
+        const el = document.getElementById('g-tab-' + s);
+        const btn = document.getElementById('g-tab-btn-' + s);
+        if(el) { el.classList.add('hidden'); el.style.display = 'none'; }
+        if(btn) btn.classList.remove('active');
+    });
+    
+    // Mapeo de IDs porque en el diseño actual los contenedores pueden tener nombres ligeramente distintos
+    let targetId = 'g-tab-' + sub;
+    if (!document.getElementById(targetId)) {
+        if (sub === 'clientes') targetId = 'g-tab-directorio';
+        if (sub === 'herramientas') targetId = 'g-tab-importar';
+    }
+    
+    const actTab = document.getElementById(targetId);
+    if(actTab) { actTab.classList.remove('hidden'); actTab.style.display = 'block'; }
+    const actBtn = document.getElementById('g-tab-btn-' + sub);
+    if(actBtn) actBtn.classList.add('active');
+};
+
+// Función para calcular los días restantes
+function calcularDiasPro(venceStr) {
+    if (!venceStr) return 0;
+    let dateString = venceStr;
+    if (venceStr.includes('/')) {
+        const parts = venceStr.split('/');
+        if (parts.length === 3) dateString = `${parts[2]}-${parts[1].padStart(2,'0')}-${parts[0].padStart(2,'0')}`;
+    }
+    const fechaVence = new Date(dateString);
+    if (isNaN(fechaVence.getTime())) return 0;
+    const hoy = new Date(); hoy.setHours(0,0,0,0);
+    return Math.ceil((fechaVence - hoy) / (1000 * 60 * 60 * 24));
+}
+
+// Función para procesar el archivo Excel o JSON
+window.procesarArchivoExcelReal = async function(event) {
+    const file = event.target.files[0]; 
+    if(!file) return;
+    
+    alert("⏳ LEYENDO ARCHIVO Y GUARDANDO EN LA NUBE...");
+    const reader = new FileReader();
+    
+    reader.onload = async function(e) {
+        try {
+            let arr = [];
+            
+            // Si es un archivo JSON de respaldo
+            if (file.name.endsWith('.json')) {
+                arr = JSON.parse(e.target.result);
+            } 
+            // Si es un archivo Excel (.xlsx, .xls, .csv)
+            else {
+                const data = new Uint8Array(e.target.result);
+                const workbook = XLSX.read(data, { type: 'array' });
+                const json = XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]], { defval: "" });
+                
+                json.forEach((r, i) => {
+                    if(!r['Cliente'] && !r['Correo/Usuario']) return;
+                    arr.push({ 
+                        id: 'imp_' + Date.now() + '_' + i, 
+                        cliente: String(r['Cliente'] || '').trim(), 
+                        whatsapp: String(r['WhatsApp'] || '').trim(), 
+                        servicio: String(r['Servicio'] || '').trim(), 
+                        tipo: String(r['Tipo'] || 'PERFIL').trim(), 
+                        correo: String(r['Correo/Usuario'] || '').trim(), 
+                        pass: String(r['Contraseña'] || '').trim(), 
+                        perfil: String(r['Perfil'] || '').trim(), 
+                        pin: String(r['PIN'] || '').trim(), 
+                        vence: String(r['Fecha vencimiento'] || '').trim() 
+                    });
+                });
+            }
+            
+            if(!window.tiendaActual) window.tiendaActual = {};
+            window.tiendaActual.gestorProData = arr;
+            
+            // Guardar en la nube si la función existe
+            if(window.persistirEnNube) {
+                const ok = await window.persistirEnNube({ gestorProData: arr });
+                if(ok) { 
+                    alert(`✅ ¡ÉXITO! ${arr.length} clientes guardados correctamente.`); 
+                    if(typeof window.renderGestorPro === 'function') window.renderGestorPro(); 
+                    window.cambiarSubTabGestor('inicio'); 
+                }
+            } else {
+                // Modo pruebas locales
+                alert(`✅ ¡ÉXITO! ${arr.length} clientes leídos en modo local.`); 
+                if(typeof window.renderGestorPro === 'function') window.renderGestorPro(); 
+                window.cambiarSubTabGestor('inicio');
+            }
+        } catch(err) { 
+            alert('Error al procesar el archivo: ' + err.message); 
+        }
+    };
+    
+    if (file.name.endsWith('.json')) {
+        reader.readAsText(file);
+    } else {
+        reader.readAsArrayBuffer(file);
+    }
+};
+
+// Asegurar que el input de archivo llame a la función correcta
+setTimeout(() => {
+    const fileInput = document.getElementById('excel-upload') || document.querySelector('input[type="file"][accept*=".xls"]');
+    if (fileInput) {
+        fileInput.onchange = window.procesarArchivoExcelReal;
+        
+        // Agregar soporte para .json si no lo tiene
+        if (!fileInput.accept.includes('.json')) {
+            fileInput.accept += ', .json';
+        }
+    }
+}, 1000);
+
+// Función para dibujar las tarjetas
+window.renderGestorPro = function() {
+    const lVentas = document.getElementById('g-lista-ventas') || document.querySelector('#tab-gestor [id*="ventas"]') || document.querySelector('#g-tab-inicio > div:last-child');
+    const lDir = document.getElementById('g-lista-clientes') || document.querySelector('#g-tab-clientes > div') || document.querySelector('#tab-gestor [id*="clientes"]');
+    
+    if(!lVentas) return;
+    
+    lVentas.innerHTML = ''; 
+    if(lDir) lDir.innerHTML = '';
+    
+    const inputBusq = document.getElementById('g-buscador') || document.querySelector('input[placeholder*="Buscar"]');
+    const q = inputBusq ? inputBusq.value.toLowerCase().trim() : '';
+    
+    let dat = (window.tiendaActual && window.tiendaActual.gestorProData) ? window.tiendaActual.gestorProData : [];
+    
+    if(dat.length === 0) { 
+        lVentas.innerHTML = '<p style="text-align:center; color:#94a3b8; padding:20px;">No hay clientes registrados. Ve a la pestaña Importar para subir tu archivo Excel o JSON.</p>'; 
+        if(lDir) lDir.innerHTML = '<p style="text-align:center; color:#94a3b8;">No hay clientes.</p>';
+        return; 
+    }
+    
+    dat.forEach(d => {
+        // Filtrar por búsqueda
+        if(q && !(d.cliente+' '+d.servicio+' '+d.correo).toLowerCase().includes(q)) return;
+        
+        const diasRestantes = calcularDiasPro(d.vence);
+        let colorDias = '#22c55e'; 
+        let txtDias = diasRestantes + ' Días';
+        
+        if(diasRestantes < 0) { 
+            colorDias = '#ef4444'; 
+            txtDias = 'VENCIDO'; 
+        } else if(diasRestantes === 0) { 
+            colorDias = '#eab308'; 
+            txtDias = 'HOY'; 
+        }
+        
+        const wnum = (d.whatsapp || '').replace(/D/g,'');
+        const msg = `https://wa.me/${wnum}?text=Hola ${encodeURIComponent(d.cliente || '')}, tus accesos son:%0A%0A%E2%9C%89%EF%B8%8F Correo: ${d.correo || ''}%0A%F0%9F%94%91 Clave: ${d.pass || ''}%0A%F0%9F%91%A4 Perfil: ${d.perfil || ''}%0A%F0%9F%93%8C PIN: ${d.pin || ''}`;
+        const msgRenovacion = `https://wa.me/${wnum}?text=Hola ${encodeURIComponent(d.cliente || '')}, te recordamos que tu servicio de ${d.servicio} está por vencer. Evita cortes realizando tu pago.`;
+        
+        // Tarjeta para Inicio (Ventas Activas)
+        const cardHtml = `
+        <div style="background:#080d1a; border:1px solid #1e293b; border-radius:12px; padding:14px; margin-bottom:12px; position:relative;">
+            <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #1e293b; padding-bottom:8px; margin-bottom:8px;">
+                <strong style="color:#fff; font-size:15px;">${d.cliente || 'Sin Nombre'}</strong>
+                <strong style="color:${colorDias}; font-weight:900; font-family:'Orbitron', sans-serif; font-size:14px;">${txtDias}</strong>
+            </div>
+            <div style="color:#38bdf8; font-size:12px; font-weight:bold; background:#111d33; padding:4px 8px; border-radius:6px; display:inline-block; margin-bottom:6px;">${d.servicio || 'Servicio General'} (${d.tipo || 'PERFIL'})</div>
+            <div style="color:#94a3b8; font-size:12px; margin-bottom:4px;">📧 <strong style="color:#cbd5e1">${d.correo || 'N/A'}</strong></div>
+            <div style="color:#94a3b8; font-size:12px; margin-bottom:4px;">🔑 <strong style="color:#cbd5e1">${d.pass || 'N/A'}</strong></div>
+            <div style="color:#94a3b8; font-size:12px; margin-bottom:4px;">👤 Perfil: <strong style="color:#cbd5e1">${d.perfil || '-'}</strong> | PIN: <strong style="color:#cbd5e1">${d.pin || '-'}</strong></div>
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:8px; margin-top:12px;">
+                <a href="${msg}" target="_blank" style="background:#1e293b; color:#38bdf8; border:1px solid #38bdf8; padding:8px; border-radius:6px; font-weight:bold; font-size:12px; text-decoration:none; text-align:center;">👤 Enviar Datos</a>
+                <a href="${msgRenovacion}" target="_blank" style="background:#1e293b; color:#eab308; border:1px solid #eab308; padding:8px; border-radius:6px; font-weight:bold; font-size:12px; text-decoration:none; text-align:center;">⏰ Recordatorio</a>
+            </div>
+        </div>`;
+        
+        lVentas.innerHTML += cardHtml;
+            
+        // Elemento para Directorio
+        if(lDir) {
+            lDir.innerHTML += `
+            <div style="background:#0f172a; border-left:4px solid #38bdf8; padding:12px; margin-bottom:8px; border-radius:6px; display:flex; justify-content:space-between; align-items:center;">
+                <div>
+                    <strong style="color:#fff;">${d.cliente || 'Sin Nombre'}</strong>
+                    <div style="color:#94a3b8; font-size:12px; margin-top:4px;">WA: ${d.whatsapp || 'N/A'}</div>
+                </div>
+                <a href="https://wa.me/${wnum}" target="_blank" style="background:#22c55e; color:#fff; text-decoration:none; padding:6px 12px; border-radius:6px; font-weight:bold; font-size:12px;">💬 Chat</a>
+            </div>`;
+        }
+    });
+};
+
+// Escuchar cambios en la variable global para re-renderizar si es necesario
+let lastDataLength = -1;
+setInterval(() => {
+    if (window.tiendaActual && window.tiendaActual.gestorProData) {
+        if (window.tiendaActual.gestorProData.length !== lastDataLength) {
+            lastDataLength = window.tiendaActual.gestorProData.length;
+            if(typeof window.renderGestorPro === 'function') window.renderGestorPro();
+        }
+    }
+}, 2000);
+</script>
 </body>
 </html>
