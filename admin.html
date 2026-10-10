@@ -1466,5 +1466,87 @@ setTimeout(() => {
     }
 }, 2000);
 </script>
-</body>
-</html>
+
+<!-- PASO1_FILTROS -->
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    window.filtroActivoDOM = 'TODOS';
+
+    window.aplicarFiltrosVisuales = function() {
+        // 1. Obtener lo que se escribe en el buscador
+        const inputQ = document.querySelector('input[placeholder*="Buscar"]');
+        const query = inputQ ? inputQ.value.toUpperCase().trim() : '';
+        
+        // 2. Buscar las tarjetas que se están mostrando en pantalla
+        const contenedores = document.querySelectorAll('.g-card, div[style*="border-radius:12px"]');
+        
+        contenedores.forEach(card => {
+            // Validar que sea realmente una tarjeta de cliente
+            if (card.innerText && card.innerText.includes('ENVIAR DATOS A WHATSAPP')) {
+                const texto = card.innerText.toUpperCase();
+                let mostrar = true;
+
+                // Aplicar el Filtro de Pestaña (Perfil vs Cuenta)
+                if (window.filtroActivoDOM === 'PERFILES' && !texto.includes('PERFIL')) mostrar = false;
+                if (window.filtroActivoDOM === 'CUENTAS' && !texto.includes('CUENTA COMPLETA')) mostrar = false;
+                
+                // Aplicar el Filtro de Búsqueda (Texto)
+                if (query !== '' && !texto.includes(query)) mostrar = false;
+
+                // Ocultar o mostrar sin borrar el código
+                card.style.display = mostrar ? 'block' : 'none';
+            }
+        });
+    };
+
+    // Escuchar cuando tocas las pestañas
+    document.addEventListener('click', (e) => {
+        const tab = e.target.closest('div');
+        if (!tab || !tab.innerText) return;
+        
+        const txt = tab.innerText.toUpperCase().trim();
+        
+        if (txt === 'PERFILES' || txt === 'CUENTAS COMPLETAS' || txt === 'CLIENTES' || txt === 'INICIO') {
+            
+            // Asignar el filtro correspondiente
+            if (txt === 'PERFILES') window.filtroActivoDOM = 'PERFILES';
+            else if (txt === 'CUENTAS COMPLETAS') window.filtroActivoDOM = 'CUENTAS';
+            else window.filtroActivoDOM = 'TODOS'; // Clientes o Inicio muestran todo
+            
+            // Resaltar la pestaña que tocaste (Borde amarillo)
+            const parent = tab.parentElement;
+            if (parent) {
+                Array.from(parent.children).forEach(sibling => {
+                    if (sibling.tagName === 'DIV' && sibling.style.border) {
+                        sibling.style.border = '1px solid #1e293b'; // Apagar las demás
+                        sibling.style.color = '#94a3b8';
+                    }
+                });
+                tab.style.border = '1px solid #eab308'; // Encender la actual
+                tab.style.color = '#eab308';
+            }
+            
+            window.aplicarFiltrosVisuales();
+        }
+    });
+
+    // Conectar el buscador y asegurar que funcione con el motor base
+    setTimeout(() => {
+        if (typeof window.renderGestorPro === 'function') {
+            const viejoRender = window.renderGestorPro;
+            window.renderGestorPro = function() {
+                viejoRender();
+                setTimeout(window.aplicarFiltrosVisuales, 150); // Re-aplicar filtro al dibujar
+            };
+        }
+        
+        const inputQ = document.querySelector('input[placeholder*="Buscar"]');
+        if (inputQ) {
+            // Reemplazar el input con un clon para limpiarlo de eventos viejos y poner el nuevo
+            const nuevoInput = inputQ.cloneNode(true);
+            inputQ.parentNode.replaceChild(nuevoInput, inputQ);
+            nuevoInput.addEventListener('input', window.aplicarFiltrosVisuales);
+        }
+    }, 2500);
+});
+</script>
