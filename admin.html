@@ -3,1226 +3,398 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
   <title>Panel Revendedor | Control Total</title>
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;800&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
   <style>
-    :root {
-      --primary: #38bdf8;
-      --accent: #22c55e;
-      --bg: #070a12;
-      --card-bg: #0f172a;
-      --border: #1e293b;
-      --alert-red: #ef4444;
-      --alert-yellow: #eab308;
-    }
+    :root { --primary: #38bdf8; --accent: #22c55e; --bg: #070a12; --card-bg: #0f172a; --border: #1e293b; }
     * { box-sizing: border-box; font-family: 'Rajdhani', sans-serif; }
-    body {
-      background-color: var(--bg);
-      color: #f8fafc;
-      margin: 0;
-      padding: 16px;
-      display: flex;
-      justify-content: center;
-      min-height: 100vh;
-    }
-    .card {
-      background: var(--card-bg);
-      border-radius: 16px;
-      padding: 22px;
-      width: 100%;
-      max-width: 680px;
-      border: 1px solid var(--border);
-      box-shadow: 0 10px 30px rgba(0,0,0,0.7);
-    }
-    h2, h3, h4 { color: var(--primary); margin-top: 0; font-family: 'Orbitron', sans-serif; }
-    .form-group { margin-bottom: 14px; position: relative; }
-    label { display: block; margin-bottom: 5px; font-size: 14px; color: #94a3b8; font-weight: 600; }
-    input, textarea, select {
-      width: 100%;
-      padding: 12px 14px;
-      border-radius: 8px;
-      border: 1px solid var(--border);
-      background-color: #080d1a;
-      color: #fff;
-      font-size: 15px;
-      outline: none;
-    }
+    body { background-color: var(--bg); color: #f8fafc; margin: 0; padding: 16px; display: flex; justify-content: center; min-height: 100vh; }
+    .card { background: var(--card-bg); border-radius: 16px; padding: 22px; width: 100%; max-width: 680px; border: 1px solid var(--border); box-shadow: 0 10px 30px rgba(0,0,0,0.7); position: relative; }
+    h2, h3, h4, h5 { color: var(--primary); margin-top: 0; font-family: 'Orbitron', sans-serif; }
+    .form-group { margin-bottom: 12px; position: relative; }
+    label { display: block; margin-bottom: 4px; font-size: 13px; color: #94a3b8; font-weight: 600; }
+    input, textarea, select { width: 100%; padding: 10px 12px; border-radius: 8px; border: 1px solid var(--border); background-color: #080d1a; color: #fff; font-size: 14px; outline: none; }
     input:focus, textarea:focus { border-color: var(--primary); }
-
-    .password-wrapper {
-      position: relative;
-      display: flex;
-      align-items: center;
-    }
-    .password-wrapper input { padding-right: 44px; }
-    .toggle-password-btn {
-      position: absolute;
-      right: 10px;
-      background: transparent;
-      border: none;
-      color: #94a3b8;
-      cursor: pointer;
-      font-size: 18px;
-      padding: 4px 6px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      width: auto;
-      user-select: none;
-    }
-
-    button {
-      width: 100%;
-      padding: 12px;
-      border: none;
-      border-radius: 8px;
-      font-size: 15px;
-      font-weight: 700;
-      cursor: pointer;
-      font-family: 'Orbitron', sans-serif;
-      transition: 0.2s;
-    }
+    .password-wrapper { position: relative; display: block; width: 100%; }
+    .password-wrapper input { width: 100%; padding-right: 45px; }
+    .toggle-password-btn { position: absolute; right: 5px; top: 50%; transform: translateY(-50%); background: transparent; border: none; color: #94a3b8; cursor: pointer; font-size: 20px; width: 35px; height: 35px; display: flex; align-items: center; justify-content: center; z-index: 10; }
+    button { width: 100%; padding: 12px; border: none; border-radius: 8px; font-size: 15px; font-weight: 700; cursor: pointer; font-family: 'Orbitron', sans-serif; transition: 0.2s; }
     .btn-primary { background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%); color: #fff; }
     .btn-success { background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%); color: #042f1a; }
     .btn-danger { background: #dc2626; color: #fff; }
     .hidden { display: none !important; }
-    .nav-tabs { display: flex; gap: 6px; margin-bottom: 20px; border-bottom: 1px solid var(--border); padding-bottom: 10px; overflow-x: auto; }
-    .nav-tab {
-      flex: 1;
-      padding: 10px 8px;
-      text-align: center;
-      background: #080d1a;
-      border-radius: 8px;
-      cursor: pointer;
-      font-size: 12px;
-      font-weight: bold;
-      color: #94a3b8;
-      white-space: nowrap;
-    }
-    .nav-tab.active { background: #1e293b; color: var(--primary); border: 1px solid var(--primary); }
-    .product-card {
-      background: #080d1a;
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 14px;
-      margin-bottom: 12px;
-      display: flex;
-      gap: 14px;
-      align-items: center;
-    }
-    .product-img { width: 65px; height: 65px; border-radius: 8px; object-fit: cover; border: 1px solid #334155; }
-    .preview-logo { width: 75px; height: 75px; border-radius: 50%; object-fit: cover; border: 2px solid var(--primary); margin: 8px 0; }
-
-    .combo-edit-box {
-      background: #080d1a;
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 16px;
-      margin-bottom: 18px;
-    }
-
-    .badge-dias {
-      display: inline-flex;
-      align-items: center;
-      gap: 5px;
-      font-family: 'Orbitron', sans-serif;
-      font-size: 11px;
-      font-weight: 800;
-      padding: 4px 9px;
-      border-radius: 6px;
-      letter-spacing: 0.5px;
-      margin-top: 4px;
-    }
+    .btn-menu-toggle { background: transparent; border: none; color: var(--primary); font-size: 26px; cursor: pointer; padding: 0; line-height: 1; display:flex; align-items:center; justify-content:center; width:30px; height:30px; }
+    .nav-tabs { display: none; flex-direction: column; gap: 8px; position: absolute; top: 75px; left: 16px; z-index: 1000; background: #0f172a; padding: 12px; border-radius: 12px; border: 1px solid var(--border); width: 230px; box-shadow: 0 15px 40px rgba(0,0,0,0.9); }
+    .nav-tabs.show-menu { display: flex; }
+    .nav-tab { text-align: left; padding: 12px 14px; background: #080d1a; border-radius: 8px; cursor: pointer; font-size: 14px; font-weight: bold; color: #94a3b8; border: 1px solid transparent; }
+    .nav-tab.active { background: #1e293b; color: var(--primary); border-color: var(--primary); }
+    .menu-backdrop { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 999; backdrop-filter: blur(2px); }
+    .menu-backdrop.show { display: block; }
+    .badge-dias { display: inline-flex; align-items: center; gap: 5px; font-family: 'Orbitron', sans-serif; font-size: 11px; font-weight: 800; padding: 4px 9px; border-radius: 6px; }
     .badge-dias.green { background: rgba(34, 197, 94, 0.15); color: #4ade80; border: 1px solid #22c55e; }
-    .badge-dias.yellow { background: rgba(234, 179, 8, 0.18); color: #facc15; border: 1px solid #eab308; }
     .badge-dias.red { background: rgba(239, 68, 68, 0.2); color: #f87171; border: 1px solid #ef4444; }
 
-    .checkbox-container {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      margin: 14px 0 18px 0;
-      cursor: pointer;
-      user-select: none;
-    }
-    .checkbox-container input {
-      width: 18px;
-      height: 18px;
-      accent-color: #38bdf8;
-      cursor: pointer;
-    }
-  </style>
-</head>
-<body>
-
-  <!-- LOGIN -->
-  <div id="login-section" class="card" style="max-width:440px;">
-    <h2 style="text-align:center;">💼 PANEL REVENDEDOR</h2>
-    <p id="login-submsg" style="text-align:center; color:#94a3b8; font-size:14px; margin-bottom:20px;">Ingresa tus credenciales para gestionar tu catálogo</p>
-    
-    <div class="form-group">
-      <label>Correo Electrónico</label>
-      <input type="email" id="email" placeholder="tu-correo@gmail.com">
-    </div>
-    
-    <div class="form-group">
-      <label>Contraseña</label>
-      <div class="password-wrapper">
-        <input type="password" id="password" placeholder="Tu clave de acceso">
-        <button type="button" class="toggle-password-btn" onclick="togglePasswordVisibility('password', this)" title="Ver contraseña">
-          👁️
-        </button>
-      </div>
-    </div>
-
-    <div class="checkbox-container" onclick="toggleCheckbox()">
-      <input type="checkbox" id="remember-session" checked onclick="event.stopPropagation()">
-      <span style="font-size:14px; color:#cbd5e1; font-weight:600;">Mantener la sesión iniciada en este dispositivo</span>
-    </div>
-
-    <button class="btn-primary" onclick="iniciarSesion()">INGRESAR A MI PANEL</button>
-  </div>
-
-  <!-- DASHBOARD -->
-  <div id="dashboard-section" class="card hidden">
-    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px; border-bottom:1px solid var(--border); padding-bottom:12px; gap:8px;">
-      <div style="display:flex; align-items:center; gap:10px;">
-        <img id="dash-logo" src="https://via.placeholder.com/40" style="width:42px; height:42px; border-radius:50%; object-fit:cover; border:1px solid var(--primary);" alt="Logo">
-        <div>
-          <span id="dash-title" style="font-family:'Orbitron'; font-weight:bold; font-size:16px; color:#fff;">Mi Tienda</span>
-          <div>
-            <span id="dash-countdown" class="badge-dias green">⏳ Calculando días...</span>
-          </div>
-        </div>
-      </div>
-      <button onclick="cerrarSesion()" style="width:auto; padding:6px 12px; background:#dc2626; color:#fff; font-size:12px;">Salir</button>
-    </div>
-
-    <!-- Pestañas -->
-    <div class="nav-tabs">
-      <div id="tab-btn-shop" class="nav-tab active" onclick="cambiarTab('shop')">⚙️ TIENDA & LOGO</div>
-      <div id="tab-btn-prods" class="nav-tab" onclick="cambiarTab('prods')">📦 SERVICIOS</div>
-      <div id="tab-btn-combos" class="nav-tab" onclick="cambiarTab('combos')">🔥 COMBOS</div>
-      <div id="tab-btn-texts" class="nav-tab" onclick="cambiarTab('texts')">📝 TEXTOS Y FRASES</div>
-      <div id="tab-btn-payments" class="nav-tab" onclick="cambiarTab('payments')">💳 PAGOS</div>
-    </div>
-
-    <!-- PESTAÑA: TIENDA & LOGO -->
-    <div id="tab-shop">
-      <div style="background:#080d1a; padding:16px; border-radius:12px; border:1px solid var(--border);">
-        <h4 style="color:var(--primary); margin-top:0;">Datos Personales y Logo de la Tienda</h4>
-        <div class="form-group">
-          <label>Nombre Comercial de la Tienda</label>
-          <input type="text" id="shop-nombre" placeholder="Ej: Mi Tienda Online">
-        </div>
-        <div class="form-group">
-          <label>Número de WhatsApp para Pedidos (con código de país, ej: 593982766054)</label>
-          <input type="text" id="shop-whatsapp" placeholder="593982766054">
-        </div>
-        
-        <div class="form-group">
-          <label>Subir Logo de tu Tienda (desde galería)</label>
-          <input type="file" id="shop-logo-file" accept="image/*" onchange="convertirImagenABase64(this, 'shop-logo-preview')">
-          <div style="text-align:center; margin-top:8px;">
-            <img id="shop-logo-preview" class="preview-logo" src="https://via.placeholder.com/80" alt="Logo Tienda">
-          </div>
-        </div>
-
-        <button id="btn-save-shop" class="btn-primary" onclick="guardarAjustesTienda()">GUARDAR AJUSTES DE TIENDA</button>
-
-        <div style="margin-top:16px; background:#111d33; padding:12px; border-radius:8px;">
-          <label style="color:#38bdf8;">Enlace de tu Catálogo Público:</label>
-          <a id="shop-public-link" href="#" target="_blank" style="color:var(--accent); font-weight:bold; word-break:break-all;"></a>
-        </div>
-      </div>
-    </div>
-
-    <!-- PESTAÑA: SERVICIOS -->
-    <div id="tab-prods" class="hidden">
-      <div style="background:#080d1a; padding:16px; border-radius:12px; border:1px solid var(--border); margin-bottom:20px;">
-        <h4 style="color:var(--accent); margin-top:0;">➕ Agregar / Editar Servicio</h4>
-        <input type="hidden" id="prod-edit-idx" value="-1">
-        <div class="form-group">
-          <label>Nombre del Servicio</label>
-          <input type="text" id="prod-nombre" placeholder="Ej: Netflix Ultra HD">
-        </div>
-        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
-          <div class="form-group">
-            <label>Precio</label>
-            <input type="text" id="prod-precio" placeholder="3.50">
-          </div>
-          <div class="form-group">
-            <label>Subir Imagen</label>
-            <input type="file" id="prod-file" accept="image/*" onchange="convertirImagenABase64(this, 'prod-preview-img')">
-          </div>
-        </div>
-        <img id="prod-preview-img" src="" style="max-height:80px; border-radius:6px; margin-bottom:10px; display:none;">
-        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
-          <div class="form-group">
-            <label>Categoría</label>
-            <select id="prod-cat">
-              <option value="streaming">Streaming</option>
-              <option value="iptv">IPTV</option>
-              <option value="musica">Música</option>
-              <option value="software">Software</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label>Insignia / Etiqueta (Opcional)</label>
-            <input type="text" id="prod-tag" placeholder="POPULAR o TOP">
-          </div>
-        </div>
-        <div class="form-group">
-          <label>Beneficios / Características (separados por comas)</label>
-          <input type="text" id="prod-features" placeholder="1 perfil dedicado, Calidad 4K, Entrega inmediata">
-        </div>
-        <button id="btn-guardar-prod" class="btn-success" onclick="guardarProducto()">AGREGAR SERVICIO AL CATÁLOGO</button>
-      </div>
-
-      <h4 style="color:#fff;">Mis Servicios Activos</h4>
-      <div id="lista-productos"></div>
-    </div>
-
-    <!-- PESTAÑA: COMBOS EDITABLES -->
-    <div id="tab-combos" class="hidden">
-      <div style="background:#080d1a; padding:16px; border-radius:12px; border:1px solid var(--border); margin-bottom:16px;">
-        <h4 style="color:var(--primary); margin-top:0;">🔥 Personalizar Servicios de Combos</h4>
-        <p style="font-size:13px; color:#94a3b8; margin-bottom:16px;">
-          Aquí puedes cambiar los nombres, imágenes y porcentaje de descuento de los combos armables de tu catálogo.
-        </p>
-
-        <!-- COMBO 1: DÚO -->
-        <div class="combo-edit-box">
-          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-            <strong style="color:#ff8c3b; font-size:16px;">Combo 1 (Dúo)</strong>
-            <label style="display:flex; align-items:center; gap:6px; cursor:pointer; color:#fff; font-size:13px;">
-              <input type="checkbox" id="combo0-activo" checked style="width:16px; height:16px;"> Activo
-            </label>
-          </div>
-          <div class="form-group">
-            <label>Nombre del Combo</label>
-            <input type="text" id="combo0-nombre" value="Combo Dúo (2 Servicios)">
-          </div>
-          <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
-            <div class="form-group">
-              <label>Cantidad de Cuentas</label>
-              <input type="number" id="combo0-cant" value="2" min="2" max="10">
-            </div>
-            <div class="form-group">
-              <label>% Descuento (ej: 10)</label>
-              <input type="number" id="combo0-desc" value="10" min="1" max="90">
-            </div>
-          </div>
-          <div class="form-group">
-            <label>Foto de Portada (Subir imagen o cambiar)</label>
-            <input type="file" accept="image/*" onchange="convertirImagenABase64(this, 'combo0-preview')">
-            <div style="text-align:center; margin-top:6px;">
-              <img id="combo0-preview" src="https://images.unsplash.com/photo-1578328819058-b69f3a3b0f6b?w=600" style="max-height:80px; border-radius:8px; object-fit:cover;">
-            </div>
-          </div>
-          <div class="form-group">
-            <label>Descripción corta</label>
-            <input type="text" id="combo0-sub" value="A tu elección · 10% OFF">
-          </div>
-        </div>
-
-        <!-- COMBO 2: TRÍO -->
-        <div class="combo-edit-box">
-          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-            <strong style="color:#a855f7; font-size:16px;">Combo 2 (Trío)</strong>
-            <label style="display:flex; align-items:center; gap:6px; cursor:pointer; color:#fff; font-size:13px;">
-              <input type="checkbox" id="combo1-activo" checked style="width:16px; height:16px;"> Activo
-            </label>
-          </div>
-          <div class="form-group">
-            <label>Nombre del Combo</label>
-            <input type="text" id="combo1-nombre" value="Combo Trío (3 Servicios)">
-          </div>
-          <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
-            <div class="form-group">
-              <label>Cantidad de Cuentas</label>
-              <input type="number" id="combo1-cant" value="3" min="2" max="10">
-            </div>
-            <div class="form-group">
-              <label>% Descuento (ej: 10)</label>
-              <input type="number" id="combo1-desc" value="10" min="1" max="90">
-            </div>
-          </div>
-          <div class="form-group">
-            <label>Foto de Portada</label>
-            <input type="file" accept="image/*" onchange="convertirImagenABase64(this, 'combo1-preview')">
-            <div style="text-align:center; margin-top:6px;">
-              <img id="combo1-preview" src="https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=600" style="max-height:80px; border-radius:8px; object-fit:cover;">
-            </div>
-          </div>
-          <div class="form-group">
-            <label>Descripción corta</label>
-            <input type="text" id="combo1-sub" value="A tu elección · 10% OFF">
-          </div>
-        </div>
-
-        <!-- COMBO 3: CUÁDRUPLE -->
-        <div class="combo-edit-box">
-          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-            <strong style="color:#06b6d4; font-size:16px;">Combo 3 (Cuádruple)</strong>
-            <label style="display:flex; align-items:center; gap:6px; cursor:pointer; color:#fff; font-size:13px;">
-              <input type="checkbox" id="combo2-activo" checked style="width:16px; height:16px;"> Activo
-            </label>
-          </div>
-          <div class="form-group">
-            <label>Nombre del Combo</label>
-            <input type="text" id="combo2-nombre" value="Combo Cuádruple (4 Servicios)">
-          </div>
-          <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
-            <div class="form-group">
-              <label>Cantidad de Cuentas</label>
-              <input type="number" id="combo2-cant" value="4" min="2" max="10">
-            </div>
-            <div class="form-group">
-              <label>% Descuento (ej: 10)</label>
-              <input type="number" id="combo2-desc" value="10" min="1" max="90">
-            </div>
-          </div>
-          <div class="form-group">
-            <label>Foto de Portada</label>
-            <input type="file" accept="image/*" onchange="convertirImagenABase64(this, 'combo2-preview')">
-            <div style="text-align:center; margin-top:6px;">
-              <img id="combo2-preview" src="https://images.unsplash.com/photo-1594909122845-11baa439b7bf?w=600" style="max-height:80px; border-radius:8px; object-fit:cover;">
-            </div>
-          </div>
-          <div class="form-group">
-            <label>Descripción corta</label>
-            <input type="text" id="combo2-sub" value="A tu elección · 10% OFF">
-          </div>
-        </div>
-
-        <button id="btn-save-combos" class="btn-success" onclick="guardarAjustesCombos()">GUARDAR CONFIGURACIÓN DE COMBOS</button>
-      </div>
-    </div>
-
-    <!-- PESTAÑA: TEXTOS -->
-    <div id="tab-texts" class="hidden">
-      <div style="background:#080d1a; padding:16px; border-radius:12px; border:1px solid var(--border);">
-        <h4 style="color:var(--primary); margin-top:0;">Personalizar Palabras y Textos del Catálogo</h4>
-        <div class="form-group">
-          <label>Insignia Superior</label>
-          <input type="text" id="txt-pill" placeholder="✦ ATENCIÓN 24/7 ✦">
-        </div>
-        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
-          <div class="form-group">
-            <label>Título Línea 1</label>
-            <input type="text" id="txt-title-1" placeholder="TU TIENDA DE">
-          </div>
-          <div class="form-group">
-            <label>Palabra Destacada Naranja</label>
-            <input type="text" id="txt-title-2" placeholder="SOFTWARE o STREAMING">
-          </div>
-        </div>
-        <div class="form-group">
-          <label>Subtítulo de Garantía / Entrega</label>
-          <input type="text" id="txt-sub" placeholder="Proveedor garantizado · Activación inmediata · Los mejores precios">
-        </div>
-        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
-          <div class="form-group">
-            <label>Símbolo de Moneda</label>
-            <input type="text" id="txt-currency" placeholder="$">
-          </div>
-          <div class="form-group">
-            <label>Texto Botón Comprar</label>
-            <input type="text" id="txt-btn-buy" placeholder="Comprar ahora!">
-          </div>
-        </div>
-        <button id="btn-save-texts" class="btn-primary" onclick="guardarTextos()">GUARDAR TEXTOS DEL CATÁLOGO</button>
-      </div>
-    </div>
-
-    <!-- PESTAÑA: PAGOS -->
-    <div id="tab-payments" class="hidden">
-      <div style="background:#080d1a; padding:16px; border-radius:12px; border:1px solid var(--border);">
-        <h4 style="color:var(--accent); margin-top:0;">Tus Cuentas Bancarias y Métodos de Pago</h4>
-        <div class="form-group">
-          <label>Detalle de tus Métodos de Pago:</label>
-          <textarea id="shop-payments" rows="8" placeholder="Ejemplo:
-🏦 BANCO PICHINCHA
-• Ahorros: 2200000000
-• Titular: Tu Nombre
-• CI: 1300000000
-
-📱 DEUNA: 0999999999"></textarea>
-        </div>
-        <button id="btn-save-payments" class="btn-success" onclick="guardarMetodosPago()">GUARDAR MÉTODOS DE PAGO</button>
-      </div>
-    </div>
-
-  </div>
-
-  <script>
-    let dbData = null;
-    let revendedorActual = null;
-    let slugActual = null;
-    let tempImgBase64 = null;
-    let tempLogoBase64 = null;
-    let tempComboImgs = [null, null, null];
-
-    function togglePasswordVisibility(inputId, btn) {
-      const input = document.getElementById(inputId);
-      if (input.type === 'password') {
-        input.type = 'text';
-        btn.innerText = '🙈';
-        btn.title = 'Ocultar contraseña';
-      } else {
-        input.type = 'password';
-        btn.innerText = '👁️';
-        btn.title = 'Ver contraseña';
-      }
-    }
-
-    const COMBOS_DEFAULT = [
-      {
-        activo: true,
-        comboCantidad: 2,
-        descuento: 10,
-        nombre: "Combo Dúo (2 Servicios)",
-        sub: "A tu elección · 10% OFF",
-        tag: "10% OFF",
-        img: "https://images.unsplash.com/photo-1578328819058-b69f3a3b0f6b?w=600",
-        features: ["Elige 2 servicios del catálogo", "Descuento automático del 10%", "Activación inmediata 24/7", "Garantía total en ambos"]
-      },
-      {
-        activo: true,
-        comboCantidad: 3,
-        descuento: 10,
-        nombre: "Combo Trío (3 Servicios)",
-        sub: "A tu elección · 10% OFF",
-        tag: "10% OFF",
-        img: "https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=600",
-        features: ["Elige 3 servicios del catálogo", "Descuento automático del 10%", "Cine, series o música a tu gusto", "Activación inmediata 24/7"]
-      },
-      {
-        activo: true,
-        comboCantidad: 4,
-        descuento: 10,
-        nombre: "Combo Cuádruple (4 Servicios)",
-        sub: "A tu elección · 10% OFF",
-        tag: "10% OFF",
-        img: "https://images.unsplash.com/photo-1594909122845-11baa439b7bf?w=600",
-        features: ["Elige 4 servicios completos", "Descuento automático del 10%", "Ideal para toda la familia", "Activación inmediata 24/7"]
-      }
-    ];
-
-    async function cargarBD() {
-      try {
-        const res = await fetch('/api/db');
-        dbData = await res.json();
-      } catch (e) {
-        alert('Error conectando a la API: ' + e.message);
-      }
-    }
-
-    function toggleCheckbox() {
-      const chk = document.getElementById('remember-session');
-      chk.checked = !chk.checked;
-    }
-
-    function calcularDiasRestantes(fechaVencimiento) {
-      if (!fechaVencimiento) return 999;
-      const ahora = new Date();
-      const vence = new Date(fechaVencimiento);
-      const diffMs = vence.getTime() - ahora.getTime();
-      return Math.ceil(diffMs / (1000 * 60 * 60 * 24));
-    }
-
-    function actualizarContadorDias() {
-      const tag = document.getElementById('dash-countdown');
-      if (!revendedorActual || !revendedorActual.vencimiento) {
-        tag.className = 'badge-dias green';
-        tag.innerText = '● SERVICIO ACTIVO';
-        return;
-      }
-      const dias = calcularDiasRestantes(revendedorActual.vencimiento);
-      if (revendedorActual.activo === false) {
-        tag.className = 'badge-dias red';
-        tag.innerText = '⛔ CUENTA SUSPENDIDA';
-      } else if (dias <= 0) {
-        tag.className = 'badge-dias red';
-        tag.innerText = dias === 0 ? '⚠️ TU SERVICIO VENCE HOY' : `⛔ SERVICIO VENCIDO (${Math.abs(dias)}d)`;
-      } else if (dias <= 5) {
-        tag.className = 'badge-dias yellow';
-        tag.innerText = `⏳ TE QUEDAN ${dias} DÍAS RESTANTES`;
-      } else {
-        tag.className = 'badge-dias green';
-        tag.innerText = `✨ TE QUEDAN ${dias} DÍAS RESTANTES`;
-      }
-    }
-
-    async function iniciarSesion(autoEmail = null, autoPass = null) {
-      const email = autoEmail || document.getElementById('email').value.trim();
-      const pass = autoPass || document.getElementById('password').value.trim();
-      const recordar = document.getElementById('remember-session').checked;
-
-      if (!dbData) await cargarBD();
-
-      const revendedores = dbData.revendedores || dbData.usuarios || {};
-      const foundSlug = Object.keys(revendedores).find(slug => {
-        const r = revendedores[slug];
-        return (r.email === email || r.correo === email) && (r.password === pass || r.clave === pass);
-      });
-
-      if (foundSlug) {
-        slugActual = foundSlug;
-        revendedorActual = revendedores[slugActual];
-        if (revendedorActual.activo === false) {
-          alert('Tu cuenta está suspendida. Contacta al Súper Administrador.');
-          return;
-        }
-
-        if (recordar || autoEmail) {
-          localStorage.setItem('revendedor_session', JSON.stringify({ slug: slugActual, email, pass }));
-        }
-
-        document.getElementById('login-section').classList.add('hidden');
-        document.getElementById('dashboard-section').classList.remove('hidden');
-        cargarTienda();
-      } else {
-        if (!autoEmail) alert('Correo o contraseña incorrectos.');
-      }
-    }
-
-    function cerrarSesion() {
-      localStorage.removeItem('revendedor_session');
-      const urlParams = new URLSearchParams(window.location.search);
-      const urlTienda = urlParams.get('tienda');
-      if (urlTienda) {
-        window.location.href = `/admin.html?tienda=${urlTienda}`;
-      } else {
-        location.reload();
-      }
-    }
-
-    async function verificarSesionGuardada() {
-      await cargarBD();
-
-      const urlParams = new URLSearchParams(window.location.search);
-      const urlTienda = urlParams.get('tienda');
-
-      const revendedores = dbData.revendedores || dbData.usuarios || {};
-
-      if (urlTienda && revendedores[urlTienda]) {
-        const revUrl = revendedores[urlTienda];
-        const saved = localStorage.getItem('revendedor_session');
-
-        if (saved) {
-          try {
-            const parsed = JSON.parse(saved);
-            if (parsed.slug && parsed.slug !== urlTienda) {
-              localStorage.removeItem('revendedor_session');
-            } else if (parsed.email && parsed.pass && parsed.slug === urlTienda) {
-              iniciarSesion(parsed.email, parsed.pass);
-              return;
-            }
-          } catch(e) {}
-        }
-
-        document.getElementById('email').value = revUrl.email || revUrl.correo || '';
-        document.getElementById('login-submsg').innerText = `Inicia sesión para administrar: ${revUrl.nombre || urlTienda}`;
-        return;
-      }
-
-      const saved = localStorage.getItem('revendedor_session');
-      if (saved) {
-        try {
-          const { email, pass } = JSON.parse(saved);
-          if (email && pass) iniciarSesion(email, pass);
-        } catch (e) {}
-      }
-    }
-
-    function cargarTienda() {
-      if (!dbData.tiendas) dbData.tiendas = {};
-      if (!dbData.tiendas[slugActual]) {
-        dbData.tiendas[slugActual] = {
-          nombre: revendedorActual.nombre || revendedorActual.nombreTienda || slugActual,
-          whatsapp: revendedorActual.whatsapp || "593982766054",
-          productos: [],
-          combos: JSON.parse(JSON.stringify(COMBOS_DEFAULT)),
-          logo: "",
-          metodosPago: "",
-          textos: {}
-        };
-      }
-
-      const tienda = dbData.tiendas[slugActual];
-
-      if (!tienda.combos || tienda.combos.length === 0) {
-        tienda.combos = JSON.parse(JSON.stringify(COMBOS_DEFAULT));
-        persistirTienda();
-      }
-
-      document.getElementById('dash-title').innerText = tienda.nombre || slugActual;
-      document.getElementById('shop-nombre').value = tienda.nombre || '';
-      document.getElementById('shop-whatsapp').value = tienda.whatsapp || '';
-      document.getElementById('shop-payments').value = tienda.metodosPago || '';
-
-      if (tienda.logo) {
-        document.getElementById('dash-logo').src = tienda.logo;
-        document.getElementById('shop-logo-preview').src = tienda.logo;
-      }
-
-      // Cargar campos de combos
-      const combos = tienda.combos;
-      [0, 1, 2].forEach(i => {
-        const c = combos[i] || COMBOS_DEFAULT[i];
-        document.getElementById(`combo${i}-activo`).checked = c.activo !== false;
-        document.getElementById(`combo${i}-nombre`).value = c.nombre || '';
-        document.getElementById(`combo${i}-cant`).value = c.comboCantidad || (i + 2);
-        document.getElementById(`combo${i}-desc`).value = c.descuento || 10;
-        document.getElementById(`combo${i}-sub`).value = c.sub || '';
-        if (c.img) document.getElementById(`combo${i}-preview`).src = c.img;
-      });
-
-      const txt = tienda.textos || {};
-      document.getElementById('txt-pill').value = txt.pill || "✦ ATENCIÓN 24/7 ✦";
-      document.getElementById('txt-title-1').value = txt.title1 || "TU TIENDA DE";
-      document.getElementById('txt-title-2').value = txt.title2 || "SOFTWARE";
-      document.getElementById('txt-sub').value = txt.sub || "Proveedor garantizado · Activación inmediata · Los mejores precios";
-      document.getElementById('txt-currency').value = txt.currency || "$";
-      document.getElementById('txt-btn-buy').value = txt.btnBuy || "Comprar ahora!";
-
-      const publicLink = window.location.origin + '/?tienda=' + slugActual;
-      const elLink = document.getElementById('shop-public-link');
-      elLink.href = publicLink;
-      elLink.innerText = publicLink;
-
-      actualizarContadorDias();
-      renderProductos();
-    }
-
-    function cambiarTab(tab) {
-      ['shop', 'prods', 'combos', 'texts', 'payments'].forEach(t => {
-        document.getElementById('tab-' + t).classList.add('hidden');
-        document.getElementById('tab-btn-' + t).classList.remove('active');
-      });
-      document.getElementById('tab-' + tab).classList.remove('hidden');
-      document.getElementById('tab-btn-' + tab).classList.add('active');
-    }
-
-    function renderProductos() {
-      const lista = document.getElementById('lista-productos');
-      lista.innerHTML = '';
-      const productos = dbData.tiendas[slugActual].productos || [];
-
-      if (productos.length === 0) {
-        lista.innerHTML = '<p style="color:#94a3b8; font-size:13px;">No has agregado servicios personalizados aún (tu catálogo mostrará los predeterminados de la plataforma).</p>';
-        return;
-      }
-
-      productos.forEach((p, idx) => {
-        const item = document.createElement('div');
-        item.className = 'product-card';
-        item.innerHTML = `
-          <img src="${p.img || 'https://via.placeholder.com/65'}" class="product-img" onerror="this.src='https://via.placeholder.com/65'">
-          <div style="flex:1;">
-            <strong style="color:#fff; font-size:16px;">${p.nombre}</strong>
-            <div style="color:var(--accent); font-weight:bold; font-size:15px;">${dbData.tiendas[slugActual]?.textos?.currency || '$'}${p.precio}</div>
-            <small style="color:#94a3b8; font-size:12px;">${p.sub || ''}</small>
-          </div>
-          <div style="display:flex; flex-direction:column; gap:6px;">
-            <button style="background:#0284c7; color:#fff; padding:6px 10px; font-size:12px;" onclick="cargarEdicionProducto(${idx})">✏️</button>
-            <button style="background:#dc2626; color:#fff; padding:6px 10px; font-size:12px;" onclick="eliminarProducto(${idx})">🗑️</button>
-          </div>
-        `;
-        lista.appendChild(item);
-      });
-    }
-
-    function cargarEdicionProducto(idx) {
-      const p = dbData.tiendas[slugActual].productos[idx];
-      document.getElementById('prod-edit-idx').value = idx;
-      document.getElementById('prod-nombre').value = p.nombre;
-      document.getElementById('prod-precio').value = p.precio;
-      document.getElementById('prod-cat').value = p.categoria || 'streaming';
-      document.getElementById('prod-tag').value = p.tag || '';
-      document.getElementById('prod-features').value = (p.features && p.features.length) ? p.features.join(', ') : '';
-      
-      const imgPrev = document.getElementById('prod-preview-img');
-      if (p.img) {
-        imgPrev.src = p.img;
-        imgPrev.style.display = 'block';
-        tempImgBase64 = p.img;
-      }
-      document.getElementById('btn-guardar-prod').innerText = "ACTUALIZAR SERVICIO";
-      cambiarTab('prods');
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
-
-    async function guardarProducto() {
-      const btn = document.getElementById('btn-guardar-prod');
-      const idx = parseInt(document.getElementById('prod-edit-idx').value);
-      const nombre = document.getElementById('prod-nombre').value.trim();
-      const precio = document.getElementById('prod-precio').value.trim();
-      const categoria = document.getElementById('prod-cat').value;
-      const tag = document.getElementById('prod-tag').value.trim();
-      const rawFeatures = document.getElementById('prod-features').value.trim();
-
-      if (!nombre || !precio) {
-        alert('Nombre y precio son obligatorios.');
-        return;
-      }
-
-      btn.disabled = true;
-      btn.innerText = "⏳ GUARDANDO...";
-
-      const features = rawFeatures ? rawFeatures.split(',').map(s => s.trim()).filter(Boolean) : [];
-      const sub = `1 mes · ${categoria.charAt(0).toUpperCase() + categoria.slice(1)}`;
-      const img = tempImgBase64 || 'https://images.unsplash.com/photo-1522869635100-9f4c5e86aa37?w=500';
-
-      if (!dbData.tiendas[slugActual].productos) dbData.tiendas[slugActual].productos = [];
-
-      const nuevoObj = { nombre, sub, categoria, tag, precio, features, img };
-
-      if (idx >= 0) {
-        dbData.tiendas[slugActual].productos[idx] = nuevoObj;
-      } else {
-        dbData.tiendas[slugActual].productos.push(nuevoObj);
-      }
-
-      const guardado = await persistirTienda();
-      btn.disabled = false;
-      btn.innerText = "AGREGAR SERVICIO AL CATÁLOGO";
-
-      if (guardado) {
-        alert('¡Servicio guardado exitosamente en la nube!');
-        document.getElementById('prod-edit-idx').value = "-1";
-        document.getElementById('prod-nombre').value = '';
-        document.getElementById('prod-precio').value = '';
-        document.getElementById('prod-tag').value = '';
-        document.getElementById('prod-features').value = '';
-        document.getElementById('prod-file').value = '';
-        document.getElementById('prod-preview-img').style.display = 'none';
-        tempImgBase64 = null;
-        renderProductos();
-      }
-    }
-
-    async function eliminarProducto(idx) {
-      if (confirm('¿Deseas eliminar este servicio de tu catálogo?')) {
-        dbData.tiendas[slugActual].productos.splice(idx, 1);
-        await persistirTienda();
-        renderProductos();
-      }
-    }
-
-    // GUARDAR AJUSTES DE COMBOS
-    async function guardarAjustesCombos() {
-      const btn = document.getElementById('btn-save-combos');
-      btn.disabled = true;
-      btn.innerText = "⏳ GUARDANDO COMBOS...";
-
-      const nuevosCombos = [];
-      [0, 1, 2].forEach(i => {
-        const activo = document.getElementById(`combo${i}-activo`).checked;
-        const nombre = document.getElementById(`combo${i}-nombre`).value.trim();
-        const comboCantidad = parseInt(document.getElementById(`combo${i}-cant`).value) || (i + 2);
-        const descuento = parseInt(document.getElementById(`combo${i}-desc`).value) || 10;
-        const sub = document.getElementById(`combo${i}-sub`).value.trim();
-        const img = tempComboImgs[i] || document.getElementById(`combo${i}-preview`).src;
-
-        nuevosCombos.push({
-          activo,
-          comboCantidad,
-          descuento,
-          nombre: nombre || `Combo (${comboCantidad} Servicios)`,
-          sub: sub || `A tu elección · ${descuento}% OFF`,
-          tag: `${descuento}% OFF`,
-          precio: `${descuento}% OFF`,
-          img,
-          features: [
-            `Elige ${comboCantidad} servicios del catálogo`,
-            `Descuento automático del ${descuento}%`,
-            `Activación inmediata 24/7`,
-            `Garantía total en todos`
-          ]
-        });
-      });
-
-      dbData.tiendas[slugActual].combos = nuevosCombos;
-      const guardado = await persistirTienda();
-      btn.disabled = false;
-      btn.innerText = "GUARDAR CONFIGURACIÓN DE COMBOS";
-
-      if (guardado) {
-        alert('¡Configuración de combos guardada y actualizada con éxito en la nube!');
-      }
-    }
-
-    async function guardarAjustesTienda() {
-      const btn = document.getElementById('btn-save-shop');
-      const nombre = document.getElementById('shop-nombre').value.trim();
-      const whatsapp = document.getElementById('shop-whatsapp').value.trim();
-
-      if (!nombre || !whatsapp) {
-        alert('Nombre y número de WhatsApp son obligatorios.');
-        return;
-      }
-
-      btn.disabled = true;
-      btn.innerText = "⏳ GUARDANDO...";
-
-      dbData.tiendas[slugActual].nombre = nombre;
-      dbData.tiendas[slugActual].whatsapp = whatsapp;
-      if (tempLogoBase64) {
-        dbData.tiendas[slugActual].logo = tempLogoBase64;
-      }
-
-      const guardado = await persistirTienda();
-      btn.disabled = false;
-      btn.innerText = "GUARDAR AJUSTES DE TIENDA";
-
-      if (guardado) {
-        alert('¡Ajustes personales y Logo guardados con éxito!');
-        document.getElementById('dash-title').innerText = nombre;
-        if (tempLogoBase64) document.getElementById('dash-logo').src = tempLogoBase64;
-      }
-    }
-
-    async function guardarTextos() {
-      const btn = document.getElementById('btn-save-texts');
-      btn.disabled = true;
-      btn.innerText = "⏳ GUARDANDO...";
-
-      dbData.tiendas[slugActual].textos = {
-        pill: document.getElementById('txt-pill').value.trim() || "✦ ATENCIÓN 24/7 ✦",
-        title1: document.getElementById('txt-title-1').value.trim() || "TU TIENDA DE",
-        title2: document.getElementById('txt-title-2').value.trim() || "SOFTWARE",
-        sub: document.getElementById('txt-sub').value.trim() || "Proveedor garantizado · Activación inmediata · Los mejores precios",
-        currency: document.getElementById('txt-currency').value.trim() || "$",
-        btnBuy: document.getElementById('txt-btn-buy').value.trim() || "Comprar ahora!"
-      };
-
-      const guardado = await persistirTienda();
-      btn.disabled = false;
-      btn.innerText = "GUARDAR TEXTOS DEL CATÁLOGO";
-
-      if (guardado) {
-        alert('¡Textos y frases guardados con éxito!');
-      }
-    }
-
-    async function guardarMetodosPago() {
-      const btn = document.getElementById('btn-save-payments');
-      btn.disabled = true;
-      btn.innerText = "⏳ GUARDANDO...";
-
-      const metodos = document.getElementById('shop-payments').value.trim();
-      dbData.tiendas[slugActual].metodosPago = metodos;
-
-      const guardado = await persistirTienda();
-      btn.disabled = false;
-      btn.innerText = "GUARDAR MÉTODOS DE PAGO";
-
-      if (guardado) {
-        alert('¡Métodos de pago guardados correctamente!');
-      }
-    }
-
-    function convertirImagenABase64(input, previewId) {
-      if (input.files && input.files[0]) {
-        const file = input.files[0];
-        const reader = new FileReader();
-        reader.onload = function(e) {
-          const img = new Image();
-          img.onload = function() {
-            const canvas = document.createElement('canvas');
-            const MAX_WIDTH = 480;
-            const scaleSize = MAX_WIDTH / img.width;
-            canvas.width = (img.width > MAX_WIDTH) ? MAX_WIDTH : img.width;
-            canvas.height = (img.width > MAX_WIDTH) ? (img.height * scaleSize) : img.height;
-            const ctx = canvas.getContext('2d');
-            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-            const b64 = canvas.toDataURL('image/jpeg', 0.80);
-
-            const prev = document.getElementById(previewId);
-            prev.src = b64;
-            prev.style.display = 'block';
-
-            if (previewId === 'prod-preview-img') tempImgBase64 = b64;
-            if (previewId === 'shop-logo-preview') tempLogoBase64 = b64;
-            if (previewId === 'combo0-preview') tempComboImgs[0] = b64;
-            if (previewId === 'combo1-preview') tempComboImgs[1] = b64;
-            if (previewId === 'combo2-preview') tempComboImgs[2] = b64;
-          };
-          img.src = e.target.result;
-        };
-        reader.readAsDataURL(file);
-      }
-    }
-
-    async function persistirTienda() {
-      try {
-        const payload = {
-          slug: slugActual,
-          tienda: dbData.tiendas[slugActual]
-        };
-
-        const res = await fetch('/api/tienda/guardar', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload)
-        });
-
-        const data = await res.json();
-        return !!data.success;
-      } catch (err) {
-        alert('Error de conexión al guardar: ' + err.message);
-        return false;
-      }
-    }
-
-    verificarSesionGuardada();
-  </script>
-
-<!-- GESTOR_PRO_INJECTION_START -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-<style>
+    /* ESTILOS DEL GESTOR PRO */
     .gestor-header { background: linear-gradient(135deg, #ca8a04 0%, #854d0e 100%); padding: 16px; border-radius: 12px; margin-bottom: 16px; box-shadow: 0 4px 15px rgba(234, 179, 8, 0.2); }
-    .gestor-title { margin: 0; color: #fff; font-size: 18px; display: flex; align-items: center; gap: 8px; font-family: 'Orbitron', sans-serif;}
+    .gestor-title { margin: 0; color: #fff; font-size: 18px; display: flex; align-items: center; gap: 8px; }
     .gestor-subtitle { margin: 4px 0 0 0; color: #fef08a; font-size: 12px; }
     .gestor-tabs-nav { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 8px; margin-bottom: 16px; }
-    .gestor-sub-tab { background: #0f172a; border: 1px solid #1e293b; color: #94a3b8; padding: 8px 16px; border-radius: 8px; font-size: 13px; font-weight: bold; cursor: pointer; white-space: nowrap; }
+    .gestor-sub-tab { background: #0f172a; border: 1px solid var(--border); color: #94a3b8; padding: 8px 16px; border-radius: 8px; font-size: 13px; font-weight: bold; cursor: pointer; white-space: nowrap; }
     .gestor-sub-tab.active { background: #1e293b; color: #eab308; border-color: #eab308; }
     .gestor-import-box { border: 2px dashed #334155; padding: 24px; text-align: center; border-radius: 12px; background: #080d1a; margin-top: 16px; cursor: pointer; transition: 0.3s; }
     .gestor-import-box:hover { border-color: #eab308; background: #0f172a; }
     .gestor-content-panel { padding-top: 8px; }
     
+    /* TARJETAS DEL GESTOR */
     .g-card { background: #080d1a; border: 1px solid #1e293b; border-radius: 12px; padding: 14px; margin-bottom: 12px; position: relative; }
     .g-card-top { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #1e293b; padding-bottom: 8px; margin-bottom: 8px; }
     .g-card-title { color: #fff; font-size: 15px; font-weight: bold; }
     .g-card-servicio { color: #38bdf8; font-size: 12px; font-weight: bold; background: #111d33; padding: 4px 8px; border-radius: 6px; display: inline-block; margin-bottom: 6px; }
     .g-card-info { color: #94a3b8; font-size: 12px; margin-bottom: 4px; }
     .g-card-bold { color: #cbd5e1; font-weight: bold; }
-</style>
+  </style>
+</head>
+<body>
 
-<div id="tab-gestor" class="hidden" style="display:none;">
-    <div class="gestor-header">
+  <!-- PANTALLA LOGIN -->
+  <div id="login-section" class="card" style="max-width:440px; align-self:center;">
+    <h2 style="text-align:center;">💼 PANEL REVENDEDOR</h2>
+    <p id="login-submsg" style="text-align:center; color:#94a3b8; font-size:14px; margin-bottom:20px;">Ingresa tus credenciales para gestionar tu catálogo</p>
+    <div class="form-group"><label>Correo Electrónico</label><input type="email" id="email" placeholder="tu-correo@gmail.com"></div>
+    <div class="form-group">
+      <label>Contraseña</label>
+      <div class="password-wrapper">
+        <input type="password" id="password" placeholder="Tu clave de acceso">
+        <button type="button" class="toggle-password-btn" onclick="togglePasswordVisibility('password', this)">👁️</button>
+      </div>
+    </div>
+    <div class="checkbox-container" onclick="toggleCheckbox('remember-session')"><input type="checkbox" id="remember-session" checked onclick="event.stopPropagation()"><span style="font-size:14px; color:#cbd5e1; font-weight:600;">Mantener sesión iniciada</span></div>
+    <button class="btn-primary" onclick="iniciarSesion()">INGRESAR A MI PANEL</button>
+  </div>
+
+  <div id="dashboard-section" class="card hidden">
+    <div id="menu-backdrop" class="menu-backdrop" onclick="toggleMenu()"></div>
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px; border-bottom:1px solid var(--border); padding-bottom:12px;">
+      <div style="display:flex; align-items:center; gap:8px; flex-shrink:0;">
+        <button class="btn-menu-toggle" onclick="toggleMenu()">☰</button>
+        <img id="dash-logo" src="https://via.placeholder.com/40" style="width:36px; height:36px; border-radius:50%; object-fit:cover; border:1px solid var(--primary);">
+      </div>
+      <div style="flex:1; min-width:0; padding:0 8px; display:flex; flex-direction:column; justify-content:center;">
+        <span id="dash-title" style="font-family:'Orbitron'; font-weight:bold; font-size:14px; color:#fff; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; line-height:1.2; margin-bottom:4px;">Mi Tienda</span>
+        <div><span id="dash-countdown" class="badge-dias green" style="font-size:10px; padding:3px 6px;">⏳ Calculando...</span></div>
+      </div>
+      <button onclick="cerrarSesion()" style="width:auto; padding:6px 10px; background:#dc2626; color:#fff; font-size:12px; font-weight:bold; flex-shrink:0; border-radius:6px;">Salir</button>
+    </div>
+
+    <!-- MENÚ LATERAL -->
+    <div id="nav-menu" class="nav-tabs">
+      <div id="tab-btn-shop" class="nav-tab active" onclick="cambiarTab('shop')">⚙️ TIENDA</div>
+      <div id="tab-btn-prods" class="nav-tab" onclick="cambiarTab('prods')">📦 SERVICIOS</div>
+      <div id="tab-btn-combos" class="nav-tab" onclick="cambiarTab('combos')">🔥 COMBOS</div>
+      <div id="tab-btn-texts" class="nav-tab" onclick="cambiarTab('texts')">📝 TEXTOS</div>
+      <div id="tab-btn-payments" class="nav-tab" onclick="cambiarTab('payments')">💳 PAGOS</div>
+      <div id="tab-btn-clients" class="nav-tab" onclick="cambiarTab('clients')" style="color:#eab308; border-color:#eab308;">👥 CLIENTES (Básico)</div>
+      <div id="tab-btn-msg" class="nav-tab" onclick="cambiarTab('msg')" style="color:#38bdf8; border-color:#38bdf8;">💬 EDITOR MENSAJES</div>
+      <div id="tab-btn-stats" class="nav-tab" onclick="cambiarTab('stats')" style="color:#22c55e; border-color:#22c55e;">📊 ESTADÍSTICAS</div>
+      
+      <!-- BOTÓN GESTOR PRO -->
+      <div id="tab-btn-gestor" class="nav-tab hidden" onclick="cambiarTab('gestor')" style="background: linear-gradient(90deg, #422006 0%, #1e293b 100%); color:#facc15; border: 1px solid #ca8a04; margin-top:10px;">👑 GESTOR PRO</div>
+    </div>
+
+    <!-- PESTAÑA: GESTOR PRO -->
+    <div id="tab-gestor" class="hidden">
+      <div class="gestor-header">
         <h3 class="gestor-title">👑 Gestor de Inventario Pro</h3>
         <p class="gestor-subtitle">Control total de Clientes, Perfiles, Cuentas y Finanzas</p>
-    </div>
-    <div class="gestor-tabs-nav">
+      </div>
+      <div class="gestor-tabs-nav">
         <div id="g-tab-btn-inicio" class="gestor-sub-tab active" onclick="cambiarSubTabGestor('inicio')">Inicio</div>
         <div id="g-tab-btn-clientes" class="gestor-sub-tab" onclick="cambiarSubTabGestor('clientes')">Directorio</div>
         <div id="g-tab-btn-herramientas" class="gestor-sub-tab" onclick="cambiarSubTabGestor('herramientas')">Importar</div>
-    </div>
+      </div>
 
-    <div id="g-tab-inicio" class="gestor-content-panel">
+      <!-- INICIO: VENTAS ACTIVAS -->
+      <div id="g-tab-inicio" class="gestor-content-panel">
         <h4 style="color:#fff; margin-top:0;">Ventas Activas</h4>
-        <input type="text" id="g-buscador" placeholder="🔍 Buscar cliente o servicio..." style="width:100%; padding:10px; margin-bottom:12px; border-radius:8px; border:1px solid #1e293b; background:#080d1a; color:#fff; font-family:'Rajdhani';" oninput="renderGestorPro()">
+        <input type="text" id="g-buscador" placeholder="🔍 Buscar cliente o servicio..." style="width:100%; padding:10px; margin-bottom:12px; border-radius:8px; border:1px solid #1e293b; background:#080d1a; color:#fff;" oninput="renderGestorPro()">
         <div id="g-lista-ventas"></div>
-    </div>
+      </div>
 
-    <div id="g-tab-clientes" class="gestor-content-panel hidden" style="display:none;">
+      <!-- CLIENTES -->
+      <div id="g-tab-clientes" class="gestor-content-panel hidden">
         <h4 style="color:#fff; margin-top:0;">Directorio de Clientes</h4>
         <div id="g-lista-clientes"></div>
-    </div>
+      </div>
 
-    <div id="g-tab-herramientas" class="gestor-content-panel hidden" style="display:none;">
+      <!-- HERRAMIENTAS: IMPORTAR EXCEL -->
+      <div id="g-tab-herramientas" class="gestor-content-panel hidden">
         <h4 style="color:#fff; margin-top:0;">Migración de Datos</h4>
         <p style="color:#94a3b8; font-size:13px;">Importa tu Excel (.xlsx) para guardarlo en la nube.</p>
         <input type="file" id="excel-upload" accept=".xlsx, .xls, .csv" style="display:none;" onchange="procesarArchivoExcelReal(event)">
         <div class="gestor-import-box" onclick="document.getElementById('excel-upload').click()">
-        <div style="font-size:30px; margin-bottom:10px;">📄</div>
-        <strong style="color:#fff;">Toca aquí para subir tu archivo Excel</strong>
-        <div style="font-size:12px; color:#64748b; margin-top:6px;">El sistema leerá automáticamente las columnas de Cliente, Servicio, Perfil, PIN, etc.</div>
+          <div style="font-size:30px; margin-bottom:10px;">📄</div>
+          <strong style="color:#fff;">Toca aquí para subir tu archivo Excel</strong>
+          <div style="font-size:12px; color:#64748b; margin-top:6px;">El sistema leerá automáticamente las columnas de Cliente, Servicio, Perfil, PIN, etc.</div>
         </div>
+      </div>
     </div>
-</div>
 
-<script>
-    setTimeout(() => {
-        const navMenu = document.querySelector('.nav-tabs') || document.getElementById('nav-menu');
-        if (navMenu && !document.getElementById('tab-btn-gestor')) {
-            const btn = document.createElement('div');
-            btn.id = 'tab-btn-gestor';
-            btn.className = 'nav-tab hidden';
-            btn.style.cssText = 'background: linear-gradient(90deg, #422006 0%, #1e293b 100%); color:#facc15; border: 1px solid #ca8a04; margin-top:10px; display:none;';
-            btn.innerHTML = '👑 GESTOR PRO';
-            btn.onclick = () => window.cambiarTab('gestor');
-            navMenu.appendChild(btn);
-        }
-        const dashSection = document.getElementById('dashboard-section');
-        const gestorTab = document.getElementById('tab-gestor');
-        if(dashSection && gestorTab && gestorTab.parentElement !== dashSection) {
-            dashSection.appendChild(gestorTab);
-        }
-    }, 500);
+    <!-- PESTAÑA BÁSICA DE TIENDA -->
+    <div id="tab-shop">
+      <div style="background:#080d1a; padding:16px; border-radius:12px; border:1px solid var(--border);">
+        <h4 style="color:var(--primary); margin-top:0;">Ajustes Principales</h4>
+        <div class="form-group"><label>Nombre Comercial</label><input type="text" id="shop-nombre"></div>
+        <div class="form-group"><label>WhatsApp</label><input type="text" id="shop-whatsapp"></div>
+        <button id="btn-save-shop" class="btn-primary" onclick="guardarAjustesTienda()">GUARDAR AJUSTES</button>
+      </div>
+    </div>
 
-    if(typeof window.cambiarTab === 'function' && !window.cambiarTabExtended) {
-        const oldCambiarTab = window.cambiarTab;
-        window.cambiarTab = function(tab) {
-            oldCambiarTab(tab); 
-            const tGestor = document.getElementById('tab-gestor');
-            const bGestor = document.getElementById('tab-btn-gestor');
-            if (tab === 'gestor') {
-                document.querySelectorAll('[id^="tab-"]').forEach(el => {
-                    if(!el.id.includes('btn') && el.id !== 'tab-gestor') {
-                        el.style.display = 'none'; el.classList.add('hidden');
-                    }
-                });
-                if(tGestor) { tGestor.style.display = 'block'; tGestor.classList.remove('hidden'); }
-                if(bGestor) { bGestor.classList.add('active'); }
-            } else {
-                if(tGestor) { tGestor.style.display = 'none'; tGestor.classList.add('hidden'); }
-                if(bGestor) { bGestor.classList.remove('active'); }
-            }
-        };
-        window.cambiarTabExtended = true;
-    }
+    <!-- CONTENEDORES PARA EVITAR ERRORES SI NO ESTÁN -->
+    <div id="tab-prods" class="hidden"><p style="color:#94a3b8;">Configuración de Servicios</p></div>
+    <div id="tab-combos" class="hidden"><p style="color:#94a3b8;">Configuración de Combos</p></div>
+    <div id="tab-texts" class="hidden"><p style="color:#94a3b8;">Configuración de Textos</p></div>
+    <div id="tab-payments" class="hidden"><p style="color:#94a3b8;">Configuración de Pagos</p></div>
+    <div id="tab-clients" class="hidden"><p style="color:#94a3b8;">CRM Básico (Te recomendamos usar Gestor Pro)</p></div>
+    <div id="tab-msg" class="hidden"><p style="color:#94a3b8;">Plantillas de Mensajes</p></div>
+    <div id="tab-stats" class="hidden"><p style="color:#94a3b8;">Estadísticas de Ventas</p></div>
 
-    if(typeof window.pintarDashboard === 'function' && !window.pintarDashboardExtended) {
-        const oldPintarDashboard = window.pintarDashboard;
-        window.pintarDashboard = function() {
-            oldPintarDashboard(); 
-            const btnGestor = document.getElementById('tab-btn-gestor');
-            if (btnGestor) {
-                if (window.revendedorActual && window.revendedorActual.gestorPremium === true) {
-                    btnGestor.classList.remove('hidden'); btnGestor.style.display = 'block';
-                } else {
-                    btnGestor.classList.add('hidden'); btnGestor.style.display = 'none';
-                }
-            }
-            if(typeof renderGestorPro === 'function') renderGestorPro();
-        };
-        window.pintarDashboardExtended = true;
+  </div>
+
+  <script>
+    if ('serviceWorker' in navigator) { navigator.serviceWorker.register('/sw.js').catch(()=>{}); }
+
+    let revendedorActual = null; let slugActual = null; let tiendaActual = {};
+
+    function toggleMenu() { document.getElementById('nav-menu').classList.toggle('show-menu'); document.getElementById('menu-backdrop').classList.toggle('show'); }
+    
+    function cambiarTab(tab) {
+      ['shop', 'prods', 'combos', 'texts', 'payments', 'stats', 'clients', 'msg', 'gestor'].forEach(t => { 
+        const el = document.getElementById('tab-' + t); if(el) el.classList.add('hidden'); 
+        const btn = document.getElementById('tab-btn-' + t); if(btn) btn.classList.remove('active'); 
+      });
+      const elTab = document.getElementById('tab-' + tab);
+      if (elTab) elTab.classList.remove('hidden'); 
+      const elBtn = document.getElementById('tab-btn-' + tab);
+      if (elBtn) elBtn.classList.add('active');
+      
+      document.getElementById('nav-menu').classList.remove('show-menu'); 
+      document.getElementById('menu-backdrop').classList.remove('show');
     }
 
     function cambiarSubTabGestor(subtab) {
-        ['inicio', 'clientes', 'herramientas'].forEach(t => {
-            const el = document.getElementById('g-tab-' + t);
-            const btn = document.getElementById('g-tab-btn-' + t);
-            if(el) { el.classList.add('hidden'); el.style.display = 'none'; }
-            if(btn) { btn.classList.remove('active'); }
-        });
-        const tEl = document.getElementById('g-tab-' + subtab);
-        const tBtn = document.getElementById('g-tab-btn-' + subtab);
-        if(tEl) { tEl.classList.remove('hidden'); tEl.style.display = 'block'; }
-        if(tBtn) tBtn.classList.add('active');
+      ['inicio', 'clientes', 'herramientas'].forEach(t => {
+        document.getElementById('g-tab-' + t).classList.add('hidden');
+        document.getElementById('g-tab-btn-' + t).classList.remove('active');
+      });
+      document.getElementById('g-tab-' + subtab).classList.remove('hidden');
+      document.getElementById('g-tab-btn-' + subtab).classList.add('active');
     }
 
-    function calcularDiasG(venceStr) {
-        if (!venceStr) return 0;
-        let dateString = venceStr;
-        if (venceStr.includes('/')) {
-            const parts = venceStr.split('/');
-            if (parts.length === 3) dateString = `${parts[2]}-${parts[1].padStart(2,'0')}-${parts[0].padStart(2,'0')}`;
-        }
-        const fechaVence = new Date(dateString);
-        const hoy = new Date(); hoy.setHours(0,0,0,0);
-        return Math.ceil((fechaVence - hoy) / (1000 * 60 * 60 * 24));
+    function togglePasswordVisibility(id, btn) { const el = document.getElementById(id); el.type = el.type === 'password' ? 'text' : 'password'; btn.innerText = el.type === 'password' ? '👁️' : '🙈'; }
+    function toggleCheckbox(id) { document.getElementById(id).checked = !document.getElementById(id).checked; }
+
+    function calcularDias(venceStr) {
+      if (!venceStr) return 0;
+      let dateString = venceStr;
+      if (venceStr.includes('/')) {
+        const parts = venceStr.split('/');
+        if (parts.length === 3) dateString = `${parts[2]}-${parts[1].padStart(2,'0')}-${parts[0].padStart(2,'0')}`;
+      }
+      const fechaVence = new Date(dateString);
+      if (isNaN(fechaVence.getTime())) return 0; // Previene el error de fecha inválida
+      const hoy = new Date(); hoy.setHours(0,0,0,0);
+      return Math.ceil((fechaVence - hoy) / (1000 * 60 * 60 * 24));
     }
 
+    // ==========================================
+    // IMPORTACIÓN REAL A LA BASE DE DATOS
+    // ==========================================
     async function procesarArchivoExcelReal(event) {
-        const file = event.target.files[0];
-        if (!file) return;
-        alert("⏳ IMPORTANDO DATOS A LA NUBE...
-Tomará unos segundos. Cierra esta alerta y espera el aviso de éxito.");
-        const reader = new FileReader();
-        reader.onload = async function(e) {
-            try {
-                const data = new Uint8Array(e.target.result);
-                const workbook = XLSX.read(data, { type: 'array' });
-                const worksheet = workbook.Sheets[workbook.SheetNames[0]];
-                const jsonData = XLSX.utils.sheet_to_json(worksheet, { defval: "" });
-                let importados = [];
-                jsonData.forEach((row, idx) => {
-                    if(!row['Cliente'] && !row['Correo/Usuario']) return; 
-                    importados.push({
-                        id: 'imp_' + Date.now() + '_' + idx,
-                        cliente: String(row['Cliente'] || 'Sin nombre').trim(),
-                        whatsapp: String(row['WhatsApp'] || '').trim(),
-                        servicio: String(row['Servicio'] || '').trim(),
-                        tipo: String(row['Tipo'] || 'PERFIL').trim(),
-                        correo: String(row['Correo/Usuario'] || '').trim(),
-                        pass: String(row['Contraseña'] || '').trim(),
-                        perfil: String(row['Perfil'] || '').trim(),
-                        pin: String(row['PIN'] || '').trim(),
-                        vence: String(row['Fecha vencimiento'] || '').trim()
-                    });
-                });
-                window.tiendaActual.gestorProData = importados;
-                
-                if(typeof window.persistirEnNube === 'function') {
-                    const ok = await window.persistirEnNube({ gestorProData: importados });
-                    if(ok) {
-                        alert(`✅ ¡IMPORTACIÓN COMPLETA!
-Se guardaron ${importados.length} registros.`);
-                        renderGestorPro(); cambiarSubTabGestor('inicio');
-                    }
-                }
-            } catch (err) { alert('Error importando: ' + err.message); }
-        };
-        reader.readAsArrayBuffer(file);
-    }
+      const file = event.target.files[0];
+      if (!file) return;
+      
+      alert("⏳ IMPORTANDO DATOS A LA NUBE...\nDependiendo de tu conexión, esto tomará unos segundos. Presiona Aceptar y espera el aviso de éxito.");
 
-    function renderGestorPro() {
-        const listaVentas = document.getElementById('g-lista-ventas');
-        const listaDir = document.getElementById('g-lista-clientes');
-        if(!listaVentas || !listaDir) return;
-        listaVentas.innerHTML = ''; listaDir.innerHTML = '';
+      const reader = new FileReader();
+      reader.onload = async function(e) {
+        try {
+          const data = new Uint8Array(e.target.result);
+          const workbook = XLSX.read(data, { type: 'array' });
+          const worksheet = workbook.Sheets[workbook.SheetNames[0]];
+          const jsonData = XLSX.utils.sheet_to_json(worksheet, { defval: "" });
+          
+          let importados = [];
+          jsonData.forEach((row, idx) => {
+            if(!row['Cliente'] && !row['Correo/Usuario']) return; 
+            
+            importados.push({
+              id: 'imp_' + Date.now() + '_' + idx,
+              cliente: String(row['Cliente'] || 'Sin nombre').trim(),
+              whatsapp: String(row['WhatsApp'] || '').trim(),
+              servicio: String(row['Servicio'] || '').trim(),
+              tipo: String(row['Tipo'] || 'PERFIL').trim(),
+              correo: String(row['Correo/Usuario'] || '').trim(),
+              pass: String(row['Contraseña'] || '').trim(),
+              perfil: String(row['Perfil'] || '').trim(),
+              pin: String(row['PIN'] || '').trim(),
+              vence: String(row['Fecha vencimiento'] || '').trim()
+            });
+          });
 
-        let datos = (window.tiendaActual && window.tiendaActual.gestorProData) ? window.tiendaActual.gestorProData : [];
-        const inputBusq = document.getElementById('g-buscador');
-        const query = inputBusq ? inputBusq.value.toLowerCase().trim() : '';
-
-        if (datos.length === 0) {
-            listaVentas.innerHTML = '<p style="color:#94a3b8; text-align:center;">No hay datos. Ve a Importar para subir tu Excel.</p>';
-            listaDir.innerHTML = '<p style="color:#94a3b8; text-align:center;">No hay clientes.</p>';
-            return;
+          tiendaActual.gestorProData = importados;
+          const ok = await persistirEnNube({ gestorProData: importados });
+          
+          if(ok) {
+            alert(`✅ ¡IMPORTACIÓN COMPLETA!\nSe han guardado ${importados.length} registros en tu base de datos.`);
+            renderGestorPro();
+            cambiarSubTabGestor('inicio');
+          }
+        } catch (err) {
+          alert('Error importando el archivo: ' + err.message);
         }
-
-        datos.forEach(d => {
-            const texto = `${d.cliente} ${d.servicio} ${d.correo}`.toLowerCase();
-            if (query && !texto.includes(query)) return;
-
-            const diasRestantes = calcularDiasG(d.vence);
-            let colorDias = '#22c55e'; let txtDias = `${diasRestantes} Días`;
-            if (diasRestantes < 0) { colorDias = '#ef4444'; txtDias = 'VENCIDO'; }
-            else if (diasRestantes === 0) { colorDias = '#eab308'; txtDias = 'HOY'; }
-
-            let wnum = (d.whatsapp || '').replace(/D/g,'');
-            let linkMsj = `https://wa.me/${wnum}?text=Hola%20${encodeURIComponent(d.cliente)},%20tus%20accesos%20son:%0A%0A%E2%9C%89%EF%B8%8F%20Correo:%20${d.correo}%0A%F0%9F%94%91%20Clave:%20${d.pass}%0A%F0%9F%91%A4%20Perfil:%20${d.perfil}%0A%F0%9F%93%8C%20PIN:%20${d.pin}`;
-
-            const card = document.createElement('div'); card.className = 'g-card';
-            card.innerHTML = `
-                <div class="g-card-top">
-                    <div class="g-card-title">${d.cliente}</div>
-                    <div style="color:${colorDias}; font-weight:900; font-family:'Orbitron'; font-size:16px;">${txtDias}</div>
-                </div>
-                <div class="g-card-servicio">${d.servicio} (${d.tipo})</div>
-                <div class="g-card-info">📧 <span class="g-card-bold">${d.correo || 'N/A'}</span></div>
-                <div class="g-card-info">🔑 <span class="g-card-bold">${d.pass || 'N/A'}</span></div>
-                <div class="g-card-info">👤 Perfil: <span class="g-card-bold">${d.perfil || '-'}</span> | PIN: <span class="g-card-bold">${d.pin || '-'}</span></div>
-                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:8px; margin-top:12px;">
-                    <a href="${linkMsj}" target="_blank" style="background:#1e293b; color:#38bdf8; border:1px solid #38bdf8; padding:8px; border-radius:6px; font-weight:bold; font-size:12px; text-decoration:none; text-align:center;">👤 Enviar Datos</a>
-                    <a href="https://wa.me/${wnum}?text=Recordatorio%20de%20pago" target="_blank" style="background:#1e293b; color:#eab308; border:1px solid #eab308; padding:8px; border-radius:6px; font-weight:bold; font-size:12px; text-decoration:none; text-align:center;">⏰ Recordatorio</a>
-                </div>
-            `;
-            listaVentas.appendChild(card);
-
-            const dir = document.createElement('div');
-            dir.style.cssText = 'background:#0f172a; border-left:4px solid #38bdf8; padding:12px; margin-bottom:8px; border-radius:6px;';
-            dir.innerHTML = `
-                <div style="display:flex; justify-content:space-between; align-items:center;">
-                    <div>
-                        <strong style="color:#fff;">${d.cliente}</strong>
-                        <div style="color:#94a3b8; font-size:12px; margin-top:4px;">WA: ${d.whatsapp || 'Sin número'}</div>
-                    </div>
-                    <a href="https://wa.me/${wnum}" target="_blank" style="background:#22c55e; color:#fff; text-decoration:none; padding:6px 12px; border-radius:6px; font-weight:bold; font-size:12px;">💬 Chat</a>
-                </div>
-            `;
-            listaDir.appendChild(dir);
-        });
+      };
+      reader.readAsArrayBuffer(file);
     }
-</script>
-<!-- GESTOR_PRO_INJECTION_END -->
 
+    // ==========================================
+    // RENDERIZAR INTERFAZ DEL GESTOR PRO
+    // ==========================================
+    function renderGestorPro() {
+      const listaVentas = document.getElementById('g-lista-ventas');
+      const listaDir = document.getElementById('g-lista-clientes');
+      if(!listaVentas || !listaDir) return;
+      listaVentas.innerHTML = ''; listaDir.innerHTML = '';
+
+      let datos = tiendaActual.gestorProData || [];
+      const inputBusq = document.getElementById('g-buscador');
+      const query = inputBusq ? inputBusq.value.toLowerCase().trim() : '';
+
+      if (datos.length === 0) {
+        listaVentas.innerHTML = '<p style="color:#94a3b8; text-align:center; padding:20px;">No hay datos. Ve a Importar para subir tu Excel.</p>';
+        listaDir.innerHTML = '<p style="color:#94a3b8; text-align:center; padding:20px;">No hay clientes.</p>';
+        return;
+      }
+
+      datos.forEach(d => {
+        const texto = `${d.cliente} ${d.servicio} ${d.correo}`.toLowerCase();
+        if (query && !texto.includes(query)) return;
+
+        const diasRestantes = calcularDias(d.vence);
+        let colorDias = '#22c55e'; let txtDias = `${diasRestantes} Días`;
+        if (diasRestantes < 0) { colorDias = '#ef4444'; txtDias = 'VENCIDO'; }
+        else if (diasRestantes === 0) { colorDias = '#eab308'; txtDias = 'HOY'; }
+
+        let wnum = (d.whatsapp || '').replace(/\D/g,'');
+        let linkMsj = `https://wa.me/${wnum}?text=Hola%20${encodeURIComponent(d.cliente)},%20tus%20accesos%20son:%0A%0A%E2%9C%89%EF%B8%8F%20Correo:%20${d.correo}%0A%F0%9F%94%91%20Clave:%20${d.pass}%0A%F0%9F%91%A4%20Perfil:%20${d.perfil}%0A%F0%9F%93%8C%20PIN:%20${d.pin}`;
+
+        const card = document.createElement('div');
+        card.className = 'g-card';
+        card.innerHTML = `
+          <div class="g-card-top">
+            <div class="g-card-title">${d.cliente}</div>
+            <div style="color:${colorDias}; font-weight:900; font-family:'Orbitron'; font-size:16px;">${txtDias}</div>
+          </div>
+          <div class="g-card-servicio">${d.servicio} (${d.tipo})</div>
+          <div class="g-card-info">📧 <span class="g-card-bold">${d.correo || 'N/A'}</span></div>
+          <div class="g-card-info">🔑 <span class="g-card-bold">${d.pass || 'N/A'}</span></div>
+          <div class="g-card-info">👤 Perfil: <span class="g-card-bold">${d.perfil || '-'}</span> | PIN: <span class="g-card-bold">${d.pin || '-'}</span></div>
+          <div style="display:grid; grid-template-columns: 1fr 1fr; gap:8px; margin-top:12px;">
+             <a href="${linkMsj}" target="_blank" style="background:#1e293b; color:#38bdf8; border:1px solid #38bdf8; padding:8px; border-radius:6px; font-weight:bold; font-size:12px; text-decoration:none; text-align:center;">👤 Enviar Datos</a>
+             <a href="https://wa.me/${wnum}?text=Recordatorio%20de%20pago" target="_blank" style="background:#1e293b; color:#eab308; border:1px solid #eab308; padding:8px; border-radius:6px; font-weight:bold; font-size:12px; text-decoration:none; text-align:center;">⏰ Recordatorio</a>
+          </div>
+        `;
+        listaVentas.appendChild(card);
+
+        const dir = document.createElement('div');
+        dir.style.cssText = 'background:#0f172a; border-left:4px solid #38bdf8; padding:12px; margin-bottom:8px; border-radius:6px;';
+        dir.innerHTML = `
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+             <div>
+                <strong style="color:#fff;">${d.cliente}</strong>
+                <div style="color:#94a3b8; font-size:12px; margin-top:4px;">WA: ${d.whatsapp || 'Sin número'}</div>
+             </div>
+             <a href="https://wa.me/${wnum}" target="_blank" style="background:#22c55e; color:#fff; text-decoration:none; padding:6px 12px; border-radius:6px; font-weight:bold; font-size:12px;">💬 Chat</a>
+          </div>
+        `;
+        listaDir.appendChild(dir);
+      });
+    }
+
+    async function iniciarSesion(autoEmail = null, autoPass = null) {
+      const email = autoEmail || document.getElementById('email').value.trim(); 
+      const pass = autoPass || document.getElementById('password').value.trim(); 
+      const recordar = document.getElementById('remember-session').checked;
+      
+      if (!email || !pass) { alert('Por favor ingresa correo y contraseña.'); return; }
+
+      try {
+        const res = await fetch('/api/db'); 
+        const db = await res.json();
+        const foundSlug = Object.keys(db.revendedores || {}).find(slug => { 
+          const r = db.revendedores[slug]; 
+          return (r.email === email || r.correo === email) && (r.password === pass || r.clave === pass); 
+        });
+
+        if (foundSlug) {
+          slugActual = foundSlug; revendedorActual = db.revendedores[slugActual];
+          if (revendedorActual.activo === false) { alert('Tienda suspendida.'); return; }
+          if (recordar || autoEmail) localStorage.setItem('revendedor_session', JSON.stringify({ slug: slugActual, email, pass }));
+          
+          tiendaActual = (db.tiendas && db.tiendas[slugActual]) ? db.tiendas[slugActual] : {};
+          
+          document.getElementById('login-section').classList.add('hidden'); 
+          document.getElementById('dashboard-section').classList.remove('hidden'); 
+          pintarDashboard();
+        } else { if (!autoEmail) alert('Correo o contraseña incorrectos.'); }
+      } catch (err) { alert('Error de conexión: ' + err.message); }
+    }
+
+    function pintarDashboard() {
+      document.getElementById('dash-title').innerText = tiendaActual.nombre || revendedorActual.nombre || slugActual;
+      document.getElementById('shop-nombre').value = tiendaActual.nombre || revendedorActual.nombre || '';
+      
+      let tag = document.getElementById('dash-countdown');
+      if (tag && revendedorActual) {
+          let dias = calcularDias(revendedorActual.vencimiento);
+          if (revendedorActual.activo === false || dias <= 0) { 
+              tag.className = 'badge-dias red'; 
+              tag.innerText = dias<=0 ? '⛔ VENCIDO' : '⛔ SUSPENDIDO'; 
+          } else { 
+              tag.className = 'badge-dias green'; 
+              tag.innerText = `✅ ${dias} DÍAS`; 
+          }
+      }
+
+      const btnGestor = document.getElementById('tab-btn-gestor');
+      if (btnGestor) {
+          if (revendedorActual && revendedorActual.gestorPremium === true) {
+              btnGestor.classList.remove('hidden');
+          } else {
+              btnGestor.classList.add('hidden');
+          }
+      }
+      
+      renderGestorPro();
+    }
+
+    async function persistirEnNube(datosParciales) {
+      if (!slugActual) return false;
+      try {
+        const res = await fetch('/api/tienda/guardar', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ slug: slugActual, tienda: datosParciales }) });
+        const data = await res.json(); if (!data.success) { alert("❌ Error Firestore."); return false; } return true;
+      } catch (err) { alert('❌ Error red.'); return false; }
+    }
+    
+    async function guardarAjustesTienda() {
+      tiendaActual.nombre = document.getElementById('shop-nombre').value.trim();
+      tiendaActual.whatsapp = document.getElementById('shop-whatsapp').value.trim();
+      const ok = await persistirEnNube({ nombre: tiendaActual.nombre, whatsapp: tiendaActual.whatsapp });
+      if (ok) { alert('✅ Guardado!'); document.getElementById('dash-title').innerText = tiendaActual.nombre; }
+    }
+
+    const sesion = localStorage.getItem('revendedor_session'); if (sesion) { try { const p = JSON.parse(sesion); if (p.email && p.pass) iniciarSesion(p.email, p.pass); } catch(e) {} }
+  </script>
 </body>
 </html>
