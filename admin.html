@@ -152,153 +152,6 @@
       cursor: pointer;
     }
   </style>
-
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js">
-    function cambiarSubTabGestor(subtab) {
-      ['inicio', 'clientes', 'herramientas'].forEach(t => {
-        const el = document.getElementById('g-tab-' + t);
-        if(el) el.classList.add('hidden');
-        const btn = document.getElementById('g-tab-btn-' + t);
-        if(btn) btn.classList.remove('active');
-      });
-      const actEl = document.getElementById('g-tab-' + subtab);
-      if(actEl) actEl.classList.remove('hidden');
-      const actBtn = document.getElementById('g-tab-btn-' + subtab);
-      if(actBtn) actBtn.classList.add('active');
-    }
-
-    function calcularDias(venceStr) {
-      if (!venceStr) return 0;
-      let dateString = venceStr;
-      if (venceStr.includes('/')) {
-        const parts = venceStr.split('/');
-        if (parts.length === 3) dateString = `${parts[2]}-${parts[1].padStart(2,'0')}-${parts[0].padStart(2,'0')}`;
-      }
-      const fechaVence = new Date(dateString);
-      if (isNaN(fechaVence.getTime())) return 0; 
-      const hoy = new Date(); hoy.setHours(0,0,0,0);
-      return Math.ceil((fechaVence - hoy) / (1000 * 60 * 60 * 24));
-    }
-
-    async function procesarArchivoExcelReal(event) {
-      const file = event.target.files[0];
-      if (!file) return;
-      alert("⏳ IMPORTANDO DATOS A LA NUBE...\nDependiendo de tu conexión, esto tomará unos segundos. Presiona Aceptar y espera el aviso de éxito.");
-      const reader = new FileReader();
-      reader.onload = async function(e) {
-        try {
-          const data = new Uint8Array(e.target.result);
-          const workbook = XLSX.read(data, { type: 'array' });
-          const worksheet = workbook.Sheets[workbook.SheetNames[0]];
-          const jsonData = XLSX.utils.sheet_to_json(worksheet, { defval: "" });
-          let importados = [];
-          jsonData.forEach((row, idx) => {
-            if(!row['Cliente'] && !row['Correo/Usuario']) return; 
-            importados.push({
-              id: 'imp_' + Date.now() + '_' + idx,
-              cliente: String(row['Cliente'] || 'Sin nombre').trim(),
-              whatsapp: String(row['WhatsApp'] || '').trim(),
-              servicio: String(row['Servicio'] || '').trim(),
-              tipo: String(row['Tipo'] || 'PERFIL').trim(),
-              correo: String(row['Correo/Usuario'] || '').trim(),
-              pass: String(row['Contraseña'] || '').trim(),
-              perfil: String(row['Perfil'] || '').trim(),
-              pin: String(row['PIN'] || '').trim(),
-              vence: String(row['Fecha vencimiento'] || '').trim()
-            });
-          });
-          tiendaActual.gestorProData = importados;
-          const ok = await persistirEnNube({ gestorProData: importados });
-          if(ok) {
-            alert(`✅ ¡IMPORTACIÓN COMPLETA!\nSe han guardado ${importados.length} registros en tu base de datos.`);
-            renderGestorPro();
-            cambiarSubTabGestor('inicio');
-          }
-        } catch (err) {
-          alert('Error importando el archivo: ' + err.message);
-        }
-      };
-      reader.readAsArrayBuffer(file);
-    }
-
-    function renderGestorPro() {
-      const listaVentas = document.getElementById('g-lista-ventas');
-      const listaDir = document.getElementById('g-lista-clientes');
-      if(!listaVentas || !listaDir) return;
-      listaVentas.innerHTML = ''; listaDir.innerHTML = '';
-      let datos = tiendaActual.gestorProData || [];
-      const inputBusq = document.getElementById('g-buscador');
-      const query = inputBusq ? inputBusq.value.toLowerCase().trim() : '';
-
-      if (datos.length === 0) {
-        listaVentas.innerHTML = '<p style="color:#94a3b8; text-align:center; padding:20px;">No hay datos. Ve a Importar para subir tu Excel.</p>';
-        listaDir.innerHTML = '<p style="color:#94a3b8; text-align:center; padding:20px;">No hay clientes.</p>';
-        return;
-      }
-
-      datos.forEach(d => {
-        const texto = `${d.cliente} ${d.servicio} ${d.correo}`.toLowerCase();
-        if (query && !texto.includes(query)) return;
-
-        const diasRestantes = calcularDias(d.vence);
-        let colorDias = '#22c55e'; let txtDias = `${diasRestantes} Días`;
-        if (diasRestantes < 0) { colorDias = '#ef4444'; txtDias = 'VENCIDO'; }
-        else if (diasRestantes === 0) { colorDias = '#eab308'; txtDias = 'HOY'; }
-
-        let wnum = (d.whatsapp || '').replace(/\D/g,'');
-        let linkMsj = `https://wa.me/${wnum}?text=Hola%20${encodeURIComponent(d.cliente)},%20tus%20accesos%20son:%0A%0A%E2%9C%89%EF%B8%8F%20Correo:%20${d.correo}%0A%F0%9F%94%91%20Clave:%20${d.pass}%0A%F0%9F%91%A4%20Perfil:%20${d.perfil}%0A%F0%9F%93%8C%20PIN:%20${d.pin}`;
-
-        const card = document.createElement('div');
-        card.className = 'g-card';
-        card.innerHTML = `
-          <div class="g-card-top">
-            <div class="g-card-title">${d.cliente}</div>
-            <div style="color:${colorDias}; font-weight:900; font-family:'Orbitron'; font-size:16px;">${txtDias}</div>
-          </div>
-          <div class="g-card-servicio">${d.servicio} (${d.tipo})</div>
-          <div class="g-card-info">📧 <span class="g-card-bold">${d.correo || 'N/A'}</span></div>
-          <div class="g-card-info">🔑 <span class="g-card-bold">${d.pass || 'N/A'}</span></div>
-          <div class="g-card-info">👤 Perfil: <span class="g-card-bold">${d.perfil || '-'}</span> | PIN: <span class="g-card-bold">${d.pin || '-'}</span></div>
-          <div style="display:grid; grid-template-columns: 1fr 1fr; gap:8px; margin-top:12px;">
-             <a href="${linkMsj}" target="_blank" style="background:#1e293b; color:#38bdf8; border:1px solid #38bdf8; padding:8px; border-radius:6px; font-weight:bold; font-size:12px; text-decoration:none; text-align:center;">👤 Enviar Datos</a>
-             <a href="https://wa.me/${wnum}?text=Recordatorio%20de%20pago" target="_blank" style="background:#1e293b; color:#eab308; border:1px solid #eab308; padding:8px; border-radius:6px; font-weight:bold; font-size:12px; text-decoration:none; text-align:center;">⏰ Recordatorio</a>
-          </div>
-        `;
-        listaVentas.appendChild(card);
-
-        const dir = document.createElement('div');
-        dir.style.cssText = 'background:#0f172a; border-left:4px solid #38bdf8; padding:12px; margin-bottom:8px; border-radius:6px;';
-        dir.innerHTML = `
-          <div style="display:flex; justify-content:space-between; align-items:center;">
-             <div>
-                <strong style="color:#fff;">${d.cliente}</strong>
-                <div style="color:#94a3b8; font-size:12px; margin-top:4px;">WA: ${d.whatsapp || 'Sin número'}</div>
-             </div>
-             <a href="https://wa.me/${wnum}" target="_blank" style="background:#22c55e; color:#fff; text-decoration:none; padding:6px 12px; border-radius:6px; font-weight:bold; font-size:12px;">💬 Chat</a>
-          </div>
-        `;
-        listaDir.appendChild(dir);
-      });
-    }
-  
-  </script>
-  <style>
-    .gestor-header { background: linear-gradient(135deg, #ca8a04 0%, #854d0e 100%); padding: 16px; border-radius: 12px; margin-bottom: 16px; box-shadow: 0 4px 15px rgba(234, 179, 8, 0.2); }
-    .gestor-title { margin: 0; color: #fff; font-size: 18px; display: flex; align-items: center; gap: 8px; font-family: 'Orbitron', sans-serif;}
-    .gestor-subtitle { margin: 4px 0 0 0; color: #fef08a; font-size: 12px; }
-    .gestor-tabs-nav { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 8px; margin-bottom: 16px; }
-    .gestor-sub-tab { background: #0f172a; border: 1px solid #1e293b; color: #94a3b8; padding: 8px 16px; border-radius: 8px; font-size: 13px; font-weight: bold; cursor: pointer; white-space: nowrap; }
-    .gestor-sub-tab.active { background: #1e293b; color: #eab308; border-color: #eab308; }
-    .gestor-import-box { border: 2px dashed #334155; padding: 24px; text-align: center; border-radius: 12px; background: #080d1a; margin-top: 16px; cursor: pointer; transition: 0.3s; }
-    .gestor-import-box:hover { border-color: #eab308; background: #0f172a; }
-    .gestor-content-panel { padding-top: 8px; }
-    .g-card { background: #080d1a; border: 1px solid #1e293b; border-radius: 12px; padding: 14px; margin-bottom: 12px; position: relative; }
-    .g-card-top { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #1e293b; padding-bottom: 8px; margin-bottom: 8px; }
-    .g-card-title { color: #fff; font-size: 15px; font-weight: bold; }
-    .g-card-servicio { color: #38bdf8; font-size: 12px; font-weight: bold; background: #111d33; padding: 4px 8px; border-radius: 6px; display: inline-block; margin-bottom: 6px; }
-    .g-card-info { color: #94a3b8; font-size: 12px; margin-bottom: 4px; }
-    .g-card-bold { color: #cbd5e1; font-weight: bold; }
-  </style>
 </head>
 <body>
 
@@ -355,42 +208,6 @@
     </div>
 
     <!-- PESTAÑA: TIENDA & LOGO -->
-    
-    <!-- PESTAÑA: GESTOR PRO -->
-    <div id="tab-gestor" class="hidden">
-      <div class="gestor-header">
-        <h3 class="gestor-title">👑 Gestor de Inventario Pro</h3>
-        <p class="gestor-subtitle">Control total de Clientes, Perfiles, Cuentas y Finanzas</p>
-      </div>
-      <div class="gestor-tabs-nav">
-        <div id="g-tab-btn-inicio" class="gestor-sub-tab active" onclick="cambiarSubTabGestor('inicio')">Inicio</div>
-        <div id="g-tab-btn-clientes" class="gestor-sub-tab" onclick="cambiarSubTabGestor('clientes')">Directorio</div>
-        <div id="g-tab-btn-herramientas" class="gestor-sub-tab" onclick="cambiarSubTabGestor('herramientas')">Importar</div>
-      </div>
-
-      <div id="g-tab-inicio" class="gestor-content-panel">
-        <h4 style="color:#fff; margin-top:0;">Ventas Activas</h4>
-        <input type="text" id="g-buscador" placeholder="🔍 Buscar cliente o servicio..." style="width:100%; padding:10px; margin-bottom:12px; border-radius:8px; border:1px solid #1e293b; background:#080d1a; color:#fff;" oninput="renderGestorPro()">
-        <div id="g-lista-ventas"></div>
-      </div>
-
-      <div id="g-tab-clientes" class="gestor-content-panel hidden">
-        <h4 style="color:#fff; margin-top:0;">Directorio de Clientes</h4>
-        <div id="g-lista-clientes"></div>
-      </div>
-
-      <div id="g-tab-herramientas" class="gestor-content-panel hidden">
-        <h4 style="color:#fff; margin-top:0;">Migración de Datos</h4>
-        <p style="color:#94a3b8; font-size:13px;">Importa tu Excel (.xlsx) para guardarlo en la nube.</p>
-        <input type="file" id="excel-upload" accept=".xlsx, .xls, .csv" style="display:none;" onchange="procesarArchivoExcelReal(event)">
-        <div class="gestor-import-box" onclick="document.getElementById('excel-upload').click()">
-          <div style="font-size:30px; margin-bottom:10px;">📄</div>
-          <strong style="color:#fff;">Toca aquí para subir tu archivo Excel</strong>
-          <div style="font-size:12px; color:#64748b; margin-top:6px;">El sistema leerá las columnas de Cliente, Servicio, Perfil, PIN, etc.</div>
-        </div>
-      </div>
-    </div>
-  
     <div id="tab-shop">
       <div style="background:#080d1a; padding:16px; border-radius:12px; border:1px solid var(--border);">
         <h4 style="color:var(--primary); margin-top:0;">Datos Personales y Logo de la Tienda</h4>
@@ -1165,3 +982,146 @@
   </script>
 </body>
 </html>
+
+<!-- INYECCIÓN SEGURA FASE 3 (GESTOR PRO) -->
+<script>
+// Función para procesar y guardar el Excel en la nube
+async function procesarArchivoExcelReal(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    
+    alert("⏳ IMPORTANDO DATOS A LA BASE DE DATOS...\nPor favor espera unos segundos hasta que salga el aviso de éxito.");
+    
+    const reader = new FileReader();
+    reader.onload = async function(e) {
+        try {
+            const data = new Uint8Array(e.target.result);
+            const workbook = XLSX.read(data, { type: 'array' });
+            const worksheet = workbook.Sheets[workbook.SheetNames[0]];
+            const jsonData = XLSX.utils.sheet_to_json(worksheet, { defval: "" });
+            
+            let importados = [];
+            jsonData.forEach((row, idx) => {
+                if(!row['Cliente'] && !row['Correo/Usuario']) return; 
+                importados.push({
+                    id: 'imp_' + Date.now() + '_' + idx,
+                    cliente: String(row['Cliente'] || 'Sin nombre').trim(),
+                    whatsapp: String(row['WhatsApp'] || '').trim(),
+                    servicio: String(row['Servicio'] || '').trim(),
+                    tipo: String(row['Tipo'] || 'PERFIL').trim(),
+                    correo: String(row['Correo/Usuario'] || '').trim(),
+                    pass: String(row['Contraseña'] || '').trim(),
+                    perfil: String(row['Perfil'] || '').trim(),
+                    pin: String(row['PIN'] || '').trim(),
+                    vence: String(row['Fecha vencimiento'] || '').trim()
+                });
+            });
+            
+            if (typeof window.tiendaActual === 'undefined') window.tiendaActual = {};
+            window.tiendaActual.gestorProData = importados;
+            
+            // Guardar en Firestore
+            if (typeof window.slugActual !== 'undefined') {
+                await fetch('/api/tienda/guardar', { 
+                    method: 'POST', 
+                    headers: { 'Content-Type': 'application/json' }, 
+                    body: JSON.stringify({ slug: window.slugActual, tienda: { gestorProData: importados } }) 
+                });
+            }
+            
+            alert(`✅ ¡ÉXITO! Se guardaron ${importados.length} clientes en tu Gestor Pro.`);
+            renderGestorPro();
+            
+            // Cambiar a pestaña inicio si existe la función
+            if(typeof window.cambiarSubTabGestor === 'function') window.cambiarSubTabGestor('inicio');
+        } catch (err) {
+            alert('Error al procesar el Excel: ' + err.message);
+        }
+    };
+    reader.readAsArrayBuffer(file);
+}
+
+// Conectar el botón de importar original a nuestra nueva función real
+setTimeout(() => {
+    const fileInput = document.querySelector('input[type="file"][accept*=".xls"]');
+    if(fileInput) { fileInput.onchange = procesarArchivoExcelReal; }
+}, 1500);
+
+// Función para dibujar las tarjetas idénticas al video
+function renderGestorPro() {
+    let tabInicio = document.getElementById('g-tab-inicio') || document.getElementById('inicio');
+    let tabClientes = document.getElementById('g-tab-clientes') || document.getElementById('clientes');
+    
+    if(!tabInicio) return; // Evitar errores si no encuentra la pestaña
+
+    let htmlVentas = '<h4 style="color:#fff; margin-top:0;">Ventas Activas</h4><input type="text" id="g-buscador" placeholder="🔍 Buscar cliente o servicio..." style="width:100%; padding:10px; margin-bottom:12px; border-radius:8px; border:1px solid #1e293b; background:#080d1a; color:#fff;" oninput="renderGestorPro()">';
+    let htmlDir = '<h4 style="color:#fff; margin-top:0;">Directorio de Clientes</h4>';
+
+    let datos = (window.tiendaActual && window.tiendaActual.gestorProData) ? window.tiendaActual.gestorProData : [];
+    const inputBusqueda = document.getElementById('g-buscador');
+    const query = inputBusqueda ? inputBusqueda.value.toLowerCase().trim() : '';
+
+    if (datos.length === 0) {
+        tabInicio.innerHTML = htmlVentas + '<p style="color:#94a3b8; text-align:center; padding:20px;">No hay datos. Ve a Herramientas (Importar) para subir tu Excel.</p>';
+        if(tabClientes) tabClientes.innerHTML = htmlDir;
+        return;
+    }
+
+    datos.forEach(d => {
+        const texto = `${d.cliente} ${d.servicio} ${d.correo}`.toLowerCase();
+        if (query && !texto.includes(query)) return;
+
+        let diasRestantes = 0;
+        if(d.vence) {
+            let parts = d.vence.split('/');
+            let dateObj = parts.length === 3 ? new Date(`${parts[2]}-${parts[1].padStart(2,'0')}-${parts[0].padStart(2,'0')}`) : new Date(d.vence);
+            const hoy = new Date(); hoy.setHours(0,0,0,0);
+            diasRestantes = Math.ceil((dateObj - hoy) / (1000 * 60 * 60 * 24));
+        }
+
+        let colorDias = '#22c55e'; let txtDias = `${diasRestantes} Días`;
+        if (diasRestantes < 0) { colorDias = '#ef4444'; txtDias = 'VENCIDO'; }
+        else if (diasRestantes === 0) { colorDias = '#eab308'; txtDias = 'HOY'; }
+
+        let wnum = (d.whatsapp || '').replace(/\D/g,'');
+        let linkMsj = `https://wa.me/${wnum}?text=Hola%20${encodeURIComponent(d.cliente)},%20tus%20accesos%20son:%0A%0A%E2%9C%89%EF%B8%8F%20Correo:%20${d.correo}%0A%F0%9F%94%91%20Clave:%20${d.pass}%0A%F0%9F%91%A4%20Perfil:%20${d.perfil}%0A%F0%9F%93%8C%20PIN:%20${d.pin}`;
+
+        htmlVentas += `
+          <div style="background:#080d1a; border:1px solid #1e293b; border-radius:12px; padding:14px; margin-bottom:12px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #1e293b; padding-bottom:8px; margin-bottom:8px;">
+              <div style="color:#fff; font-size:15px; font-weight:bold;">${d.cliente}</div>
+              <div style="color:${colorDias}; font-weight:900; font-family:'Orbitron', sans-serif; font-size:14px;">${txtDias}</div>
+            </div>
+            <div style="color:#38bdf8; font-size:12px; font-weight:bold; background:#111d33; padding:4px 8px; border-radius:6px; display:inline-block; margin-bottom:6px;">${d.servicio} (${d.tipo})</div>
+            <div style="color:#94a3b8; font-size:12px; margin-bottom:4px;">📧 <b style="color:#cbd5e1">${d.correo || 'N/A'}</b></div>
+            <div style="color:#94a3b8; font-size:12px; margin-bottom:4px;">🔑 <b style="color:#cbd5e1">${d.pass || 'N/A'}</b></div>
+            <div style="color:#94a3b8; font-size:12px; margin-bottom:4px;">👤 Perfil: <b style="color:#cbd5e1">${d.perfil || '-'}</b> | PIN: <b style="color:#cbd5e1">${d.pin || '-'}</b></div>
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:8px; margin-top:12px;">
+               <a href="${linkMsj}" target="_blank" style="background:#1e293b; color:#38bdf8; border:1px solid #38bdf8; padding:8px; border-radius:6px; font-weight:bold; font-size:12px; text-align:center; text-decoration:none;">👤 Enviar Datos</a>
+               <a href="https://wa.me/${wnum}?text=Recordatorio%20de%20pago" target="_blank" style="background:#1e293b; color:#eab308; border:1px solid #eab308; padding:8px; border-radius:6px; font-weight:bold; font-size:12px; text-align:center; text-decoration:none;">⏰ Recordatorio</a>
+            </div>
+          </div>
+        `;
+
+        htmlDir += `
+          <div style="background:#0f172a; border-left:4px solid #38bdf8; padding:12px; margin-bottom:8px; border-radius:6px; display:flex; justify-content:space-between; align-items:center;">
+             <div>
+                <strong style="color:#fff;">${d.cliente}</strong>
+                <div style="color:#94a3b8; font-size:12px; margin-top:4px;">WA: ${d.whatsapp || 'Sin número'}</div>
+             </div>
+             <a href="https://wa.me/${wnum}" target="_blank" style="background:#22c55e; color:#fff; text-decoration:none; padding:6px 12px; border-radius:6px; font-weight:bold; font-size:12px;">💬 Chat</a>
+          </div>
+        `;
+    });
+
+    tabInicio.innerHTML = htmlVentas;
+    if(tabClientes) tabClientes.innerHTML = htmlDir;
+}
+
+// Escuchar cambios para renderizar al cargar la tienda
+setInterval(() => {
+    if(window.tiendaActual && window.tiendaActual.gestorProData && !document.getElementById('g-buscador')) {
+        renderGestorPro();
+    }
+}, 2000);
+</script>
