@@ -6,7 +6,6 @@
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
   <title>Panel Revendedor | Control Total</title>
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;800&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
-  <!-- LIBRERÍA PARA LEER EXCEL -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
   <style>
     :root { --primary: #38bdf8; --accent: #22c55e; --bg: #070a12; --card-bg: #0f172a; --border: #1e293b; }
@@ -44,15 +43,6 @@
     .badge-dias { display: inline-flex; align-items: center; gap: 5px; font-family: 'Orbitron', sans-serif; font-size: 11px; font-weight: 800; padding: 4px 9px; border-radius: 6px; }
     .badge-dias.green { background: rgba(34, 197, 94, 0.15); color: #4ade80; border: 1px solid #22c55e; }
     .badge-dias.red { background: rgba(239, 68, 68, 0.2); color: #f87171; border: 1px solid #ef4444; }
-    .checkbox-container { display: flex; align-items: center; gap: 10px; margin: 14px 0 18px 0; cursor: pointer; user-select: none; }
-    .checkbox-container input { width: 18px; height: 18px; accent-color: #38bdf8; }
-    .tipo-selector { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px; }
-    .tipo-btn { background: #080d1a; border: 1px solid var(--border); color: #94a3b8; padding: 10px; text-align: center; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 13px; }
-    .tipo-btn.active { background: rgba(34, 197, 94, 0.15); border-color: var(--accent); color: var(--accent); }
-    .var-chip { background: #111625; border: 1px solid #1e293b; color: var(--primary); padding: 6px 10px; border-radius: 6px; font-size: 12px; font-weight: bold; cursor: pointer; text-align: left; }
-    .var-chip:hover { border-color: var(--primary); background: #18223b; }
-    .filtro-btn { background: #111625; border: 1px solid #1e293b; color: #94a3b8; padding: 6px 10px; border-radius: 6px; font-size: 11px; font-weight: bold; cursor: pointer; white-space: nowrap; }
-    .filtro-btn.active { background: var(--primary); color: #070a12; border-color: var(--primary); }
 
     /* ESTILOS DEL GESTOR PRO */
     .gestor-header { background: linear-gradient(135deg, #ca8a04 0%, #854d0e 100%); padding: 16px; border-radius: 12px; margin-bottom: 16px; box-shadow: 0 4px 15px rgba(234, 179, 8, 0.2); }
@@ -64,6 +54,14 @@
     .gestor-import-box { border: 2px dashed #334155; padding: 24px; text-align: center; border-radius: 12px; background: #080d1a; margin-top: 16px; cursor: pointer; transition: 0.3s; }
     .gestor-import-box:hover { border-color: #eab308; background: #0f172a; }
     .gestor-content-panel { padding-top: 8px; }
+    
+    /* TARJETAS DEL GESTOR */
+    .g-card { background: #080d1a; border: 1px solid #1e293b; border-radius: 12px; padding: 14px; margin-bottom: 12px; position: relative; }
+    .g-card-top { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #1e293b; padding-bottom: 8px; margin-bottom: 8px; }
+    .g-card-title { color: #fff; font-size: 15px; font-weight: bold; }
+    .g-card-servicio { color: #38bdf8; font-size: 12px; font-weight: bold; background: #111d33; padding: 4px 8px; border-radius: 6px; display: inline-block; margin-bottom: 6px; }
+    .g-card-info { color: #94a3b8; font-size: 12px; margin-bottom: 4px; }
+    .g-card-bold { color: #cbd5e1; font-weight: bold; }
   </style>
 </head>
 <body>
@@ -97,18 +95,15 @@
       <button onclick="cerrarSesion()" style="width:auto; padding:6px 10px; background:#dc2626; color:#fff; font-size:12px; font-weight:bold; flex-shrink:0; border-radius:6px;">Salir</button>
     </div>
 
-    <!-- MENÚ LATERAL -->
     <div id="nav-menu" class="nav-tabs">
       <div id="tab-btn-shop" class="nav-tab active" onclick="cambiarTab('shop')">⚙️ TIENDA</div>
       <div id="tab-btn-prods" class="nav-tab" onclick="cambiarTab('prods')">📦 SERVICIOS</div>
       <div id="tab-btn-combos" class="nav-tab" onclick="cambiarTab('combos')">🔥 COMBOS</div>
       <div id="tab-btn-texts" class="nav-tab" onclick="cambiarTab('texts')">📝 TEXTOS</div>
       <div id="tab-btn-payments" class="nav-tab" onclick="cambiarTab('payments')">💳 PAGOS</div>
-      <div id="tab-btn-clients" class="nav-tab" onclick="cambiarTab('clients')" style="color:#eab308; border-color:#eab308;">👥 CLIENTES (CRM Básico)</div>
+      <div id="tab-btn-clients" class="nav-tab" onclick="cambiarTab('clients')" style="color:#eab308; border-color:#eab308;">👥 CLIENTES (Básico)</div>
       <div id="tab-btn-msg" class="nav-tab" onclick="cambiarTab('msg')" style="color:#38bdf8; border-color:#38bdf8;">💬 EDITOR MENSAJES</div>
       <div id="tab-btn-stats" class="nav-tab" onclick="cambiarTab('stats')" style="color:#22c55e; border-color:#22c55e;">📊 ESTADÍSTICAS</div>
-      
-      <!-- BOTÓN GESTOR PRO (OCULTO POR DEFECTO) -->
       <div id="tab-btn-gestor" class="nav-tab hidden" onclick="cambiarTab('gestor')" style="background: linear-gradient(90deg, #422006 0%, #1e293b 100%); color:#facc15; border: 1px solid #ca8a04; margin-top:10px;">👑 GESTOR PRO</div>
     </div>
 
@@ -120,164 +115,70 @@
       </div>
       <div class="gestor-tabs-nav">
         <div id="g-tab-btn-inicio" class="gestor-sub-tab active" onclick="cambiarSubTabGestor('inicio')">Inicio</div>
-        <div id="g-tab-btn-clientes" class="gestor-sub-tab" onclick="cambiarSubTabGestor('clientes')">Clientes</div>
-        <div id="g-tab-btn-perfiles" class="gestor-sub-tab" onclick="cambiarSubTabGestor('perfiles')">Perfiles</div>
-        <div id="g-tab-btn-cuentas" class="gestor-sub-tab" onclick="cambiarSubTabGestor('cuentas')">Cuentas</div>
-        <div id="g-tab-btn-finanzas" class="gestor-sub-tab" onclick="cambiarSubTabGestor('finanzas')">Dashboard</div>
-        <div id="g-tab-btn-herramientas" class="gestor-sub-tab" onclick="cambiarSubTabGestor('herramientas')">Herramientas</div>
+        <div id="g-tab-btn-clientes" class="gestor-sub-tab" onclick="cambiarSubTabGestor('clientes')">Directorio</div>
+        <div id="g-tab-btn-herramientas" class="gestor-sub-tab" onclick="cambiarSubTabGestor('herramientas')">Importar</div>
       </div>
 
+      <!-- INICIO: VENTAS ACTIVAS -->
+      <div id="g-tab-inicio" class="gestor-content-panel">
+        <h4 style="color:#fff; margin-top:0;">Ventas Activas</h4>
+        <input type="text" id="g-buscador" placeholder="🔍 Buscar cliente o servicio..." style="margin-bottom:12px;" oninput="renderGestorPro()">
+        <div id="g-lista-ventas"></div>
+      </div>
+
+      <!-- CLIENTES -->
+      <div id="g-tab-clientes" class="gestor-content-panel hidden">
+        <h4 style="color:#fff; margin-top:0;">Directorio de Clientes</h4>
+        <div id="g-lista-clientes"></div>
+      </div>
+
+      <!-- HERRAMIENTAS: IMPORTAR EXCEL -->
       <div id="g-tab-herramientas" class="gestor-content-panel hidden">
         <h4 style="color:#fff; margin-top:0;">Migración de Datos</h4>
-        <p style="color:#94a3b8; font-size:13px;">Importa tu Excel (.xlsx) o exporta tu información actual para tener un respaldo contable.</p>
-        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-top:16px;">
-          <button style="background:#1e293b; color:#eab308; border:1px solid #eab308;" onclick="exportarExcel()">📤 Exportar Excel</button>
-          <button style="background:#14532d; color:#4ade80; border:1px solid #22c55e;" onclick="document.getElementById('excel-upload').click()">📥 Importar Excel</button>
-        </div>
-        <input type="file" id="excel-upload" accept=".xlsx, .xls, .csv" style="display:none;" onchange="procesarArchivoExcel(event)">
-        <div class="gestor-import-box" onclick="document.getElementById('excel-upload').click()">
-          <div style="font-size:30px; margin-bottom:10px;">📄</div>
-          <strong style="color:#fff;">Toca aquí para subir tu archivo Excel</strong>
-          <div style="font-size:12px; color:#64748b; margin-top:6px;">El sistema leerá automáticamente las columnas de Cliente, Servicio, Perfil, PIN, etc.</div>
-        </div>
+        <p style="color:#94a3b8; font-size:13px;">Importa tu Excel (.xlsx) para guardarlo en la nube.</p>
+        <button id="btn-import-real" style="background:#14532d; color:#4ade80; border:1px solid #22c55e;" onclick="document.getElementById('excel-upload').click()">📥 Importar y Guardar</button>
+        <input type="file" id="excel-upload" accept=".xlsx, .xls, .csv" style="display:none;" onchange="procesarArchivoExcelReal(event)">
       </div>
-      <div id="g-tab-inicio" class="gestor-content-panel"><p style="color:#94a3b8; text-align:center; padding:20px;">Ventas pendientes y activas se mostrarán aquí.</p></div>
-      <div id="g-tab-clientes" class="gestor-content-panel hidden"><p style="color:#94a3b8; text-align:center; padding:20px;">Directorio CRM Avanzado se mostrará aquí.</p></div>
-      <div id="g-tab-perfiles" class="gestor-content-panel hidden"><p style="color:#94a3b8; text-align:center; padding:20px;">Control de perfiles (bolitas de ocupación) se mostrará aquí.</p></div>
-      <div id="g-tab-cuentas" class="gestor-content-panel hidden"><p style="color:#94a3b8; text-align:center; padding:20px;">Control de Cuentas Completas se mostrará aquí.</p></div>
-      <div id="g-tab-finanzas" class="gestor-content-panel hidden"><p style="color:#94a3b8; text-align:center; padding:20px;">Dashboard Financiero (Balance, Ingresos, Gastos) se mostrará aquí.</p></div>
     </div>
 
-    <!-- PESTAÑA: TIENDA -->
+    <!-- PESTAÑA BÁSICA DE TIENDA (para mantener funcionalidad) -->
     <div id="tab-shop">
       <div style="background:#080d1a; padding:16px; border-radius:12px; border:1px solid var(--border);">
         <h4 style="color:var(--primary); margin-top:0;">Ajustes Principales</h4>
         <div class="form-group"><label>Nombre Comercial</label><input type="text" id="shop-nombre"></div>
-        <div class="form-group"><label>WhatsApp (ej: 593982766054)</label><input type="text" id="shop-whatsapp"></div>
-        <div class="form-group" style="background:#111625; padding:12px; border-radius:10px; border:1px solid #1e293b;">
-          <label style="color:#fff;">Estado de Atención</label>
-          <select id="shop-status-online" style="background:#080d1a; color:#fff; border:1px solid #1e293b;"><option value="online">🟢 En línea (Entrega inmediata)</option><option value="offline">🌙 Fuera de horario (Dejar pedido)</option></select>
-        </div>
-        <div class="form-group"><label>Link de Descarga Directa APK (Opcional)</label><input type="text" id="shop-apk"></div>
-        <div class="form-group" style="background:#111625; padding:12px; border-radius:10px; border:1px solid #1e293b;">
-          <label style="color:#fff;">Color Principal</label>
-          <input type="hidden" id="shop-tema" value="orange">
-          <div class="theme-selector">
-            <div id="theme-orange" class="theme-opt active" onclick="seleccionarTema('orange')"><div class="theme-circle" style="background:#ff6a00;"></div>Naranja</div>
-            <div id="theme-blue" class="theme-opt" onclick="seleccionarTema('blue')"><div class="theme-circle" style="background:#0284c7;"></div>Azul</div>
-            <div id="theme-green" class="theme-opt" onclick="seleccionarTema('green')"><div class="theme-circle" style="background:#10b981;"></div>Verde</div>
-            <div id="theme-purple" class="theme-opt" onclick="seleccionarTema('purple')"><div class="theme-circle" style="background:#a855f7;"></div>Morado</div>
-          </div>
-        </div>
-        <div class="form-group"><label>Subir Logo</label><input type="file" id="shop-logo-file" accept="image/*" onchange="convertirImagenABase64(this, 'shop-logo-preview')"><div style="text-align:center; margin-top:8px;"><img id="shop-logo-preview" class="preview-logo" src="https://via.placeholder.com/80"></div></div>
+        <div class="form-group"><label>WhatsApp</label><input type="text" id="shop-whatsapp"></div>
         <button id="btn-save-shop" class="btn-primary" onclick="guardarAjustesTienda()">GUARDAR AJUSTES</button>
-        <div style="margin-top:16px; background:#111d33; padding:12px; border-radius:8px;">
-          <label style="color:#38bdf8; font-size:13px; font-weight:bold; display:block; margin-bottom:4px;">Enlace de tu Catálogo Público:</label>
-          <a id="shop-public-link" href="#" target="_blank" style="color:var(--accent); font-weight:bold; word-break:break-all; font-size:14px; text-decoration:none;"></a>
-        </div>
       </div>
     </div>
 
-    <!-- PESTAÑA: SERVICIOS -->
-    <div id="tab-prods" class="hidden">
-      <div style="background:#080d1a; padding:16px; border-radius:12px; border:1px solid var(--border); margin-bottom:20px;">
-        <h4 style="color:var(--accent); margin-top:0;">➕ Agregar / Editar Servicio</h4>
-        <input type="hidden" id="prod-edit-idx" value="-1">
-        <div class="form-group"><label>Nombre del Servicio</label><input type="text" id="prod-nombre"></div>
-        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;"><div class="form-group"><label>Precio</label><input type="text" id="prod-precio"></div><div class="form-group"><label>Subir Imagen</label><input type="file" id="prod-file" accept="image/*" onchange="convertirImagenABase64(this, 'prod-preview-img')"></div></div>
-        <img id="prod-preview-img" src="" style="max-height:80px; border-radius:6px; margin-bottom:10px; display:none;">
-        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;"><div class="form-group"><label>Categoría</label><select id="prod-cat"><option value="streaming">Streaming</option><option value="iptv">IPTV</option><option value="musica">Música</option><option value="software">Software</option><option value="gaming">Gaming</option></select></div><div class="form-group"><label>Insignia</label><input type="text" id="prod-tag" placeholder="POPULAR"></div></div>
-        <div class="form-group"><label>Beneficios (separados por coma)</label><input type="text" id="prod-features"></div>
-        <button id="btn-guardar-prod" class="btn-success" onclick="guardarProducto()">AGREGAR / ACTUALIZAR SERVICIO</button>
-      </div>
-      <h4 style="color:#fff;">Mis Servicios Activos</h4><div id="lista-productos"></div>
-    </div>
-
-    <!-- PESTAÑA: COMBOS -->
-    <div id="tab-combos" class="hidden">
-      <div style="background:#080d1a; padding:16px; border-radius:12px; border:1px solid var(--border); margin-bottom:16px;"><h4 style="color:var(--primary); margin-top:0;">🔥 Personalizar Combos</h4><div id="combo-boxes-container"></div><button id="btn-save-combos" class="btn-success" onclick="guardarAjustesCombos()">GUARDAR COMBOS</button></div>
-    </div>
-
-    <!-- PESTAÑA: TEXTOS -->
-    <div id="tab-texts" class="hidden">
-      <div style="background:#080d1a; padding:16px; border-radius:12px; border:1px solid var(--border);"><h4 style="color:var(--primary); margin-top:0;">Personalizar Textos</h4><div class="form-group"><label>Insignia Superior</label><input type="text" id="txt-pill"></div><div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;"><div class="form-group"><label>Título L1</label><input type="text" id="txt-title-1"></div><div class="form-group"><label>Palabra Destacada</label><input type="text" id="txt-title-2"></div></div><div class="form-group"><label>Subtítulo</label><input type="text" id="txt-sub"></div><div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;"><div class="form-group"><label>Símbolo Moneda</label><input type="text" id="txt-currency"></div><div class="form-group"><label>Botón Comprar</label><input type="text" id="txt-btn-buy"></div></div><button id="btn-save-texts" class="btn-primary" onclick="guardarTextos()">GUARDAR TEXTOS</button></div>
-    </div>
-
-    <!-- PESTAÑA: PAGOS -->
-    <div id="tab-payments" class="hidden">
-      <div style="background:#080d1a; padding:16px; border-radius:12px; border:1px solid var(--border);">
-        <h4 style="color:var(--accent); margin-top:0;">💳 Configuración de Pagos</h4>
-        <div class="form-group"><label>Cuentas Bancarias / Billeteras (Texto manual)</label><textarea id="shop-payments" rows="6"></textarea></div>
-        <div style="background:#111625; padding:12px; border-radius:10px; border:1px solid #1e293b; margin-bottom:14px;">
-          <h5 style="color:var(--primary); margin-top:0; margin-bottom:8px;">🔗 Enlace de Pago Directo (Opcional)</h5>
-          <div class="form-group"><label>Texto del Botón (Ej: Pagar con Binance)</label><input type="text" id="shop-pay-btn" placeholder="Ej: Pagar en Línea"></div>
-          <div class="form-group"><label>Link de Pago (URL)</label><input type="text" id="shop-pay-link" placeholder="https://..."></div>
-        </div>
-        <button id="btn-save-payments" class="btn-success" onclick="guardarMetodosPago()">GUARDAR MÉTODOS DE PAGO</button>
-      </div>
-    </div>
-    
-    <!-- PESTAÑA: ESTADISTICAS -->
-    <div id="tab-stats" class="hidden">
-      <div style="background:#080d1a; padding:16px; border-radius:12px; border:1px solid var(--border);">
-        <h4 style="color:var(--primary); margin-top:0;">📊 Rendimiento de Ventas</h4>
-        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-bottom:16px;">
-          <div style="background:#111625; padding:16px; border-radius:10px; text-align:center; border:1px solid #1e293b;"><div style="font-size:26px; font-weight:900; color:#38bdf8; font-family:'Orbitron';" id="stat-vistas">0</div><div style="font-size:12px; color:#94a3b8; margin-top:4px;">Visitas al Catálogo</div></div>
-          <div style="background:#111625; padding:16px; border-radius:10px; text-align:center; border:1px solid #1e293b;"><div style="font-size:26px; font-weight:900; color:#22c55e; font-family:'Orbitron';" id="stat-clics">0</div><div style="font-size:12px; color:#94a3b8; margin-top:4px;">Clics de Compra</div></div>
-        </div>
-        <h5 style="color:#fff; margin-bottom:8px;">Top de Servicios más solicitados:</h5>
-        <div id="stat-top-list" style="background:#111625; border-radius:10px; padding:12px; border:1px solid #1e293b; color:#cbd5e1; font-size:13px;">(Aún no hay datos)</div>
-      </div>
-    </div>
-    
-    <!-- PESTAÑA: EDITOR DE MENSAJES -->
-    <div id="tab-msg" class="hidden">
-      <div style="background:#080d1a; padding:16px; border-radius:12px; border:1px solid var(--border);">
-        <h4 style="color:var(--primary); margin-top:0;">💬 Editor de Plantillas</h4>
-        <div class="form-group"><label>1. Plantilla de Bienvenida (Nuevos datos)</label><textarea id="tpl-bienvenida" rows="4"></textarea></div>
-        <div class="form-group"><label>2. Plantilla de Cobro (Recordatorio de pago)</label><textarea id="tpl-cobro" rows="4"></textarea></div>
-        <div class="form-group"><label>3. Plantilla de Renovación Exitosa</label><textarea id="tpl-renovacion" rows="4"></textarea></div>
-        <div class="form-group"><label>4. Plantilla de Actualización de Datos</label><textarea id="tpl-actualizacion" rows="4"></textarea></div>
-        <button class="btn-success" onclick="guardarPlantillas()">GUARDAR PLANTILLAS</button>
-      </div>
-    </div>
-
-    <!-- PESTAÑA: CLIENTES (CRM BÁSICO) -->
-    <div id="tab-clients" class="hidden">
-      <div style="background:#080d1a; padding:16px; border-radius:12px; border:1px solid var(--border); margin-bottom:20px;">
-        <h4 style="color:var(--accent); margin-top:0;">Gestión de Clientes (Básica)</h4>
-        <p style="color:#94a3b8; font-size:13px;">Si activaste el Gestor Pro, te recomendamos usar la nueva pestaña dorada "Gestor Pro" en el menú.</p>
-        <button class="btn-primary" onclick="cambiarTab('gestor')">IR AL GESTOR PRO</button>
-      </div>
-    </div>
-
+    <div id="tab-prods" class="hidden"><p style="color:#fff;">(Servicios Activo)</p></div>
+    <div id="tab-combos" class="hidden"><p style="color:#fff;">(Combos Activo)</p></div>
+    <div id="tab-texts" class="hidden"><p style="color:#fff;">(Textos Activo)</p></div>
+    <div id="tab-payments" class="hidden"><p style="color:#fff;">(Pagos Activo)</p></div>
+    <div id="tab-clients" class="hidden"><p style="color:#fff;">(CRM Básico Activo)</p></div>
+    <div id="tab-msg" class="hidden"><p style="color:#fff;">(Mensajes Activo)</p></div>
+    <div id="tab-stats" class="hidden"><p style="color:#fff;">(Stats Activo)</p></div>
   </div>
 
   <script>
     if ('serviceWorker' in navigator) { navigator.serviceWorker.register('/sw.js').catch(()=>{}); }
 
     let revendedorActual = null; let slugActual = null; let tiendaActual = {};
-    let tempImgBase64 = null; let tempLogoBase64 = null; let tempComboImgs = [null, null, null];
 
     function toggleMenu() { document.getElementById('nav-menu').classList.toggle('show-menu'); document.getElementById('menu-backdrop').classList.toggle('show'); }
-    
     function cambiarTab(tab) {
       ['shop', 'prods', 'combos', 'texts', 'payments', 'stats', 'clients', 'msg', 'gestor'].forEach(t => { 
-        const el = document.getElementById('tab-' + t);
-        if(el) el.classList.add('hidden'); 
-        const btn = document.getElementById('tab-btn-' + t);
-        if(btn) btn.classList.remove('active'); 
+        const el = document.getElementById('tab-' + t); if(el) el.classList.add('hidden'); 
+        const btn = document.getElementById('tab-btn-' + t); if(btn) btn.classList.remove('active'); 
       });
-      const targetEl = document.getElementById('tab-' + tab);
-      if(targetEl) targetEl.classList.remove('hidden'); 
-      const targetBtn = document.getElementById('tab-btn-' + tab);
-      if(targetBtn) targetBtn.classList.add('active');
+      document.getElementById('tab-' + tab).classList.remove('hidden'); 
+      document.getElementById('tab-btn-' + tab).classList.add('active');
       document.getElementById('nav-menu').classList.remove('show-menu'); 
       document.getElementById('menu-backdrop').classList.remove('show');
     }
 
     function cambiarSubTabGestor(subtab) {
-      ['inicio', 'clientes', 'perfiles', 'cuentas', 'finanzas', 'herramientas'].forEach(t => {
+      ['inicio', 'clientes', 'herramientas'].forEach(t => {
         document.getElementById('g-tab-' + t).classList.add('hidden');
         document.getElementById('g-tab-btn-' + t).classList.remove('active');
       });
@@ -287,136 +188,172 @@
 
     function togglePasswordVisibility(id, btn) { const el = document.getElementById(id); el.type = el.type === 'password' ? 'text' : 'password'; btn.innerText = el.type === 'password' ? '👁️' : '🙈'; }
     function toggleCheckbox(id) { document.getElementById(id).checked = !document.getElementById(id).checked; }
-    function seleccionarTema(color) { document.querySelectorAll('.theme-opt').forEach(el => el.classList.remove('active')); const sel = document.getElementById('theme-' + color); if (sel) sel.classList.add('active'); document.getElementById('shop-tema').value = color; }
 
-    function procesarArchivoExcel(event) {
+    function calcularDias(venceStr) {
+      if (!venceStr) return 0;
+      // Tratar formato dd/mm/yyyy del Excel si es necesario
+      let dateString = venceStr;
+      if (venceStr.includes('/')) {
+        const parts = venceStr.split('/');
+        if (parts.length === 3) dateString = `${parts[2]}-${parts[1].padStart(2,'0')}-${parts[0].padStart(2,'0')}`;
+      }
+      const fechaVence = new Date(dateString);
+      const hoy = new Date(); hoy.setHours(0,0,0,0);
+      return Math.ceil((fechaVence - hoy) / (1000 * 60 * 60 * 24));
+    }
+
+    // ==========================================
+    // IMPORTACIÓN REAL A LA BASE DE DATOS (FASE 3)
+    // ==========================================
+    async function procesarArchivoExcelReal(event) {
       const file = event.target.files[0];
       if (!file) return;
+      
+      const btn = document.getElementById('btn-import-real');
+      btn.innerText = "⏳ IMPORTANDO Y GUARDANDO..."; btn.disabled = true;
+
       const reader = new FileReader();
-      reader.onload = function(e) {
-        const data = new Uint8Array(e.target.result);
-        const workbook = XLSX.read(data, { type: 'array' });
-        const worksheet = workbook.Sheets[workbook.SheetNames[0]];
-        const jsonData = XLSX.utils.sheet_to_json(worksheet, { defval: "" });
-        alert(`✅ ¡Éxito! Se leyeron ${jsonData.length} filas de tu archivo Excel.\n\nEl sistema está listo para importar tus clientes, perfiles y cuentas en la Fase 3.`);
+      reader.onload = async function(e) {
+        try {
+          const data = new Uint8Array(e.target.result);
+          const workbook = XLSX.read(data, { type: 'array' });
+          const worksheet = workbook.Sheets[workbook.SheetNames[0]];
+          const jsonData = XLSX.utils.sheet_to_json(worksheet, { defval: "" });
+          
+          let importados = [];
+          jsonData.forEach((row, idx) => {
+            if(!row['Cliente'] && !row['Correo/Usuario']) return; // Omitir filas vacías
+            
+            // Construir el objeto cliente basado en tus columnas de Excel
+            importados.push({
+              id: 'imp_' + Date.now() + '_' + idx,
+              cliente: String(row['Cliente'] || 'Sin nombre').trim(),
+              whatsapp: String(row['WhatsApp'] || '').trim(),
+              servicio: String(row['Servicio'] || '').trim(),
+              tipo: String(row['Tipo'] || 'PERFIL').trim(),
+              correo: String(row['Correo/Usuario'] || '').trim(),
+              pass: String(row['Contraseña'] || '').trim(),
+              perfil: String(row['Perfil'] || '').trim(),
+              pin: String(row['PIN'] || '').trim(),
+              vence: String(row['Fecha vencimiento'] || '').trim()
+            });
+          });
+
+          // Guardar en la variable local y subir a Firestore
+          tiendaActual.gestorProData = importados;
+          const ok = await persistirEnNube({ gestorProData: importados });
+          
+          btn.innerText = "📥 Importar y Guardar"; btn.disabled = false;
+          
+          if(ok) {
+            alert(`✅ ¡IMPORTACIÓN COMPLETA!\nSe han guardado ${importados.length} registros en tu base de datos.`);
+            renderGestorPro();
+            cambiarSubTabGestor('inicio');
+          }
+        } catch (err) {
+          alert('Error importando: ' + err.message);
+          btn.innerText = "📥 Importar y Guardar"; btn.disabled = false;
+        }
       };
       reader.readAsArrayBuffer(file);
     }
-    
-    function exportarExcel() { alert("La función de descargar archivo Excel estará disponible en la Fase 3."); }
 
-    function calcularDias(vence) { if (!vence) return 999; const diff = new Date(vence) - new Date(); return Math.ceil(diff / (1000 * 60 * 60 * 24)); }
+    // ==========================================
+    // RENDERIZAR INTERFAZ DEL GESTOR (FASE 3)
+    // ==========================================
+    function renderGestorPro() {
+      const listaVentas = document.getElementById('g-lista-ventas');
+      const listaDir = document.getElementById('g-lista-clientes');
+      listaVentas.innerHTML = ''; listaDir.innerHTML = '';
+
+      let datos = tiendaActual.gestorProData || [];
+      const query = document.getElementById('g-buscador').value.toLowerCase().trim();
+
+      if (datos.length === 0) {
+        listaVentas.innerHTML = '<p style="color:#94a3b8; text-align:center;">No hay datos. Ve a Importar para subir tu Excel.</p>';
+        return;
+      }
+
+      datos.forEach(d => {
+        // Filtrar por búsqueda
+        const texto = `${d.cliente} ${d.servicio} ${d.correo}`.toLowerCase();
+        if (query && !texto.includes(query)) return;
+
+        const diasRestantes = calcularDias(d.vence);
+        let colorDias = '#22c55e'; let txtDias = `${diasRestantes} Días`;
+        if (diasRestantes < 0) { colorDias = '#ef4444'; txtDias = 'VENCIDO'; }
+        else if (diasRestantes === 0) { colorDias = '#eab308'; txtDias = 'HOY'; }
+
+        // Tarjeta para INICIO (Ventas Activas)
+        const card = document.createElement('div');
+        card.className = 'g-card';
+        card.innerHTML = `
+          <div class="g-card-top">
+            <div class="g-card-title">${d.cliente}</div>
+            <div style="color:${colorDias}; font-weight:900; font-family:'Orbitron'; font-size:16px;">${txtDias}</div>
+          </div>
+          <div class="g-card-servicio">${d.servicio} (${d.tipo})</div>
+          <div class="g-card-info">📧 <span class="g-card-bold">${d.correo || 'N/A'}</span></div>
+          <div class="g-card-info">🔑 <span class="g-card-bold">${d.pass || 'N/A'}</span></div>
+          <div class="g-card-info">👤 Perfil: <span class="g-card-bold">${d.perfil || '-'}</span> | PIN: <span class="g-card-bold">${d.pin || '-'}</span></div>
+          <div style="display:grid; grid-template-columns: 1fr 1fr; gap:8px; margin-top:12px;">
+             <button style="background:#1e293b; color:#38bdf8; border:1px solid #38bdf8; padding:8px; border-radius:6px; font-weight:bold; font-size:12px;">👤 Enviar Datos</button>
+             <button style="background:#1e293b; color:#eab308; border:1px solid #eab308; padding:8px; border-radius:6px; font-weight:bold; font-size:12px;">⏰ Recordatorio</button>
+          </div>
+        `;
+        listaVentas.appendChild(card);
+
+        // Directorio rápido para CLIENTES
+        const dir = document.createElement('div');
+        dir.style = 'background:#0f172a; border-left:4px solid #38bdf8; padding:12px; margin-bottom:8px; border-radius:6px;';
+        dir.innerHTML = `
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+             <div>
+                <strong style="color:#fff;">${d.cliente}</strong>
+                <div style="color:#94a3b8; font-size:12px; margin-top:4px;">WA: ${d.whatsapp || 'Sin número'}</div>
+             </div>
+             <a href="https://wa.me/${(d.whatsapp || '').replace(/\D/g,'')}" target="_blank" style="background:#22c55e; color:#fff; text-decoration:none; padding:6px 12px; border-radius:6px; font-weight:bold; font-size:12px;">💬 Chat</a>
+          </div>
+        `;
+        listaDir.appendChild(dir);
+      });
+    }
 
     async function iniciarSesion(autoEmail = null, autoPass = null) {
       const email = autoEmail || document.getElementById('email').value.trim(); 
       const pass = autoPass || document.getElementById('password').value.trim(); 
       const recordar = document.getElementById('remember-session').checked;
-      
       if (!email || !pass) { alert('Por favor ingresa correo y contraseña.'); return; }
 
       try {
         const res = await fetch('/api/db'); 
         const db = await res.json();
         const foundSlug = Object.keys(db.revendedores || {}).find(slug => { 
-          const r = db.revendedores[slug]; 
-          return (r.email === email || r.correo === email) && (r.password === pass || r.clave === pass); 
+          const r = db.revendedores[slug]; return (r.email === email || r.correo === email) && (r.password === pass || r.clave === pass); 
         });
 
         if (foundSlug) {
-          slugActual = foundSlug; 
-          revendedorActual = db.revendedores[slugActual];
+          slugActual = foundSlug; revendedorActual = db.revendedores[slugActual];
           if (revendedorActual.activo === false) { alert('Tienda suspendida.'); return; }
           if (recordar || autoEmail) localStorage.setItem('revendedor_session', JSON.stringify({ slug: slugActual, email, pass }));
           
           tiendaActual = (db.tiendas && db.tiendas[slugActual]) ? db.tiendas[slugActual] : {};
-          if (!Array.isArray(tiendaActual.productos)) tiendaActual.productos = [];
-          if (!Array.isArray(tiendaActual.clientes)) tiendaActual.clientes = [];
           
           document.getElementById('login-section').classList.add('hidden'); 
           document.getElementById('dashboard-section').classList.remove('hidden'); 
           pintarDashboard();
-        } else { 
-          if (!autoEmail) alert('Correo o contraseña incorrectos.'); 
-        }
+        } else { if (!autoEmail) alert('Correo o contraseña incorrectos.'); }
       } catch (err) { alert('Error de conexión: ' + err.message); }
     }
-
-    function cerrarSesion() { localStorage.removeItem('revendedor_session'); location.reload(); }
 
     function pintarDashboard() {
       document.getElementById('dash-title').innerText = tiendaActual.nombre || revendedorActual.nombre || slugActual;
       document.getElementById('shop-nombre').value = tiendaActual.nombre || revendedorActual.nombre || '';
-      document.getElementById('shop-whatsapp').value = tiendaActual.whatsapp || revendedorActual.whatsapp || '';
-      document.getElementById('shop-payments').value = tiendaActual.metodosPago || '';
-      document.getElementById('shop-pay-btn').value = tiendaActual.payBtn || '';
-      document.getElementById('shop-pay-link').value = tiendaActual.payLink || '';
-      document.getElementById('shop-apk').value = tiendaActual.apkUrl || '';
       
-      seleccionarTema(tiendaActual.tema || 'orange');
-      document.getElementById('shop-status-online').value = tiendaActual.estadoAtencion || 'online';
-      if (tiendaActual.logo) document.getElementById('dash-logo').src = tiendaActual.logo;
-
-      const txt = tiendaActual.textos || {};
-      document.getElementById('txt-pill').value = txt.pill || "✦ ATENCIÓN 24/7 ✦"; 
-      document.getElementById('txt-title-1').value = txt.title1 || "CATÁLOGO OFICIAL"; 
-      document.getElementById('txt-title-2').value = txt.title2 || "FULL MOVIES EC";
-      document.getElementById('txt-sub').value = txt.sub || "Calidad Garantizada y Entrega Inmediata"; 
-      document.getElementById('txt-currency').value = txt.currency || "$"; 
-      document.getElementById('txt-btn-buy').value = txt.btnBuy || "Comprar ahora!";
-
-      let tag = document.getElementById('dash-countdown'); 
-      let dias = calcularDias(revendedorActual.vencimiento);
-      if (revendedorActual.activo === false || dias <= 0) { tag.className = 'badge-dias red'; tag.innerText = dias<=0 ? '⛔ VENCIDO' : '⛔ SUSPENDIDO'; }
-      else { tag.className = 'badge-dias green'; tag.innerText = `✅ ${dias} DÍAS`; }
-
-      const publicLink = window.location.origin + "/?tienda=" + slugActual;
-      const elLink = document.getElementById("shop-public-link");
-      if (elLink) { elLink.href = publicLink; elLink.innerText = publicLink; }
-
-      // MOSTRAR U OCULTAR BOTÓN DEL GESTOR PRO SEGÚN PERMISO
       const btnGestor = document.getElementById('tab-btn-gestor');
-      if (btnGestor) {
-        if (revendedorActual && revendedorActual.gestorPremium === true) {
-          btnGestor.classList.remove('hidden');
-        } else {
-          btnGestor.classList.add('hidden');
-        }
-      }
-
-      renderProductos();
-      cargarEstadisticas();
-    }
-
-    async function cargarEstadisticas() {
-      try {
-        const res = await fetch("/api/stats/" + slugActual); const data = await res.json();
-        document.getElementById("stat-vistas").innerText = data.vistas || 0; 
-        document.getElementById("stat-clics").innerText = data.clics || 0;
-        const topList = document.getElementById("stat-top-list");
-        if (data.top && Object.keys(data.top).length > 0) {
-          const sorted = Object.entries(data.top).sort((a,b) => b[1] - a[1]);
-          topList.innerHTML = sorted.map(item => `<div style="display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid #1e293b;"><span>${item[0]}</span><strong style="color:var(--primary);">${item[1]} pedidos</strong></div>`).join("");
-        } else { topList.innerHTML = "(Aún no hay datos suficientes)"; }
-      } catch(e) {}
-    }
-
-    function renderProductos() {
-      const lista = document.getElementById('lista-productos'); lista.innerHTML = '';
-      (tiendaActual.productos || []).forEach((p, idx) => {
-        const item = document.createElement('div'); item.className = 'product-card';
-        item.innerHTML = `<img src="${p.img || 'https://via.placeholder.com/65'}" class="product-img"><div style="flex:1;"><strong style="color:#fff; font-size:15px;">${p.nombre}</strong><div style="color:var(--accent); font-weight:bold; font-size:14px;">$${p.precio}</div></div><div style="display:flex; flex-direction:column; gap:6px;"><button style="background:#0284c7; color:#fff; padding:6px; font-size:12px;" onclick="cargarEdicionProducto(${idx})">✏️</button><button style="background:#dc2626; color:#fff; padding:6px; font-size:12px;" onclick="eliminarProducto(${idx})">🗑️</button></div>`;
-        lista.appendChild(item);
-      });
-    }
-
-    function reComprimirBase64(b64) {
-      return new Promise((resolve) => {
-        const img = new Image(); img.onload = () => {
-          const canvas = document.createElement('canvas'); const MAX_WIDTH = 250; const scale = (img.width > MAX_WIDTH) ? (MAX_WIDTH / img.width) : 1;
-          canvas.width = img.width * scale; canvas.height = img.height * scale;
-          const ctx = canvas.getContext('2d'); ctx.drawImage(img, 0, 0, canvas.width, canvas.height); resolve(canvas.toDataURL('image/jpeg', 0.5));
-        }; img.onerror = () => resolve(b64); img.src = b64;
-      });
+      if (btnGestor && revendedorActual.gestorPremium === true) btnGestor.classList.remove('hidden');
+      
+      renderGestorPro();
     }
 
     async function persistirEnNube(datosParciales) {
@@ -426,57 +363,13 @@
         const data = await res.json(); if (!data.success) { alert("❌ Error Firestore."); return false; } return true;
       } catch (err) { alert('❌ Error red.'); return false; }
     }
-
-    function convertirImagenABase64(input, previewId) {
-      if (input.files && input.files[0]) {
-        const reader = new FileReader(); reader.onload = function(e) {
-          const img = new Image(); img.onload = function() {
-            const canvas = document.createElement('canvas'); const MAX_WIDTH = 250; const scale = (img.width > MAX_WIDTH) ? (MAX_WIDTH / img.width) : 1;
-            canvas.width = img.width * scale; canvas.height = img.height * scale;
-            const ctx = canvas.getContext('2d'); ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-            const b64 = canvas.toDataURL('image/jpeg', 0.50); const prev = document.getElementById(previewId); prev.src = b64; prev.style.display = 'block';
-            if (previewId === 'prod-preview-img') tempImgBase64 = b64; if (previewId === 'shop-logo-preview') tempLogoBase64 = b64;
-          }; img.src = e.target.result;
-        }; reader.readAsDataURL(input.files[0]);
-      }
-    }
-
-    function cargarEdicionProducto(idx) {
-      const p = tiendaActual.productos[idx]; document.getElementById('prod-edit-idx').value = idx; document.getElementById('prod-nombre').value = p.nombre; document.getElementById('prod-precio').value = p.precio;
-      document.getElementById('prod-cat').value = p.categoria || 'streaming'; document.getElementById('prod-tag').value = p.tag || ''; document.getElementById('prod-features').value = (p.features || []).join(', ');
-      if (p.img) { document.getElementById('prod-preview-img').src = p.img; document.getElementById('prod-preview-img').style.display = 'block'; tempImgBase64 = p.img; }
-      document.getElementById('btn-guardar-prod').innerText = "ACTUALIZAR SERVICIO"; window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
-
-    async function guardarProducto() {
-      const btn = document.getElementById('btn-guardar-prod'); const idx = parseInt(document.getElementById('prod-edit-idx').value);
-      const nombre = document.getElementById('prod-nombre').value.trim(); const precio = document.getElementById('prod-precio').value.trim();
-      if (!slugActual || !nombre || !precio) return;
-      btn.disabled = true; btn.innerText = "⏳ GUARDANDO...";
-      const features = document.getElementById('prod-features').value.trim() ? document.getElementById('prod-features').value.trim().split(',').map(s => s.trim()).filter(Boolean) : ["Garantía"];
-      const sub = `1 mes · ${document.getElementById('prod-cat').value}`; const img = tempImgBase64 || (idx >= 0 && tiendaActual.productos[idx].img) || 'https://images.unsplash.com/photo-1522869635100-9f4c5e86aa37?w=500';
-      if (!Array.isArray(tiendaActual.productos)) tiendaActual.productos = [];
-      const nuevoObj = { nombre, sub, categoria: document.getElementById('prod-cat').value, tag: document.getElementById('prod-tag').value.trim(), precio, features, img };
-      if (idx >= 0) tiendaActual.productos[idx] = nuevoObj; else tiendaActual.productos.push(nuevoObj);
-      for (let i=0; i<tiendaActual.productos.length; i++) { let pr = tiendaActual.productos[i]; if (pr.img && pr.img.length > 30000 && pr.img.startsWith('data:image')) { try { pr.img = await reComprimirBase64(pr.img); } catch(e){} } }
-      const ok = await persistirEnNube({ productos: tiendaActual.productos });
-      btn.disabled = false; btn.innerText = "AGREGAR / ACTUALIZAR SERVICIO";
-      if (ok) { alert('✅ Guardado!'); document.getElementById('prod-edit-idx').value = "-1"; document.getElementById('prod-nombre').value = ''; document.getElementById('prod-precio').value = ''; document.getElementById('prod-features').value = ''; document.getElementById('prod-preview-img').style.display = 'none'; tempImgBase64 = null; renderProductos(); }
-    }
-
-    async function eliminarProducto(idx) { if (confirm('¿Eliminar servicio?')) { tiendaActual.productos.splice(idx, 1); await persistirEnNube({ productos: tiendaActual.productos }); renderProductos(); } }
     
     async function guardarAjustesTienda() {
-      const btn = document.getElementById('btn-save-shop'); btn.disabled = true; btn.innerText = "⏳ GUARDANDO...";
-      const payload = { nombre: document.getElementById('shop-nombre').value.trim(), whatsapp: document.getElementById('shop-whatsapp').value.trim(), tema: document.getElementById('shop-tema').value, estadoAtencion: document.getElementById('shop-status-online').value, apkUrl: document.getElementById('shop-apk').value.trim() };
-      if (tempLogoBase64) { if (tempLogoBase64.length > 30000) { try { tempLogoBase64 = await reComprimirBase64(tempLogoBase64); } catch(e){} } payload.logo = tempLogoBase64; }
-      tiendaActual = { ...tiendaActual, ...payload }; const ok = await persistirEnNube(payload); btn.disabled = false; btn.innerText = "GUARDAR AJUSTES"; if (ok) { alert('✅ Guardado!'); document.getElementById('dash-title').innerText = payload.nombre; if (tempLogoBase64) document.getElementById('dash-logo').src = tempLogoBase64; }
+      tiendaActual.nombre = document.getElementById('shop-nombre').value.trim();
+      tiendaActual.whatsapp = document.getElementById('shop-whatsapp').value.trim();
+      const ok = await persistirEnNube({ nombre: tiendaActual.nombre, whatsapp: tiendaActual.whatsapp });
+      if (ok) { alert('✅ Guardado!'); document.getElementById('dash-title').innerText = tiendaActual.nombre; }
     }
-    
-    async function guardarAjustesCombos() { alert("Guardado de combos activado."); }
-    async function guardarTextos() { alert("Textos guardados."); }
-    async function guardarMetodosPago() { alert("Métodos de pago guardados."); }
-    async function guardarPlantillas() { alert("Plantillas guardadas."); }
 
     const sesion = localStorage.getItem('revendedor_session'); if (sesion) { try { const p = JSON.parse(sesion); if (p.email && p.pass) iniciarSesion(p.email, p.pass); } catch(e) {} }
   </script>
