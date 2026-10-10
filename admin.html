@@ -1277,5 +1277,194 @@ setInterval(() => {
     }
 }, 2000);
 </script>
+
+<!-- MOTOR_INTELIGENTE_GESTOR -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    // 1. Conectar el botón de "Subir archivo Excel" automáticamente por su texto
+    document.addEventListener('click', (e) => {
+        const text = e.target.innerText || '';
+        const parentText = e.target.closest('div') ? e.target.closest('div').innerText : '';
+        
+        if (text.includes('Subir archivo Excel') || parentText.includes('Subir archivo Excel')) {
+            let input = document.getElementById('gestor-file-upload');
+            if (!input) {
+                input = document.createElement('input');
+                input.type = 'file';
+                input.id = 'gestor-file-upload';
+                input.accept = '.xlsx, .xls, .csv, .json';
+                input.style.display = 'none';
+                input.onchange = window.procesarArchivoExcelReal;
+                document.body.appendChild(input);
+            }
+            input.click();
+        }
+    });
+
+    // 2. Cargar memoria local al iniciar
+    setTimeout(() => {
+        if(window.slugActual) {
+            const localData = localStorage.getItem('gestor_data_' + window.slugActual);
+            if(localData && (!window.tiendaActual || !window.tiendaActual.gestorProData || window.tiendaActual.gestorProData.length === 0)) {
+                if(!window.tiendaActual) window.tiendaActual = {};
+                window.tiendaActual.gestorProData = JSON.parse(localData);
+                window.renderGestorPro();
+            }
+        }
+    }, 1500);
+});
+
+// Función para calcular días
+function calcularDiasG(venceStr) {
+    if (!venceStr) return 0;
+    let d = venceStr;
+    if (d.includes('/')) {
+        let p = d.split('/');
+        if (p.length === 3) d = `${p[2]}-${p[1].padStart(2,'0')}-${p[0].padStart(2,'0')}`;
+    }
+    const f = new Date(d);
+    const h = new Date(); h.setHours(0,0,0,0);
+    return Math.ceil((f - h) / (1000 * 60 * 60 * 24)) || 0;
+}
+
+// Motor de Procesamiento (Excel y JSON)
+window.procesarArchivoExcelReal = async function(event) {
+    const file = event.target.files[0]; 
+    if(!file) return;
+    
+    alert("⏳ LEYENDO ARCHIVO Y GUARDANDO EN LA NUBE...");
+    const reader = new FileReader();
+    reader.onload = async function(e) {
+        try {
+            let arr = [];
+            if (file.name.endsWith('.json')) {
+                arr = JSON.parse(e.target.result);
+            } else {
+                const data = new Uint8Array(e.target.result);
+                const workbook = XLSX.read(data, { type: 'array' });
+                const json = XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]], { defval: "" });
+                
+                json.forEach((r, i) => {
+                    if(!r['Cliente'] && !r['Correo/Usuario']) return;
+                    arr.push({ 
+                        id: 'imp_' + Date.now() + '_' + i, 
+                        cliente: String(r['Cliente'] || '').trim(), 
+                        whatsapp: String(r['WhatsApp'] || '').trim(), 
+                        servicio: String(r['Servicio'] || '').trim(), 
+                        tipo: String(r['Tipo'] || 'PERFIL').trim(), 
+                        correo: String(r['Correo/Usuario'] || '').trim(), 
+                        pass: String(r['Contraseña'] || '').trim(), 
+                        perfil: String(r['Perfil'] || '').trim(), 
+                        pin: String(r['PIN'] || '').trim(), 
+                        vence: String(r['Fecha vencimiento'] || '').trim() 
+                    });
+                });
+            }
+            
+            if(!window.tiendaActual) window.tiendaActual = {};
+            window.tiendaActual.gestorProData = arr;
+            
+            // Blindaje en memoria del celular
+            if(window.slugActual) {
+                localStorage.setItem('gestor_data_' + window.slugActual, JSON.stringify(arr));
+            }
+
+            // Guardado en servidor
+            if(window.persistirEnNube) {
+                await window.persistirEnNube({ gestorProData: arr });
+            }
+            
+            alert(`✅ ¡ÉXITO! ${arr.length} clientes procesados.`); 
+            window.renderGestorPro();
+            
+        } catch(err) { 
+            alert('Error al leer el archivo: ' + err.message); 
+        }
+    };
+    
+    if (file.name.endsWith('.json')) reader.readAsText(file);
+    else reader.readAsArrayBuffer(file);
+};
+
+// Motor de Renderizado de Tarjetas
+window.renderGestorPro = function() {
+    // Buscar dónde poner los datos de forma inteligente sin depender de IDs
+    let contenedor = document.getElementById('g-lista-ventas');
+    
+    if (!contenedor) {
+        // Buscar el contenedor que dice "No hay datos."
+        const divs = Array.from(document.querySelectorAll('div, p')).filter(el => el.innerText && el.innerText.trim() === 'No hay datos.');
+        if(divs.length > 0) {
+            contenedor = divs[0].parentElement;
+        }
+    }
+    
+    if(!contenedor) return;
+
+    let dat = (window.tiendaActual && window.tiendaActual.gestorProData) ? window.tiendaActual.gestorProData : [];
+    
+    if(dat.length === 0) {
+        return; // Dejar la pantalla como está si no hay datos
+    }
+
+    // Buscador
+    const inputQ = document.querySelector('input[placeholder*="Buscar"]');
+    const q = inputQ ? inputQ.value.toLowerCase().trim() : '';
+
+    let htmlTarjetas = '';
+    
+    dat.forEach(d => {
+        if(q && !(d.cliente+' '+d.servicio+' '+d.correo).toLowerCase().includes(q)) return;
+        
+        const diasRestantes = calcularDiasG(d.vence);
+        let colorDias = '#22c55e'; let txtDias = diasRestantes + ' Días';
+        
+        if (diasRestantes < 0) { colorDias = '#ef4444'; txtDias = 'VENCIDO'; } 
+        else if (diasRestantes === 0) { colorDias = '#eab308'; txtDias = 'HOY'; }
+
+        const wnum = (d.whatsapp || '').replace(/\D/g,'');
+        const msg = `https://wa.me/${wnum}?text=Hola ${encodeURIComponent(d.cliente || '')}, tus accesos son:%0A%0A%E2%9C%89%EF%B8%8F Correo: ${d.correo || ''}%0A%F0%9F%94%91 Clave: ${d.pass || ''}%0A%F0%9F%91%A4 Perfil: ${d.perfil || ''}%0A%F0%9F%93%8C PIN: ${d.pin || ''}`;
+
+        htmlTarjetas += `
+        <div style="background:#080d1a; border:1px solid #1e293b; border-radius:12px; padding:14px; margin-bottom:12px; box-shadow: 0 4px 10px rgba(0,0,0,0.3);">
+            <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #1e293b; padding-bottom:8px; margin-bottom:8px;">
+                <strong style="color:#fff; font-size:15px; font-family:'Rajdhani', sans-serif;">${d.cliente || 'Sin Nombre'}</strong>
+                <strong style="color:${colorDias}; font-weight:900; font-family:'Orbitron', sans-serif; font-size:14px; background: rgba(0,0,0,0.3); padding:4px 8px; border-radius:6px;">${txtDias}</strong>
+            </div>
+            <div style="color:#38bdf8; font-size:12px; font-weight:bold; background:#111d33; padding:4px 8px; border-radius:6px; display:inline-block; margin-bottom:6px;">${d.servicio} (${d.tipo})</div>
+            <div style="color:#94a3b8; font-size:12px; margin-bottom:4px;">📧 <b style="color:#cbd5e1">${d.correo || 'N/A'}</b></div>
+            <div style="color:#94a3b8; font-size:12px; margin-bottom:4px;">🔑 <b style="color:#cbd5e1">${d.pass || 'N/A'}</b></div>
+            <div style="color:#94a3b8; font-size:12px;">👤 Perfil: <b style="color:#cbd5e1">${d.perfil || '-'}</b> | PIN: <b style="color:#cbd5e1">${d.pin || '-'}</b></div>
+            
+            <div style="margin-top:12px;">
+                <a href="${msg}" target="_blank" style="display:block; width:100%; background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%); color:#fff; padding:10px; border-radius:8px; font-weight:bold; font-size:13px; text-decoration:none; text-align:center; font-family:'Orbitron', sans-serif; box-shadow: 0 4px 10px rgba(2, 132, 199, 0.3);">ENVIAR DATOS A WHATSAPP</a>
+            </div>
+        </div>`;
+    });
+    
+    // Si la búsqueda no arroja nada
+    if (htmlTarjetas === '') {
+        htmlTarjetas = '<p style="text-align:center; color:#94a3b8; padding:20px;">No se encontraron resultados.</p>';
+    }
+
+    // Insertar manteniendo la zona de subir archivo si existe
+    const dragZone = contenedor.querySelector('div[style*="dashed"]');
+    if (dragZone) {
+        contenedor.innerHTML = htmlTarjetas;
+        contenedor.appendChild(dragZone);
+    } else {
+        contenedor.innerHTML = htmlTarjetas;
+    }
+};
+
+// Escuchar la barra de búsqueda en tiempo real
+setTimeout(() => {
+    const inputQ = document.querySelector('input[placeholder*="Buscar"]');
+    if(inputQ) {
+        inputQ.addEventListener('input', window.renderGestorPro);
+    }
+}, 2000);
+</script>
 </body>
 </html>
