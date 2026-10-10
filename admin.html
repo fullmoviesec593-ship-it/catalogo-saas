@@ -32,14 +32,6 @@
     .nav-tab.active { background: #1e293b; color: var(--primary); border-color: var(--primary); }
     .menu-backdrop { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 999; backdrop-filter: blur(2px); }
     .menu-backdrop.show { display: block; }
-    .product-card { background: #080d1a; border: 1px solid var(--border); border-radius: 12px; padding: 14px; margin-bottom: 12px; display: flex; gap: 14px; align-items: center; }
-    .product-img { width: 65px; height: 65px; border-radius: 8px; object-fit: cover; border: 1px solid #334155; }
-    .preview-logo { width: 75px; height: 75px; border-radius: 50%; object-fit: cover; border: 2px solid var(--primary); margin: 8px 0; }
-    .combo-edit-box { background: #080d1a; border: 1px solid var(--border); border-radius: 12px; padding: 16px; margin-bottom: 18px; }
-    .theme-selector { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-top: 6px; }
-    .theme-opt { border: 2px solid #1e293b; border-radius: 10px; padding: 10px 6px; text-align: center; cursor: pointer; font-size: 12px; font-weight: bold; background: #080d1a; display: flex; flex-direction: column; align-items: center; gap: 6px; transition: all 0.2s; }
-    .theme-circle { width: 22px; height: 22px; border-radius: 50%; border: 2px solid #fff; }
-    .theme-opt.active { border-color: #fff; box-shadow: 0 0 12px rgba(255,255,255,0.3); }
     .badge-dias { display: inline-flex; align-items: center; gap: 5px; font-family: 'Orbitron', sans-serif; font-size: 11px; font-weight: 800; padding: 4px 9px; border-radius: 6px; }
     .badge-dias.green { background: rgba(34, 197, 94, 0.15); color: #4ade80; border: 1px solid #22c55e; }
     .badge-dias.red { background: rgba(239, 68, 68, 0.2); color: #f87171; border: 1px solid #ef4444; }
@@ -107,7 +99,7 @@
       <div id="tab-btn-msg" class="nav-tab" onclick="cambiarTab('msg')" style="color:#38bdf8; border-color:#38bdf8;">💬 EDITOR MENSAJES</div>
       <div id="tab-btn-stats" class="nav-tab" onclick="cambiarTab('stats')" style="color:#22c55e; border-color:#22c55e;">📊 ESTADÍSTICAS</div>
       
-      <!-- BOTÓN GESTOR PRO (OCULTO POR DEFECTO) -->
+      <!-- BOTÓN GESTOR PRO -->
       <div id="tab-btn-gestor" class="nav-tab hidden" onclick="cambiarTab('gestor')" style="background: linear-gradient(90deg, #422006 0%, #1e293b 100%); color:#facc15; border: 1px solid #ca8a04; margin-top:10px;">👑 GESTOR PRO</div>
     </div>
 
@@ -159,14 +151,14 @@
       </div>
     </div>
 
-    <!-- PESTAÑAS BASICAS -->
-    <div id="tab-prods" class="hidden"><p style="color:#fff;">(Servicios Activo)</p></div>
-    <div id="tab-combos" class="hidden"><p style="color:#fff;">(Combos Activo)</p></div>
-    <div id="tab-texts" class="hidden"><p style="color:#fff;">(Textos Activo)</p></div>
-    <div id="tab-payments" class="hidden"><p style="color:#fff;">(Pagos Activo)</p></div>
-    <div id="tab-clients" class="hidden"><p style="color:#fff;">(CRM Básico Activo)</p></div>
-    <div id="tab-msg" class="hidden"><p style="color:#fff;">(Mensajes Activo)</p></div>
-    <div id="tab-stats" class="hidden"><p style="color:#fff;">(Stats Activo)</p></div>
+    <!-- PESTAÑAS BASICAS (ocultas para no hacer ruido) -->
+    <div id="tab-prods" class="hidden"><p style="color:#fff;">(Servicios)</p></div>
+    <div id="tab-combos" class="hidden"><p style="color:#fff;">(Combos)</p></div>
+    <div id="tab-texts" class="hidden"><p style="color:#fff;">(Textos)</p></div>
+    <div id="tab-payments" class="hidden"><p style="color:#fff;">(Pagos)</p></div>
+    <div id="tab-clients" class="hidden"><p style="color:#fff;">(CRM Básico)</p></div>
+    <div id="tab-msg" class="hidden"><p style="color:#fff;">(Mensajes)</p></div>
+    <div id="tab-stats" class="hidden"><p style="color:#fff;">(Stats)</p></div>
 
   </div>
 
@@ -213,13 +205,13 @@
     }
 
     // ==========================================
-    // IMPORTACIÓN REAL A LA BASE DE DATOS (FASE 3)
+    // IMPORTACIÓN REAL A LA BASE DE DATOS
     // ==========================================
     async function procesarArchivoExcelReal(event) {
       const file = event.target.files[0];
       if (!file) return;
       
-      alert("⏳ IMPORTANDO DATOS A LA NUBE...\nDependiendo de tu conexión, esto tomará unos segundos. Presiona Aceptar y espera el mensaje de éxito.");
+      alert("⏳ IMPORTANDO DATOS...\nPresiona Aceptar y espera unos segundos.");
 
       const reader = new FileReader();
       reader.onload = async function(e) {
@@ -251,7 +243,7 @@
           const ok = await persistirEnNube({ gestorProData: importados });
           
           if(ok) {
-            alert(`✅ ¡IMPORTACIÓN COMPLETA!\nSe han guardado ${importados.length} registros en tu base de datos.`);
+            alert(`✅ ¡COMPLETADO!\nSe guardaron ${importados.length} registros en tu base de datos.`);
             renderGestorPro();
             cambiarSubTabGestor('inicio');
           }
@@ -263,7 +255,7 @@
     }
 
     // ==========================================
-    // RENDERIZAR INTERFAZ DEL GESTOR (FASE 3)
+    // RENDERIZAR INTERFAZ DEL GESTOR (TARJETAS)
     // ==========================================
     function renderGestorPro() {
       const listaVentas = document.getElementById('g-lista-ventas');
@@ -361,6 +353,12 @@
       document.getElementById('dash-title').innerText = tiendaActual.nombre || revendedorActual.nombre || slugActual;
       document.getElementById('shop-nombre').value = tiendaActual.nombre || revendedorActual.nombre || '';
       
+      // ESTA ES LA LÍNEA QUE BORRÉ POR ACCIDENTE Y QUE CAUSABA EL ERROR "CALCULANDO"
+      let tag = document.getElementById('dash-countdown');
+      let dias = calcularDias(revendedorActual.vencimiento);
+      if (revendedorActual.activo === false || dias <= 0) { tag.className = 'badge-dias red'; tag.innerText = dias<=0 ? '⛔ VENCIDO' : '⛔ SUSPENDIDO'; }
+      else { tag.className = 'badge-dias green'; tag.innerText = `✅ ${dias} DÍAS`; }
+
       const btnGestor = document.getElementById('tab-btn-gestor');
       if (btnGestor && revendedorActual.gestorPremium === true) btnGestor.classList.remove('hidden');
       
