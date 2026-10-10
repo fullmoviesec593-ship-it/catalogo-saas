@@ -152,6 +152,25 @@
       cursor: pointer;
     }
   </style>
+
+<style>
+  .btn-hamburguesa { background: transparent; border: none; color: #38bdf8; font-size: 28px; cursor: pointer; margin-right: 12px; display: flex; align-items: center; justify-content: center; z-index: 1001;}
+  .menu-flotante { display: none !important; flex-direction: column !important; position: absolute; top: 75px; left: 16px; background: #0f172a; padding: 15px; border-radius: 12px; border: 1px solid #1e293b; z-index: 1000; box-shadow: 0 15px 40px rgba(0,0,0,0.9); width: 240px; overflow-x: hidden !important; }
+  .menu-flotante.show { display: flex !important; }
+  .menu-flotante > div { width: 100%; text-align: left; padding: 12px 14px; background: #080d1a; border-radius: 8px; font-weight: bold; color: #94a3b8; border: 1px solid transparent; margin-bottom: 8px; }
+  .backdrop { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.6); z-index: 999; backdrop-filter: blur(2px); }
+  .backdrop.show { display: block; }
+  
+  .gestor-header { background: linear-gradient(135deg, #ca8a04 0%, #854d0e 100%); padding: 16px; border-radius: 12px; margin-bottom: 16px; box-shadow: 0 4px 15px rgba(234, 179, 8, 0.2); }
+  .gestor-title { margin: 0; color: #fff; font-size: 18px; display: flex; align-items: center; gap: 8px; font-family: 'Orbitron', sans-serif;}
+  .gestor-tabs-nav { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 8px; margin-bottom: 16px; }
+  .gestor-sub-tab { background: #0f172a; border: 1px solid #1e293b; color: #94a3b8; padding: 8px 16px; border-radius: 8px; font-size: 13px; font-weight: bold; cursor: pointer; white-space: nowrap; }
+  .gestor-sub-tab.active { background: #1e293b; color: #eab308; border-color: #eab308; }
+  .gestor-import-box { border: 2px dashed #334155; padding: 24px; text-align: center; border-radius: 12px; background: #080d1a; margin-top: 16px; cursor: pointer; transition: 0.3s; }
+  .g-card { background: #080d1a; border: 1px solid #1e293b; border-radius: 12px; padding: 14px; margin-bottom: 12px; position: relative; }
+</style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+
 </head>
 <body>
 
@@ -207,8 +226,40 @@
       <div id="tab-btn-payments" class="nav-tab" onclick="cambiarTab('payments')">💳 PAGOS</div>
     </div>
 
-    <!-- PESTAÑA: TIENDA & LOGO -->
-    <div id="tab-shop">
+    <div id="tab-btn-gestor" class="nav-tab hidden" onclick="cambiarTab('gestor')" style="background: linear-gradient(90deg, #422006 0%, #1e293b 100%); color:#facc15; border: 1px solid #ca8a04; margin-top:10px;">👑 GESTOR PRO</div>
+</div>
+<!-- PESTAÑA: TIENDA & LOGO -->
+    
+<!-- PESTAÑA GESTOR PRO -->
+<div id="tab-gestor" class="hidden" style="display:none;">
+    <div class="gestor-header">
+        <h3 class="gestor-title">👑 Gestor de Inventario Pro</h3>
+        <p style="margin: 4px 0 0 0; color: #fef08a; font-size: 12px;">Control total de Clientes, Perfiles y Finanzas</p>
+    </div>
+    <div class="gestor-tabs-nav">
+        <div id="g-tab-btn-inicio" class="gestor-sub-tab active" onclick="cambiarSubTabGestor('inicio')">Inicio</div>
+        <div id="g-tab-btn-clientes" class="gestor-sub-tab" onclick="cambiarSubTabGestor('clientes')">Directorio</div>
+        <div id="g-tab-btn-herramientas" class="gestor-sub-tab" onclick="cambiarSubTabGestor('herramientas')">Importar</div>
+    </div>
+    <div id="g-tab-inicio">
+        <h4 style="color:#fff; margin-top:0;">Ventas Activas</h4>
+        <input type="text" id="g-buscador" placeholder="🔍 Buscar cliente o servicio..." style="width:100%; padding:10px; margin-bottom:12px; border-radius:8px; border:1px solid #1e293b; background:#080d1a; color:#fff;" oninput="renderGestorPro()">
+        <div id="g-lista-ventas"></div>
+    </div>
+    <div id="g-tab-clientes" style="display:none;">
+        <h4 style="color:#fff; margin-top:0;">Directorio de Clientes</h4>
+        <div id="g-lista-clientes"></div>
+    </div>
+    <div id="g-tab-herramientas" style="display:none;">
+        <h4 style="color:#fff; margin-top:0;">Migración de Datos</h4>
+        <input type="file" id="excel-upload" accept=".xlsx, .xls, .csv" style="display:none;" onchange="procesarArchivoExcelReal(event)">
+        <div class="gestor-import-box" onclick="document.getElementById('excel-upload').click()">
+            <div style="font-size:30px; margin-bottom:10px;">📄</div><strong style="color:#fff;">Toca aquí para subir tu archivo Excel</strong>
+        </div>
+    </div>
+</div>
+
+<div id="tab-shop">
       <div style="background:#080d1a; padding:16px; border-radius:12px; border:1px solid var(--border);">
         <h4 style="color:var(--primary); margin-top:0;">Datos Personales y Logo de la Tienda</h4>
         <div class="form-group">
