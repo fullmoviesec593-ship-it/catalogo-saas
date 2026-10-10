@@ -1550,3 +1550,135 @@ document.addEventListener('DOMContentLoaded', () => {
     }, 2500);
 });
 </script>
+
+<!-- PASO2_FIX_FECHAS_Y_MEMORIA -->
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    
+    // 1. MEJORAR EL CÁLCULO DE FECHAS PARA ENTENDER EL CÓDIGO DE EXCEL
+    window.calcularDiasG = function(venceStr) {
+        if (!venceStr) return 0;
+        let d = String(venceStr).trim();
+        
+        // Si Excel lo pasó como número serial oculto (ej: 45200)
+        if (!isNaN(d) && Number(d) > 20000) {
+            const dateObj = new Date(Math.round((Number(d) - 25569) * 86400 * 1000));
+            d = dateObj.toISOString().split('T')[0];
+        } else if (d.includes('/')) {
+            let p = d.split('/');
+            if (p[2] && p[2].length === 4) { // Formato DD/MM/YYYY
+                d = `${p[2]}-${p[1].padStart(2,'0')}-${p[0].padStart(2,'0')}`;
+            }
+        } else if (d.includes('-')) {
+            let p = d.split('-');
+            if (p[2] && p[2].length === 4) { // Formato DD-MM-YYYY
+                d = `${p[2]}-${p[1].padStart(2,'0')}-${p[0].padStart(2,'0')}`;
+            }
+        }
+
+        const f = new Date(d);
+        if (isNaN(f.getTime())) return 0; // Evitar errores si la celda está rota
+
+        const h = new Date(); h.setHours(0,0,0,0);
+        return Math.ceil((f - h) / (1000 * 60 * 60 * 24));
+    };
+
+    // 2. FORZAR EXTRACCIÓN DE TEXTO PURO AL IMPORTAR EL EXCEL
+    if (typeof window.procesarArchivoExcelReal === 'function') {
+        window.procesarArchivoExcelReal = async function(event) {
+            const file = event.target.files[0]; 
+            if(!file) return;
+            
+            alert("⏳ IMPORTANDO DATOS Y CALCULANDO FECHAS EXACTAS...");
+            const reader = new FileReader();
+            reader.onload = async function(e) {
+                try {
+                    let arr = [];
+                    if (file.name.endsWith('.json')) {
+                        arr = JSON.parse(e.target.result);
+                    } else {
+                        const data = new Uint8Array(e.target.result);
+                        const workbook = XLSX.read(data, { type: 'array' });
+                        
+                        // raw: false fuerza a leer las celdas tal cual se ven visualmente en Excel
+                        const json = XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]], { raw: false, dateNF: 'yyyy-mm-dd', defval: "" });
+                        
+                        json.forEach((r, i) => {
+                            if(!r['Cliente'] && !r['Correo/Usuario']) return;
+                            
+                            // Buscar la columna de fecha sin importar cómo la llamaste
+                            let fechaV = r['Fecha vencimiento'] || r['Fecha de vencimiento'] || r['Vence'] || r['vence'] || '';
+                            
+                            arr.push({ 
+                                id: 'imp_' + Date.now() + '_' + i, 
+                                cliente: String(r['Cliente'] || '').trim(), 
+                                whatsapp: String(r['WhatsApp'] || '').trim(), 
+                                servicio: String(r['Servicio'] || '').trim(), 
+                                tipo: String(r['Tipo'] || 'PERFIL').trim(), 
+                                correo: String(r['Correo/Usuario'] || '').trim(), 
+                                pass: String(r['Contraseña'] || '').trim(), 
+                                perfil: String(r['Perfil'] || '').trim(), 
+                                pin: String(r['PIN'] || '').trim(), 
+                                vence: String(fechaV).trim() 
+                            });
+                        });
+                    }
+                    
+                    if(!window.tiendaActual) window.tiendaActual = {};
+                    window.tiendaActual.gestorProData = arr;
+                    
+                    // Guardar fuertemente en local y subir a la nube
+                    if(window.slugActual) localStorage.setItem('gestor_data_' + window.slugActual, JSON.stringify(arr));
+                    if(window.persistirEnNube) await window.persistirEnNube({ gestorProData: arr });
+                    
+                    alert(`✅ ¡ÉXITO! ${arr.length} clientes importados con fechas correctas.`); 
+                    if (typeof window.renderGestorPro === 'function') window.renderGestorPro();
+                    if (typeof window.aplicarFiltrosVisuales === 'function') window.aplicarFiltrosVisuales();
+                    
+                } catch(err) { 
+                    alert('Error al leer el archivo Excel: ' + err.message); 
+                }
+            };
+            if (file.name.endsWith('.json')) reader.readAsText(file);
+            else reader.readAsArrayBuffer(file);
+        };
+    }
+
+    // 3. VIGÍA DE MEMORIA (EVITA QUE SE BORRE AL CAMBIAR DE PESTAÑA)
+    setInterval(() => {
+        // Detectar si la pantalla del Gestor Pro está abierta
+        const gestorHeader = document.querySelector('h3');
+        if (gestorHeader && gestorHeader.innerText.includes('Gestor de Inventario Pro')) {
+            const contenedorGestor = gestorHeader.closest('div').parentElement;
+            
+            // Si el Gestor está visible
+            if (contenedorGestor && contenedorGestor.style.display !== 'none') {
+                const tarjetasVisibles = document.querySelectorAll('.g-card');
+                
+                // Si el panel original borró las tarjetas, el vigía las restaura
+                if (tarjetasVisibles.length === 0) {
+                    // Rescatar datos de la memoria blindada
+                    if ((!window.tiendaActual || !window.tiendaActual.gestorProData || window.tiendaActual.gestorProData.length === 0) && window.slugActual) {
+                        const local = localStorage.getItem('gestor_data_' + window.slugActual);
+                        if (local) {
+                            if (!window.tiendaActual) window.tiendaActual = {};
+                            window.tiendaActual.gestorProData = JSON.parse(local);
+                        }
+                    }
+                    
+                    // Redibujar mágicamente
+                    if (window.tiendaActual && window.tiendaActual.gestorProData && window.tiendaActual.gestorProData.length > 0) {
+                        if (typeof window.renderGestorPro === 'function') {
+                            window.renderGestorPro();
+                            if (typeof window.aplicarFiltrosVisuales === 'function') {
+                                setTimeout(window.aplicarFiltrosVisuales, 100);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }, 1000);
+    
+});
+</script>
