@@ -2042,3 +2042,49 @@ document.addEventListener('DOMContentLoaded', () => {
     }, 500);
 });
 </script>
+
+<!-- BOTON FLOTANTE SOLDADO -->
+<button id="btn-fab-gestor" class="btn-nuevo-gestor" style="display:none; position:fixed; bottom:80px; right:20px; z-index:9999;" onclick="abrirModalCorrecto()">+</button>
+
+<script>
+window.abrirModalCorrecto = function() {
+    if(typeof window.cerrarModalesG === 'function') window.cerrarModalesG();
+    const p = window.filtroActivoDOM || 'INICIO';
+    
+    if (p === 'SERVICIOS') { 
+        const m = document.getElementById('m-servicio');
+        if(m) m.style.display = 'flex'; 
+    } else if (p === 'CLIENTES' || p === 'INICIO') { 
+        const m = document.getElementById('m-cliente');
+        if(m) m.style.display = 'flex'; 
+    } else if (p === 'PERFILES') { 
+        if(typeof window.switchTipoCuenta === 'function') window.switchTipoCuenta('PERFIL'); 
+        const m = document.getElementById('m-cuenta');
+        if(m) m.style.display = 'flex'; 
+    } else if (p === 'CUENTAS') { 
+        if(typeof window.switchTipoCuenta === 'function') window.switchTipoCuenta('CUENTA'); 
+        const m = document.getElementById('m-cuenta');
+        if(m) m.style.display = 'flex'; 
+    }
+};
+
+// Vigía blindado para mostrar/ocultar el botón
+setInterval(() => {
+    const fab = document.getElementById('btn-fab-gestor');
+    const buscador = document.querySelector('input[placeholder*="Buscar"]');
+    const viejoBtn = document.getElementById('btn-add-cliente');
+    
+    if (viejoBtn) viejoBtn.style.display = 'none'; // Asegurar que el viejo no moleste
+    
+    if (fab && buscador) {
+        // Si el buscador está visible en pantalla, mostramos el botón flotante
+        if (buscador.offsetParent !== null) {
+            fab.style.display = 'flex';
+        } else {
+            fab.style.display = 'none';
+        }
+    } else if (fab) {
+        fab.style.display = 'none';
+    }
+}, 300);
+</script>
