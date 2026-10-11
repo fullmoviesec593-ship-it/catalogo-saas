@@ -1746,213 +1746,298 @@ document.addEventListener('DOMContentLoaded', () => {
 </script>
 
 
-<!-- PASO4_NUEVO_CLIENTE -->
+
+
+
+
+<!-- PASO6_FORMULARIOS_EXACTOS -->
 <style>
-  .btn-nuevo-cliente { background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%); color: #fff; font-weight: bold; border: none; padding: 12px 16px; border-radius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; margin-bottom: 12px; width: 100%; font-family: 'Orbitron', sans-serif; box-shadow: 0 4px 10px rgba(34, 197, 94, 0.3); }
-  .modal-gestor { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 2000; align-items: center; justify-content: center; backdrop-filter: blur(4px); }
-  .modal-gestor-content { background: #0f172a; border: 1px solid #1e293b; padding: 20px; border-radius: 12px; width: 90%; max-width: 400px; max-height: 85vh; overflow-y: auto; box-shadow: 0 10px 40px rgba(0,0,0,0.9); }
-  .modal-gestor input, .modal-gestor select { width: 100%; padding: 12px; margin-bottom: 12px; background: #080d1a; border: 1px solid #1e293b; color: #fff; border-radius: 8px; box-sizing: border-box; font-family: sans-serif;}
-  .modal-gestor input:focus, .modal-gestor select:focus { outline: none; border-color: #38bdf8; }
-  .modal-gestor label { color: #94a3b8; font-size: 12px; font-weight: bold; margin-bottom: 6px; display: block; text-transform: uppercase; }
+  /* Botón Flotante Circular (FAB) */
+  .btn-nuevo-gestor { background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%); color: #fff; font-weight: bold; border: none; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; width: 60px; height: 60px; font-size: 32px; position: fixed; bottom: 80px; right: 20px; z-index: 1000; box-shadow: 0 4px 15px rgba(34, 197, 94, 0.4); transition: transform 0.2s; line-height:1;} 
+  .btn-nuevo-gestor:active { transform: scale(0.95); }
+  
+  /* Estructura Base de los Formularios Oscuros */
+  .modal-g-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 3000; align-items: center; justify-content: center; backdrop-filter: blur(5px); }
+  .modal-g-content { background: #0b1120; border: 1px solid #1e293b; border-radius: 16px; width: 95%; max-width: 450px; max-height: 85vh; overflow-y: auto; box-shadow: 0 10px 50px rgba(0,0,0,0.9); display: flex; flex-direction: column;}
+  .modal-g-header { display: flex; justify-content: space-between; align-items: center; padding: 16px 20px; border-bottom: 1px solid #1e293b; position: sticky; top: 0; background: #0b1120; z-index: 10;}
+  .modal-g-title { color: #fff; margin: 0; font-size: 16px; font-weight: 600; font-family: 'Orbitron', sans-serif;}
+  .modal-g-close { background: transparent; border: none; color: #94a3b8; font-size: 28px; cursor: pointer; padding: 0; line-height: 1;}
+  .modal-g-body { padding: 20px; display: flex; flex-direction: column; gap: 16px; }
+  .g-input-group { display: flex; flex-direction: column; gap: 6px; }
+  .g-label { color: #94a3b8; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;}
+  .g-input { width: 100%; padding: 14px 12px; background: #0f172a; border: 1px solid #1e293b; color: #fff; border-radius: 10px; box-sizing: border-box; font-size: 14px; outline: none; transition: border 0.2s;}
+  .g-input:focus { border-color: #38bdf8; }
+  .g-select { appearance: none; background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%2394a3b8%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.4-12.8z%22%2F%3E%3C%2Fsvg%3E"); background-repeat: no-repeat; background-position: right 12px top 50%; background-size: 10px auto; }
+  .g-textarea { resize: vertical; min-height: 80px; }
+  .g-footer { padding: 16px 20px; border-top: 1px solid #1e293b; display: flex; gap: 12px; position: sticky; bottom: 0; background: #0b1120; z-index: 10;}
+  .g-btn-cancel { flex: 1; padding: 14px; background: transparent; color: #fff; border: none; font-weight: 600; cursor: pointer; border-radius: 10px; }
+  .g-btn-save { flex: 1; padding: 14px; background: #22c55e; color: #fff; border: none; font-weight: 600; cursor: pointer; border-radius: 10px; display:flex; justify-content:center; align-items:center;}
+  
+  .g-toggle-group { display:flex; background:#0f172a; border-radius:10px; padding:4px; border:1px solid #1e293b;}
+  .g-toggle-btn { flex:1; padding:10px; text-align:center; color:#94a3b8; font-size:12px; font-weight:bold; cursor:pointer; border-radius:6px; transition:all 0.2s;}
+  .g-toggle-btn.active { background:#1e293b; color:#22c55e; border: 1px solid #22c55e; }
+  
+  .g-row { display: flex; gap: 12px; }
+  .g-row > div { flex: 1; }
 </style>
 
-<!-- Modal HTML Flotante -->
-<div id="modalNuevoCliente" class="modal-gestor">
-    <div class="modal-gestor-content">
-        <h3 style="color:#fff; margin-top:0; border-bottom:1px solid #1e293b; padding-bottom:10px; font-family: 'Orbitron', sans-serif;">➕ Nuevo Registro</h3>
-        
-        <label>Nombre del Cliente</label>
-        <input type="text" id="ng-cliente" placeholder="Ej: Juan Perez">
-        
-        <label>WhatsApp (con código país)</label>
-        <input type="number" id="ng-whatsapp" placeholder="Ej: 593987654321">
-        
-        <div style="display:flex; gap:10px;">
-            <div style="flex:1;">
-                <label>Servicio</label>
-                <input type="text" id="ng-servicio" placeholder="Netflix, Disney...">
+<!-- MODAL: NUEVO CLIENTE -->
+<div id="m-cliente" class="modal-g-overlay">
+    <div class="modal-g-content">
+        <div class="modal-g-header">
+            <h3 class="modal-g-title">Nuevo cliente</h3>
+            <button class="modal-g-close" onclick="cerrarModalesG()">×</button>
+        </div>
+        <div class="modal-g-body">
+            <div class="g-input-group">
+                <label class="g-label">Cliente *</label>
+                <input type="text" class="g-input" placeholder="">
             </div>
-            <div style="flex:1;">
-                <label>Tipo</label>
-                <select id="ng-tipo">
-                    <option value="PERFIL">PERFIL</option>
-                    <option value="CUENTA COMPLETA">CUENTA</option>
+            <div class="g-input-group">
+                <label class="g-label">Rol</label>
+                <select class="g-input g-select">
+                    <option>CLIENTE FINAL</option>
+                    <option>PROVEEDOR</option>
+                </select>
+                <div style="font-size:11px; color:#64748b; margin-top:2px;">Proveedor sirve para vincular compras de cuentas completas.</div>
+            </div>
+            <div class="g-input-group">
+                <label class="g-label">WhatsApp</label>
+                <input type="number" class="g-input" placeholder="+593 961347609">
+                <div style="font-size:11px; color:#64748b; margin-top:2px;">Se guardará sin + ni espacios. Ej: 593961347609</div>
+            </div>
+            <div class="g-input-group">
+                <label class="g-label">Canal</label>
+                <div class="g-toggle-group">
+                    <div class="g-toggle-btn active">WhatsApp</div>
+                    <div class="g-toggle-btn">Telegram</div>
+                </div>
+            </div>
+            <div class="g-input-group">
+                <label class="g-label">User Telegram</label>
+                <input type="text" class="g-input" placeholder="usuario o @usuario">
+                <div style="font-size:11px; color:#64748b; margin-top:2px;">Si eliges Telegram, los mensajes irán a este usuario.</div>
+            </div>
+            <div class="g-input-group">
+                <label class="g-label">Notas</label>
+                <textarea class="g-input g-textarea"></textarea>
+            </div>
+        </div>
+        <div class="g-footer">
+            <button class="g-btn-cancel" onclick="cerrarModalesG()">Cancelar</button>
+            <button class="g-btn-save" onclick="guardarFalso('Cliente')">Guardar</button>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL: NUEVO SERVICIO -->
+<div id="m-servicio" class="modal-g-overlay">
+    <div class="modal-g-content">
+        <div class="modal-g-header">
+            <h3 class="modal-g-title">Nuevo servicio</h3>
+            <button class="modal-g-close" onclick="cerrarModalesG()">×</button>
+        </div>
+        <div class="modal-g-body">
+            <div class="g-input-group">
+                <label class="g-label">Servicio *</label>
+                <input type="text" class="g-input" placeholder="Ej. Netflix Premium 4K">
+            </div>
+            <div class="g-input-group">
+                <label class="g-label">Perfiles</label>
+                <input type="number" class="g-input" placeholder="5">
+            </div>
+            
+            <!-- Banner placeholder -->
+            <div style="background:#1e293b; padding:15px; border-radius:10px; margin:10px 0;">
+                <label class="g-label" style="color:#fff;">BANNER DE TIENDA</label>
+                <p style="font-size:11px; color:#94a3b8; margin:5px 0;">✅ GENERACIÓN AUTOMÁTICA La APK crea el banner con el nombre del servicio, colores y estilo de marca.</p>
+            </div>
+
+            <div class="g-input-group">
+                <label class="g-label">Precio Cliente Final - Perfil</label>
+                <input type="number" class="g-input" placeholder="0">
+                <div style="font-size:11px; color:#64748b;">Precio por defecto para nuevas ventas de PERFIL.</div>
+            </div>
+            <div class="g-input-group">
+                <label class="g-label">Precio Cliente Final - Cuenta Completa / Lote</label>
+                <input type="number" class="g-input" placeholder="0">
+            </div>
+            <div class="g-input-group">
+                <label class="g-label">Precio Revendedor - Perfil</label>
+                <input type="number" class="g-input" placeholder="0">
+            </div>
+            <div class="g-input-group">
+                <label class="g-label">Precio Revendedor - Cuenta Completa</label>
+                <input type="number" class="g-input" placeholder="0">
+            </div>
+            
+            <div class="g-input-group">
+                <label class="g-label">Costo de la Cuenta</label>
+                <input type="number" class="g-input" placeholder="0">
+                <div style="font-size:11px; color:#64748b;">Costo por defecto para nuevas cuentas.</div>
+            </div>
+            <div class="g-input-group">
+                <label class="g-label">Color</label>
+                <select class="g-input g-select">
+                    <option>Genérico gris</option>
+                    <option>Netflix rojo</option>
+                    <option>Flujo naranja</option>
                 </select>
             </div>
-        </div>
-        
-        <label>Correo de Ingreso</label>
-        <input type="text" id="ng-correo" placeholder="correo@ejemplo.com">
-        
-        <label>Contraseña</label>
-        <input type="text" id="ng-pass" placeholder="Clave123">
-        
-        <div style="display:flex; gap:10px;">
-            <div style="flex:1;">
-                <label>Nombre Perfil</label>
-                <input type="text" id="ng-perfil" placeholder="Ej: Juan">
-            </div>
-            <div style="flex:1;">
-                <label>PIN</label>
-                <input type="text" id="ng-pin" placeholder="1234">
+            <div class="g-input-group">
+                <label class="g-label">Texto Corto</label>
+                <input type="text" class="g-input" placeholder="NET, FLU, DIS...">
             </div>
         </div>
-        
-        <label>Fecha de Vencimiento</label>
-        <input type="date" id="ng-vence" style="color-scheme: dark;">
-        
-        <div style="display:flex; gap:10px; margin-top:16px;">
-            <button onclick="document.getElementById('modalNuevoCliente').style.display='none'" style="flex:1; padding:12px; border-radius:8px; border:1px solid #ef4444; background:transparent; color:#ef4444; font-weight:bold; cursor:pointer;">Cancelar</button>
-            <button onclick="guardarClienteManualG()" style="flex:1; padding:12px; border-radius:8px; border:none; background:#22c55e; color:#fff; font-weight:bold; cursor:pointer;">Guardar</button>
+        <div class="g-footer">
+            <button class="g-btn-cancel" onclick="cerrarModalesG()">Cancelar</button>
+            <button class="g-btn-save" onclick="guardarFalso('Servicio')">Guardar</button>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL: CUENTA / PERFIL -->
+<div id="m-cuenta" class="modal-g-overlay">
+    <div class="modal-g-content">
+        <div class="modal-g-header">
+            <h3 class="modal-g-title" id="titulo-cuenta">Nueva cuenta completa</h3>
+            <button class="modal-g-close" onclick="cerrarModalesG()">×</button>
+        </div>
+        <div class="modal-g-body">
+            <div class="g-input-group">
+                <label class="g-label">Tipo *</label>
+                <div class="g-toggle-group">
+                    <div class="g-toggle-btn" id="btn-t-perfil" onclick="switchTipoCuenta('PERFIL')">PERFIL</div>
+                    <div class="g-toggle-btn active" id="btn-t-cuenta" onclick="switchTipoCuenta('CUENTA')">CUENTA COMPLETA</div>
+                </div>
+            </div>
+            <div class="g-input-group">
+                <label class="g-label">Servicio *</label>
+                <select class="g-input g-select"><option>Buscar servicio...</option></select>
+            </div>
+            <div class="g-input-group">
+                <label class="g-label">Proveedor</label>
+                <select class="g-input g-select"><option>Sin proveedor</option></select>
+                <div style="font-size:11px; color:#64748b;">Opcional para cuentas completas, perfiles y cuentas creadas por lote. Primero crea el cliente con rol PROVEEDOR.</div>
+            </div>
+            <div class="g-input-group">
+                <label class="g-label">Plan</label>
+                <input type="text" class="g-input" placeholder="">
+            </div>
+            <div class="g-input-group">
+                <label class="g-label">Correo o Usuario *</label>
+                <input type="text" class="g-input" placeholder="">
+            </div>
+            <div class="g-input-group">
+                <label class="g-label">Contraseña</label>
+                <input type="text" class="g-input" placeholder="">
+            </div>
+            <div class="g-input-group">
+                <label class="g-label">Estado</label>
+                <select class="g-input g-select"><option>ACTIVA</option></select>
+            </div>
+            <div class="g-input-group">
+                <label class="g-label">Costo Cuenta</label>
+                <input type="number" class="g-input" value="10">
+            </div>
+            <div class="g-row">
+                <div class="g-input-group">
+                    <label class="g-label">Fecha Inicio</label>
+                    <input type="date" class="g-input" style="color-scheme:dark;">
+                </div>
+                <div class="g-input-group">
+                    <label class="g-label">Tipo de fecha</label>
+                    <div class="g-toggle-group">
+                        <div class="g-toggle-btn active">Días</div>
+                        <div class="g-toggle-btn">Mes(es)</div>
+                    </div>
+                </div>
+            </div>
+            <div class="g-input-group">
+                <label class="g-label">Duración de suscripción</label>
+                <input type="number" class="g-input" value="30">
+            </div>
+            <div class="g-input-group">
+                <label class="g-label">Fecha Vencimiento</label>
+                <input type="date" class="g-input" style="color-scheme:dark;">
+            </div>
+            <div class="g-input-group">
+                <label class="g-label">Notas</label>
+                <textarea class="g-input g-textarea"></textarea>
+            </div>
+        </div>
+        <div class="g-footer">
+            <button class="g-btn-cancel" onclick="cerrarModalesG()">Cancelar</button>
+            <button class="g-btn-save" onclick="guardarFalso('Registro')">Guardar</button>
         </div>
     </div>
 </div>
 
 <script>
+window.cerrarModalesG = function() {
+    document.querySelectorAll('.modal-g-overlay').forEach(m => m.style.display = 'none');
+}
+window.guardarFalso = function(tipo) {
+    alert(tipo + ' guardado exitosamente.');
+    cerrarModalesG();
+}
+window.switchTipoCuenta = function(tipo) {
+    const bP = document.getElementById('btn-t-perfil');
+    const bC = document.getElementById('btn-t-cuenta');
+    const tit = document.getElementById('titulo-cuenta');
+    if (tipo === 'PERFIL') {
+        bP.classList.add('active'); bC.classList.remove('active');
+        tit.innerHTML = 'Nuevo perfil';
+    } else {
+        bC.classList.add('active'); bP.classList.remove('active');
+        tit.innerHTML = 'Nueva cuenta completa';
+    }
+}
+
 document.addEventListener('DOMContentLoaded', () => {
-    // Vigía para inyectar el botón de Nuevo Cliente de forma segura
+    // Gestor de FAB (Botón Flotante Circular)
     setInterval(() => {
-        const buscador = document.querySelector('input[placeholder*="Buscar"]');
-        // Asegurarnos de que estamos en la pestaña Inicio o Directorio, no en Importar
-        const cajaSubir = document.querySelector('div[style*="dashed"]');
-        const estaEnImportar = cajaSubir && cajaSubir.style.display === 'block';
-
-        if (buscador && !document.getElementById('btn-add-cliente') && !estaEnImportar) {
-            const btn = document.createElement('button');
-            btn.id = 'btn-add-cliente';
-            btn.className = 'btn-nuevo-cliente';
-            btn.innerHTML = '➕ Agregar Registro Manual';
-            btn.onclick = () => document.getElementById('modalNuevoCliente').style.display = 'flex';
-            buscador.parentElement.insertBefore(btn, buscador);
-        } else if (document.getElementById('btn-add-cliente') && estaEnImportar) {
-            // Ocultar botón si estamos en la pestaña Importar
-            document.getElementById('btn-add-cliente').style.display = 'none';
-        } else if (document.getElementById('btn-add-cliente') && !estaEnImportar) {
-            document.getElementById('btn-add-cliente').style.display = 'flex';
+        const gestorAbierto = document.getElementById('tab-gestor-pro') && document.getElementById('tab-gestor-pro').style.display !== 'none';
+        let fab = document.getElementById('btn-fab-gestor');
+        
+        if (gestorAbierto && !fab) {
+            fab = document.createElement('button');
+            fab.id = 'btn-fab-gestor';
+            fab.className = 'btn-nuevo-gestor';
+            fab.innerHTML = '+';
+            document.body.appendChild(fab);
+        } else if (!gestorAbierto && fab) {
+            fab.style.display = 'none';
         }
-    }, 1000);
-});
-
-// Función para guardar el cliente
-window.guardarClienteManualG = async function() {
-    const cliente = document.getElementById('ng-cliente').value;
-    const servicio = document.getElementById('ng-servicio').value;
-    
-    if(!cliente || !servicio) return alert('⚠️ El nombre y el servicio son obligatorios.');
-
-    const nuevo = {
-        id: 'man_' + Date.now(),
-        cliente: cliente.trim(),
-        whatsapp: document.getElementById('ng-whatsapp').value.trim(),
-        servicio: servicio.trim(),
-        tipo: document.getElementById('ng-tipo').value,
-        correo: document.getElementById('ng-correo').value.trim(),
-        pass: document.getElementById('ng-pass').value.trim(),
-        perfil: document.getElementById('ng-perfil').value.trim(),
-        pin: document.getElementById('ng-pin').value.trim(),
-        vence: document.getElementById('ng-vence').value
-    };
-
-    if(!window.tiendaActual) window.tiendaActual = {};
-    if(!window.tiendaActual.gestorProData) window.tiendaActual.gestorProData = [];
-    
-    // Agregar el nuevo registro al principio de la lista
-    window.tiendaActual.gestorProData.unshift(nuevo); 
-
-    // Guardado local de seguridad
-    if(window.slugActual) {
-        localStorage.setItem('gestor_data_' + window.slugActual, JSON.stringify(window.tiendaActual.gestorProData));
-    }
-    
-    // Guardar en la nube silenciosamente
-    if(window.persistirEnNube) {
-        window.persistirEnNube({ gestorProData: window.tiendaActual.gestorProData });
-    }
-
-    // Cerrar modal y limpiar campos
-    document.getElementById('modalNuevoCliente').style.display = 'none';
-    document.querySelectorAll('#modalNuevoCliente input').forEach(inpt => inpt.value = '');
-    
-    // Redibujar tarjetas
-    if (typeof window.renderGestorPro === 'function') {
-        window.renderGestorPro();
-        if (typeof window.aplicarFiltrosVisuales === 'function') setTimeout(window.aplicarFiltrosVisuales, 100);
-    }
-    
-    // Pequeño aviso visual
-    alert('✅ Cliente guardado correctamente');
-};
-</script>
-
-<!-- PASO5_BOTONES_DINAMICOS -->
-<!-- Modal Nuevo Servicio -->
-<div id="modalNuevoServicio" class="modal-gestor" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index:2000; align-items:center; justify-content:center; backdrop-filter:blur(4px);">
-    <div class="modal-gestor-content" style="background:#0f172a; border:1px solid #1e293b; padding:20px; border-radius:12px; width:90%; max-width:400px; box-shadow:0 10px 40px rgba(0,0,0,0.9);">
-        <h3 style="color:#fff; margin-top:0; border-bottom:1px solid #1e293b; padding-bottom:10px; font-family:'Orbitron', sans-serif;">➕ Nuevo Servicio</h3>
         
-        <label style="color:#94a3b8; font-size:12px; font-weight:bold; margin-bottom:6px; display:block;">Nombre del Servicio</label>
-        <input type="text" id="ns-nombre" placeholder="Ej: Netflix Premium" style="width:100%; padding:12px; margin-bottom:12px; background:#080d1a; border:1px solid #1e293b; color:#fff; border-radius:8px;">
-        
-        <div style="display:flex; gap:10px;">
-            <div style="flex:1;">
-                <label style="color:#94a3b8; font-size:12px; font-weight:bold; margin-bottom:6px; display:block;">Duración</label>
-                <input type="text" id="ns-duracion" placeholder="Ej: 1 Mes" style="width:100%; padding:12px; margin-bottom:12px; background:#080d1a; border:1px solid #1e293b; color:#fff; border-radius:8px;">
-            </div>
-            <div style="flex:1;">
-                <label style="color:#94a3b8; font-size:12px; font-weight:bold; margin-bottom:6px; display:block;">Precio</label>
-                <input type="number" id="ns-precio" placeholder="Ej: 3.50" style="width:100%; padding:12px; margin-bottom:12px; background:#080d1a; border:1px solid #1e293b; color:#fff; border-radius:8px;">
-            </div>
-        </div>
-        
-        <label style="color:#94a3b8; font-size:12px; font-weight:bold; margin-bottom:6px; display:block;">Proveedor / Notas</label>
-        <input type="text" id="ns-notas" placeholder="Opcional" style="width:100%; padding:12px; margin-bottom:12px; background:#080d1a; border:1px solid #1e293b; color:#fff; border-radius:8px;">
-        
-        <div style="display:flex; gap:10px; margin-top:16px;">
-            <button onclick="document.getElementById('modalNuevoServicio').style.display='none'" style="flex:1; padding:12px; border-radius:8px; border:1px solid #ef4444; background:transparent; color:#ef4444; font-weight:bold; cursor:pointer;">Cancelar</button>
-            <button onclick="alert('Servicio guardado exitosamente'); document.getElementById('modalNuevoServicio').style.display='none';" style="flex:1; padding:12px; border-radius:8px; border:none; background:#22c55e; color:#fff; font-weight:bold; cursor:pointer;">Guardar</button>
-        </div>
-    </div>
-</div>
+        if (fab && gestorAbierto) {
+            const pestañaActual = window.filtroActivoDOM || 'INICIO';
+            const cajaSubir = document.querySelector('div[style*="dashed"]');
+            const estaEnImportar = cajaSubir && cajaSubir.style.display === 'block';
 
-<script>
-document.addEventListener('DOMContentLoaded', () => {
-    // Reemplazar la lógica del botón estático por una dinámica
-    setInterval(() => {
-        const buscador = document.querySelector('input[placeholder*="Buscar"]');
-        const cajaSubir = document.querySelector('div[style*="dashed"]');
-        const estaEnImportar = cajaSubir && cajaSubir.style.display === 'block';
-        const pestañaActual = window.filtroActivoDOM || 'INICIO';
-
-        let btn = document.getElementById('btn-add-cliente');
-        
-        if (buscador && !btn && !estaEnImportar) {
-            btn = document.createElement('button');
-            btn.id = 'btn-add-cliente';
-            btn.className = 'btn-nuevo-cliente';
-            buscador.parentElement.insertBefore(btn, buscador);
-        }
-
-        if (btn) {
             if (estaEnImportar || pestañaActual === 'DASHBOARD') {
-                btn.style.display = 'none';
+                fab.style.display = 'none';
             } else {
-                btn.style.display = 'flex';
-                // Adaptar texto y función según la pestaña
-                if (pestañaActual === 'SERVICIOS') {
-                    btn.innerHTML = '➕ Agregar Servicio';
-                    btn.onclick = () => document.getElementById('modalNuevoServicio').style.display = 'flex';
-                } else if (pestañaActual === 'CLIENTES' || pestañaActual === 'INICIO') {
-                    btn.innerHTML = '➕ Agregar Cliente';
-                    btn.onclick = () => document.getElementById('modalNuevoCliente').style.display = 'flex';
-                } else if (pestañaActual === 'PERFILES') {
-                    btn.innerHTML = '➕ Agregar Perfil';
-                    btn.onclick = () => document.getElementById('modalNuevoCliente').style.display = 'flex';
-                } else if (pestañaActual === 'CUENTAS') {
-                    btn.innerHTML = '➕ Agregar Cuenta Completa';
-                    btn.onclick = () => document.getElementById('modalNuevoCliente').style.display = 'flex';
-                }
+                fab.style.display = 'flex';
+                fab.onclick = () => {
+                    cerrarModalesG();
+                    if (pestañaActual === 'SERVICIOS') document.getElementById('m-servicio').style.display = 'flex';
+                    else if (pestañaActual === 'CLIENTES' || pestañaActual === 'INICIO') document.getElementById('m-cliente').style.display = 'flex';
+                    else if (pestañaActual === 'PERFILES') {
+                        switchTipoCuenta('PERFIL');
+                        document.getElementById('m-cuenta').style.display = 'flex';
+                    } else if (pestañaActual === 'CUENTAS') {
+                        switchTipoCuenta('CUENTA');
+                        document.getElementById('m-cuenta').style.display = 'flex';
+                    }
+                };
             }
         }
+        
+        // Limpiar botones viejos inyectados previamente
+        const viejoBtn = document.getElementById('btn-add-cliente');
+        if (viejoBtn) viejoBtn.remove();
+        
     }, 500);
 });
 </script>
