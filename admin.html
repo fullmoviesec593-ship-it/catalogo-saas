@@ -1683,3 +1683,64 @@ document.addEventListener('DOMContentLoaded', () => {
     
 });
 </script>
+
+<!-- PASO3_DASHBOARD_E_IMPORTAR -->
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    
+    // 1. LÓGICA DEL DASHBOARD (Contar tarjetas en tiempo real)
+    setInterval(() => {
+        const tarjetas = document.querySelectorAll('.g-card, div[style*="border-radius:12px"]');
+        let total = 0;
+        let vencidos = 0;
+
+        tarjetas.forEach(card => {
+            if (card.innerText && card.innerText.includes('ENVIAR DATOS A WHATSAPP')) {
+                total++;
+                if (card.innerText.includes('VENCIDO')) {
+                    vencidos++;
+                }
+            }
+        });
+
+        const dTot = document.getElementById('dash-tot-clientes');
+        const dVen = document.getElementById('dash-tot-vencidos');
+        
+        // Si los contadores existen en el HTML, actualizarlos
+        if (dTot) dTot.innerText = total;
+        if (dVen) dVen.innerText = vencidos;
+        
+    }, 1000); // Revisa cada segundo
+
+    // 2. LÓGICA DE LA PESTAÑA IMPORTAR (Ocultar/Mostrar elementos)
+    document.addEventListener('click', (e) => {
+        const tab = e.target.closest('div');
+        if (!tab || !tab.innerText) return;
+        
+        const txt = tab.innerText.toUpperCase().trim();
+        
+        // Identificar los elementos a ocultar/mostrar
+        const buscador = document.querySelector('input[placeholder*="Buscar"]');
+        const listaTarjetas = document.getElementById('g-lista-ventas') || document.querySelector('div[style*="border-radius:12px"]')?.parentElement;
+        const cajaSubir = document.querySelector('div[style*="dashed"]') || document.querySelector('div[onclick*="gestor-file-upload"]');
+        
+        if (txt === 'IMPORTAR' || txt === 'HERRAMIENTAS') {
+            if (buscador) buscador.style.display = 'none';
+            if (listaTarjetas) listaTarjetas.style.display = 'none';
+            if (cajaSubir) cajaSubir.style.display = 'block';
+        } 
+        else if (txt === 'INICIO' || txt === 'CLIENTES' || txt === 'PERFILES' || txt === 'CUENTAS COMPLETAS') {
+            if (buscador) buscador.style.display = 'block';
+            if (listaTarjetas) listaTarjetas.style.display = 'block';
+            if (cajaSubir) cajaSubir.style.display = 'none';
+        }
+    });
+    
+    // Ocultar la caja de subir Excel por defecto al inicio
+    setTimeout(() => {
+        const cajaSubir = document.querySelector('div[style*="dashed"]') || document.querySelector('div[onclick*="gestor-file-upload"]');
+        if (cajaSubir) cajaSubir.style.display = 'none';
+    }, 500);
+
+});
+</script>
