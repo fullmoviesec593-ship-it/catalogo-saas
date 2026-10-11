@@ -1883,3 +1883,76 @@ window.guardarClienteManualG = async function() {
     alert('✅ Cliente guardado correctamente');
 };
 </script>
+
+<!-- PASO5_BOTONES_DINAMICOS -->
+<!-- Modal Nuevo Servicio -->
+<div id="modalNuevoServicio" class="modal-gestor" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index:2000; align-items:center; justify-content:center; backdrop-filter:blur(4px);">
+    <div class="modal-gestor-content" style="background:#0f172a; border:1px solid #1e293b; padding:20px; border-radius:12px; width:90%; max-width:400px; box-shadow:0 10px 40px rgba(0,0,0,0.9);">
+        <h3 style="color:#fff; margin-top:0; border-bottom:1px solid #1e293b; padding-bottom:10px; font-family:'Orbitron', sans-serif;">➕ Nuevo Servicio</h3>
+        
+        <label style="color:#94a3b8; font-size:12px; font-weight:bold; margin-bottom:6px; display:block;">Nombre del Servicio</label>
+        <input type="text" id="ns-nombre" placeholder="Ej: Netflix Premium" style="width:100%; padding:12px; margin-bottom:12px; background:#080d1a; border:1px solid #1e293b; color:#fff; border-radius:8px;">
+        
+        <div style="display:flex; gap:10px;">
+            <div style="flex:1;">
+                <label style="color:#94a3b8; font-size:12px; font-weight:bold; margin-bottom:6px; display:block;">Duración</label>
+                <input type="text" id="ns-duracion" placeholder="Ej: 1 Mes" style="width:100%; padding:12px; margin-bottom:12px; background:#080d1a; border:1px solid #1e293b; color:#fff; border-radius:8px;">
+            </div>
+            <div style="flex:1;">
+                <label style="color:#94a3b8; font-size:12px; font-weight:bold; margin-bottom:6px; display:block;">Precio</label>
+                <input type="number" id="ns-precio" placeholder="Ej: 3.50" style="width:100%; padding:12px; margin-bottom:12px; background:#080d1a; border:1px solid #1e293b; color:#fff; border-radius:8px;">
+            </div>
+        </div>
+        
+        <label style="color:#94a3b8; font-size:12px; font-weight:bold; margin-bottom:6px; display:block;">Proveedor / Notas</label>
+        <input type="text" id="ns-notas" placeholder="Opcional" style="width:100%; padding:12px; margin-bottom:12px; background:#080d1a; border:1px solid #1e293b; color:#fff; border-radius:8px;">
+        
+        <div style="display:flex; gap:10px; margin-top:16px;">
+            <button onclick="document.getElementById('modalNuevoServicio').style.display='none'" style="flex:1; padding:12px; border-radius:8px; border:1px solid #ef4444; background:transparent; color:#ef4444; font-weight:bold; cursor:pointer;">Cancelar</button>
+            <button onclick="alert('Servicio guardado exitosamente'); document.getElementById('modalNuevoServicio').style.display='none';" style="flex:1; padding:12px; border-radius:8px; border:none; background:#22c55e; color:#fff; font-weight:bold; cursor:pointer;">Guardar</button>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    // Reemplazar la lógica del botón estático por una dinámica
+    setInterval(() => {
+        const buscador = document.querySelector('input[placeholder*="Buscar"]');
+        const cajaSubir = document.querySelector('div[style*="dashed"]');
+        const estaEnImportar = cajaSubir && cajaSubir.style.display === 'block';
+        const pestañaActual = window.filtroActivoDOM || 'INICIO';
+
+        let btn = document.getElementById('btn-add-cliente');
+        
+        if (buscador && !btn && !estaEnImportar) {
+            btn = document.createElement('button');
+            btn.id = 'btn-add-cliente';
+            btn.className = 'btn-nuevo-cliente';
+            buscador.parentElement.insertBefore(btn, buscador);
+        }
+
+        if (btn) {
+            if (estaEnImportar || pestañaActual === 'DASHBOARD') {
+                btn.style.display = 'none';
+            } else {
+                btn.style.display = 'flex';
+                // Adaptar texto y función según la pestaña
+                if (pestañaActual === 'SERVICIOS') {
+                    btn.innerHTML = '➕ Agregar Servicio';
+                    btn.onclick = () => document.getElementById('modalNuevoServicio').style.display = 'flex';
+                } else if (pestañaActual === 'CLIENTES' || pestañaActual === 'INICIO') {
+                    btn.innerHTML = '➕ Agregar Cliente';
+                    btn.onclick = () => document.getElementById('modalNuevoCliente').style.display = 'flex';
+                } else if (pestañaActual === 'PERFILES') {
+                    btn.innerHTML = '➕ Agregar Perfil';
+                    btn.onclick = () => document.getElementById('modalNuevoCliente').style.display = 'flex';
+                } else if (pestañaActual === 'CUENTAS') {
+                    btn.innerHTML = '➕ Agregar Cuenta Completa';
+                    btn.onclick = () => document.getElementById('modalNuevoCliente').style.display = 'flex';
+                }
+            }
+        }
+    }, 500);
+});
+</script>
