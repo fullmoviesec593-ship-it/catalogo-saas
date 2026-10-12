@@ -1694,5 +1694,232 @@ setInterval(() => {
     }
 }, 300);
 </script>
+
+<!-- SISTEMA_PRO_UNIFICADO -->
+<style>
+  /* Botón Flotante Circular (FAB) */
+  .btn-nuevo-gestor { background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%); color: #fff; font-weight: bold; border: none; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; width: 60px; height: 60px; font-size: 32px; position: fixed; bottom: 80px; right: 20px; z-index: 1000; box-shadow: 0 4px 15px rgba(34, 197, 94, 0.4); transition: transform 0.2s; line-height:1;} 
+  .btn-nuevo-gestor:active { transform: scale(0.95); }
+  
+  /* Modales Oscuros Premium */
+  .modal-g-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 3000; align-items: center; justify-content: center; backdrop-filter: blur(5px); }
+  .modal-g-content { background: #0b1120; border: 1px solid #1e293b; border-radius: 16px; width: 95%; max-width: 450px; max-height: 85vh; overflow-y: auto; box-shadow: 0 10px 50px rgba(0,0,0,0.9); display: flex; flex-direction: column;}
+  .modal-g-header { display: flex; justify-content: space-between; align-items: center; padding: 16px 20px; border-bottom: 1px solid #1e293b; position: sticky; top: 0; background: #0b1120; z-index: 10;}
+  .modal-g-title { color: #fff; margin: 0; font-size: 16px; font-weight: 600; font-family: 'Orbitron', sans-serif;}
+  .modal-g-close { background: transparent; border: none; color: #94a3b8; font-size: 28px; cursor: pointer; padding: 0; line-height: 1;}
+  .modal-g-body { padding: 20px; display: flex; flex-direction: column; gap: 16px; }
+  .g-input-group { display: flex; flex-direction: column; gap: 6px; }
+  .g-label { color: #94a3b8; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;}
+  .g-input { width: 100%; padding: 14px 12px; background: #0f172a; border: 1px solid #1e293b; color: #fff; border-radius: 10px; box-sizing: border-box; font-size: 14px; outline: none; transition: border 0.2s;}
+  .g-input:focus { border-color: #38bdf8; }
+  .g-footer { padding: 16px 20px; border-top: 1px solid #1e293b; display: flex; gap: 12px; position: sticky; bottom: 0; background: #0b1120; z-index: 10;}
+  .g-btn-cancel { flex: 1; padding: 14px; background: transparent; color: #fff; border: none; font-weight: 600; cursor: pointer; border-radius: 10px; }
+  .g-btn-save { flex: 1; padding: 14px; background: #22c55e; color: #fff; border: none; font-weight: 600; cursor: pointer; border-radius: 10px; }
+</style>
+
+<!-- BOTÓN FAB FLOTANTE -->
+<button id="btn-fab-gestor" class="btn-nuevo-gestor" style="display:none;" onclick="abrirModalPorPestaña()">+</button>
+
+<!-- 1. MODAL: NUEVO CLIENTE -->
+<div id="modal-g-cliente" class="modal-g-overlay">
+    <div class="modal-g-content">
+        <div class="modal-g-header">
+            <h3 class="modal-g-title">Nuevo cliente</h3>
+            <button class="modal-g-close" onclick="cerrarModalesG()">×</button>
+        </div>
+        <div class="modal-g-body">
+            <div class="g-input-group">
+                <label class="g-label">Cliente *</label>
+                <input type="text" class="g-input" placeholder="Nombre del cliente">
+            </div>
+            <div class="g-input-group">
+                <label class="g-label">WhatsApp</label>
+                <input type="number" class="g-input" placeholder="+593 961347609">
+            </div>
+        </div>
+        <div class="g-footer">
+            <button class="g-btn-cancel" onclick="cerrarModalesG()">Cancelar</button>
+            <button class="g-btn-save" onclick="guardarFalsoG('Cliente')">Guardar</button>
+        </div>
+    </div>
+</div>
+
+<!-- 2. MODAL: NUEVO SERVICIO -->
+<div id="modal-g-servicio" class="modal-g-overlay">
+    <div class="modal-g-content">
+        <div class="modal-g-header">
+            <h3 class="modal-g-title">Nuevo servicio</h3>
+            <button class="modal-g-close" onclick="cerrarModalesG()">×</button>
+        </div>
+        <div class="modal-g-body">
+            <div class="g-input-group">
+                <label class="g-label">Servicio *</label>
+                <input type="text" class="g-input" placeholder="Ej. Netflix Premium 4K">
+            </div>
+            <div class="g-input-group">
+                <label class="g-label">Perfiles</label>
+                <input type="number" class="g-input" placeholder="5">
+            </div>
+            <div class="g-input-group">
+                <label class="g-label">Precio Cliente Final</label>
+                <input type="number" class="g-input" placeholder="0">
+            </div>
+        </div>
+        <div class="g-footer">
+            <button class="g-btn-cancel" onclick="cerrarModalesG()">Cancelar</button>
+            <button class="g-btn-save" onclick="guardarFalsoG('Servicio')">Guardar</button>
+        </div>
+    </div>
+</div>
+
+<!-- 3. MODAL: NUEVA CUENTA / PERFIL -->
+<div id="modal-g-cuenta" class="modal-g-overlay">
+    <div class="modal-g-content">
+        <div class="modal-g-header">
+            <h3 class="modal-g-title" id="titulo-m-cuenta">Nueva cuenta completa</h3>
+            <button class="modal-g-close" onclick="cerrarModalesG()">×</button>
+        </div>
+        <div class="modal-g-body">
+            <div class="g-input-group">
+                <label class="g-label">Servicio *</label>
+                <input type="text" class="g-input" placeholder="Ej. Spotify">
+            </div>
+            <div class="g-input-group">
+                <label class="g-label">Correo o Usuario *</label>
+                <input type="text" class="g-input" placeholder="">
+            </div>
+            <div class="g-input-group">
+                <label class="g-label">Contraseña</label>
+                <input type="text" class="g-input" placeholder="">
+            </div>
+        </div>
+        <div class="g-footer">
+            <button class="g-btn-cancel" onclick="cerrarModalesG()">Cancelar</button>
+            <button class="g-btn-save" onclick="guardarFalsoG('Cuenta/Perfil')">Guardar</button>
+        </div>
+    </div>
+</div>
+
+<script>
+window.pestañaActualGestor = 'INICIO';
+
+// Lógica Maestra: Cambio de Pestañas
+window.cambiarSubTabGestor = function(sub) {
+    window.pestañaActualGestor = sub.toUpperCase();
+    
+    // 1. Limpiar todos los botones (Bordes grises)
+    const tabs = ['dashboard', 'inicio', 'servicios', 'clientes', 'perfiles', 'cuentas', 'importar', 'directorio'];
+    tabs.forEach(s => {
+        const btn = document.getElementById('g-tab-btn-' + s);
+        if(btn) {
+            btn.classList.remove('active');
+            btn.style.border = '1px solid #1e293b';
+            btn.style.color = '#94a3b8';
+        }
+    });
+    
+    // 2. Encender el botón tocado (Borde amarillo)
+    const actBtn = document.getElementById('g-tab-btn-' + sub);
+    if (actBtn) {
+        actBtn.classList.add('active');
+        actBtn.style.border = '1px solid #eab308';
+        actBtn.style.color = '#eab308';
+    }
+
+    // 3. Ocultar todos los contenedores primero
+    const contInicio = document.getElementById('g-tab-inicio');
+    const contDashboard = document.getElementById('g-tab-dashboard');
+    const contImportar = document.getElementById('g-tab-importar');
+    const contDirectorio = document.getElementById('g-tab-clientes') || document.getElementById('g-tab-directorio');
+    const buscador = document.querySelector('input[placeholder*="Buscar"]');
+
+    if(contInicio) contInicio.style.display = 'none';
+    if(contDashboard) contDashboard.style.display = 'none';
+    if(contImportar) contImportar.style.display = 'none';
+    if(contDirectorio) contDirectorio.style.display = 'none';
+    if(buscador) buscador.style.display = 'none';
+
+    // 4. Mostrar solo lo que corresponde
+    if (sub === 'dashboard') {
+        if(contDashboard) contDashboard.style.display = 'block';
+    } else if (sub === 'importar') {
+        if(contImportar) contImportar.style.display = 'block';
+    } else if (sub === 'clientes' || sub === 'directorio') {
+        if(contDirectorio) contDirectorio.style.display = 'block';
+        if(buscador) buscador.style.display = 'block';
+    } else {
+        if(contInicio) contInicio.style.display = 'block';
+        if(buscador) buscador.style.display = 'block';
+        aplicarFiltrosTarjetasG(); // Filtrar tarjetas según pestaña
+    }
+};
+
+// Lógica Maestra: Filtros
+window.aplicarFiltrosTarjetasG = function() {
+    const p = window.pestañaActualGestor;
+    const inputQ = document.querySelector('input[placeholder*="Buscar"]');
+    const q = inputQ ? inputQ.value.toUpperCase().trim() : '';
+    
+    const tarjetas = document.querySelectorAll('.g-card');
+    tarjetas.forEach(card => {
+        const txt = card.innerText.toUpperCase();
+        let show = true;
+        
+        if (p === 'PERFILES' && !txt.includes('PERFIL')) show = false;
+        if (p === 'CUENTAS' && !txt.includes('CUENTA COMPLETA')) show = false;
+        if (q !== '' && !txt.includes(q)) show = false;
+        
+        card.style.display = show ? 'block' : 'none';
+    });
+};
+
+// Conectar buscador
+setTimeout(() => {
+    const inputQ = document.querySelector('input[placeholder*="Buscar"]');
+    if(inputQ) inputQ.addEventListener('input', window.aplicarFiltrosTarjetasG);
+}, 1000);
+
+// Lógica Maestra: Modales
+window.cerrarModalesG = function() {
+    document.querySelectorAll('.modal-g-overlay').forEach(m => m.style.display = 'none');
+};
+
+window.guardarFalsoG = function(tipo) {
+    alert(tipo + ' guardado exitosamente.');
+    cerrarModalesG();
+};
+
+window.abrirModalPorPestaña = function() {
+    cerrarModalesG();
+    const p = window.pestañaActualGestor;
+    if (p === 'SERVICIOS') {
+        document.getElementById('modal-g-servicio').style.display = 'flex';
+    } else if (p === 'CLIENTES' || p === 'DIRECTORIO') {
+        document.getElementById('modal-g-cliente').style.display = 'flex';
+    } else if (p === 'PERFILES' || p === 'CUENTAS' || p === 'INICIO') {
+        const t = document.getElementById('titulo-m-cuenta');
+        if (t) t.innerText = (p === 'PERFILES') ? 'Nuevo perfil' : 'Nueva cuenta completa';
+        document.getElementById('modal-g-cuenta').style.display = 'flex';
+    }
+};
+
+// Vigía del FAB (Asegura que el botón se muestre en el lugar correcto)
+setInterval(() => {
+    const fab = document.getElementById('btn-fab-gestor');
+    const gestorContainer = document.getElementById('tab-gestor-pro');
+    const isGestorOpen = gestorContainer && gestorContainer.style.display !== 'none';
+    
+    if (fab && isGestorOpen) {
+        const p = window.pestañaActualGestor;
+        if (p === 'DASHBOARD' || p === 'IMPORTAR') {
+            fab.style.display = 'none'; // Ocultar en dashboard e importar
+        } else {
+            fab.style.display = 'flex';
+        }
+    } else if (fab) {
+        fab.style.display = 'none';
+    }
+}, 300);
+</script>
 </body>
 </html>
