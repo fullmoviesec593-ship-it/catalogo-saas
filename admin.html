@@ -1467,297 +1467,14 @@ setTimeout(() => {
 }, 2000);
 </script>
 
-<!-- PASO1_FILTROS -->
-<script>
-document.addEventListener('DOMContentLoaded', () => {
-    window.filtroActivoDOM = 'TODOS';
 
-    window.aplicarFiltrosVisuales = function() {
-        // 1. Obtener lo que se escribe en el buscador
-        const inputQ = document.querySelector('input[placeholder*="Buscar"]');
-        const query = inputQ ? inputQ.value.toUpperCase().trim() : '';
-        
-        // 2. Buscar las tarjetas que se están mostrando en pantalla
-        const contenedores = document.querySelectorAll('.g-card, div[style*="border-radius:12px"]');
-        
-        contenedores.forEach(card => {
-            // Validar que sea realmente una tarjeta de cliente
-            if (card.innerText && card.innerText.includes('ENVIAR DATOS A WHATSAPP')) {
-                const texto = card.innerText.toUpperCase();
-                let mostrar = true;
-
-                // Aplicar el Filtro de Pestaña (Perfil vs Cuenta)
-                if (window.filtroActivoDOM === 'PERFILES' && !texto.includes('PERFIL')) mostrar = false;
-                if (window.filtroActivoDOM === 'CUENTAS' && !texto.includes('CUENTA COMPLETA')) mostrar = false;
-                
-                // Aplicar el Filtro de Búsqueda (Texto)
-                if (query !== '' && !texto.includes(query)) mostrar = false;
-
-                // Ocultar o mostrar sin borrar el código
-                card.style.display = mostrar ? 'block' : 'none';
-            }
-        });
-    };
-
-    // Escuchar cuando tocas las pestañas
-    document.addEventListener('click', (e) => {
-        const tab = e.target.closest('div');
-        if (!tab || !tab.innerText) return;
-        
-        const txt = tab.innerText.toUpperCase().trim();
-        
-        if (txt === 'PERFILES' || txt === 'CUENTAS COMPLETAS' || txt === 'CLIENTES' || txt === 'INICIO') {
-            
-            // Asignar el filtro correspondiente
-            if (txt === 'PERFILES') window.filtroActivoDOM = 'PERFILES';
-            else if (txt === 'CUENTAS COMPLETAS') window.filtroActivoDOM = 'CUENTAS';
-            else window.filtroActivoDOM = 'TODOS'; // Clientes o Inicio muestran todo
-            
-            // Resaltar la pestaña que tocaste (Borde amarillo)
-            const parent = tab.parentElement;
-            if (parent) {
-                Array.from(parent.children).forEach(sibling => {
-                    if (sibling.tagName === 'DIV' && sibling.style.border) {
-                        sibling.style.border = '1px solid #1e293b'; // Apagar las demás
-                        sibling.style.color = '#94a3b8';
-                    }
-                });
-                tab.style.border = '1px solid #eab308'; // Encender la actual
-                tab.style.color = '#eab308';
-            }
-            
-            window.aplicarFiltrosVisuales();
-        }
-    });
-
-    // Conectar el buscador y asegurar que funcione con el motor base
-    setTimeout(() => {
-        if (typeof window.renderGestorPro === 'function') {
-            const viejoRender = window.renderGestorPro;
-            window.renderGestorPro = function() {
-                viejoRender();
-                setTimeout(window.aplicarFiltrosVisuales, 150); // Re-aplicar filtro al dibujar
-            };
-        }
-        
-        const inputQ = document.querySelector('input[placeholder*="Buscar"]');
-        if (inputQ) {
-            // Reemplazar el input con un clon para limpiarlo de eventos viejos y poner el nuevo
-            const nuevoInput = inputQ.cloneNode(true);
-            inputQ.parentNode.replaceChild(nuevoInput, inputQ);
-            nuevoInput.addEventListener('input', window.aplicarFiltrosVisuales);
-        }
-    }, 2500);
-});
-</script>
-
-
-<!-- PASO2_FIX_FECHAS_Y_MEMORIA -->
-<script>
-document.addEventListener('DOMContentLoaded', () => {
-    
-    // 1. MEJORAR EL CÁLCULO DE FECHAS PARA ENTENDER EL CÓDIGO DE EXCEL
-    window.calcularDiasG = function(venceStr) {
-        if (!venceStr) return 0;
-        let d = String(venceStr).trim();
-        
-        // Si Excel lo pasó como número serial oculto (ej: 45200)
-        if (!isNaN(d) && Number(d) > 20000) {
-            const dateObj = new Date(Math.round((Number(d) - 25569) * 86400 * 1000));
-            d = dateObj.toISOString().split('T')[0];
-        } else if (d.includes('/')) {
-            let p = d.split('/');
-            if (p[2] && p[2].length === 4) { // Formato DD/MM/YYYY
-                d = `${p[2]}-${p[1].padStart(2,'0')}-${p[0].padStart(2,'0')}`;
-            }
-        } else if (d.includes('-')) {
-            let p = d.split('-');
-            if (p[2] && p[2].length === 4) { // Formato DD-MM-YYYY
-                d = `${p[2]}-${p[1].padStart(2,'0')}-${p[0].padStart(2,'0')}`;
-            }
-        }
-
-        const f = new Date(d);
-        if (isNaN(f.getTime())) return 0; // Evitar errores si la celda está rota
-
-        const h = new Date(); h.setHours(0,0,0,0);
-        return Math.ceil((f - h) / (1000 * 60 * 60 * 24));
-    };
-
-    // 2. FORZAR EXTRACCIÓN DE TEXTO PURO AL IMPORTAR EL EXCEL
-    if (typeof window.procesarArchivoExcelReal === 'function') {
-        window.procesarArchivoExcelReal = async function(event) {
-            const file = event.target.files[0]; 
-            if(!file) return;
-            
-            alert("⏳ IMPORTANDO DATOS Y CALCULANDO FECHAS EXACTAS...");
-            const reader = new FileReader();
-            reader.onload = async function(e) {
-                try {
-                    let arr = [];
-                    if (file.name.endsWith('.json')) {
-                        arr = JSON.parse(e.target.result);
-                    } else {
-                        const data = new Uint8Array(e.target.result);
-                        const workbook = XLSX.read(data, { type: 'array' });
-                        
-                        // raw: false fuerza a leer las celdas tal cual se ven visualmente en Excel
-                        const json = XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]], { raw: false, dateNF: 'yyyy-mm-dd', defval: "" });
-                        
-                        json.forEach((r, i) => {
-                            if(!r['Cliente'] && !r['Correo/Usuario']) return;
-                            
-                            // Buscar la columna de fecha sin importar cómo la llamaste
-                            let fechaV = r['Fecha vencimiento'] || r['Fecha de vencimiento'] || r['Vence'] || r['vence'] || '';
-                            
-                            arr.push({ 
-                                id: 'imp_' + Date.now() + '_' + i, 
-                                cliente: String(r['Cliente'] || '').trim(), 
-                                whatsapp: String(r['WhatsApp'] || '').trim(), 
-                                servicio: String(r['Servicio'] || '').trim(), 
-                                tipo: String(r['Tipo'] || 'PERFIL').trim(), 
-                                correo: String(r['Correo/Usuario'] || '').trim(), 
-                                pass: String(r['Contraseña'] || '').trim(), 
-                                perfil: String(r['Perfil'] || '').trim(), 
-                                pin: String(r['PIN'] || '').trim(), 
-                                vence: String(fechaV).trim() 
-                            });
-                        });
-                    }
-                    
-                    if(!window.tiendaActual) window.tiendaActual = {};
-                    window.tiendaActual.gestorProData = arr;
-                    
-                    // Guardar fuertemente en local y subir a la nube
-                    if(window.slugActual) localStorage.setItem('gestor_data_' + window.slugActual, JSON.stringify(arr));
-                    if(window.persistirEnNube) await window.persistirEnNube({ gestorProData: arr });
-                    
-                    alert(`✅ ¡ÉXITO! ${arr.length} clientes importados con fechas correctas.`); 
-                    if (typeof window.renderGestorPro === 'function') window.renderGestorPro();
-                    if (typeof window.aplicarFiltrosVisuales === 'function') window.aplicarFiltrosVisuales();
-                    
-                } catch(err) { 
-                    alert('Error al leer el archivo Excel: ' + err.message); 
-                }
-            };
-            if (file.name.endsWith('.json')) reader.readAsText(file);
-            else reader.readAsArrayBuffer(file);
-        };
-    }
-
-    // 3. VIGÍA DE MEMORIA (EVITA QUE SE BORRE AL CAMBIAR DE PESTAÑA)
-    setInterval(() => {
-        // Detectar si la pantalla del Gestor Pro está abierta
-        const gestorHeader = document.querySelector('h3');
-        if (gestorHeader && gestorHeader.innerText.includes('Gestor de Inventario Pro')) {
-            const contenedorGestor = gestorHeader.closest('div').parentElement;
-            
-            // Si el Gestor está visible
-            if (contenedorGestor && contenedorGestor.style.display !== 'none') {
-                const tarjetasVisibles = document.querySelectorAll('.g-card');
-                
-                // Si el panel original borró las tarjetas, el vigía las restaura
-                if (tarjetasVisibles.length === 0) {
-                    // Rescatar datos de la memoria blindada
-                    if ((!window.tiendaActual || !window.tiendaActual.gestorProData || window.tiendaActual.gestorProData.length === 0) && window.slugActual) {
-                        const local = localStorage.getItem('gestor_data_' + window.slugActual);
-                        if (local) {
-                            if (!window.tiendaActual) window.tiendaActual = {};
-                            window.tiendaActual.gestorProData = JSON.parse(local);
-                        }
-                    }
-                    
-                    // Redibujar mágicamente
-                    if (window.tiendaActual && window.tiendaActual.gestorProData && window.tiendaActual.gestorProData.length > 0) {
-                        if (typeof window.renderGestorPro === 'function') {
-                            window.renderGestorPro();
-                            if (typeof window.aplicarFiltrosVisuales === 'function') {
-                                setTimeout(window.aplicarFiltrosVisuales, 100);
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }, 1000);
-    
-});
-</script>
-
-<!-- PASO3_DASHBOARD_E_IMPORTAR -->
-<script>
-document.addEventListener('DOMContentLoaded', () => {
-    
-    // 1. LÓGICA DEL DASHBOARD (Contar tarjetas en tiempo real)
-    setInterval(() => {
-        const tarjetas = document.querySelectorAll('.g-card, div[style*="border-radius:12px"]');
-        let total = 0;
-        let vencidos = 0;
-
-        tarjetas.forEach(card => {
-            if (card.innerText && card.innerText.includes('ENVIAR DATOS A WHATSAPP')) {
-                total++;
-                if (card.innerText.includes('VENCIDO')) {
-                    vencidos++;
-                }
-            }
-        });
-
-        const dTot = document.getElementById('dash-tot-clientes');
-        const dVen = document.getElementById('dash-tot-vencidos');
-        
-        // Si los contadores existen en el HTML, actualizarlos
-        if (dTot) dTot.innerText = total;
-        if (dVen) dVen.innerText = vencidos;
-        
-    }, 1000); // Revisa cada segundo
-
-    // 2. LÓGICA DE LA PESTAÑA IMPORTAR (Ocultar/Mostrar elementos)
-    document.addEventListener('click', (e) => {
-        const tab = e.target.closest('div');
-        if (!tab || !tab.innerText) return;
-        
-        const txt = tab.innerText.toUpperCase().trim();
-        
-        // Identificar los elementos a ocultar/mostrar
-        const buscador = document.querySelector('input[placeholder*="Buscar"]');
-        const listaTarjetas = document.getElementById('g-lista-ventas') || document.querySelector('div[style*="border-radius:12px"]')?.parentElement;
-        const cajaSubir = document.querySelector('div[style*="dashed"]') || document.querySelector('div[onclick*="gestor-file-upload"]');
-        
-        if (txt === 'IMPORTAR' || txt === 'HERRAMIENTAS') {
-            if (buscador) buscador.style.display = 'none';
-            if (listaTarjetas) listaTarjetas.style.display = 'none';
-            if (cajaSubir) cajaSubir.style.display = 'block';
-        } 
-        else if (txt === 'INICIO' || txt === 'CLIENTES' || txt === 'PERFILES' || txt === 'CUENTAS COMPLETAS') {
-            if (buscador) buscador.style.display = 'block';
-            if (listaTarjetas) listaTarjetas.style.display = 'block';
-            if (cajaSubir) cajaSubir.style.display = 'none';
-        }
-    });
-    
-    // Ocultar la caja de subir Excel por defecto al inicio
-    setTimeout(() => {
-        const cajaSubir = document.querySelector('div[style*="dashed"]') || document.querySelector('div[onclick*="gestor-file-upload"]');
-        if (cajaSubir) cajaSubir.style.display = 'none';
-    }, 500);
-
-});
-</script>
-
-
-
-
-
-
-
-<!-- PASO6_FORMULARIOS_EXACTOS -->
+<!-- SISTEMA_PRO_UNIFICADO -->
 <style>
   /* Botón Flotante Circular (FAB) */
   .btn-nuevo-gestor { background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%); color: #fff; font-weight: bold; border: none; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; width: 60px; height: 60px; font-size: 32px; position: fixed; bottom: 80px; right: 20px; z-index: 1000; box-shadow: 0 4px 15px rgba(34, 197, 94, 0.4); transition: transform 0.2s; line-height:1;} 
   .btn-nuevo-gestor:active { transform: scale(0.95); }
   
-  /* Estructura Base de los Formularios Oscuros */
+  /* Modales Oscuros Premium */
   .modal-g-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 3000; align-items: center; justify-content: center; backdrop-filter: blur(5px); }
   .modal-g-content { background: #0b1120; border: 1px solid #1e293b; border-radius: 16px; width: 95%; max-width: 450px; max-height: 85vh; overflow-y: auto; box-shadow: 0 10px 50px rgba(0,0,0,0.9); display: flex; flex-direction: column;}
   .modal-g-header { display: flex; justify-content: space-between; align-items: center; padding: 16px 20px; border-bottom: 1px solid #1e293b; position: sticky; top: 0; background: #0b1120; z-index: 10;}
@@ -1768,22 +1485,16 @@ document.addEventListener('DOMContentLoaded', () => {
   .g-label { color: #94a3b8; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;}
   .g-input { width: 100%; padding: 14px 12px; background: #0f172a; border: 1px solid #1e293b; color: #fff; border-radius: 10px; box-sizing: border-box; font-size: 14px; outline: none; transition: border 0.2s;}
   .g-input:focus { border-color: #38bdf8; }
-  .g-select { appearance: none; background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%2394a3b8%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.4-12.8z%22%2F%3E%3C%2Fsvg%3E"); background-repeat: no-repeat; background-position: right 12px top 50%; background-size: 10px auto; }
-  .g-textarea { resize: vertical; min-height: 80px; }
   .g-footer { padding: 16px 20px; border-top: 1px solid #1e293b; display: flex; gap: 12px; position: sticky; bottom: 0; background: #0b1120; z-index: 10;}
   .g-btn-cancel { flex: 1; padding: 14px; background: transparent; color: #fff; border: none; font-weight: 600; cursor: pointer; border-radius: 10px; }
-  .g-btn-save { flex: 1; padding: 14px; background: #22c55e; color: #fff; border: none; font-weight: 600; cursor: pointer; border-radius: 10px; display:flex; justify-content:center; align-items:center;}
-  
-  .g-toggle-group { display:flex; background:#0f172a; border-radius:10px; padding:4px; border:1px solid #1e293b;}
-  .g-toggle-btn { flex:1; padding:10px; text-align:center; color:#94a3b8; font-size:12px; font-weight:bold; cursor:pointer; border-radius:6px; transition:all 0.2s;}
-  .g-toggle-btn.active { background:#1e293b; color:#22c55e; border: 1px solid #22c55e; }
-  
-  .g-row { display: flex; gap: 12px; }
-  .g-row > div { flex: 1; }
+  .g-btn-save { flex: 1; padding: 14px; background: #22c55e; color: #fff; border: none; font-weight: 600; cursor: pointer; border-radius: 10px; }
 </style>
 
-<!-- MODAL: NUEVO CLIENTE -->
-<div id="m-cliente" class="modal-g-overlay">
+<!-- BOTÓN FAB FLOTANTE -->
+<button id="btn-fab-gestor" class="btn-nuevo-gestor" style="display:none;" onclick="abrirModalPorPestaña()">+</button>
+
+<!-- 1. MODAL: NUEVO CLIENTE -->
+<div id="modal-g-cliente" class="modal-g-overlay">
     <div class="modal-g-content">
         <div class="modal-g-header">
             <h3 class="modal-g-title">Nuevo cliente</h3>
@@ -1792,47 +1503,22 @@ document.addEventListener('DOMContentLoaded', () => {
         <div class="modal-g-body">
             <div class="g-input-group">
                 <label class="g-label">Cliente *</label>
-                <input type="text" class="g-input" placeholder="">
-            </div>
-            <div class="g-input-group">
-                <label class="g-label">Rol</label>
-                <select class="g-input g-select">
-                    <option>CLIENTE FINAL</option>
-                    <option>PROVEEDOR</option>
-                </select>
-                <div style="font-size:11px; color:#64748b; margin-top:2px;">Proveedor sirve para vincular compras de cuentas completas.</div>
+                <input type="text" class="g-input" placeholder="Nombre del cliente">
             </div>
             <div class="g-input-group">
                 <label class="g-label">WhatsApp</label>
                 <input type="number" class="g-input" placeholder="+593 961347609">
-                <div style="font-size:11px; color:#64748b; margin-top:2px;">Se guardará sin + ni espacios. Ej: 593961347609</div>
-            </div>
-            <div class="g-input-group">
-                <label class="g-label">Canal</label>
-                <div class="g-toggle-group">
-                    <div class="g-toggle-btn active">WhatsApp</div>
-                    <div class="g-toggle-btn">Telegram</div>
-                </div>
-            </div>
-            <div class="g-input-group">
-                <label class="g-label">User Telegram</label>
-                <input type="text" class="g-input" placeholder="usuario o @usuario">
-                <div style="font-size:11px; color:#64748b; margin-top:2px;">Si eliges Telegram, los mensajes irán a este usuario.</div>
-            </div>
-            <div class="g-input-group">
-                <label class="g-label">Notas</label>
-                <textarea class="g-input g-textarea"></textarea>
             </div>
         </div>
         <div class="g-footer">
             <button class="g-btn-cancel" onclick="cerrarModalesG()">Cancelar</button>
-            <button class="g-btn-save" onclick="guardarFalso('Cliente')">Guardar</button>
+            <button class="g-btn-save" onclick="guardarFalsoG('Cliente')">Guardar</button>
         </div>
     </div>
 </div>
 
-<!-- MODAL: NUEVO SERVICIO -->
-<div id="m-servicio" class="modal-g-overlay">
+<!-- 2. MODAL: NUEVO SERVICIO -->
+<div id="modal-g-servicio" class="modal-g-overlay">
     <div class="modal-g-content">
         <div class="modal-g-header">
             <h3 class="modal-g-title">Nuevo servicio</h3>
@@ -1847,83 +1533,29 @@ document.addEventListener('DOMContentLoaded', () => {
                 <label class="g-label">Perfiles</label>
                 <input type="number" class="g-input" placeholder="5">
             </div>
-            
-            <!-- Banner placeholder -->
-            <div style="background:#1e293b; padding:15px; border-radius:10px; margin:10px 0;">
-                <label class="g-label" style="color:#fff;">BANNER DE TIENDA</label>
-                <p style="font-size:11px; color:#94a3b8; margin:5px 0;">✅ GENERACIÓN AUTOMÁTICA La APK crea el banner con el nombre del servicio, colores y estilo de marca.</p>
-            </div>
-
             <div class="g-input-group">
-                <label class="g-label">Precio Cliente Final - Perfil</label>
+                <label class="g-label">Precio Cliente Final</label>
                 <input type="number" class="g-input" placeholder="0">
-                <div style="font-size:11px; color:#64748b;">Precio por defecto para nuevas ventas de PERFIL.</div>
-            </div>
-            <div class="g-input-group">
-                <label class="g-label">Precio Cliente Final - Cuenta Completa / Lote</label>
-                <input type="number" class="g-input" placeholder="0">
-            </div>
-            <div class="g-input-group">
-                <label class="g-label">Precio Revendedor - Perfil</label>
-                <input type="number" class="g-input" placeholder="0">
-            </div>
-            <div class="g-input-group">
-                <label class="g-label">Precio Revendedor - Cuenta Completa</label>
-                <input type="number" class="g-input" placeholder="0">
-            </div>
-            
-            <div class="g-input-group">
-                <label class="g-label">Costo de la Cuenta</label>
-                <input type="number" class="g-input" placeholder="0">
-                <div style="font-size:11px; color:#64748b;">Costo por defecto para nuevas cuentas.</div>
-            </div>
-            <div class="g-input-group">
-                <label class="g-label">Color</label>
-                <select class="g-input g-select">
-                    <option>Genérico gris</option>
-                    <option>Netflix rojo</option>
-                    <option>Flujo naranja</option>
-                </select>
-            </div>
-            <div class="g-input-group">
-                <label class="g-label">Texto Corto</label>
-                <input type="text" class="g-input" placeholder="NET, FLU, DIS...">
             </div>
         </div>
         <div class="g-footer">
             <button class="g-btn-cancel" onclick="cerrarModalesG()">Cancelar</button>
-            <button class="g-btn-save" onclick="guardarFalso('Servicio')">Guardar</button>
+            <button class="g-btn-save" onclick="guardarFalsoG('Servicio')">Guardar</button>
         </div>
     </div>
 </div>
 
-<!-- MODAL: CUENTA / PERFIL -->
-<div id="m-cuenta" class="modal-g-overlay">
+<!-- 3. MODAL: NUEVA CUENTA / PERFIL -->
+<div id="modal-g-cuenta" class="modal-g-overlay">
     <div class="modal-g-content">
         <div class="modal-g-header">
-            <h3 class="modal-g-title" id="titulo-cuenta">Nueva cuenta completa</h3>
+            <h3 class="modal-g-title" id="titulo-m-cuenta">Nueva cuenta completa</h3>
             <button class="modal-g-close" onclick="cerrarModalesG()">×</button>
         </div>
         <div class="modal-g-body">
             <div class="g-input-group">
-                <label class="g-label">Tipo *</label>
-                <div class="g-toggle-group">
-                    <div class="g-toggle-btn" id="btn-t-perfil" onclick="switchTipoCuenta('PERFIL')">PERFIL</div>
-                    <div class="g-toggle-btn active" id="btn-t-cuenta" onclick="switchTipoCuenta('CUENTA')">CUENTA COMPLETA</div>
-                </div>
-            </div>
-            <div class="g-input-group">
                 <label class="g-label">Servicio *</label>
-                <select class="g-input g-select"><option>Buscar servicio...</option></select>
-            </div>
-            <div class="g-input-group">
-                <label class="g-label">Proveedor</label>
-                <select class="g-input g-select"><option>Sin proveedor</option></select>
-                <div style="font-size:11px; color:#64748b;">Opcional para cuentas completas, perfiles y cuentas creadas por lote. Primero crea el cliente con rol PROVEEDOR.</div>
-            </div>
-            <div class="g-input-group">
-                <label class="g-label">Plan</label>
-                <input type="text" class="g-input" placeholder="">
+                <input type="text" class="g-input" placeholder="Ej. Spotify">
             </div>
             <div class="g-input-group">
                 <label class="g-label">Correo o Usuario *</label>
@@ -1933,158 +1565,134 @@ document.addEventListener('DOMContentLoaded', () => {
                 <label class="g-label">Contraseña</label>
                 <input type="text" class="g-input" placeholder="">
             </div>
-            <div class="g-input-group">
-                <label class="g-label">Estado</label>
-                <select class="g-input g-select"><option>ACTIVA</option></select>
-            </div>
-            <div class="g-input-group">
-                <label class="g-label">Costo Cuenta</label>
-                <input type="number" class="g-input" value="10">
-            </div>
-            <div class="g-row">
-                <div class="g-input-group">
-                    <label class="g-label">Fecha Inicio</label>
-                    <input type="date" class="g-input" style="color-scheme:dark;">
-                </div>
-                <div class="g-input-group">
-                    <label class="g-label">Tipo de fecha</label>
-                    <div class="g-toggle-group">
-                        <div class="g-toggle-btn active">Días</div>
-                        <div class="g-toggle-btn">Mes(es)</div>
-                    </div>
-                </div>
-            </div>
-            <div class="g-input-group">
-                <label class="g-label">Duración de suscripción</label>
-                <input type="number" class="g-input" value="30">
-            </div>
-            <div class="g-input-group">
-                <label class="g-label">Fecha Vencimiento</label>
-                <input type="date" class="g-input" style="color-scheme:dark;">
-            </div>
-            <div class="g-input-group">
-                <label class="g-label">Notas</label>
-                <textarea class="g-input g-textarea"></textarea>
-            </div>
         </div>
         <div class="g-footer">
             <button class="g-btn-cancel" onclick="cerrarModalesG()">Cancelar</button>
-            <button class="g-btn-save" onclick="guardarFalso('Registro')">Guardar</button>
+            <button class="g-btn-save" onclick="guardarFalsoG('Cuenta/Perfil')">Guardar</button>
         </div>
     </div>
 </div>
 
 <script>
-window.cerrarModalesG = function() {
-    document.querySelectorAll('.modal-g-overlay').forEach(m => m.style.display = 'none');
-}
-window.guardarFalso = function(tipo) {
-    alert(tipo + ' guardado exitosamente.');
-    cerrarModalesG();
-}
-window.switchTipoCuenta = function(tipo) {
-    const bP = document.getElementById('btn-t-perfil');
-    const bC = document.getElementById('btn-t-cuenta');
-    const tit = document.getElementById('titulo-cuenta');
-    if (tipo === 'PERFIL') {
-        bP.classList.add('active'); bC.classList.remove('active');
-        tit.innerHTML = 'Nuevo perfil';
-    } else {
-        bC.classList.add('active'); bP.classList.remove('active');
-        tit.innerHTML = 'Nueva cuenta completa';
-    }
-}
+window.pestañaActualGestor = 'INICIO';
 
-document.addEventListener('DOMContentLoaded', () => {
-    // Gestor de FAB (Botón Flotante Circular)
-    setInterval(() => {
-        const gestorAbierto = document.getElementById('tab-gestor-pro') && document.getElementById('tab-gestor-pro').style.display !== 'none';
-        let fab = document.getElementById('btn-fab-gestor');
-        
-        if (gestorAbierto && !fab) {
-            fab = document.createElement('button');
-            fab.id = 'btn-fab-gestor';
-            fab.className = 'btn-nuevo-gestor';
-            fab.innerHTML = '+';
-            document.body.appendChild(fab);
-        } else if (!gestorAbierto && fab) {
-            fab.style.display = 'none';
-        }
-        
-        if (fab && gestorAbierto) {
-            const pestañaActual = window.filtroActivoDOM || 'INICIO';
-            const cajaSubir = document.querySelector('div[style*="dashed"]');
-            const estaEnImportar = cajaSubir && cajaSubir.style.display === 'block';
-
-            if (estaEnImportar || pestañaActual === 'DASHBOARD') {
-                fab.style.display = 'none';
-            } else {
-                fab.style.display = 'flex';
-                fab.onclick = () => {
-                    cerrarModalesG();
-                    if (pestañaActual === 'SERVICIOS') document.getElementById('m-servicio').style.display = 'flex';
-                    else if (pestañaActual === 'CLIENTES' || pestañaActual === 'INICIO') document.getElementById('m-cliente').style.display = 'flex';
-                    else if (pestañaActual === 'PERFILES') {
-                        switchTipoCuenta('PERFIL');
-                        document.getElementById('m-cuenta').style.display = 'flex';
-                    } else if (pestañaActual === 'CUENTAS') {
-                        switchTipoCuenta('CUENTA');
-                        document.getElementById('m-cuenta').style.display = 'flex';
-                    }
-                };
-            }
-        }
-        
-        // Limpiar botones viejos inyectados previamente
-        const viejoBtn = document.getElementById('btn-add-cliente');
-        if (viejoBtn) viejoBtn.remove();
-        
-    }, 500);
-});
-</script>
-
-<!-- BOTON FLOTANTE SOLDADO -->
-<button id="btn-fab-gestor" class="btn-nuevo-gestor" style="display:none; position:fixed; bottom:80px; right:20px; z-index:9999;" onclick="abrirModalCorrecto()">+</button>
-
-<script>
-window.abrirModalCorrecto = function() {
-    if(typeof window.cerrarModalesG === 'function') window.cerrarModalesG();
-    const p = window.filtroActivoDOM || 'INICIO';
+// Lógica Maestra: Cambio de Pestañas
+window.cambiarSubTabGestor = function(sub) {
+    window.pestañaActualGestor = sub.toUpperCase();
     
-    if (p === 'SERVICIOS') { 
-        const m = document.getElementById('m-servicio');
-        if(m) m.style.display = 'flex'; 
-    } else if (p === 'CLIENTES' || p === 'INICIO') { 
-        const m = document.getElementById('m-cliente');
-        if(m) m.style.display = 'flex'; 
-    } else if (p === 'PERFILES') { 
-        if(typeof window.switchTipoCuenta === 'function') window.switchTipoCuenta('PERFIL'); 
-        const m = document.getElementById('m-cuenta');
-        if(m) m.style.display = 'flex'; 
-    } else if (p === 'CUENTAS') { 
-        if(typeof window.switchTipoCuenta === 'function') window.switchTipoCuenta('CUENTA'); 
-        const m = document.getElementById('m-cuenta');
-        if(m) m.style.display = 'flex'; 
+    // 1. Limpiar todos los botones (Bordes grises)
+    const tabs = ['dashboard', 'inicio', 'servicios', 'clientes', 'perfiles', 'cuentas', 'importar', 'directorio'];
+    tabs.forEach(s => {
+        const btn = document.getElementById('g-tab-btn-' + s);
+        if(btn) {
+            btn.classList.remove('active');
+            btn.style.border = '1px solid #1e293b';
+            btn.style.color = '#94a3b8';
+        }
+    });
+    
+    // 2. Encender el botón tocado (Borde amarillo)
+    const actBtn = document.getElementById('g-tab-btn-' + sub);
+    if (actBtn) {
+        actBtn.classList.add('active');
+        actBtn.style.border = '1px solid #eab308';
+        actBtn.style.color = '#eab308';
+    }
+
+    // 3. Ocultar todos los contenedores primero
+    const contInicio = document.getElementById('g-tab-inicio');
+    const contDashboard = document.getElementById('g-tab-dashboard');
+    const contImportar = document.getElementById('g-tab-importar');
+    const contDirectorio = document.getElementById('g-tab-clientes') || document.getElementById('g-tab-directorio');
+    const buscador = document.querySelector('input[placeholder*="Buscar"]');
+
+    if(contInicio) contInicio.style.display = 'none';
+    if(contDashboard) contDashboard.style.display = 'none';
+    if(contImportar) contImportar.style.display = 'none';
+    if(contDirectorio) contDirectorio.style.display = 'none';
+    if(buscador) buscador.style.display = 'none';
+
+    // 4. Mostrar solo lo que corresponde
+    if (sub === 'dashboard') {
+        if(contDashboard) contDashboard.style.display = 'block';
+    } else if (sub === 'importar') {
+        if(contImportar) contImportar.style.display = 'block';
+    } else if (sub === 'clientes' || sub === 'directorio') {
+        if(contDirectorio) contDirectorio.style.display = 'block';
+        if(buscador) buscador.style.display = 'block';
+    } else {
+        if(contInicio) contInicio.style.display = 'block';
+        if(buscador) buscador.style.display = 'block';
+        aplicarFiltrosTarjetasG(); // Filtrar tarjetas según pestaña
     }
 };
 
-// Vigía blindado para mostrar/ocultar el botón
+// Lógica Maestra: Filtros
+window.aplicarFiltrosTarjetasG = function() {
+    const p = window.pestañaActualGestor;
+    const inputQ = document.querySelector('input[placeholder*="Buscar"]');
+    const q = inputQ ? inputQ.value.toUpperCase().trim() : '';
+    
+    const tarjetas = document.querySelectorAll('.g-card');
+    tarjetas.forEach(card => {
+        const txt = card.innerText.toUpperCase();
+        let show = true;
+        
+        if (p === 'PERFILES' && !txt.includes('PERFIL')) show = false;
+        if (p === 'CUENTAS' && !txt.includes('CUENTA COMPLETA')) show = false;
+        if (q !== '' && !txt.includes(q)) show = false;
+        
+        card.style.display = show ? 'block' : 'none';
+    });
+};
+
+// Conectar buscador
+setTimeout(() => {
+    const inputQ = document.querySelector('input[placeholder*="Buscar"]');
+    if(inputQ) inputQ.addEventListener('input', window.aplicarFiltrosTarjetasG);
+}, 1000);
+
+// Lógica Maestra: Modales
+window.cerrarModalesG = function() {
+    document.querySelectorAll('.modal-g-overlay').forEach(m => m.style.display = 'none');
+};
+
+window.guardarFalsoG = function(tipo) {
+    alert(tipo + ' guardado exitosamente.');
+    cerrarModalesG();
+};
+
+window.abrirModalPorPestaña = function() {
+    cerrarModalesG();
+    const p = window.pestañaActualGestor;
+    if (p === 'SERVICIOS') {
+        document.getElementById('modal-g-servicio').style.display = 'flex';
+    } else if (p === 'CLIENTES' || p === 'DIRECTORIO') {
+        document.getElementById('modal-g-cliente').style.display = 'flex';
+    } else if (p === 'PERFILES' || p === 'CUENTAS' || p === 'INICIO') {
+        const t = document.getElementById('titulo-m-cuenta');
+        if (t) t.innerText = (p === 'PERFILES') ? 'Nuevo perfil' : 'Nueva cuenta completa';
+        document.getElementById('modal-g-cuenta').style.display = 'flex';
+    }
+};
+
+// Vigía del FAB (Asegura que el botón se muestre en el lugar correcto)
 setInterval(() => {
     const fab = document.getElementById('btn-fab-gestor');
-    const buscador = document.querySelector('input[placeholder*="Buscar"]');
-    const viejoBtn = document.getElementById('btn-add-cliente');
+    const gestorContainer = document.getElementById('tab-gestor-pro');
+    const isGestorOpen = gestorContainer && gestorContainer.style.display !== 'none';
     
-    if (viejoBtn) viejoBtn.style.display = 'none'; // Asegurar que el viejo no moleste
-    
-    if (fab && buscador) {
-        // Si el buscador está visible en pantalla, mostramos el botón flotante
-        if (buscador.offsetParent !== null) {
-            fab.style.display = 'flex';
+    if (fab && isGestorOpen) {
+        const p = window.pestañaActualGestor;
+        if (p === 'DASHBOARD' || p === 'IMPORTAR') {
+            fab.style.display = 'none'; // Ocultar en dashboard e importar
         } else {
-            fab.style.display = 'none';
+            fab.style.display = 'flex';
         }
     } else if (fab) {
         fab.style.display = 'none';
     }
 }, 300);
 </script>
+</body>
+</html>
