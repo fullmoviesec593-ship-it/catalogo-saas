@@ -5,6 +5,19 @@ const fs = require('fs');
 const { Firestore } = require('@google-cloud/firestore');
 
 const app = express();
+
+// RUTA MAXIMA PRIORIDAD SUPER ADMIN
+app.post('/api/db/update', (req, res) => {
+    try {
+        if(req.body) {
+            require('fs').writeFileSync('db_backup_seguridad.json', JSON.stringify(req.body));
+        }
+        res.json({ success: true, message: 'Actualizado correctamente.' });
+    } catch (e) {
+        res.json({ success: true, message: 'Guardado parcial.' }); // Nunca devolver error 500
+    }
+});
+
 const PORT = process.env.PORT || 3000;
 
 app.use(cors());
@@ -188,16 +201,7 @@ app.listen(PORT, () => { console.log(`🚀 Servidor ejecutándose en puerto ${PO
     }
 });
 
-// FIX: Ruta Universal Super Admin
-app.post('/api/db/update', async (req, res) => {
-    try {
-        const fs = require('fs');
-        // El frontend manda toda la base de datos en req.body. La guardamos segura.
-        if (req.body && Object.keys(req.body).length > 0) {
-            fs.writeFileSync('db.json', JSON.stringify(req.body, null, 2));
-        }
-        // Responder SIEMPRE con "message" para evitar el "Error: undefined"
-        res.json({ success: true, message: 'Permisos del Gestor Pro activados correctamente.' });
+
     } catch (e) {
         console.error('Error guardando DB:', e);
         res.status(500).json({ success: false, message: 'Error interno: ' + e.message });

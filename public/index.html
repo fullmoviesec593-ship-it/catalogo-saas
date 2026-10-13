@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Admin - Full Movies Ec</title>
+    <!-- Librería para leer archivos de Excel (.xls, .xlsx) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <style>
+        :root {
+            --bg-dark: #07050d;
+            --panel-bg: rgba(20, 16, 35, 0.7);
+            --border-color: rgba(168, 85, 247, 0.2);
+            --purple-glow: #a855f7;
+            --green-glow: #22c55e;
+            --text-main: #f3f4f6;
+            --text-muted: #9ca3af;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+        
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            padding: 16px;
+            padding-bottom: 80px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .container { width: 100%; max-width: 440px; }
+
+        header {
+            text-align: center;
+            margin-bottom: 24px;
+            padding-top: 10px;
+        }
+
+        header h1 {
+            font-size: 24px;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            color: #fff;
+        }
+
+        header span { color: var(--purple-glow); text-shadow: 0 0 15px rgba(168, 85, 247, 0.4); }
+
+        /* NAVEGACIÓN TABS */
+        .tabs {
+            display: flex;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border-color);
+            border-radius: 14px;
+            padding: 4px;
+            margin-bottom: 24px;
+        }
+
+        .tab-btn {
+            flex: 1;
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            padding: 12px;
+            font-size: 14px;
+            font-weight: 600;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .tab-btn.active {
+            background: linear-gradient(135deg, #9333ea, #7e22ce);
+            color: #fff;
+            box-shadow: 0 4px 15px rgba(147, 51, 234, 0.4);
+        }
+
+        /* PANELES Y TARJETAS */
+        .card {
+            background: var(--panel-bg);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        .card h2 {
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #fff;
+        }
+
+        .card p.desc {
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-bottom: 16px;
+            line-height: 1.4;
+        }
+
+        /* FORMULARIOS MODERNOS */
+        .form-group { margin-bottom: 14px; }
+
+        input, select {
+            width: 100%;
+            background: rgba(10, 8, 18, 0.8);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 14px 16px;
+            color: #fff;
+            font-size: 14px;
+            outline: none;
+            transition: all 0.3s;
+        }
+
+        input:focus {
+            border-color: var(--purple-glow);
+            box-shadow: 0 0 0 3px rgba(168, 85, 247, 0.15);
+        }
+
+        input::placeholder { color: #6b7280; }
+
+        .row { display: flex; gap: 10px; }
+
+        /* BOTONES */
+        .btn {
+            width: 100%;
+            border: none;
+            border-radius: 12px;
+            padding: 14px;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: center;
+        }
+
+        .btn-purple {
+            background: linear-gradient(135deg, #a855f7, #9333ea);
+            color: white;
+            box-shadow: 0 4px 15px rgba(168, 85, 247, 0.3);
+        }
+        .btn-purple:active { transform: scale(0.98); }
+
+        .btn-green {
+            background: linear-gradient(135deg, #22c55e, #16a34a);
+            color: white;
+            box-shadow: 0 4px 15px rgba(34, 197, 94, 0.3);
+        }
+        .btn-green:active { transform: scale(0.98); }
+
+        .btn-danger {
+            background: rgba(239, 68, 68, 0.15);
+            color: #f87171;
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            padding: 8px 12px;
+            font-size: 12px;
+            border-radius: 8px;
+            width: auto;
+        }
+
+        .data-actions {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 16px;
+        }
+        .data-actions button {
+            flex: 1;
+            padding: 10px;
+            font-size: 12px;
+            border-radius: 10px;
+            font-weight: 600;
+        }
+
+        .item-list { display: flex; flex-direction: column; gap: 12px; }
+
+        .item-card {
+            background: rgba(15, 12, 26, 0.9);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 14px;
+            padding: 14px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .item-info h3 { font-size: 14px; font-weight: 700; color: #fff; margin-bottom: 2px; }
+        .item-info p { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+        .tag-plan { color: var(--purple-glow); font-weight: 600; }
+
+        .badge {
+            font-size: 9px;
+            font-weight: 800;
+            padding: 4px 8px;
+            border-radius: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .badge-libre { background: rgba(34, 197, 94, 0.2); color: #4ade80; border: 1px solid rgba(34, 197, 94, 0.4); }
+        .badge-ocupado { background: rgba(239, 68, 68, 0.2); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.4); }
+
+        .hidden { display: none !important; }
+        .alert-msg { font-size: 13px; text-align: center; margin-top: 10px; font-weight: 600; }
+        .text-center { text-align: center; color: var(--text-muted); font-size: 13px; padding: 20px; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <header>
+            <h1>👑 Admin<br><span>Full Movies Ec</span></h1>
+        </header>
+
+        <!-- NAVEGACIÓN -->
+        <div class="tabs">
+            <button onclick="mostrarSeccion('clientes')" id="tab-clientes" class="tab-btn active">Recordatorios</button>
+            <button onclick="mostrarSeccion('inventario')" id="tab-inventario" class="tab-btn">Bodega / Cuentas</button>
+        </div>
+
+        <!-- ================= SECCIÓN 1: CLIENTES ================= -->
+        <div id="seccion-clientes">
+            <div class="card">
+                <h2>➕ Registro Manual</h2>
+                <form id="form-cliente">
+                    <div class="form-group"><input type="number" id="numero" required placeholder="WhatsApp (Ej: 5939...)"></div>
+                    <div class="form-group"><input type="text" id="nombre" required placeholder="Nombre del Cliente"></div>
+                    <div class="form-group"><input type="text" id="plan" required placeholder="Servicio (Ej: Netflix)"></div>
+                    <div class="form-group"><input type="date" id="vence" required></div>
+                    <button type="submit" class="btn btn-purple">Guardar Cliente</button>
+                </form>
+            </div>
+
+            <div class="card">
+                <h2>📋 Clientes Activos</h2>
+                <div class="data-actions">
+                    <button class="btn btn-purple" onclick="exportarJson('clientes')">📥 Exportar JSON</button>
+                    <button class="btn btn-green" onclick="exportarCsv('clientes')">📊 Exportar CSV</button>
+                </div>
+                <div class="form-group" style="margin-bottom: 0;">
+                    <input type="file" id="file-clientes" accept=".json,.csv,.xls,.xlsx" style="font-size: 12px; padding: 10px;" onchange="importarArchivoUniversal('clientes', event)">
+                </div>
+                <p class="desc" style="margin-top: 6px; margin-bottom: 14px;">⚡ Sube tu archivo de clientes aquí para importarlos masivamente.</p>
+                <div id="lista-clientes" class="item-list">
+                    <div class="text-center">Cargando clientes...</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ================= SECCIÓN 2: INVENTARIO ================= -->
+        <div id="seccion-inventario" class="hidden">
+            <div class="card" style="border-color: rgba(34, 197, 94, 0.3);">
+                <h2 style="color: #4ade80;">📦 Agregar Cuenta a Bodega</h2>
+                <p class="desc">Estas cuentas serán despachadas de forma 100% automática por el bot al usar el comando <code>!entregar</code>.</p>
+                
+                <form id="form-inventario">
+                    <div class="form-group"><input type="text" id="inv-servicio" required placeholder="Servicio (Ej: Netflix)"></div>
+                    <div class="form-group"><input type="email" id="inv-correo" required placeholder="Correo de la cuenta"></div>
+                    <div class="form-group"><input type="text" id="inv-clave" required placeholder="Contraseña"></div>
+                    <div class="row">
+                        <div class="form-group" style="flex: 1;"><input type="text" id="inv-perfil" required placeholder="Perfil (Ej: 1)"></div>
+                        <div class="form-group" style="flex: 1;"><input type="text" id="inv-pin" placeholder="PIN (Opcional)"></div>
+                    </div>
+                    <button type="submit" class="btn btn-green">Guardar en Bodega</button>
+                </form>
+                <div id="mensaje-inv" class="alert-msg hidden"></div>
+            </div>
+            
+            <div class="card">
+                <h2>🗄️ Cuentas en Bodega</h2>
+                <div class="data-actions">
+                    <button class="btn btn-purple" onclick="exportarJson('inventario')">📥 Exportar JSON</button>
+                    <button class="btn btn-green" onclick="exportarCsv('inventario')">📊 Exportar CSV</button>
+                </div>
+                <div class="form-group" style="margin-bottom: 0;">
+                    <!-- Selector habilitado también en Bodega -->
+                    <input type="file" id="file-inventario" accept=".json,.csv,.xls,.xlsx" style="font-size: 12px; padding: 10px;" onchange="importarArchivoUniversal('inventario', event)">
+                </div>
+                <p class="desc" style="margin-top: 6px; margin-bottom: 14px;">⚡ Sube tu archivo de cuentas aquí para distribuirlas automáticamente entre libres y ocupadas (con cliente y fecha).</p>
+                <div id="lista-inventario" class="item-list">
+                    <div class="text-center">Cargando inventario...</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getFirestore, doc, setDoc, addDoc, collection, getDocs, deleteDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+        const firebaseConfig = {
+          apiKey: "AIzaSyDP4RQgPV5GKo49jzQ4Tc6BSKCwNHY_Q5I",
+          authDomain: "mi-tienda-a2487.firebaseapp.com",
+          projectId: "mi-tienda-a2487",
+          storageBucket: "mi-tienda-a2487.firebasestorage.app",
+          messagingSenderId: "360375752770",
+          appId: "1:360375752770:web:442d2346254662478975db"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        window.mostrarSeccion = function(seccion) {
+            document.getElementById('seccion-clientes').classList.add('hidden');
+            document.getElementById('seccion-inventario').classList.add('hidden');
+            document.getElementById('tab-clientes').classList.remove('active');
+            document.getElementById('tab-inventario').classList.remove('active');
+
+            document.getElementById('seccion-' + seccion).classList.remove('hidden');
+            document.getElementById('tab-' + seccion).classList.add('active');
+        };
+
+        function convertirFechaExcel(val) {
+            if (!val) return new Date().toISOString().split('T')[0];
+            if (!isNaN(val) && typeof val === 'number') {
+                const date = new Date(Math.round((val - (25567 + 2)) * 86400 * 1000));
+                return date.toISOString().split('T')[0];
+            }
+            let str = val.toString().trim();
+            if (str.includes('/')) {
+                const partes = str.split('/');
+                if (partes.length === 3 && partes[2].length === 4) {
+                    return `${partes[2]}-${partes[1].padStart(2,'0')}-${partes[0].padStart(2,'0')}`;
+                }
+            }
+            return str.length >= 10 ? str.substring(0, 10) : str;
+        }
+
+        window.exportarJson = async function(coleccion) {
+            const querySnapshot = await getDocs(collection(db, coleccion));
+            const datos = [];
+            querySnapshot.forEach(d => datos.push({ id: d.id, ...d.data() }));
+            const blob = new Blob([JSON.stringify(datos, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a'); a.href = url; a.download = `${coleccion}_fullmoviesec.json`; a.click();
+        };
+
+        window.exportarCsv = async function(coleccion) {
+            const querySnapshot = await getDocs(collection(db, coleccion));
+            const datos = [];
+            querySnapshot.forEach(d => datos.push({ id: d.id, ...d.data() }));
+            if(datos.length === 0) { alert('No hay datos para exportar.'); return; }
+            const keys = Object.keys(datos[0]);
+            let csv = keys.join(',') + '\n';
+            datos.forEach(row => { csv += keys.map(k => `"${(row[k] || '').toString().replace(/"/g, '""')}"`).join(',') + '\n'; });
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a'); a.href = url; a.download = `${coleccion}_fullmoviesec.csv`; a.click();
+        };
+
+        // 🧠 IMPORTADOR INTELIGENTE DUAL (Clientes o Bodega)
+        window.importarArchivoUniversal = async function(destino, event) {
+            const file = event.target.files[0];
+            if(!file) return;
+            const nombreArchivo = file.name.toLowerCase();
+            let importados = 0;
+
+            async function procesarFila(obj) {
+                if (!obj || typeof obj !== 'object') return;
+                const lowerObj = {};
+                for (let k in obj) { lowerObj[k.toLowerCase().trim()] = obj[k]; }
+
+                if (destino === 'clientes') {
+                    const nombre = lowerObj.nombre || lowerObj.cliente || lowerObj.name;
+                    const plan = lowerObj.plan || lowerObj.servicio || lowerObj.producto;
+                    const venceRaw = lowerObj.vence || lowerObj.vencimiento || lowerObj.fecha || lowerObj.corte;
+                    const numero = lowerObj.whatsapp || lowerObj.numero || lowerObj.telefono || lowerObj.id;
+
+                    if (nombre || venceRaw || (numero && plan)) {
+                        const numId = numero ? numero.toString().replace(/[^0-9]/g, '') : ('cli_' + Date.now() + Math.floor(Math.random()*1000));
+                        await setDoc(doc(db, 'clientes', numId), {
+                            nombre: (nombre || 'Sin Nombre').toString(),
+                            plan: (plan || 'Streaming').toString(),
+                            vence: convertirFechaExcel(venceRaw)
+                        });
+                        importados++;
+                    }
+                } else if (destino === 'inventario') {
+                    const servicio = lowerObj.servicio || lowerObj.plan || lowerObj.producto || 'Netflix';
+                    const correo = lowerObj.correo || lowerObj.email || lowerObj.mail || lowerObj.usuario;
+                    const clave = lowerObj.clave || lowerObj.password || lowerObj.contrasena;
+                    const perfil = lowerObj.perfil || lowerObj.profile || '1';
+                    
+                    // Detectar si está ocupado o libre según el archivo
+                    const asignadoA = lowerObj.asignadoa || lowerObj.asignado_a || lowerObj.cliente || lowerObj.ocupado || '';
+                    const estado = (asignadoA && asignadoA.toString().trim() !== '') ? 'ocupado' : (lowerObj.estado || 'libre');
+
+                    if (correo || clave || servicio) {
+                        await addDoc(collection(db, 'inventario'), {
+                            servicio: servicio.toString(),
+                            correo: (correo || '').toString(),
+                            clave: (clave || '').toString(),
+                            perfil: perfil.toString(),
+                            pin: (lowerObj.pin || '').toString(),
+                            estado: estado.toString(),
+                            asignadoA: asignadoA.toString()
+                        });
+                        importados++;
+                    }
+                }
+            }
+
+            try {
+                if (nombreArchivo.endsWith('.json')) {
+                    const reader = new FileReader();
+                    reader.onload = async function(e) {
+                        const json = JSON.parse(e.target.result);
+                        for (let key in json) {
+                            const seccion = json[key];
+                            if (typeof seccion === 'object' && seccion !== null) {
+                                for (let docId in seccion) { await procesarFila(seccion[docId]); }
+                            } else if (Array.isArray(json)) {
+                                for (let item of json) { await procesarFila(item); }
+                            }
+                        }
+                        alert(`¡Importación en ${destino} exitosa! 🚀 Registros procesados: ${importados}`);
+                        if(destino === 'clientes') cargarClientes(); else cargarInventario();
+                    };
+                    reader.readAsText(file);
+                } 
+                else if (nombreArchivo.endsWith('.xls') || nombreArchivo.endsWith('.xlsx') || nombreArchivo.endsWith('.csv')) {
+                    const reader = new FileReader();
+                    reader.onload = async function(e) {
+                        const data = new Uint8Array(e.target.result);
+                        const workbook = XLSX.read(data, { type: 'array' });
+                        const firstSheetName = workbook.SheetNames[0];
+                        const rows = XLSX.utils.sheet_to_json(workbook.Sheets[firstSheetName]);
+
+                        for (let row of rows) { await procesarFila(row); }
+
+                        alert(`¡Importación en ${destino} exitosa! 📊 Registros procesados: ${importados}`);
+                        if(destino === 'clientes') cargarClientes(); else cargarInventario();
+                    };
+                    reader.readAsArrayBuffer(file);
+                }
+            } catch(err) {
+                console.error(err);
+                alert('Error al leer el archivo. Revisa el formato.');
+            }
+        };
+
+        async function cargarClientes() {
+            const listaDiv = document.getElementById('lista-clientes');
+            listaDiv.innerHTML = ''; 
+            try {
+                const querySnapshot = await getDocs(collection(db, "clientes"));
+                if(querySnapshot.empty) { listaDiv.innerHTML = '<div class="text-center">No hay clientes registrados.</div>'; return; }
+                querySnapshot.forEach((documento) => {
+                    const c = documento.data();
+                    listaDiv.innerHTML += `
+                        <div class="item-card">
+                            <div class="item-info">
+                                <h3>${c.nombre}</h3>
+                                <p class="tag-plan">${c.plan}</p>
+                                <p>Vence: ${c.vence} | 📱 ${documento.id}</p>
+                            </div>
+                            <button class="btn btn-danger btn-eliminar-cli" data-id="${documento.id}">🗑️ Borrar</button>
+                        </div>`;
+                });
+                document.querySelectorAll('.btn-eliminar-cli').forEach(btn => {
+                    btn.addEventListener('click', async (e) => {
+                        if(confirm('¿Eliminar cliente?')) {
+                            await deleteDoc(doc(db, "clientes", e.currentTarget.getAttribute('data-id')));
+                            cargarClientes();
+                        }
+                    });
+                });
+            } catch (error) { console.error(error); }
+        }
+
+        document.getElementById('form-cliente').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = e.target.querySelector('button'); btn.innerText = "Guardando...";
+            try {
+                await setDoc(doc(db, "clientes", document.getElementById('numero').value.trim()), {
+                    nombre: document.getElementById('nombre').value.trim(),
+                    plan: document.getElementById('plan').value.trim(),
+                    vence: document.getElementById('vence').value
+                });
+                e.target.reset(); cargarClientes();
+            } catch (error) {} finally { btn.innerText = "Guardar Cliente"; }
+        });
+
+        async function cargarInventario() {
+            const listaDiv = document.getElementById('lista-inventario');
+            listaDiv.innerHTML = ''; 
+            try {
+                const querySnapshot = await getDocs(collection(db, "inventario"));
+                if(querySnapshot.empty) { listaDiv.innerHTML = '<div class="text-center">La bodega está vacía.</div>'; return; }
+                querySnapshot.forEach((documento) => {
+                    const i = documento.data();
+                    const badgeClass = i.estado === 'libre' ? 'badge-libre' : 'badge-ocupado';
+                    listaDiv.innerHTML += `
+                        <div class="item-card" style="flex-direction: column; align-items: flex-start; gap: 8px;">
+                            <div style="display: flex; justify-content: space-between; width: 100%; align-items: center;">
+                                <h3 style="color:#fff; font-size:14px;">${i.servicio} - Perfil: ${i.perfil}</h3>
+                                <span class="badge ${badgeClass}">${i.estado}</span>
+                            </div>
+                            <div style="font-size:12px; color: #9ca3af; width: 100%;">
+                                <p>📧 ${i.correo}</p>
+                                <p>🔑 ${i.clave} ${i.pin ? '| PIN: ' + i.pin : ''}</p>
+                                ${i.estado === 'ocupado' && i.asignadoA ? `<p style="color:#a855f7; margin-top:4px;">👤 Ocupado por: ${i.asignadoA}</p>` : ''}
+                            </div>
+                            <div style="width: 100%; text-align: right; margin-top: 4px;">
+                                <button class="btn btn-danger btn-eliminar-inv" data-id="${documento.id}">Borrar Cuenta</button>
+                            </div>
+                        </div>`;
+                });
+                document.querySelectorAll('.btn-eliminar-inv').forEach(btn => {
+                    btn.addEventListener('click', async (e) => {
+                        if(confirm('¿Eliminar cuenta de la bodega?')) {
+                            await deleteDoc(doc(db, "inventario", e.currentTarget.getAttribute('data-id')));
+                            cargarInventario();
+                        }
+                    });
+                });
+            } catch (error) { console.error(error); }
+        }
+
+        document.getElementById('form-inventario').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = e.target.querySelector('button'); btn.innerText = "Guardando...";
+            const msg = document.getElementById('mensaje-inv');
+            try {
+                await addDoc(collection(db, "inventario"), {
+                    servicio: document.getElementById('inv-servicio').value.trim(),
+                    correo: document.getElementById('inv-correo').value.trim(),
+                    clave: document.getElementById('inv-clave').value.trim(),
+                    perfil: document.getElementById('inv-perfil').value.trim(),
+                    pin: document.getElementById('inv-pin').value.trim(),
+                    estado: 'libre'
+                });
+                msg.innerHTML = "✅ Cuenta registrada exitosamente en Bodega.";
+                msg.style.color = "#4ade80";
+                msg.classList.remove('hidden');
+                e.target.reset(); cargarInventario();
+                setTimeout(() => { msg.classList.add('hidden'); }, 3000);
+            } catch (error) { console.error(error); } finally { btn.innerText = "Guardar en Bodega"; }
+        });
+
+        cargarClientes();
+        cargarInventario();
+    </script>
+</body>
+</html>
