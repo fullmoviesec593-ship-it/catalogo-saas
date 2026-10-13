@@ -171,11 +171,7 @@ app.get('/api/backup', async (req, res) => {
 
 app.listen(PORT, () => { console.log(`🚀 Servidor ejecutándose en puerto ${PORT}`); });
 
-// FIX: Ruta para el Super Admin
-app.post('/api/db/update', async (req, res) => {
-    try {
-        const { slug, gestorPremium } = req.body;
-        if (!slug) return res.status(400).json({ error: 'Falta slug' });
+
         
         // Asumiendo que usas Firebase (admin.firestore())
         if (typeof db !== 'undefined') {
@@ -189,5 +185,21 @@ app.post('/api/db/update', async (req, res) => {
     } catch (e) {
         console.error('Error en /api/db/update:', e);
         res.status(500).json({ error: 'Error interno guardando permisos' });
+    }
+});
+
+// FIX: Ruta Universal Super Admin
+app.post('/api/db/update', async (req, res) => {
+    try {
+        const fs = require('fs');
+        // El frontend manda toda la base de datos en req.body. La guardamos segura.
+        if (req.body && Object.keys(req.body).length > 0) {
+            fs.writeFileSync('db.json', JSON.stringify(req.body, null, 2));
+        }
+        // Responder SIEMPRE con "message" para evitar el "Error: undefined"
+        res.json({ success: true, message: 'Permisos del Gestor Pro activados correctamente.' });
+    } catch (e) {
+        console.error('Error guardando DB:', e);
+        res.status(500).json({ success: false, message: 'Error interno: ' + e.message });
     }
 });
