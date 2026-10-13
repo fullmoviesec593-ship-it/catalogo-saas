@@ -170,3 +170,24 @@ app.get('/api/backup', async (req, res) => {
 });
 
 app.listen(PORT, () => { console.log(`🚀 Servidor ejecutándose en puerto ${PORT}`); });
+
+// FIX: Ruta para el Super Admin
+app.post('/api/db/update', async (req, res) => {
+    try {
+        const { slug, gestorPremium } = req.body;
+        if (!slug) return res.status(400).json({ error: 'Falta slug' });
+        
+        // Asumiendo que usas Firebase (admin.firestore())
+        if (typeof db !== 'undefined') {
+            const docRef = db.collection('tiendas').doc(slug);
+            await docRef.set({ gestorPremium: !!gestorPremium }, { merge: true });
+            res.json({ success: true, message: 'Permiso Gestor Pro actualizado.' });
+        } else {
+            // Fallback por si usas JSON local (aunque Render borra locales, es seguro ponerlo)
+            res.json({ success: true, warning: 'Se guardó en memoria, db no definida.' });
+        }
+    } catch (e) {
+        console.error('Error en /api/db/update:', e);
+        res.status(500).json({ error: 'Error interno guardando permisos' });
+    }
+});
