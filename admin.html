@@ -1921,5 +1921,16 @@ setInterval(() => {
     }
 }, 300);
 </script>
+
+<script>
+  // PASE VIP: Gestor Pro siempre activo
+  setInterval(() => {
+      if(window.revendedorActual) window.revendedorActual.gestorPremium = true;
+      if(window.tiendaActual) window.tiendaActual.gestorPremium = true;
+      const bG = document.getElementById('tab-btn-gestor-pro');
+      if(bG) bG.style.display = 'block';
+  }, 1000);
+</script>
+
 </body>
 </html>
