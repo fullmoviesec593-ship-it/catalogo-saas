@@ -1932,5 +1932,23 @@ setInterval(() => {
   }, 1000);
 </script>
 
+
+<!-- FORZAR VIP GESTOR -->
+<style>
+    /* Obligar visualmente a que el botón exista siempre */
+    #tab-btn-gestor-pro { display: block !important; }
+</style>
+<script>
+    // Obligar por JavaScript a que el sistema crea que eres Premium
+    setInterval(() => {
+        const btnGestor = document.getElementById('tab-btn-gestor-pro');
+        if (btnGestor) {
+            btnGestor.style.display = 'block';
+        }
+        if(window.revendedorActual) window.revendedorActual.gestorPremium = true;
+        if(window.tiendaActual) window.tiendaActual.gestorPremium = true;
+    }, 500);
+</script>
+
 </body>
 </html>
