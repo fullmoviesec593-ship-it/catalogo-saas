@@ -12,8 +12,7 @@ app.post('/api/db/update', async (req, res) => {
         if(req.body) {
             require('fs').writeFileSync('db_backup_seguridad.json', JSON.stringify(req.body));
         }
-        res.json({ success: true, message: 'Actualizado correctamente.' });
-    } catch (e) {
+        res.json({ success: true, message: 'Actualizado correctamente.' }); } catch (e) {
         res.json({ success: true, message: 'Guardado parcial.' }); // Nunca devolver error 500
     }
 });
@@ -48,8 +47,7 @@ try {
   if (creds && creds.project_id && creds.client_email && creds.private_key) {
     dbFirestore = new Firestore({ projectId: creds.project_id, credentials: { client_email: creds.client_email, private_key: creds.private_key } });
     console.log('✅ FIRESTORE NATIVO CONECTADO');
-  } else { errorDiagnostico = 'Credenciales no encontradas'; }
-} catch (e) { errorDiagnostico = e.message; }
+  } else { errorDiagnostico = 'Credenciales no encontradas'; } catch (e) { errorDiagnostico = e.message; }
 
 const LOCAL_DB_PATH = path.join(__dirname, 'database.json');
 function leerDBLocal() {
@@ -77,8 +75,7 @@ app.post('/api/stats/track', async (req, res) => {
       }
     }
     await ref.set(data, { merge: true });
-    return res.json({ success: true });
-  } catch (e) { return res.json({ success: false }); }
+    return res.json({ success: true }); } catch (e) { return res.json({ success: false }); }
 });
 
 app.get('/api/stats/:slug', async (req, res) => {
@@ -88,8 +85,7 @@ app.get('/api/stats/:slug', async (req, res) => {
       const doc = await dbFirestore.collection('saas_estadisticas').doc(slug).get();
       if (doc.exists) return res.json(doc.data());
     }
-    return res.json({ vistas: 0, clics: 0, top: {} });
-  } catch (e) { return res.json({ vistas: 0, clics: 0, top: {} }); }
+    return res.json({ vistas: 0, clics: 0, top: {} }); } catch (e) { return res.json({ vistas: 0, clics: 0, top: {} }); }
 });
 
 app.get('/manifest.json', async (req, res) => {
@@ -97,8 +93,7 @@ app.get('/manifest.json', async (req, res) => {
   try {
     let db = leerDBLocal();
     if (dbFirestore && slug) { const docTienda = await dbFirestore.collection('saas_tiendas').doc(slug).get(); if (docTienda.exists && docTienda.data().nombre) nombreTienda = docTienda.data().nombre; }
-    else if (slug && db.tiendas && db.tiendas[slug]) nombreTienda = db.tiendas[slug].nombre || nombreTienda;
-  } catch (err) {}
+    else if (slug && db.tiendas && db.tiendas[slug]) nombreTienda = db.tiendas[slug].nombre || nombreTienda; } catch (err) {}
   const startUrl = slug ? `/?tienda=${encodeURIComponent(slug)}&source=pwa` : `/?source=pwa`;
   res.setHeader('Content-Type', 'application/manifest+json; charset=utf-8');
   res.json({ name: nombreTienda, short_name: nombreTienda.substring(0, 12), start_url: startUrl, display: "standalone", background_color: "#090a0f", theme_color: "#ff6a00", orientation: "portrait", icons: [{ src: "https://cdn-icons-png.flaticon.com/512/3074/3074767.png", sizes: "192x192", type: "image/png" }, { src: "https://cdn-icons-png.flaticon.com/512/3074/3074767.png", sizes: "512x512", type: "image/png" }] });
@@ -115,9 +110,7 @@ app.get('/api/db', async (req, res) => {
     if (dbFirestore) {
       const snapRev = await dbFirestore.collection('saas_revendedores').get(); const revendedores = {}; snapRev.forEach(doc => { revendedores[doc.id] = doc.data(); });
       const snapTiendas = await dbFirestore.collection('saas_tiendas').get(); const tiendas = {}; snapTiendas.forEach(doc => { tiendas[doc.id] = doc.data(); });
-      guardarDBLocal({ revendedores, tiendas }); return res.json({ revendedores, tiendas, firestore: true });
-    }
-  } catch (e) {}
+      guardarDBLocal({ revendedores, tiendas }); return res.json({ revendedores, tiendas, firestore: true }); } catch (e) {}
   return res.json({ ...leerDBLocal(), firestore: false });
 });
 
@@ -127,24 +120,21 @@ app.post('/api/tienda/guardar', async (req, res) => {
     let guardadoNube = false;
     if (dbFirestore) { await dbFirestore.collection('saas_tiendas').doc(slug).set(tienda, { merge: true }); guardadoNube = true; }
     const local = leerDBLocal(); if (!local.tiendas) local.tiendas = {}; local.tiendas[slug] = { ...(local.tiendas[slug] || {}), ...tienda }; guardarDBLocal(local);
-    return res.json({ success: true, guardadoNube });
-  } catch (err) { return res.status(500).json({ error: err.message }); }
+    return res.json({ success: true, guardadoNube }); } catch (err) { return res.status(500).json({ error: err.message }); }
 });
 
 app.post('/api/revendedor/guardar', async (req, res) => {
   try {
     const { slug, revendedor, tienda } = req.body;
     if (dbFirestore) { await dbFirestore.collection('saas_revendedores').doc(slug).set(revendedor, { merge: true }); if (tienda) await dbFirestore.collection('saas_tiendas').doc(slug).set(tienda, { merge: true }); }
-    return res.json({ success: true });
-  } catch (err) { return res.status(500).json({ error: err.message }); }
+    return res.json({ success: true }); } catch (err) { return res.status(500).json({ error: err.message }); }
 });
 
 app.post('/api/revendedor/toggle-suspension', async (req, res) => {
   try {
     const { slug, suspendido } = req.body; const activo = !suspendido;
     if (dbFirestore) await dbFirestore.collection('saas_revendedores').doc(slug).set({ activo }, { merge: true });
-    return res.json({ success: true, activo });
-  } catch (err) { return res.status(500).json({ error: err.message }); }
+    return res.json({ success: true, activo }); } catch (err) { return res.status(500).json({ error: err.message }); }
 });
 
 app.post('/api/auth/recuperar-password', async (req, res) => {
@@ -158,16 +148,14 @@ app.post('/api/auth/recuperar-password', async (req, res) => {
       if (dbFirestore) await dbFirestore.collection('saas_revendedores').doc(foundSlug).set({ password: nuevaPassword }, { merge: true });
       return res.json({ success: true, message: 'Contraseña actualizada.' });
     }
-    return res.json({ success: true, slug: foundSlug });
-  } catch (err) { return res.status(500).json({ error: err.message }); }
+    return res.json({ success: true, slug: foundSlug }); } catch (err) { return res.status(500).json({ error: err.message }); }
 });
 
 app.post('/api/revendedor/eliminar', async (req, res) => {
   try {
     const { slug } = req.body;
     if (dbFirestore) { await dbFirestore.collection('saas_revendedores').doc(slug).delete(); await dbFirestore.collection('saas_tiendas').doc(slug).delete(); }
-    return res.json({ success: true });
-  } catch (err) { return res.status(500).json({ error: err.message }); }
+    return res.json({ success: true }); } catch (err) { return res.status(500).json({ error: err.message }); }
 });
 
 app.get('/api/backup', async (req, res) => {
@@ -176,9 +164,7 @@ app.get('/api/backup', async (req, res) => {
       const snapRev = await dbFirestore.collection('saas_revendedores').get(); const revendedores = {}; snapRev.forEach(d => { revendedores[d.id] = d.data(); });
       const snapTiendas = await dbFirestore.collection('saas_tiendas').get(); const tiendas = {}; snapTiendas.forEach(d => { tiendas[d.id] = d.data(); });
       res.setHeader('Content-disposition', 'attachment; filename=backup-saas-' + Date.now() + '.json'); res.setHeader('Content-type', 'application/json');
-      return res.send(JSON.stringify({ revendedores, tiendas }, null, 2));
-    }
-  } catch (e) {}
+      return res.send(JSON.stringify({ revendedores, tiendas }, null, 2)); } catch (e) {}
   res.json(leerDBLocal());
 });
 
@@ -193,16 +179,11 @@ app.listen(PORT, () => { console.log(`🚀 Servidor ejecutándose en puerto ${PO
             res.json({ success: true, message: 'Permiso Gestor Pro actualizado.' });
         } else {
             // Fallback por si usas JSON local (aunque Render borra locales, es seguro ponerlo)
-            res.json({ success: true, warning: 'Se guardó en memoria, db no definida.' });
-        }
-    } catch (e) {
+            res.json({ success: true, warning: 'Se guardó en memoria, db no definida.' }); } catch (e) {
         console.error('Error en /api/db/update:', e);
         res.status(500).json({ error: 'Error interno guardando permisos' });
     }
-});
-
-
-    } catch (e) {
+}); } catch (e) {
         console.error('Error guardando DB:', e);
         res.status(500).json({ success: false, message: 'Error interno: ' + e.message });
     }
@@ -266,9 +247,7 @@ app.get('/panel-ofertas', (req, res) => {
                     if(data.success) {
                         alert('✅ ¡Oferta aplicada a tu catálogo exitosamente!');
                     } else {
-                        alert('⚠️ Hubo un problema al guardar.');
-                    }
-                } catch(e) {
+                        alert('⚠️ Hubo un problema al guardar.'); } catch (e) {
                     alert('Error de conexión con el servidor.');
                 }
             }
