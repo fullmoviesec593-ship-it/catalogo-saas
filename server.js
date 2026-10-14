@@ -195,10 +195,10 @@ app.listen(PORT, () => { console.log(`🚀 Servidor ejecutándose en puerto ${PO
             // Fallback por si usas JSON local (aunque Render borra locales, es seguro ponerlo)
             res.json({ success: true, warning: 'Se guardó en memoria, db no definida.' });
         }
-    } catch (e) {
-        console.error('Error en /api/db/update:', e);
-        res.status(500).json({ error: 'Error interno guardando permisos' });
-    }
+//     } catch (e) {
+//         console.error('Error en /api/db/update:', e);
+//         res.status(500).json({ error: 'Error interno guardando permisos' });
+//     }
 });
 
 
