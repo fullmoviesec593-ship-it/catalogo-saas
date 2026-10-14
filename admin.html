@@ -2008,5 +2008,112 @@ setInterval(() => {
 }, 500);
 </script>
 
+
+<!-- SISTEMA DE OFERTA RELAMPAGO (ADMIN) -->
+<style>
+  .modal-oferta { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); z-index:99999; align-items:center; justify-content:center; backdrop-filter:blur(5px); }
+  .mo-content { background:#0f172a; border:1px solid #0ea5e9; border-radius:16px; width:90%; max-width:400px; padding:20px; box-shadow:0 10px 40px rgba(14,165,233,0.3); }
+  .mo-header { font-size:18px; color:#fff; font-weight:bold; margin-bottom:20px; display:flex; align-items:center; border-bottom:1px solid #1e293b; padding-bottom:10px; font-family:'Orbitron', sans-serif;}
+  .mo-group { margin-bottom:15px; }
+  .mo-label { color:#94a3b8; font-size:11px; font-weight:bold; margin-bottom:6px; display:block; text-transform:uppercase; }
+  .mo-input { width:100%; padding:12px; background:#0b1120; border:1px solid #1e293b; color:#fff; border-radius:8px; box-sizing:border-box; font-size:14px; }
+  .mo-input:focus { border-color:#0ea5e9; outline:none; }
+  .mo-btn-save { width:100%; padding:14px; background:linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%); color:#fff; font-weight:bold; border:none; border-radius:8px; cursor:pointer; font-size:15px; margin-top:10px;}
+  .mo-btn-cancel { width:100%; padding:12px; background:transparent; color:#ef4444; font-weight:bold; border:1px solid #ef4444; border-radius:8px; margin-top:10px; cursor:pointer; }
+</style>
+
+<div id="modal-oferta" class="modal-oferta">
+    <div class="mo-content">
+        <div class="mo-header">⚡ Configurar Oferta Relámpago</div>
+        
+        <div class="mo-group">
+            <label class="mo-label">Estado de la Oferta</label>
+            <select id="of-estado" class="mo-input">
+                <option value="0">🔴 INACTIVA</option>
+                <option value="1">🟢 ACTIVA (Visible en catálogo)</option>
+            </select>
+        </div>
+        
+        <div class="mo-group" style="display:flex; gap:10px;">
+            <div style="flex:1;">
+                <label class="mo-label">Descuento (%)</label>
+                <input type="number" id="of-porcentaje" class="mo-input" placeholder="Ej: 20">
+            </div>
+        </div>
+        
+        <div class="mo-group">
+            <label class="mo-label">Fecha y Hora de Inicio</label>
+            <input type="datetime-local" id="of-inicio" class="mo-input" style="color-scheme:dark;">
+        </div>
+        
+        <div class="mo-group">
+            <label class="mo-label">Fecha y Hora de Fin</label>
+            <input type="datetime-local" id="of-fin" class="mo-input" style="color-scheme:dark;">
+        </div>
+        
+        <button class="mo-btn-save" onclick="guardarOferta()">Guardar Oferta</button>
+        <button class="mo-btn-cancel" onclick="document.getElementById('modal-oferta').style.display='none'">Cancelar</button>
+    </div>
+</div>
+
+<script>
+// 1. Crear el botón flotante azul a la izquierda
+setInterval(() => {
+    if(!document.getElementById('btn-abrir-oferta')) {
+        const btn = document.createElement('button');
+        btn.id = 'btn-abrir-oferta';
+        btn.innerHTML = '⚡ Oferta';
+        btn.style.cssText = 'position:fixed; bottom:20px; left:20px; background:linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%); color:#fff; border:none; padding:12px 20px; border-radius:30px; font-weight:bold; box-shadow:0 4px 15px rgba(14,165,233,0.5); z-index:9000; cursor:pointer; font-family:sans-serif;';
+        
+        btn.onclick = () => {
+            // Cargar datos si ya existe una oferta guardada
+            if(window.tiendaActual && window.tiendaActual.ofertaTemporal) {
+                document.getElementById('of-estado').value = window.tiendaActual.ofertaTemporal.activa ? "1" : "0";
+                document.getElementById('of-porcentaje').value = window.tiendaActual.ofertaTemporal.porcentaje || "";
+                document.getElementById('of-inicio').value = window.tiendaActual.ofertaTemporal.inicio || "";
+                document.getElementById('of-fin').value = window.tiendaActual.ofertaTemporal.fin || "";
+            }
+            document.getElementById('modal-oferta').style.display = 'flex';
+        };
+        document.body.appendChild(btn);
+    }
+}, 1000);
+
+// 2. Función para guardar la oferta en la base de datos
+window.guardarOferta = async function() {
+    const activa = document.getElementById('of-estado').value === "1";
+    const porcentaje = parseFloat(document.getElementById('of-porcentaje').value);
+    const inicio = document.getElementById('of-inicio').value;
+    const fin = document.getElementById('of-fin').value;
+
+    if (activa && (!porcentaje || !inicio || !fin)) {
+        return alert('⚠️ Para activar la oferta, debes llenar el porcentaje, la hora de inicio y la hora de fin.');
+    }
+
+    const configOferta = { activa, porcentaje, inicio, fin };
+    
+    // Inyectar en la variable global
+    if(!window.tiendaActual) window.tiendaActual = {};
+    window.tiendaActual.ofertaTemporal = configOferta;
+
+    try {
+        // Usar la misma ruta de guardado que usa el sistema nativo
+        const slug = window.slugActual || (window.tiendaActual && window.tiendaActual.slug);
+        if(!slug) throw new Error("No se detectó el ID de la tienda");
+
+        const res = await fetch('/api/tienda/guardar', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({ slug: slug, ofertaTemporal: configOferta })
+        });
+        
+        alert('✅ Oferta programada con éxito.');
+        document.getElementById('modal-oferta').style.display = 'none';
+    } catch(e) {
+        alert('⚠️ Error al conectar con el servidor. Revisar conexión.');
+    }
+};
+</script>
+
 </body>
 </html>
