@@ -2060,22 +2060,7 @@ setInterval(() => {
 // 1. Crear el botón flotante azul a la izquierda
 setInterval(() => {
     if(!document.getElementById('btn-abrir-oferta')) {
-        const btn = document.createElement('button');
-        btn.id = 'btn-abrir-oferta';
-        btn.innerHTML = '⚡ Oferta';
-        btn.style.cssText = 'position:fixed; bottom:20px; left:20px; background:linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%); color:#fff; border:none; padding:12px 20px; border-radius:30px; font-weight:bold; box-shadow:0 4px 15px rgba(14,165,233,0.5); z-index:9000; cursor:pointer; font-family:sans-serif;';
-        
-        btn.onclick = () => {
-            // Cargar datos si ya existe una oferta guardada
-            if(window.tiendaActual && window.tiendaActual.ofertaTemporal) {
-                document.getElementById('of-estado').value = window.tiendaActual.ofertaTemporal.activa ? "1" : "0";
-                document.getElementById('of-porcentaje').value = window.tiendaActual.ofertaTemporal.porcentaje || "";
-                document.getElementById('of-inicio').value = window.tiendaActual.ofertaTemporal.inicio || "";
-                document.getElementById('of-fin').value = window.tiendaActual.ofertaTemporal.fin || "";
-            }
-            document.getElementById('modal-oferta').style.display = 'flex';
-        };
-        document.body.appendChild(btn);
+        /* Botón flotante eliminado */
     }
 }, 1000);
 
@@ -2113,6 +2098,49 @@ window.guardarOferta = async function() {
         alert('⚠️ Error al conectar con el servidor. Revisar conexión.');
     }
 };
+</script>
+
+
+<script>
+setInterval(() => {
+    // Si el botón de oferta no existe en el menú, lo creamos
+    if(!document.getElementById('btn-menu-oferta')) {
+        const todosLosElementos = document.getElementsByTagName('*');
+        
+        for (let i = 0; i < todosLosElementos.length; i++) {
+            let el = todosLosElementos[i];
+            
+            // Buscamos específicamente el botón de GESTOR PRO en el menú
+            if (el.innerText && el.innerText.includes('GESTOR PRO') && el.children.length < 3 && el.tagName !== 'SCRIPT' && el.tagName !== 'STYLE') {
+                
+                // Clonamos su diseño exactamente igual
+                let btnOferta = el.cloneNode(true);
+                btnOferta.id = 'btn-menu-oferta';
+                btnOferta.innerHTML = '⚡ OFERTA TEMPORAL';
+                
+                // Le damos colores de "Oferta" (Azul neón/Celeste)
+                btnOferta.style.border = '1px solid #0ea5e9';
+                btnOferta.style.color = '#38bdf8';
+                btnOferta.style.marginTop = '10px'; // Separación del botón de arriba
+                
+                // Le damos la función para abrir el modal
+                btnOferta.onclick = () => {
+                    if(window.tiendaActual && window.tiendaActual.ofertaTemporal) {
+                        document.getElementById('of-estado').value = window.tiendaActual.ofertaTemporal.activa ? "1" : "0";
+                        document.getElementById('of-porcentaje').value = window.tiendaActual.ofertaTemporal.porcentaje || "";
+                        document.getElementById('of-inicio').value = window.tiendaActual.ofertaTemporal.inicio || "";
+                        document.getElementById('of-fin').value = window.tiendaActual.ofertaTemporal.fin || "";
+                    }
+                    document.getElementById('modal-oferta').style.display = 'flex';
+                };
+                
+                // Lo insertamos justo debajo del botón de Gestor Pro
+                el.parentNode.insertBefore(btnOferta, el.nextSibling);
+                break; // Terminamos la búsqueda
+            }
+        }
+    }
+}, 1000);
 </script>
 
 </body>
