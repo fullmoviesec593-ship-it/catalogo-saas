@@ -1491,7 +1491,7 @@ setTimeout(() => {
 </style>
 
 <!-- BOTÓN FAB FLOTANTE -->
-<button id="btn-fab-gestor" class="btn-nuevo-gestor" style="display:none;" onclick="abrirModalPorPestaña()">+</button>
+
 
 <!-- 1. MODAL: NUEVO CLIENTE -->
 <div id="modal-g-cliente" class="modal-g-overlay">
@@ -1718,7 +1718,7 @@ setInterval(() => {
 </style>
 
 <!-- BOTÓN FAB FLOTANTE -->
-<button id="btn-fab-gestor" class="btn-nuevo-gestor" style="display:none;" onclick="abrirModalPorPestaña()">+</button>
+
 
 <!-- 1. MODAL: NUEVO CLIENTE -->
 <div id="modal-g-cliente" class="modal-g-overlay">
@@ -1948,6 +1948,30 @@ setInterval(() => {
         if(window.revendedorActual) window.revendedorActual.gestorPremium = true;
         if(window.tiendaActual) window.tiendaActual.gestorPremium = true;
     }, 500);
+</script>
+
+
+<!-- FAB BLINDADO -->
+<button id="btn-fab-gestor-pro" class="btn-nuevo-gestor" style="display:none; position:fixed; bottom:80px; right:20px; z-index:99999; box-shadow: 0 4px 15px rgba(34, 197, 94, 0.6);" onclick="abrirModalPorPestaña()">+</button>
+
+<script>
+// Sensor blindado: Vigila la barra de búsqueda para mostrar el botón
+setInterval(() => {
+    const fab = document.getElementById('btn-fab-gestor-pro');
+    const buscador = document.querySelector('input[placeholder*="Buscar"]');
+    
+    // Si el buscador es visible en pantalla, el Gestor está abierto
+    const isGestorActive = buscador && buscador.offsetParent !== null; 
+    const pestana = window.pestañaActualGestor || 'INICIO';
+    
+    if (fab) {
+        if (isGestorActive && pestana !== 'DASHBOARD' && pestana !== 'IMPORTAR') {
+            fab.style.display = 'flex';
+        } else {
+            fab.style.display = 'none';
+        }
+    }
+}, 300);
 </script>
 
 </body>
