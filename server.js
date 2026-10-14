@@ -7,7 +7,7 @@ const { Firestore } = require('@google-cloud/firestore');
 const app = express();
 
 // RUTA MAXIMA PRIORIDAD SUPER ADMIN
-app.post('/api/db/update', (req, res) => {
+app.post('/api/db/update', async (req, res) => {
     try {
         if(req.body) {
             require('fs').writeFileSync('db_backup_seguridad.json', JSON.stringify(req.body));
@@ -189,7 +189,7 @@ app.listen(PORT, () => { console.log(`🚀 Servidor ejecutándose en puerto ${PO
         // Asumiendo que usas Firebase (admin.firestore())
         if (typeof db !== 'undefined') {
             const docRef = db.collection('tiendas').doc(slug);
-            await docRef.set({ gestorPremium: !!gestorPremium }, { merge: true });
+            docRef.set({ gestorPremium: !!gestorPremium }, { merge: true });
             res.json({ success: true, message: 'Permiso Gestor Pro actualizado.' });
         } else {
             // Fallback por si usas JSON local (aunque Render borra locales, es seguro ponerlo)
