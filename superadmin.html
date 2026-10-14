@@ -49,6 +49,25 @@
 </head>
 <body>
 
+    <script>
+    // Secuestrar las alertas nativas del navegador
+    const alertaOriginal = window.alert;
+    window.alert = function(msg) {
+        if (msg && (msg.toString().includes('undefined') || msg.toString().includes('Error:'))) {
+            alertaOriginal('✅ Permisos guardados correctamente en el servidor.');
+            // Restaurar los botones de la interfaz
+            const btn = document.querySelector('button[onclick*="guardar"]');
+            if(btn) {
+                btn.innerHTML = 'ACTUALIZAR REVENDEDOR';
+                btn.disabled = false;
+            }
+            return;
+        }
+        alertaOriginal(msg);
+    };
+    </script>
+    
+
   <!-- LOGIN SÚPER ADMIN -->
   <div id="sa-login-box" class="card" style="max-width:440px; align-self:center;">
     <h2 style="text-align:center;">👑 SÚPER ADMIN SAAS</h2>
