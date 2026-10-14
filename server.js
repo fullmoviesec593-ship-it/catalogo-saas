@@ -47,7 +47,7 @@ try {
   if (creds && creds.project_id && creds.client_email && creds.private_key) {
     dbFirestore = new Firestore({ projectId: creds.project_id, credentials: { client_email: creds.client_email, private_key: creds.private_key } });
     console.log('✅ FIRESTORE NATIVO CONECTADO');
-  } else { errorDiagnostico = 'Credenciales no encontradas'; } catch (e) { errorDiagnostico = e.message; }
+  } else { errorDiagnostico = 'Credenciales no encontradas'; } } catch (e) { errorDiagnostico = e.message; }
 
 const LOCAL_DB_PATH = path.join(__dirname, 'database.json');
 function leerDBLocal() {
