@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>⚡ Ofertas Relámpago</title>
+    <style>
+        body { background-color: #0f172a; color: #fff; font-family: sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+        .box { background: #1e293b; padding: 30px; border-radius: 15px; border: 2px solid #0ea5e9; box-shadow: 0 0 20px rgba(14,165,233,0.4); width: 90%; max-width: 400px; }
+        input, select { width: 100%; padding: 12px; margin-top: 5px; margin-bottom: 20px; border-radius: 8px; border: 1px solid #334155; background: #0f172a; color: white; box-sizing: border-box; font-size: 14px; }
+        button { width: 100%; padding: 15px; background: linear-gradient(135deg, #ef4444 0%, #b91c1c 100%); border: none; border-radius: 8px; color: white; font-weight: bold; font-size: 16px; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <div class="box">
+        <h2 style="text-align:center; color:#38bdf8; margin-top:0;">⚡ OFERTA TEMPORAL</h2>
+        
+        <label>ID de tu Tienda (Slug)</label>
+        <input type="text" id="of-slug" value="fullmoviesstream">
+        
+        <label>Estado de la Oferta</label>
+        <select id="of-estado">
+            <option value="1">🟢 ACTIVA (Visible)</option>
+            <option value="0">🔴 INACTIVA</option>
+        </select>
+        
+        <label>Descuento Global (%)</label>
+        <input type="number" id="of-porcentaje" placeholder="Ej: 20">
+        
+        <label>Fecha y Hora de Cierre</label>
+        <input type="datetime-local" id="of-fin" style="color-scheme: dark;">
+        
+        <button onclick="guardarOferta()">🚀 APLICAR OFERTA</button>
+    </div>
+    <script>
+        async function guardarOferta() {
+            const slug = document.getElementById('of-slug').value;
+            if(!slug) return alert('Debes poner el ID de tu tienda');
+            
+            const oferta = {
+                activa: document.getElementById('of-estado').value === "1",
+                porcentaje: parseFloat(document.getElementById('of-porcentaje').value),
+                fin: document.getElementById('of-fin').value
+            };
+            
+            if (oferta.activa && (!oferta.porcentaje || !oferta.fin)) {
+                return alert('Para activar, debes llenar el porcentaje y la fecha de fin.');
+            }
+            
+            try {
+                const res = await fetch('/api/tienda/guardar', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ slug: slug, ofertaTemporal: oferta })
+                });
+                const data = await res.json();
+                if(data.success) {
+                    alert('✅ ¡Oferta guardada exitosamente en la base de datos!');
+                } else {
+                    alert('⚠️ Hubo un problema al guardar.');
+                }
+            } catch(e) {
+                alert('Error de conexión. Intenta de nuevo.');
+            }
+        }
+    </script>
+</body>
+</html>
