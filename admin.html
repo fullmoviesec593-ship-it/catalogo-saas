@@ -2092,7 +2092,7 @@ setInterval(() => {
             // Llamada directa y segura a tu servidor
             const res = await fetch('/api/db');
             const data = await res.json();
-            const servicios = data.servicios || data.tiendas || [];
+            const servicios = data.servicios && data.servicios.length > 0 ? data.servicios : [];
             
             if (servicios.length === 0) {
                 contenedor.innerHTML = '<span style="color:#ef4444; font-size:12px;">No se encontraron servicios registrados.</span>';

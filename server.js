@@ -28,18 +28,36 @@ const app = express();
 // Tubería 1: Enviar datos de Firebase al Panel
 app.get('/api/db', async (req, res) => {
     try {
+        let catLocal = [];
+        try {
+            const dbL = JSON.parse(fs.readFileSync('db.json', 'utf8'));
+            if (dbL.servicios) catLocal = dbL.servicios;
+        } catch(e) {}
+        
         if (typeof dbFirestore !== 'undefined' && dbFirestore) {
             const tiendasSnap = await dbFirestore.collection('saas_tiendas').get();
             const tiendas = tiendasSnap.docs.map(d => d.data());
             const revSnap = await dbFirestore.collection('saas_revendedores').get();
             const revendedores = revSnap.docs.map(d => d.data());
-            return res.json({ servicios: tiendas, tiendas: tiendas, revendedores: revendedores });
+            
+            // Leemos el VERDADERO catálogo de servicios
+            let catNube = [];
+            try {
+                const snap = await dbFirestore.collection('saas_servicios').get();
+                if (!snap.empty) { catNube = snap.docs.map(d => d.data()); }
+                else {
+                    const snap2 = await dbFirestore.collection('servicios').get();
+                    if (!snap2.empty) catNube = snap2.docs.map(d => d.data());
+                }
+            } catch(e) {}
+            
+            const catFinal = catNube.length > 0 ? catNube : catLocal;
+            return res.json({ servicios: catFinal, tiendas: tiendas, revendedores: revendedores });
         }
-        res.json({ servicios: [], tiendas: [], revendedores: [] });
+        res.json({ servicios: catLocal, tiendas: [], revendedores: [] });
     } catch (e) { res.json({ servicios: [], tiendas: [], revendedores: [] }); }
 });
 
-// Tubería 2: Guardar nuevos usuarios en Firebase
 app.post('/api/revendedor/guardar', async (req, res) => {
     try {
         if (typeof dbFirestore !== 'undefined' && dbFirestore) {
