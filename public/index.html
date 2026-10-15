@@ -480,5 +480,167 @@
 })();
 </script>
 
+
+<script id="motor-universal-variantes">
+(function() {
+    function fusionarTarjetas() {
+        const botones = Array.from(document.querySelectorAll('button, a')).filter(b => {
+            const t = (b.textContent || '').trim().toLowerCase();
+            return t.includes('comprar') || t.includes('pedir');
+        });
+
+        if (botones.length < 2) return;
+
+        let tarjetas = [];
+        botones.forEach(btn => {
+            if (btn.closest('#modalOferta') || btn.closest('form') || btn.closest('nav') || btn.closest('header')) return;
+
+            // Subir hasta encontrar la tarjeta individual exacta
+            let card = btn.parentElement;
+            while (card && card !== document.body) {
+                const parent = card.parentElement;
+                const btnsEnParent = Array.from(parent.querySelectorAll('button, a')).filter(b => {
+                    const t = (b.textContent || '').trim().toLowerCase();
+                    return t.includes('comprar') || t.includes('pedir');
+                });
+                if (btnsEnParent.length > 1) break;
+                card = parent;
+            }
+
+
+            // Buscar el precio sin usar barras invertidas que se rompan
+            const todos = Array.from(card.querySelectorAll('*'));
+            const precioEl = todos.find(el => {
+                if (el.children.length > 0) return false;
+                const txt = (el.textContent || '').trim();
+                return txt.startsWith('
+</html>
+) && txt.length >= 2 && txt.length <= 12;
+            });
+
+            // Buscar el título del servicio
+            const ignorar = ['streaming', 'video', 'música', 'musica', 'software', 'ia', 'top', 'popular', 'streaming y tv', 'streaming y deportes', 'streaming, anime', 'comprar ahora!', 'pedir'];
+            let tituloEl = card.querySelector('h1, h2, h3, h4, .card-title, .service-title, .titulo');
+            
+                for (let el of todos) {
+                    if (el.children.length === 0) {
+                        let txt = (el.textContent || '').trim();
+                        let low = txt.toLowerCase();
+                            tituloEl = el;
+                            break;
+                        }
+                    }
+                }
+            }
+
+            if (tituloEl && precioEl) {
+                let numStr = precioEl.textContent.replace('
+</html>
+, '').trim();
+                tarjetas.push({
+                    card: card,
+                    tituloOriginal: (tituloEl.dataset.originalTitle || tituloEl.textContent).trim(),
+                    tituloEl: tituloEl,
+                    precioEl: precioEl,
+                    precioNum: parseFloat(numStr) || 0,
+                    boton: btn
+                });
+                    tituloEl.dataset.originalTitle = tituloEl.textContent.trim();
+                }
+            }
+        });
+
+        // Agrupar por familia de marca
+        let familias = {};
+        tarjetas.forEach(t => {
+            let low = t.tituloOriginal.toLowerCase();
+            let base = t.tituloOriginal;
+
+            if (low.includes('spotify')) base = 'Spotify';
+            else if (low.includes('flujo')) base = 'Flujo TV';
+            else if (low.includes('netflix')) base = 'Netflix';
+            else if (low.includes('disney')) base = 'Disney+ ESPN';
+            else if (low.includes('prime')) base = 'Prime Video';
+            else if (low.includes('hbo') || low.includes('max')) base = 'HBO Max';
+            else if (low.includes('zona movie')) base = 'IPTV Zona Movie';
+            else if (low.includes('stream live') || low.includes('iptv')) base = 'IPTV Stream Live';
+            else if (low.includes('estella') || low.includes('stella')) base = 'Estella TV';
+            else if (low.includes('oleada')) base = 'Oleada TV';
+            else if (low.includes('vix')) base = 'ViX Premium';
+            else if (low.includes('crunchyroll')) base = 'Crunchyroll';
+            else if (low.includes('canva')) base = 'Canva Pro';
+            else if (low.includes('gpt')) base = 'ChatGPT';
+
+            familias[base].push(t);
+        });
+
+        // Fusionar tarjetas de cada familia
+        Object.keys(familias).forEach(base => {
+            let grupo = familias[base];
+            if (grupo.length > 1) {
+                grupo.sort((a, b) => a.precioNum - b.precioNum);
+
+                let principal = grupo[0];
+                principal.tituloEl.textContent = base;
+
+                for (let i = 1; i < grupo.length; i++) {
+                    grupo[i].card.dataset.oculto = 'true';
+                    grupo[i].card.style.setProperty('display', 'none', 'important');
+                }
+
+                if (principal.card.querySelector('.selector-planes-fm')) return;
+
+                let cajaSelect = document.createElement('div');
+                cajaSelect.style.cssText = 'margin: 10px 0; background: #0f172a; padding: 8px 10px; border-radius: 10px; border: 1px solid #0284c7; width: 100%; box-sizing: border-box;';
+                
+                let html = '<label style="font-size: 10px; color: #38bdf8; font-weight: bold; text-transform: uppercase; display: block; margin-bottom: 5px; text-align: left;">⚡ ELIGE TU PLAN / OPCIÓN:</label>';
+                html += '<select class="selector-planes-fm" style="width: 100%; padding: 8px; border-radius: 6px; background: #090d16; color: #fff; font-weight: bold; font-size: 13px; border: 1px solid #1e293b; outline: none; cursor: pointer;">';
+
+                grupo.forEach((item, idx) => {
+                    let nombreVar = item.tituloOriginal;
+                    if (nombreVar.toLowerCase().startsWith(base.toLowerCase())) {
+                        nombreVar = nombreVar.substring(base.length).trim();
+                    }
+                    if (nombreVar.toLowerCase().startsWith('tv')) {
+                        nombreVar = nombreVar.substring(2).trim();
+                    }
+                    
+                        nombreVar = idx === 0 ? 'Plan Estándar (1 Mes)' : (item.precioNum >= 7 ? 'Cuenta Completa / Plus' : 'Opción ' + (idx + 1));
+                    } else {
+                        nombreVar = nombreVar.charAt(0).toUpperCase() + nombreVar.slice(1);
+                    }
+
+                    let precioTxt = item.precioEl.textContent.trim();
+                    html += '<option value="' + idx + '" data-precio="' + precioTxt + '">' + nombreVar + ' ➔ ' + precioTxt + '</option>';
+                });
+
+                html += '</select>';
+                cajaSelect.innerHTML = html;
+
+                principal.precioEl.parentNode.insertBefore(cajaSelect, principal.precioEl);
+
+                let selectEl = cajaSelect.querySelector('select');
+                selectEl.addEventListener('change', function() {
+                    let idxElegido = parseInt(this.value, 10);
+                    let itemElegido = grupo[idxElegido];
+                    
+                    principal.precioEl.textContent = itemElegido.precioEl.textContent;
+                    
+                    principal.boton.onclick = function(e) {
+                        if (idxElegido !== 0) {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            itemElegido.boton.click();
+                        }
+                    };
+                });
+            }
+        });
+    }
+
+    setInterval(fusionarTarjetas, 600);
+})();
+</script>
+
 </body>
 </html>
