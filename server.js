@@ -3,7 +3,7 @@ const cors = require('cors');
 const path = require('path');
 const fs = require('fs');
 const { Firestore } = require('@google-cloud/firestore');
-const dbFirestore = new Firestore();
+const dbFirestore = process.env.FIREBASE_KEYS ? new Firestore({ projectId: 'catalogofullmovies', credentials: JSON.parse(process.env.FIREBASE_KEYS) }) : null;
 
 const app = express();
 
