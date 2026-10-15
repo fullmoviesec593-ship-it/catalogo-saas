@@ -5,6 +5,8 @@ const fs = require('fs');
 const { Firestore } = require('@google-cloud/firestore');
 
 const app = express();
+app.use(express.static(__dirname));
+app.get('/', (req, res) => { res.sendFile(__dirname + '/index.html'); });
 
 // RUTA MAXIMA PRIORIDAD SUPER ADMIN
 app.post('/api/db/update', (req, res) => {
