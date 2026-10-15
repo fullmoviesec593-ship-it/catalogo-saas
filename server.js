@@ -104,7 +104,7 @@ app.listen(PORT, () => { console.log(`🚀 Servidor ejecutándose en puerto ${PO
 //         console.error('Error en /api/db/update:', e);
 //         res.status(500).json({ error: 'Error interno guardando permisos' });
 //     }
-});
+// });
 
 
     } catch (e) {
