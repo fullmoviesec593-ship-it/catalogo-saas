@@ -5,6 +5,10 @@ const fs = require('fs');
 const { Firestore } = require('@google-cloud/firestore');
 
 const app = express();
+
+app.all('/api/stats/track', (req, res) => res.json({ success: true }));
+app.all('/api/db', (req, res) => res.json({ success: true }));
+
 app.use(express.static(__dirname));
 app.get('/', (req, res) => { res.sendFile(__dirname + '/index.html'); });
 
