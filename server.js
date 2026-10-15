@@ -119,10 +119,6 @@ app.post('/api/tienda/guardar', async (req, res) => {
   } catch (err) { return res.status(500).json({ error: err.message }); }
 });
 
- if (tienda) await dbFirestore.collection('saas_tiendas').doc(slug).set(tienda, { merge: true }); }
-    return res.json({ success: true });
-  } catch (err) { return res.status(500).json({ error: err.message }); }
-});
 
 app.post('/api/revendedor/toggle-suspension', async (req, res) => {
   try {
