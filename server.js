@@ -99,7 +99,7 @@ app.listen(PORT, () => { console.log(`🚀 Servidor ejecutándose en puerto ${PO
             res.json({ success: true, message: 'Permiso Gestor Pro actualizado.' });
         } else {
             // Fallback por si usas JSON local (aunque Render borra locales, es seguro ponerlo)
-            res.json({ success: true, warning: 'Se guardó en memoria, db no definida.' });
+//             res.json({ success: true, warning: 'Se guardó en memoria, db no definida.' });
         }
 //     } catch (e) {
 //         console.error('Error en /api/db/update:', e);
