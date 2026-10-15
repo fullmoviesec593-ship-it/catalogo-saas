@@ -74,14 +74,14 @@ app.get('/api/status', async (req, res) => {
 });
 
 
-app.all('/api/stats/track', (req, res) => res.json({ success: true }));
-app.all('/api/db', (req, res) => res.json({ success: true }));
+app.all('/api/stats/track', async (req, res) => res.json({ success: true }));
+app.all('/api/db', async (req, res) => res.json({ success: true }));
 
 app.use(express.static(__dirname));
-app.get('/', (req, res) => { res.sendFile(__dirname + '/index.html'); });
+app.get('/', async (req, res) => { res.sendFile(__dirname + '/index.html'); });
 
 // RUTA MAXIMA PRIORIDAD SUPER ADMIN
-app.post(['/api/login', '/api/auth/login', '/login'], (req, res) => {
+app.post(['/api/login', '/api/auth/login', '/login'], async (req, res) => {
     const { email, password } = req.body || {};
     if (email === 'fullmoviesec593@gmail.com' && password === 'LuDa0519') {
         res.json({ success: true, token: 'admin-token', message: 'Bienvenido' });
@@ -90,7 +90,7 @@ app.post(['/api/login', '/api/auth/login', '/login'], (req, res) => {
     }
 });
 
-app.post('/api/db/update', (req, res) => {
+app.post('/api/db/update', async (req, res) => {
     try {
         const { slug, gestorPremium } = req.body;
         if (!slug) return res.status(400).json({ error: 'Slug requerido' });
@@ -195,7 +195,7 @@ app.listen(PORT, () => { console.log(`🚀 Servidor ejecutándose en puerto ${PO
 // });
 
 // RUTA INDEPENDIENTE: PANEL DE OFERTAS
-app.get('/panel-ofertas', (req, res) => {
+app.get('/panel-ofertas', async (req, res) => {
     res.send(`
     <!DOCTYPE html>
     <html lang="es">
