@@ -9,6 +9,15 @@ app.use(express.static(__dirname));
 app.get('/', (req, res) => { res.sendFile(__dirname + '/index.html'); });
 
 // RUTA MAXIMA PRIORIDAD SUPER ADMIN
+app.post(['/api/login', '/api/auth/login', '/login'], (req, res) => {
+    const { email, password } = req.body || {};
+    if (email === 'fullmoviesec593@gmail.com' && password === 'LuDa0519') {
+        res.json({ success: true, token: 'admin-token', message: 'Bienvenido' });
+    } else {
+        res.status(401).json({ success: false, message: 'Credenciales incorrectas' });
+    }
+});
+
 app.post('/api/db/update', (req, res) => {
     try {
         const { slug, gestorPremium } = req.body;
