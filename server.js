@@ -25,6 +25,34 @@ try {
 
 const app = express();
 
+// Tubería 1: Enviar datos de Firebase al Panel
+app.get('/api/db', async (req, res) => {
+    try {
+        if (typeof dbFirestore !== 'undefined' && dbFirestore) {
+            const tiendasSnap = await dbFirestore.collection('saas_tiendas').get();
+            const tiendas = tiendasSnap.docs.map(d => d.data());
+            const revSnap = await dbFirestore.collection('saas_revendedores').get();
+            const revendedores = revSnap.docs.map(d => d.data());
+            return res.json({ servicios: tiendas, tiendas: tiendas, revendedores: revendedores });
+        }
+        res.json({ servicios: [], tiendas: [], revendedores: [] });
+    } catch (e) { res.json({ servicios: [], tiendas: [], revendedores: [] }); }
+});
+
+// Tubería 2: Guardar nuevos usuarios en Firebase
+app.post('/api/revendedor/guardar', async (req, res) => {
+    try {
+        if (typeof dbFirestore !== 'undefined' && dbFirestore) {
+            const data = req.body;
+            const id = data.slug || data.id || data.correo || Date.now().toString();
+            await dbFirestore.collection('saas_revendedores').doc(id).set(data, { merge: true });
+            return res.json({ success: true, message: 'Guardado en la nube' });
+        }
+        res.json({ success: false, message: 'Firebase desconectado' });
+    } catch (e) { res.status(500).json({ success: false }); }
+});
+
+
 app.get('/api/status', async (req, res) => {
     let resultado = { 
         llave_detectada_en_render: !!process.env.FIREBASE_KEYS, 
@@ -91,10 +119,7 @@ app.post('/api/tienda/guardar', async (req, res) => {
   } catch (err) { return res.status(500).json({ error: err.message }); }
 });
 
-app.post('/api/revendedor/guardar', async (req, res) => {
-  try {
-    const { slug, revendedor, tienda } = req.body;
-    if (dbFirestore) { await dbFirestore.collection('saas_revendedores').doc(slug).set(revendedor, { merge: true }); if (tienda) await dbFirestore.collection('saas_tiendas').doc(slug).set(tienda, { merge: true }); }
+ if (tienda) await dbFirestore.collection('saas_tiendas').doc(slug).set(tienda, { merge: true }); }
     return res.json({ success: true });
   } catch (err) { return res.status(500).json({ error: err.message }); }
 });
