@@ -2051,7 +2051,23 @@ setInterval(() => {
             <input type="datetime-local" id="of-fin" class="mo-input" style="color-scheme:dark;">
         </div>
         
-        <button class="mo-btn-save" onclick="guardarOferta()">Guardar Oferta</button>
+        
+    <!-- Nuevo campo: Alcance de la oferta -->
+    <div style="margin-bottom: 15px;">
+        <label style="display: block; color: #8e9cb1; font-size: 10px; font-weight: bold; margin-bottom: 5px; text-transform: uppercase;">Alcance de la Oferta</label>
+        <select id="ofertaAlcance" style="width: 100%; padding: 12px; background: #0f172a; border: 1px solid #1e293b; color: #fff; border-radius: 8px; outline: none; appearance: none;" onchange="document.getElementById('cajaEspecificos').style.display = this.value === 'especificos' ? 'block' : 'none'">
+            <option value="todos">Todos los servicios</option>
+            <option value="especificos">Solo a servicios específicos...</option>
+        </select>
+    </div>
+    
+    <!-- Caja oculta que aparece solo si eligen 'especificos' -->
+    <div id="cajaEspecificos" style="display: none; margin-bottom: 15px;">
+        <label style="display: block; color: #8e9cb1; font-size: 10px; font-weight: bold; margin-bottom: 5px; text-transform: uppercase;">¿A cuáles servicios? (Escribe los nombres)</label>
+        <input type="text" id="ofertaServiciosNombres" placeholder="Ej: Netflix, Prime Video, Combos..." style="width: 100%; padding: 12px; background: #0f172a; border: 1px solid #1e293b; color: #fff; border-radius: 8px; outline: none; box-sizing: border-box;">
+    </div>
+
+<button class="mo-btn-save" onclick="guardarOferta()">Guardar Oferta</button>
         <button class="mo-btn-cancel" onclick="document.getElementById('modal-oferta').style.display='none'">Cancelar</button>
     </div>
 </div>
