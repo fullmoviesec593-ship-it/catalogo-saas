@@ -3,7 +3,25 @@ const cors = require('cors');
 const path = require('path');
 const fs = require('fs');
 const { Firestore } = require('@google-cloud/firestore');
-const dbFirestore = process.env.FIREBASE_KEYS ? new Firestore({ projectId: 'catalogofullmovies', credentials: JSON.parse(String(process.env.FIREBASE_KEYS).replace(/\\n/g, '\n')) }) : null;
+
+let dbFirestore = null;
+try {
+    if (process.env.FIREBASE_KEYS) {
+        let rawKeys = process.env.FIREBASE_KEYS;
+        const creds = JSON.parse(rawKeys);
+        if (creds.private_key) {
+            creds.private_key = creds.private_key.replace(/\\n/g, '\n');
+        }
+        dbFirestore = new Firestore({ projectId: creds.project_id || 'catalogofullmovies', credentials: creds });
+        console.log('✅ Bóveda de Firebase abierta con éxito');
+    } else {
+        console.log('⚠️ No se detectó la variable FIREBASE_KEYS en Render');
+    }
+} catch (error) {
+    console.error('❌ Error de formato en la llave de Firebase:', error.message);
+}
+
+
 
 const app = express();
 
