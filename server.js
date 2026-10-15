@@ -107,11 +107,11 @@ app.listen(PORT, () => { console.log(`🚀 Servidor ejecutándose en puerto ${PO
 // });
 
 
-    } catch (e) {
-        console.error('Error guardando DB:', e);
-        res.status(500).json({ success: false, message: 'Error interno: ' + e.message });
-    }
-});
+//     } catch (e) {
+//         console.error('Error guardando DB:', e);
+//         res.status(500).json({ success: false, message: 'Error interno: ' + e.message });
+//     }
+// });
 
 // RUTA INDEPENDIENTE: PANEL DE OFERTAS
 app.get('/panel-ofertas', (req, res) => {
