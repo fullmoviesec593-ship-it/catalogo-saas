@@ -457,1628 +457,25 @@
 
   </div>
 
-  <script>
-    let dbData = null;
-    let revendedorActual = null;
-    let slugActual = null;
-    let tempImgBase64 = null;
-    let tempLogoBase64 = null;
-    let tempComboImgs = [null, null, null];
-
-    function togglePasswordVisibility(inputId, btn) {
-      const input = document.getElementById(inputId);
-      if (input.type === 'password') {
-        input.type = 'text';
-        btn.innerText = '🙈';
-        btn.title = 'Ocultar contraseña';
-      } else {
-        input.type = 'password';
-        btn.innerText = '👁️';
-        btn.title = 'Ver contraseña';
-      }
-    }
-
-    const COMBOS_DEFAULT = [
-      {
-        activo: true,
-        comboCantidad: 2,
-        descuento: 10,
-        nombre: "Combo Dúo (2 Servicios)",
-        sub: "A tu elección · 10% OFF",
-        tag: "10% OFF",
-        img: "https://images.unsplash.com/photo-1578328819058-b69f3a3b0f6b?w=600",
-        features: ["Elige 2 servicios del catálogo", "Descuento automático del 10%", "Activación inmediata 24/7", "Garantía total en ambos"]
-      },
-      {
-        activo: true,
-        comboCantidad: 3,
-        descuento: 10,
-        nombre: "Combo Trío (3 Servicios)",
-        sub: "A tu elección · 10% OFF",
-        tag: "10% OFF",
-        img: "https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=600",
-        features: ["Elige 3 servicios del catálogo", "Descuento automático del 10%", "Cine, series o música a tu gusto", "Activación inmediata 24/7"]
-      },
-      {
-        activo: true,
-        comboCantidad: 4,
-        descuento: 10,
-        nombre: "Combo Cuádruple (4 Servicios)",
-        sub: "A tu elección · 10% OFF",
-        tag: "10% OFF",
-        img: "https://images.unsplash.com/photo-1594909122845-11baa439b7bf?w=600",
-        features: ["Elige 4 servicios completos", "Descuento automático del 10%", "Ideal para toda la familia", "Activación inmediata 24/7"]
-      }
+  
+    <script id="script-ofertas-maestro">
+    const catalogoOficial = [
+        "Netflix cuenta completa", "Disney+ ESPN CUENTA COMPLETA", "Disney+ ESPN",
+        "Prime Video", "HBO Max", "Crunchyroll", "Vix Premium", 
+        "Flujo Tv", "Flujo tv 3 meses", "Flujo tv 6 meses", "Flujo Tv 12 + 2 meses", "Flujo Tv cuenta completa",
+        "Estella Tv", "Oleada Tv", "TeleLatino cuenta completa",
+        "IPTV stream live", "IPTV Zona Movie", "Viki Rakuten", "YouTube Premium",
+        "Spotify", "Spotify 2 meses", "Spotify 3 meses", "Spotify 6 meses", "Spotify 12 meses", 
+        "Deezer 1 mes", "Licencias Windows 10 & 11", "Microsoft Office",
+        "Canva Pro y Edu", "Cap cut", "Chat Gpt Plus", "Chat Gpt Pro (1 dispositivo PC o Móvil)", 
+        "Catálogo Digital"
     ];
 
-    async function cargarBD() {
-      try {
-        const res = await fetch('/api/db');
-        dbData = await res.json();
-      } catch (e) {
-        alert('Error conectando a la API: ' + e.message);
-      }
-    }
-
-    function toggleCheckbox() {
-      const chk = document.getElementById('remember-session');
-      chk.checked = !chk.checked;
-    }
-
-    function calcularDiasRestantes(fechaVencimiento) {
-      if (!fechaVencimiento) return 999;
-      const ahora = new Date();
-      const vence = new Date(fechaVencimiento);
-      const diffMs = vence.getTime() - ahora.getTime();
-      return Math.ceil(diffMs / (1000 * 60 * 60 * 24));
-    }
-
-    function actualizarContadorDias() {
-      const tag = document.getElementById('dash-countdown');
-      if (!revendedorActual || !revendedorActual.vencimiento) {
-        tag.className = 'badge-dias green';
-        tag.innerText = '● SERVICIO ACTIVO';
-        return;
-      }
-      const dias = calcularDiasRestantes(revendedorActual.vencimiento);
-      if (revendedorActual.activo === false) {
-        tag.className = 'badge-dias red';
-        tag.innerText = '⛔ CUENTA SUSPENDIDA';
-      } else if (dias <= 0) {
-        tag.className = 'badge-dias red';
-        tag.innerText = dias === 0 ? '⚠️ TU SERVICIO VENCE HOY' : `⛔ SERVICIO VENCIDO (${Math.abs(dias)}d)`;
-      } else if (dias <= 5) {
-        tag.className = 'badge-dias yellow';
-        tag.innerText = `⏳ TE QUEDAN ${dias} DÍAS RESTANTES`;
-      } else {
-        tag.className = 'badge-dias green';
-        tag.innerText = `✨ TE QUEDAN ${dias} DÍAS RESTANTES`;
-      }
-    }
-
-    async function iniciarSesion(autoEmail = null, autoPass = null) {
-      const email = autoEmail || document.getElementById('email').value.trim();
-      const pass = autoPass || document.getElementById('password').value.trim();
-      const recordar = document.getElementById('remember-session').checked;
-
-      if (!dbData) await cargarBD();
-
-      const revendedores = dbData.revendedores || dbData.usuarios || {};
-      const foundSlug = Object.keys(revendedores).find(slug => {
-        const r = revendedores[slug];
-        return (r.email === email || r.correo === email) && (r.password === pass || r.clave === pass);
-      });
-
-      if (foundSlug) {
-        slugActual = foundSlug;
-        revendedorActual = revendedores[slugActual];
-        if (revendedorActual.activo === false) {
-          alert('Tu cuenta está suspendida. Contacta al Súper Administrador.');
-          return;
-        }
-
-        if (recordar || autoEmail) {
-          localStorage.setItem('revendedor_session', JSON.stringify({ slug: slugActual, email, pass }));
-        }
-
-        document.getElementById('login-section').classList.add('hidden');
-        document.getElementById('dashboard-section').classList.remove('hidden');
-        cargarTienda();
-      } else {
-        if (!autoEmail) alert('Correo o contraseña incorrectos.');
-      }
-    }
-
-    function cerrarSesion() {
-      localStorage.removeItem('revendedor_session');
-      const urlParams = new URLSearchParams(window.location.search);
-      const urlTienda = urlParams.get('tienda');
-      if (urlTienda) {
-        window.location.href = `/admin.html?tienda=${urlTienda}`;
-      } else {
-        location.reload();
-      }
-    }
-
-    async function verificarSesionGuardada() {
-      await cargarBD();
-
-      const urlParams = new URLSearchParams(window.location.search);
-      const urlTienda = urlParams.get('tienda');
-
-      const revendedores = dbData.revendedores || dbData.usuarios || {};
-
-      if (urlTienda && revendedores[urlTienda]) {
-        const revUrl = revendedores[urlTienda];
-        const saved = localStorage.getItem('revendedor_session');
-
-        if (saved) {
-          try {
-            const parsed = JSON.parse(saved);
-            if (parsed.slug && parsed.slug !== urlTienda) {
-              localStorage.removeItem('revendedor_session');
-            } else if (parsed.email && parsed.pass && parsed.slug === urlTienda) {
-              iniciarSesion(parsed.email, parsed.pass);
-              return;
-            }
-          } catch(e) {}
-        }
-
-        document.getElementById('email').value = revUrl.email || revUrl.correo || '';
-        document.getElementById('login-submsg').innerText = `Inicia sesión para administrar: ${revUrl.nombre || urlTienda}`;
-        return;
-      }
-
-      const saved = localStorage.getItem('revendedor_session');
-      if (saved) {
-        try {
-          const { email, pass } = JSON.parse(saved);
-          if (email && pass) iniciarSesion(email, pass);
-        } catch (e) {}
-      }
-    }
-
-    function cargarTienda() {
-      if (!dbData.tiendas) dbData.tiendas = {};
-      if (!dbData.tiendas[slugActual]) {
-        dbData.tiendas[slugActual] = {
-          nombre: revendedorActual.nombre || revendedorActual.nombreTienda || slugActual,
-          whatsapp: revendedorActual.whatsapp || "593982766054",
-          productos: [],
-          combos: JSON.parse(JSON.stringify(COMBOS_DEFAULT)),
-          logo: "",
-          metodosPago: "",
-          textos: {}
-        };
-      }
-
-      const tienda = dbData.tiendas[slugActual];
-
-      if (!tienda.combos || tienda.combos.length === 0) {
-        tienda.combos = JSON.parse(JSON.stringify(COMBOS_DEFAULT));
-        persistirTienda();
-      }
-
-      document.getElementById('dash-title').innerText = tienda.nombre || slugActual;
-      document.getElementById('shop-nombre').value = tienda.nombre || '';
-      document.getElementById('shop-whatsapp').value = tienda.whatsapp || '';
-      document.getElementById('shop-payments').value = tienda.metodosPago || '';
-
-      if (tienda.logo) {
-        document.getElementById('dash-logo').src = tienda.logo;
-        document.getElementById('shop-logo-preview').src = tienda.logo;
-      }
-
-      // Cargar campos de combos
-      const combos = tienda.combos;
-      [0, 1, 2].forEach(i => {
-        const c = combos[i] || COMBOS_DEFAULT[i];
-        document.getElementById(`combo${i}-activo`).checked = c.activo !== false;
-        document.getElementById(`combo${i}-nombre`).value = c.nombre || '';
-        document.getElementById(`combo${i}-cant`).value = c.comboCantidad || (i + 2);
-        document.getElementById(`combo${i}-desc`).value = c.descuento || 10;
-        document.getElementById(`combo${i}-sub`).value = c.sub || '';
-        if (c.img) document.getElementById(`combo${i}-preview`).src = c.img;
-      });
-
-      const txt = tienda.textos || {};
-      document.getElementById('txt-pill').value = txt.pill || "✦ ATENCIÓN 24/7 ✦";
-      document.getElementById('txt-title-1').value = txt.title1 || "TU TIENDA DE";
-      document.getElementById('txt-title-2').value = txt.title2 || "SOFTWARE";
-      document.getElementById('txt-sub').value = txt.sub || "Proveedor garantizado · Activación inmediata · Los mejores precios";
-      document.getElementById('txt-currency').value = txt.currency || "$";
-      document.getElementById('txt-btn-buy').value = txt.btnBuy || "Comprar ahora!";
-
-      const publicLink = window.location.origin + '/?tienda=' + slugActual;
-      const elLink = document.getElementById('shop-public-link');
-      elLink.href = publicLink;
-      elLink.innerText = publicLink;
-
-      actualizarContadorDias();
-      renderProductos();
-    }
-
-    function cambiarTab(tab) {
-      ['shop', 'prods', 'combos', 'texts', 'payments'].forEach(t => {
-        document.getElementById('tab-' + t).classList.add('hidden');
-        document.getElementById('tab-btn-' + t).classList.remove('active');
-      });
-      document.getElementById('tab-' + tab).classList.remove('hidden');
-      document.getElementById('tab-btn-' + tab).classList.add('active');
-    }
-
-    function renderProductos() {
-      const lista = document.getElementById('lista-productos');
-      lista.innerHTML = '';
-      const productos = dbData.tiendas[slugActual].productos || [];
-
-      if (productos.length === 0) {
-        lista.innerHTML = '<p style="color:#94a3b8; font-size:13px;">No has agregado servicios personalizados aún (tu catálogo mostrará los predeterminados de la plataforma).</p>';
-        return;
-      }
-
-      productos.forEach((p, idx) => {
-        const item = document.createElement('div');
-        item.className = 'product-card';
-        item.innerHTML = `
-          <img src="${p.img || 'https://via.placeholder.com/65'}" class="product-img" onerror="this.src='https://via.placeholder.com/65'">
-          <div style="flex:1;">
-            <strong style="color:#fff; font-size:16px;">${p.nombre}</strong>
-            <div style="color:var(--accent); font-weight:bold; font-size:15px;">${dbData.tiendas[slugActual]?.textos?.currency || '$'}${p.precio}</div>
-            <small style="color:#94a3b8; font-size:12px;">${p.sub || ''}</small>
-          </div>
-          <div style="display:flex; flex-direction:column; gap:6px;">
-            <button style="background:#0284c7; color:#fff; padding:6px 10px; font-size:12px;" onclick="cargarEdicionProducto(${idx})">✏️</button>
-            <button style="background:#dc2626; color:#fff; padding:6px 10px; font-size:12px;" onclick="eliminarProducto(${idx})">🗑️</button>
-          </div>
-        `;
-        lista.appendChild(item);
-      });
-    }
-
-    function cargarEdicionProducto(idx) {
-      const p = dbData.tiendas[slugActual].productos[idx];
-      document.getElementById('prod-edit-idx').value = idx;
-      document.getElementById('prod-nombre').value = p.nombre;
-      document.getElementById('prod-precio').value = p.precio;
-      document.getElementById('prod-cat').value = p.categoria || 'streaming';
-      document.getElementById('prod-tag').value = p.tag || '';
-      document.getElementById('prod-features').value = (p.features && p.features.length) ? p.features.join(', ') : '';
-      
-      const imgPrev = document.getElementById('prod-preview-img');
-      if (p.img) {
-        imgPrev.src = p.img;
-        imgPrev.style.display = 'block';
-        tempImgBase64 = p.img;
-      }
-      document.getElementById('btn-guardar-prod').innerText = "ACTUALIZAR SERVICIO";
-      cambiarTab('prods');
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
-
-    async function guardarProducto() {
-      const btn = document.getElementById('btn-guardar-prod');
-      const idx = parseInt(document.getElementById('prod-edit-idx').value);
-      const nombre = document.getElementById('prod-nombre').value.trim();
-      const precio = document.getElementById('prod-precio').value.trim();
-      const categoria = document.getElementById('prod-cat').value;
-      const tag = document.getElementById('prod-tag').value.trim();
-      const rawFeatures = document.getElementById('prod-features').value.trim();
-
-      if (!nombre || !precio) {
-        alert('Nombre y precio son obligatorios.');
-        return;
-      }
-
-      btn.disabled = true;
-      btn.innerText = "⏳ GUARDANDO...";
-
-      const features = rawFeatures ? rawFeatures.split(',').map(s => s.trim()).filter(Boolean) : [];
-      const sub = `1 mes · ${categoria.charAt(0).toUpperCase() + categoria.slice(1)}`;
-      const img = tempImgBase64 || 'https://images.unsplash.com/photo-1522869635100-9f4c5e86aa37?w=500';
-
-      if (!dbData.tiendas[slugActual].productos) dbData.tiendas[slugActual].productos = [];
-
-      const nuevoObj = { nombre, sub, categoria, tag, precio, features, img };
-
-      if (idx >= 0) {
-        dbData.tiendas[slugActual].productos[idx] = nuevoObj;
-      } else {
-        dbData.tiendas[slugActual].productos.push(nuevoObj);
-      }
-
-      const guardado = await persistirTienda();
-      btn.disabled = false;
-      btn.innerText = "AGREGAR SERVICIO AL CATÁLOGO";
-
-      if (guardado) {
-        alert('¡Servicio guardado exitosamente en la nube!');
-        document.getElementById('prod-edit-idx').value = "-1";
-        document.getElementById('prod-nombre').value = '';
-        document.getElementById('prod-precio').value = '';
-        document.getElementById('prod-tag').value = '';
-        document.getElementById('prod-features').value = '';
-        document.getElementById('prod-file').value = '';
-        document.getElementById('prod-preview-img').style.display = 'none';
-        tempImgBase64 = null;
-        renderProductos();
-      }
-    }
-
-    async function eliminarProducto(idx) {
-      if (confirm('¿Deseas eliminar este servicio de tu catálogo?')) {
-        dbData.tiendas[slugActual].productos.splice(idx, 1);
-        await persistirTienda();
-        renderProductos();
-      }
-    }
-
-    // GUARDAR AJUSTES DE COMBOS
-    async function guardarAjustesCombos() {
-      const btn = document.getElementById('btn-save-combos');
-      btn.disabled = true;
-      btn.innerText = "⏳ GUARDANDO COMBOS...";
-
-      const nuevosCombos = [];
-      [0, 1, 2].forEach(i => {
-        const activo = document.getElementById(`combo${i}-activo`).checked;
-        const nombre = document.getElementById(`combo${i}-nombre`).value.trim();
-        const comboCantidad = parseInt(document.getElementById(`combo${i}-cant`).value) || (i + 2);
-        const descuento = parseInt(document.getElementById(`combo${i}-desc`).value) || 10;
-        const sub = document.getElementById(`combo${i}-sub`).value.trim();
-        const img = tempComboImgs[i] || document.getElementById(`combo${i}-preview`).src;
-
-        nuevosCombos.push({
-          activo,
-          comboCantidad,
-          descuento,
-          nombre: nombre || `Combo (${comboCantidad} Servicios)`,
-          sub: sub || `A tu elección · ${descuento}% OFF`,
-          tag: `${descuento}% OFF`,
-          precio: `${descuento}% OFF`,
-          img,
-          features: [
-            `Elige ${comboCantidad} servicios del catálogo`,
-            `Descuento automático del ${descuento}%`,
-            `Activación inmediata 24/7`,
-            `Garantía total en todos`
-          ]
-        });
-      });
-
-      dbData.tiendas[slugActual].combos = nuevosCombos;
-      const guardado = await persistirTienda();
-      btn.disabled = false;
-      btn.innerText = "GUARDAR CONFIGURACIÓN DE COMBOS";
-
-      if (guardado) {
-        alert('¡Configuración de combos guardada y actualizada con éxito en la nube!');
-      }
-    }
-
-    async function guardarAjustesTienda() {
-      const btn = document.getElementById('btn-save-shop');
-      const nombre = document.getElementById('shop-nombre').value.trim();
-      const whatsapp = document.getElementById('shop-whatsapp').value.trim();
-
-      if (!nombre || !whatsapp) {
-        alert('Nombre y número de WhatsApp son obligatorios.');
-        return;
-      }
-
-      btn.disabled = true;
-      btn.innerText = "⏳ GUARDANDO...";
-
-      dbData.tiendas[slugActual].nombre = nombre;
-      dbData.tiendas[slugActual].whatsapp = whatsapp;
-      if (tempLogoBase64) {
-        dbData.tiendas[slugActual].logo = tempLogoBase64;
-      }
-
-      const guardado = await persistirTienda();
-      btn.disabled = false;
-      btn.innerText = "GUARDAR AJUSTES DE TIENDA";
-
-      if (guardado) {
-        alert('¡Ajustes personales y Logo guardados con éxito!');
-        document.getElementById('dash-title').innerText = nombre;
-        if (tempLogoBase64) document.getElementById('dash-logo').src = tempLogoBase64;
-      }
-    }
-
-    async function guardarTextos() {
-      const btn = document.getElementById('btn-save-texts');
-      btn.disabled = true;
-      btn.innerText = "⏳ GUARDANDO...";
-
-      dbData.tiendas[slugActual].textos = {
-        pill: document.getElementById('txt-pill').value.trim() || "✦ ATENCIÓN 24/7 ✦",
-        title1: document.getElementById('txt-title-1').value.trim() || "TU TIENDA DE",
-        title2: document.getElementById('txt-title-2').value.trim() || "SOFTWARE",
-        sub: document.getElementById('txt-sub').value.trim() || "Proveedor garantizado · Activación inmediata · Los mejores precios",
-        currency: document.getElementById('txt-currency').value.trim() || "$",
-        btnBuy: document.getElementById('txt-btn-buy').value.trim() || "Comprar ahora!"
-      };
-
-      const guardado = await persistirTienda();
-      btn.disabled = false;
-      btn.innerText = "GUARDAR TEXTOS DEL CATÁLOGO";
-
-      if (guardado) {
-        alert('¡Textos y frases guardados con éxito!');
-      }
-    }
-
-    async function guardarMetodosPago() {
-      const btn = document.getElementById('btn-save-payments');
-      btn.disabled = true;
-      btn.innerText = "⏳ GUARDANDO...";
-
-      const metodos = document.getElementById('shop-payments').value.trim();
-      dbData.tiendas[slugActual].metodosPago = metodos;
-
-      const guardado = await persistirTienda();
-      btn.disabled = false;
-      btn.innerText = "GUARDAR MÉTODOS DE PAGO";
-
-      if (guardado) {
-        alert('¡Métodos de pago guardados correctamente!');
-      }
-    }
-
-    function convertirImagenABase64(input, previewId) {
-      if (input.files && input.files[0]) {
-        const file = input.files[0];
-        const reader = new FileReader();
-        reader.onload = function(e) {
-          const img = new Image();
-          img.onload = function() {
-            const canvas = document.createElement('canvas');
-            const MAX_WIDTH = 480;
-            const scaleSize = MAX_WIDTH / img.width;
-            canvas.width = (img.width > MAX_WIDTH) ? MAX_WIDTH : img.width;
-            canvas.height = (img.width > MAX_WIDTH) ? (img.height * scaleSize) : img.height;
-            const ctx = canvas.getContext('2d');
-            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-            const b64 = canvas.toDataURL('image/jpeg', 0.80);
-
-            const prev = document.getElementById(previewId);
-            prev.src = b64;
-            prev.style.display = 'block';
-
-            if (previewId === 'prod-preview-img') tempImgBase64 = b64;
-            if (previewId === 'shop-logo-preview') tempLogoBase64 = b64;
-            if (previewId === 'combo0-preview') tempComboImgs[0] = b64;
-            if (previewId === 'combo1-preview') tempComboImgs[1] = b64;
-            if (previewId === 'combo2-preview') tempComboImgs[2] = b64;
-          };
-          img.src = e.target.result;
-        };
-        reader.readAsDataURL(file);
-      }
-    }
-
-    async function persistirTienda() {
-      try {
-        const payload = {
-          slug: slugActual,
-          tienda: dbData.tiendas[slugActual]
-        };
-
-        const res = await fetch('/api/tienda/guardar', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload)
-        });
-
-        const data = await res.json();
-        return !!data.success;
-      } catch (err) {
-        alert('Error de conexión al guardar: ' + err.message);
-        return false;
-      }
-    }
-
-    verificarSesionGuardada();
-  </script>
-
-
-<!-- GESTOR_PRO_FANTASMA -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-<style>
-  .menu-flotante { display: none !important; flex-direction: column !important; position: absolute; top: 70px; left: 16px; background: #0f172a; padding: 15px; border-radius: 12px; border: 1px solid #1e293b; z-index: 1000; box-shadow: 0 15px 40px rgba(0,0,0,0.9); width: 240px; }
-  .menu-flotante.show { display: flex !important; }
-  .menu-flotante .nav-tab { width: 100%; text-align: left; padding: 12px 14px; background: #080d1a; border-radius: 8px; margin-bottom: 8px; font-weight: bold; border: 1px solid transparent; }
-  .backdrop { display: none; position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.6); z-index: 999; backdrop-filter: blur(2px); }
-  .backdrop.show { display: block; }
-  .gestor-header { background: linear-gradient(135deg, #ca8a04 0%, #854d0e 100%); padding: 16px; border-radius: 12px; margin-bottom: 16px; box-shadow: 0 4px 15px rgba(234, 179, 8, 0.2);}
-  .gestor-title { margin: 0; color: #fff; font-size: 18px; font-family: 'Orbitron', sans-serif;}
-  .gestor-tabs-nav { display: flex; gap: 8px; overflow-x: auto; margin-bottom: 16px; }
-  .gestor-sub-tab { background: #0f172a; border: 1px solid #1e293b; color: #94a3b8; padding: 8px 16px; border-radius: 8px; font-size: 13px; font-weight: bold; cursor: pointer; }
-  .gestor-sub-tab.active { background: #1e293b; color: #eab308; border-color: #eab308; }
-  .g-card { background: #080d1a; border: 1px solid #1e293b; border-radius: 12px; padding: 14px; margin-bottom: 12px; }
-</style>
-
-<script>
-document.addEventListener("DOMContentLoaded", () => {
-    const dash = document.getElementById('dashboard-section');
-    const navMenu = document.querySelector('.nav-tabs') || document.getElementById('nav-menu');
-    
-    if(dash && navMenu && !document.querySelector('.btn-hamburguesa')) {
-        
-        // 1. Convertir el menú a Hamburguesa
-        navMenu.classList.add('menu-flotante');
-        
-        const headerTop = dash.querySelector('div');
-        if(headerTop) {
-            headerTop.style.display = 'flex';
-            headerTop.style.alignItems = 'center';
-            
-            const btnHam = document.createElement('button');
-            btnHam.className = 'btn-hamburguesa';
-            btnHam.innerHTML = '☰';
-            btnHam.style.cssText = 'background: transparent; border: none; color: #38bdf8; font-size: 32px; cursor: pointer; margin-right: 12px; padding: 0; line-height: 1;';
-            headerTop.insertBefore(btnHam, headerTop.firstChild);
-            
-            const bdrop = document.createElement('div');
-            bdrop.className = 'backdrop';
-            document.body.appendChild(bdrop);
-            
-            btnHam.onclick = () => { navMenu.classList.toggle('show'); bdrop.classList.toggle('show'); };
-            bdrop.onclick = () => { navMenu.classList.remove('show'); bdrop.classList.remove('show'); };
-        }
-
-        // 2. Agregar Botón Gestor al menú
-        const btnGestor = document.createElement('div');
-        btnGestor.id = 'tab-btn-gestor';
-        btnGestor.className = 'nav-tab hidden';
-        btnGestor.style.cssText = 'background: linear-gradient(90deg, #422006 0%, #1e293b 100%); color:#facc15; border: 1px solid #ca8a04; cursor:pointer;';
-        btnGestor.innerHTML = '👑 GESTOR PRO';
-        btnGestor.onclick = () => window.cambiarTab('gestor');
-        navMenu.appendChild(btnGestor);
-
-        // 3. Crear pestaña del Gestor Pro
-        const tabGestor = document.createElement('div');
-        tabGestor.id = 'tab-gestor';
-        tabGestor.className = 'hidden';
-        tabGestor.innerHTML = `
-            <div class="gestor-header">
-                <h3 class="gestor-title">👑 Gestor de Inventario Pro</h3>
-            </div>
-            
-    <div class="gestor-tabs-nav">
-        <div id="g-tab-btn-dashboard" class="gestor-sub-tab" onclick="cambiarSubTabGestor('dashboard')">📊 Dashboard</div>
-        <div id="g-tab-btn-inicio" class="gestor-sub-tab active" onclick="cambiarSubTabGestor('inicio')">🏠 Inicio</div>
-        <div id="g-tab-btn-servicios" class="gestor-sub-tab" onclick="cambiarSubTabGestor('servicios')">📦 Servicios</div>
-        <div id="g-tab-btn-clientes" class="gestor-sub-tab" onclick="cambiarSubTabGestor('clientes')">👥 Clientes</div>
-        <div id="g-tab-btn-perfiles" class="gestor-sub-tab" onclick="cambiarSubTabGestor('perfiles')">👤 Perfiles</div>
-        <div id="g-tab-btn-cuentas" class="gestor-sub-tab" onclick="cambiarSubTabGestor('cuentas')">📺 Cuentas Completas</div>
-        <div id="g-tab-btn-importar" class="gestor-sub-tab" onclick="cambiarSubTabGestor('importar')">📄 Importar</div>
-    </div>
-    
-    <!-- DASHBOARD -->
-    <div id="g-tab-dashboard" class="hidden" style="display:none;">
-        <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:16px;">
-            <div style="background:#080d1a; padding:16px; border-radius:12px; border:1px solid #1e293b; text-align:center;">
-                <div style="color:#94a3b8; font-size:12px; font-weight:bold;">TOTAL REGISTROS</div>
-                <div id="dash-tot-clientes" style="color:#38bdf8; font-size:24px; font-weight:900; font-family:'Orbitron', sans-serif;">0</div>
-            </div>
-            <div style="background:#080d1a; padding:16px; border-radius:12px; border:1px solid #1e293b; text-align:center;">
-                <div style="color:#94a3b8; font-size:12px; font-weight:bold;">VENCIDOS</div>
-                <div id="dash-tot-vencidos" style="color:#ef4444; font-size:24px; font-weight:900; font-family:'Orbitron', sans-serif;">0</div>
-            </div>
-        </div>
-    </div>
-    
-    <div id="g-tab-inicio">
-
-                <input type="text" id="g-buscador" placeholder="🔍 Buscar cliente..." style="width:100%; padding:10px; margin-bottom:12px; border-radius:8px; border:1px solid #1e293b; background:#080d1a; color:#fff;" oninput="renderGestorPro()">
-                <div id="g-lista-ventas"></div>
-            </div>
-            <div id="g-tab-clientes" class="hidden">
-                <div id="g-lista-clientes"></div>
-            </div>
-            <div id="g-tab-herramientas" class="hidden">
-                <input type="file" id="excel-upload" accept=".xlsx, .xls, .csv" style="display:none;" onchange="procesarArchivoExcelReal(event)">
-                <div onclick="document.getElementById('excel-upload').click()" style="border: 2px dashed #334155; padding: 24px; text-align: center; border-radius: 12px; background: #080d1a; margin-top: 16px; cursor: pointer;">
-                    <div style="font-size:30px; margin-bottom:10px;">📄</div><strong style="color:#fff;">Subir archivo Excel</strong>
-                </div>
-            </div>
-        `;
-        dash.appendChild(tabGestor);
-
-        // 4. Interceptar clicks del menú para cerrarlo
-        if(typeof window.cambiarTab === 'function') {
-            const oldCambiar = window.cambiarTab;
-            window.cambiarTab = function(tabId) {
-                try { oldCambiar(tabId); } catch(e){}
-                navMenu.classList.remove('show');
-                const bd = document.querySelector('.backdrop'); if(bd) bd.classList.remove('show');
-                
-                // Asegurar que Gestor se oculta o muestra
-                const allTabs = dash.querySelectorAll(':scope > div[id^="tab-"]');
-                allTabs.forEach(el => {
-                    if(!el.id.includes('btn-')) { el.classList.add('hidden'); el.style.display = 'none'; }
-                });
-                const actTab = document.getElementById('tab-' + tabId);
-                if(actTab) { actTab.classList.remove('hidden'); actTab.style.display = 'block'; }
-            };
-        }
-
-        // 5. Interceptar pintarDashboard para mostrar botón si es Premium
-        if(typeof window.pintarDashboard === 'function') {
-            const oldPintar = window.pintarDashboard;
-            window.pintarDashboard = function() {
-                try { oldPintar(); } catch(e){}
-                if(window.revendedorActual && window.revendedorActual.gestorPremium) {
-                    btnGestor.classList.remove('hidden'); btnGestor.style.display = 'block';
-                } else {
-                    btnGestor.classList.add('hidden'); btnGestor.style.display = 'none';
-                }
-                if(typeof renderGestorPro === 'function') renderGestorPro();
-            };
-        }
-    }
-});
-
-
-window.filtroActualG = 'todos';
-window.cambiarSubTabGestor = function(sub) {
-    const tabs = ['dashboard', 'inicio', 'servicios', 'clientes', 'perfiles', 'cuentas', 'importar', 'herramientas', 'directorio'];
-    tabs.forEach(s => {
-        const btn = document.getElementById('g-tab-btn-' + s);
-        if(btn) btn.classList.remove('active');
-        const isFiltro = ['inicio', 'servicios', 'perfiles', 'cuentas'].includes(s);
-        let elId = 'g-tab-' + (isFiltro ? 'inicio' : s);
-        if (s === 'clientes') elId = 'g-tab-clientes';
-        if (s === 'importar') elId = 'g-tab-importar';
-        if (s === 'herramientas') elId = 'g-tab-herramientas';
-        if (s === 'directorio') elId = 'g-tab-directorio';
-        
-        const el = document.getElementById(elId);
-        if(el && !isFiltro && s !== 'inicio') { el.classList.add('hidden'); el.style.display = 'none'; }
-    });
-
-    let targetId = 'g-tab-' + sub;
-    if(sub === 'inicio') { window.filtroActualG = 'todos'; targetId = 'g-tab-inicio'; }
-    if(sub === 'servicios') { window.filtroActualG = 'servicio'; targetId = 'g-tab-inicio'; }
-    if(sub === 'perfiles') { window.filtroActualG = 'perfil'; targetId = 'g-tab-inicio'; }
-    if(sub === 'cuentas') { window.filtroActualG = 'cuenta'; targetId = 'g-tab-inicio'; }
-    
-    if(sub === 'clientes' || sub === 'directorio') { targetId = document.getElementById('g-tab-clientes') ? 'g-tab-clientes' : 'g-tab-directorio'; }
-    if(sub === 'importar' || sub === 'herramientas') { targetId = document.getElementById('g-tab-importar') ? 'g-tab-importar' : 'g-tab-herramientas'; }
-    if(sub === 'dashboard') targetId = 'g-tab-dashboard';
-
-    const target = document.getElementById(targetId);
-    if(target) { target.classList.remove('hidden'); target.style.display = 'block'; }
-    
-    const btnAct = document.getElementById('g-tab-btn-' + sub);
-    if(btnAct) btnAct.classList.add('active');
-
-    if(typeof window.renderGestorPro === 'function') window.renderGestorPro();
-};
-
-window.procesarArchivoExcelReal = async function(event) {
-    const file = event.target.files[0]; if(!file) return;
-    alert("⏳ LEYENDO EXCEL Y SUBIENDO A LA NUBE...");
-    const reader = new FileReader();
-    reader.onload = async function(e) {
-        try {
-            const data = new Uint8Array(e.target.result);
-            const workbook = XLSX.read(data, { type: 'array' });
-            const json = XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]], { defval: "" });
-            let arr = [];
-            json.forEach((r, i) => {
-                if(!r['Cliente'] && !r['Correo/Usuario']) return;
-                arr.push({ id:'imp_'+Date.now()+'_'+i, cliente:String(r['Cliente']||'').trim(), whatsapp:String(r['WhatsApp']||'').trim(), servicio:String(r['Servicio']||'').trim(), tipo:String(r['Tipo']||'PERFIL').trim(), correo:String(r['Correo/Usuario']||'').trim(), pass:String(r['Contraseña']||'').trim(), perfil:String(r['Perfil']||'').trim(), pin:String(r['PIN']||'').trim(), vence:String(r['Fecha vencimiento']||'').trim() });
-            });
-            if(!window.tiendaActual) window.tiendaActual = {};
-            window.tiendaActual.gestorProData = arr; if(window.slugActual) localStorage.setItem('gestor_data_' + window.slugActual, JSON.stringify(arr));
-            if(window.persistirEnNube) {
-                const ok = await window.persistirEnNube({ gestorProData: arr });
-                if(ok) { alert(`✅ ¡ÉXITO! ${arr.length} clientes guardados.`); renderGestorPro(); window.cambiarSubTabGestor('inicio'); }
-            }
-        } catch(err) { alert('Error: ' + err.message); }
-    };
-    reader.readAsArrayBuffer(file);
-};
-
-window.renderGestorPro = function() {
-    const lVentas = document.getElementById('g-lista-ventas');
-    const lDir = document.getElementById('g-lista-clientes');
-    if(!lVentas || !lDir) return;
-    lVentas.innerHTML = ''; lDir.innerHTML = '';
-    const q = (document.getElementById('g-buscador')?document.getElementById('g-buscador').value:'').toLowerCase().trim();
-    
-    let dat = (window.tiendaActual && window.tiendaActual.gestorProData) ? window.tiendaActual.gestorProData : [];
-    
-    // Guardado local
-    if(dat.length === 0 && window.slugActual) {
-        const local = localStorage.getItem('gestor_data_' + window.slugActual);
-        if(local) dat = JSON.parse(local);
-    }
-    
-    let tVencidos = 0; let tClientes = 0;
-
-    
-    if(dat.length===0) { lVentas.innerHTML='<p style="text-align:center;color:#94a3b8;">No hay datos.</p>'; return; }
-    
-    
-    dat.forEach(d => {
-        tClientes++;
-        const diasRestantes = calcularDiasPro(d.vence);
-        if (diasRestantes < 0) tVencidos++;
-        
-        const tp = (d.tipo || '').toLowerCase();
-        if(window.filtroActualG === 'perfil' && !tp.includes('perfil')) return;
-        if(window.filtroActualG === 'cuenta' && !tp.includes('cuenta')) return;
-        if(window.filtroActualG === 'servicio' && !tp.includes('servicio')) return;
-
-        let colorDias = '#22c55e'; 
-        let txtDias = diasRestantes + ' Días';
-        
-        if(diasRestantes < 0) { 
-            colorDias = '#ef4444'; 
-            txtDias = 'VENCIDO'; 
-        } else if(diasRestantes === 0) { 
-            colorDias = '#eab308'; 
-            txtDias = 'HOY'; 
-        }
-        
-        const wnum = (d.whatsapp || '').replace(/D/g,'');
-        const msg = `https://wa.me/${wnum}?text=Hola ${encodeURIComponent(d.cliente || '')}, tus accesos son:%0A%0A%E2%9C%89%EF%B8%8F Correo: ${d.correo || ''}%0A%F0%9F%94%91 Clave: ${d.pass || ''}%0A%F0%9F%91%A4 Perfil: ${d.perfil || ''}%0A%F0%9F%93%8C PIN: ${d.pin || ''}`;
-        const msgRenovacion = `https://wa.me/${wnum}?text=Hola ${encodeURIComponent(d.cliente || '')}, te recordamos que tu servicio de ${d.servicio} está por vencer. Evita cortes realizando tu pago.`;
-        
-        // Tarjeta para Inicio (Ventas Activas)
-        const cardHtml = `
-        <div style="background:#080d1a; border:1px solid #1e293b; border-radius:12px; padding:14px; margin-bottom:12px; position:relative;">
-            <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #1e293b; padding-bottom:8px; margin-bottom:8px;">
-                <strong style="color:#fff; font-size:15px;">${d.cliente || 'Sin Nombre'}</strong>
-                <strong style="color:${colorDias}; font-weight:900; font-family:'Orbitron', sans-serif; font-size:14px;">${txtDias}</strong>
-            </div>
-            <div style="color:#38bdf8; font-size:12px; font-weight:bold; background:#111d33; padding:4px 8px; border-radius:6px; display:inline-block; margin-bottom:6px;">${d.servicio || 'Servicio General'} (${d.tipo || 'PERFIL'})</div>
-            <div style="color:#94a3b8; font-size:12px; margin-bottom:4px;">📧 <strong style="color:#cbd5e1">${d.correo || 'N/A'}</strong></div>
-            <div style="color:#94a3b8; font-size:12px; margin-bottom:4px;">🔑 <strong style="color:#cbd5e1">${d.pass || 'N/A'}</strong></div>
-            <div style="color:#94a3b8; font-size:12px; margin-bottom:4px;">👤 Perfil: <strong style="color:#cbd5e1">${d.perfil || '-'}</strong> | PIN: <strong style="color:#cbd5e1">${d.pin || '-'}</strong></div>
-            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:8px; margin-top:12px;">
-                <a href="${msg}" target="_blank" style="background:#1e293b; color:#38bdf8; border:1px solid #38bdf8; padding:8px; border-radius:6px; font-weight:bold; font-size:12px; text-decoration:none; text-align:center;">👤 Enviar Datos</a>
-                <a href="${msgRenovacion}" target="_blank" style="background:#1e293b; color:#eab308; border:1px solid #eab308; padding:8px; border-radius:6px; font-weight:bold; font-size:12px; text-decoration:none; text-align:center;">⏰ Recordatorio</a>
-            </div>
-        </div>`;
-        
-        lVentas.innerHTML += cardHtml;
-            
-        // Elemento para Directorio
-        if(lDir) {
-            lDir.innerHTML += `
-            <div style="background:#0f172a; border-left:4px solid #38bdf8; padding:12px; margin-bottom:8px; border-radius:6px; display:flex; justify-content:space-between; align-items:center;">
-                <div>
-                    <strong style="color:#fff;">${d.cliente || 'Sin Nombre'}</strong>
-                    <div style="color:#94a3b8; font-size:12px; margin-top:4px;">WA: ${d.whatsapp || 'N/A'}</div>
-                </div>
-                <a href="https://wa.me/${wnum}" target="_blank" style="background:#22c55e; color:#fff; text-decoration:none; padding:6px 12px; border-radius:6px; font-weight:bold; font-size:12px;">💬 Chat</a>
-            </div>`;
-        }
-    });
-
-    const dTot = document.getElementById('dash-tot-clientes');
-    const dVen = document.getElementById('dash-tot-vencidos');
-    if(dTot) dTot.innerText = tClientes;
-    if(dVen) dVen.innerText = tVencidos;
-};
-// Escuchar cambios en la variable global para re-renderizar si es necesario
-let lastDataLength = -1;
-setInterval(() => {
-    if (window.tiendaActual && window.tiendaActual.gestorProData) {
-        if (window.tiendaActual.gestorProData.length !== lastDataLength) {
-            lastDataLength = window.tiendaActual.gestorProData.length;
-            if(typeof window.renderGestorPro === 'function') window.renderGestorPro();
-        }
-    }
-}, 2000);
-</script>
-
-<!-- MOTOR_INTELIGENTE_GESTOR -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-<script>
-document.addEventListener('DOMContentLoaded', () => {
-    // 1. Conectar el botón de "Subir archivo Excel" automáticamente por su texto
-    document.addEventListener('click', (e) => {
-        const text = e.target.innerText || '';
-        const parentText = e.target.closest('div') ? e.target.closest('div').innerText : '';
-        
-        if (text.includes('Subir archivo Excel') || parentText.includes('Subir archivo Excel')) {
-            let input = document.getElementById('gestor-file-upload');
-            if (!input) {
-                input = document.createElement('input');
-                input.type = 'file';
-                input.id = 'gestor-file-upload';
-                input.accept = '.xlsx, .xls, .csv, .json';
-                input.style.display = 'none';
-                input.onchange = window.procesarArchivoExcelReal;
-                document.body.appendChild(input);
-            }
-            input.click();
-        }
-    });
-
-    // 2. Cargar memoria local al iniciar
-    setTimeout(() => {
-        if(window.slugActual) {
-            const localData = localStorage.getItem('gestor_data_' + window.slugActual);
-            if(localData && (!window.tiendaActual || !window.tiendaActual.gestorProData || window.tiendaActual.gestorProData.length === 0)) {
-                if(!window.tiendaActual) window.tiendaActual = {};
-                window.tiendaActual.gestorProData = JSON.parse(localData);
-                window.renderGestorPro();
-            }
-        }
-    }, 1500);
-});
-
-// Función para calcular días
-function calcularDiasG(venceStr) {
-    if (!venceStr) return 0;
-    let d = venceStr;
-    if (d.includes('/')) {
-        let p = d.split('/');
-        if (p.length === 3) d = `${p[2]}-${p[1].padStart(2,'0')}-${p[0].padStart(2,'0')}`;
-    }
-    const f = new Date(d);
-    const h = new Date(); h.setHours(0,0,0,0);
-    return Math.ceil((f - h) / (1000 * 60 * 60 * 24)) || 0;
-}
-
-// Motor de Procesamiento (Excel y JSON)
-window.procesarArchivoExcelReal = async function(event) {
-    const file = event.target.files[0]; 
-    if(!file) return;
-    
-    alert("⏳ LEYENDO ARCHIVO Y GUARDANDO EN LA NUBE...");
-    const reader = new FileReader();
-    reader.onload = async function(e) {
-        try {
-            let arr = [];
-            if (file.name.endsWith('.json')) {
-                arr = JSON.parse(e.target.result);
-            } else {
-                const data = new Uint8Array(e.target.result);
-                const workbook = XLSX.read(data, { type: 'array' });
-                const json = XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]], { defval: "" });
-                
-                json.forEach((r, i) => {
-                    if(!r['Cliente'] && !r['Correo/Usuario']) return;
-                    arr.push({ 
-                        id: 'imp_' + Date.now() + '_' + i, 
-                        cliente: String(r['Cliente'] || '').trim(), 
-                        whatsapp: String(r['WhatsApp'] || '').trim(), 
-                        servicio: String(r['Servicio'] || '').trim(), 
-                        tipo: String(r['Tipo'] || 'PERFIL').trim(), 
-                        correo: String(r['Correo/Usuario'] || '').trim(), 
-                        pass: String(r['Contraseña'] || '').trim(), 
-                        perfil: String(r['Perfil'] || '').trim(), 
-                        pin: String(r['PIN'] || '').trim(), 
-                        vence: String(r['Fecha vencimiento'] || '').trim() 
-                    });
-                });
-            }
-            
-            if(!window.tiendaActual) window.tiendaActual = {};
-            window.tiendaActual.gestorProData = arr;
-            
-            // Blindaje en memoria del celular
-            if(window.slugActual) {
-                localStorage.setItem('gestor_data_' + window.slugActual, JSON.stringify(arr));
-            }
-
-            // Guardado en servidor
-            if(window.persistirEnNube) {
-                await window.persistirEnNube({ gestorProData: arr });
-            }
-            
-            alert(`✅ ¡ÉXITO! ${arr.length} clientes procesados.`); 
-            window.renderGestorPro();
-            
-        } catch(err) { 
-            alert('Error al leer el archivo: ' + err.message); 
-        }
-    };
-    
-    if (file.name.endsWith('.json')) reader.readAsText(file);
-    else reader.readAsArrayBuffer(file);
-};
-
-// Motor de Renderizado de Tarjetas
-window.renderGestorPro = function() {
-    // Buscar dónde poner los datos de forma inteligente sin depender de IDs
-    let contenedor = document.getElementById('g-lista-ventas');
-    
-    if (!contenedor) {
-        // Buscar el contenedor que dice "No hay datos."
-        const divs = Array.from(document.querySelectorAll('div, p')).filter(el => el.innerText && el.innerText.trim() === 'No hay datos.');
-        if(divs.length > 0) {
-            contenedor = divs[0].parentElement;
-        }
-    }
-    
-    if(!contenedor) return;
-
-    let dat = (window.tiendaActual && window.tiendaActual.gestorProData) ? window.tiendaActual.gestorProData : [];
-    
-    if(dat.length === 0) {
-        return; // Dejar la pantalla como está si no hay datos
-    }
-
-    // Buscador
-    const inputQ = document.querySelector('input[placeholder*="Buscar"]');
-    const q = inputQ ? inputQ.value.toLowerCase().trim() : '';
-
-    let htmlTarjetas = '';
-    
-    dat.forEach(d => {
-        if(q && !(d.cliente+' '+d.servicio+' '+d.correo).toLowerCase().includes(q)) return;
-        
-        const diasRestantes = calcularDiasG(d.vence);
-        let colorDias = '#22c55e'; let txtDias = diasRestantes + ' Días';
-        
-        if (diasRestantes < 0) { colorDias = '#ef4444'; txtDias = 'VENCIDO'; } 
-        else if (diasRestantes === 0) { colorDias = '#eab308'; txtDias = 'HOY'; }
-
-        const wnum = (d.whatsapp || '').replace(/\D/g,'');
-        const msg = `https://wa.me/${wnum}?text=Hola ${encodeURIComponent(d.cliente || '')}, tus accesos son:%0A%0A%E2%9C%89%EF%B8%8F Correo: ${d.correo || ''}%0A%F0%9F%94%91 Clave: ${d.pass || ''}%0A%F0%9F%91%A4 Perfil: ${d.perfil || ''}%0A%F0%9F%93%8C PIN: ${d.pin || ''}`;
-
-        htmlTarjetas += `
-        <div style="background:#080d1a; border:1px solid #1e293b; border-radius:12px; padding:14px; margin-bottom:12px; box-shadow: 0 4px 10px rgba(0,0,0,0.3);">
-            <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #1e293b; padding-bottom:8px; margin-bottom:8px;">
-                <strong style="color:#fff; font-size:15px; font-family:'Rajdhani', sans-serif;">${d.cliente || 'Sin Nombre'}</strong>
-                <strong style="color:${colorDias}; font-weight:900; font-family:'Orbitron', sans-serif; font-size:14px; background: rgba(0,0,0,0.3); padding:4px 8px; border-radius:6px;">${txtDias}</strong>
-            </div>
-            <div style="color:#38bdf8; font-size:12px; font-weight:bold; background:#111d33; padding:4px 8px; border-radius:6px; display:inline-block; margin-bottom:6px;">${d.servicio} (${d.tipo})</div>
-            <div style="color:#94a3b8; font-size:12px; margin-bottom:4px;">📧 <b style="color:#cbd5e1">${d.correo || 'N/A'}</b></div>
-            <div style="color:#94a3b8; font-size:12px; margin-bottom:4px;">🔑 <b style="color:#cbd5e1">${d.pass || 'N/A'}</b></div>
-            <div style="color:#94a3b8; font-size:12px;">👤 Perfil: <b style="color:#cbd5e1">${d.perfil || '-'}</b> | PIN: <b style="color:#cbd5e1">${d.pin || '-'}</b></div>
-            
-            <div style="margin-top:12px;">
-                <a href="${msg}" target="_blank" style="display:block; width:100%; background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%); color:#fff; padding:10px; border-radius:8px; font-weight:bold; font-size:13px; text-decoration:none; text-align:center; font-family:'Orbitron', sans-serif; box-shadow: 0 4px 10px rgba(2, 132, 199, 0.3);">ENVIAR DATOS A WHATSAPP</a>
-            </div>
-        </div>`;
-    });
-    
-    // Si la búsqueda no arroja nada
-    if (htmlTarjetas === '') {
-        htmlTarjetas = '<p style="text-align:center; color:#94a3b8; padding:20px;">No se encontraron resultados.</p>';
-    }
-
-    // Insertar manteniendo la zona de subir archivo si existe
-    const dragZone = contenedor.querySelector('div[style*="dashed"]');
-    if (dragZone) {
-        contenedor.innerHTML = htmlTarjetas;
-        contenedor.appendChild(dragZone);
-    } else {
-        contenedor.innerHTML = htmlTarjetas;
-    }
-};
-
-// Escuchar la barra de búsqueda en tiempo real
-setTimeout(() => {
-    const inputQ = document.querySelector('input[placeholder*="Buscar"]');
-    if(inputQ) {
-        inputQ.addEventListener('input', window.renderGestorPro);
-    }
-}, 2000);
-</script>
-
-
-<!-- SISTEMA_PRO_UNIFICADO -->
-<style>
-  /* Botón Flotante Circular (FAB) */
-  .btn-nuevo-gestor { background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%); color: #fff; font-weight: bold; border: none; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; width: 60px; height: 60px; font-size: 32px; position: fixed; bottom: 80px; right: 20px; z-index: 1000; box-shadow: 0 4px 15px rgba(34, 197, 94, 0.4); transition: transform 0.2s; line-height:1;} 
-  .btn-nuevo-gestor:active { transform: scale(0.95); }
-  
-  /* Modales Oscuros Premium */
-  .modal-g-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 3000; align-items: center; justify-content: center; backdrop-filter: blur(5px); }
-  .modal-g-content { background: #0b1120; border: 1px solid #1e293b; border-radius: 16px; width: 95%; max-width: 450px; max-height: 85vh; overflow-y: auto; box-shadow: 0 10px 50px rgba(0,0,0,0.9); display: flex; flex-direction: column;}
-  .modal-g-header { display: flex; justify-content: space-between; align-items: center; padding: 16px 20px; border-bottom: 1px solid #1e293b; position: sticky; top: 0; background: #0b1120; z-index: 10;}
-  .modal-g-title { color: #fff; margin: 0; font-size: 16px; font-weight: 600; font-family: 'Orbitron', sans-serif;}
-  .modal-g-close { background: transparent; border: none; color: #94a3b8; font-size: 28px; cursor: pointer; padding: 0; line-height: 1;}
-  .modal-g-body { padding: 20px; display: flex; flex-direction: column; gap: 16px; }
-  .g-input-group { display: flex; flex-direction: column; gap: 6px; }
-  .g-label { color: #94a3b8; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;}
-  .g-input { width: 100%; padding: 14px 12px; background: #0f172a; border: 1px solid #1e293b; color: #fff; border-radius: 10px; box-sizing: border-box; font-size: 14px; outline: none; transition: border 0.2s;}
-  .g-input:focus { border-color: #38bdf8; }
-  .g-footer { padding: 16px 20px; border-top: 1px solid #1e293b; display: flex; gap: 12px; position: sticky; bottom: 0; background: #0b1120; z-index: 10;}
-  .g-btn-cancel { flex: 1; padding: 14px; background: transparent; color: #fff; border: none; font-weight: 600; cursor: pointer; border-radius: 10px; }
-  .g-btn-save { flex: 1; padding: 14px; background: #22c55e; color: #fff; border: none; font-weight: 600; cursor: pointer; border-radius: 10px; }
-</style>
-
-<!-- BOTÓN FAB FLOTANTE -->
-
-
-<!-- 1. MODAL: NUEVO CLIENTE -->
-<div id="modal-g-cliente" class="modal-g-overlay">
-    <div class="modal-g-content">
-        <div class="modal-g-header">
-            <h3 class="modal-g-title">Nuevo cliente</h3>
-            <button class="modal-g-close" onclick="cerrarModalesG()">×</button>
-        </div>
-        <div class="modal-g-body">
-            <div class="g-input-group">
-                <label class="g-label">Cliente *</label>
-                <input type="text" class="g-input" placeholder="Nombre del cliente">
-            </div>
-            <div class="g-input-group">
-                <label class="g-label">WhatsApp</label>
-                <input type="number" class="g-input" placeholder="+593 961347609">
-            </div>
-        </div>
-        <div class="g-footer">
-            <button class="g-btn-cancel" onclick="cerrarModalesG()">Cancelar</button>
-            <button class="g-btn-save" onclick="guardarFalsoG('Cliente')">Guardar</button>
-        </div>
-    </div>
-</div>
-
-<!-- 2. MODAL: NUEVO SERVICIO -->
-<div id="modal-g-servicio" class="modal-g-overlay">
-    <div class="modal-g-content">
-        <div class="modal-g-header">
-            <h3 class="modal-g-title">Nuevo servicio</h3>
-            <button class="modal-g-close" onclick="cerrarModalesG()">×</button>
-        </div>
-        <div class="modal-g-body">
-            <div class="g-input-group">
-                <label class="g-label">Servicio *</label>
-                <input type="text" class="g-input" placeholder="Ej. Netflix Premium 4K">
-            </div>
-            <div class="g-input-group">
-                <label class="g-label">Perfiles</label>
-                <input type="number" class="g-input" placeholder="5">
-            </div>
-            <div class="g-input-group">
-                <label class="g-label">Precio Cliente Final</label>
-                <input type="number" class="g-input" placeholder="0">
-            </div>
-        </div>
-        <div class="g-footer">
-            <button class="g-btn-cancel" onclick="cerrarModalesG()">Cancelar</button>
-            <button class="g-btn-save" onclick="guardarFalsoG('Servicio')">Guardar</button>
-        </div>
-    </div>
-</div>
-
-<!-- 3. MODAL: NUEVA CUENTA / PERFIL -->
-<div id="modal-g-cuenta" class="modal-g-overlay">
-    <div class="modal-g-content">
-        <div class="modal-g-header">
-            <h3 class="modal-g-title" id="titulo-m-cuenta">Nueva cuenta completa</h3>
-            <button class="modal-g-close" onclick="cerrarModalesG()">×</button>
-        </div>
-        <div class="modal-g-body">
-            <div class="g-input-group">
-                <label class="g-label">Servicio *</label>
-                <input type="text" class="g-input" placeholder="Ej. Spotify">
-            </div>
-            <div class="g-input-group">
-                <label class="g-label">Correo o Usuario *</label>
-                <input type="text" class="g-input" placeholder="">
-            </div>
-            <div class="g-input-group">
-                <label class="g-label">Contraseña</label>
-                <input type="text" class="g-input" placeholder="">
-            </div>
-        </div>
-        <div class="g-footer">
-            <button class="g-btn-cancel" onclick="cerrarModalesG()">Cancelar</button>
-            <button class="g-btn-save" onclick="guardarFalsoG('Cuenta/Perfil')">Guardar</button>
-        </div>
-    </div>
-</div>
-
-<script>
-window.pestañaActualGestor = 'INICIO';
-
-// Lógica Maestra: Cambio de Pestañas
-window.cambiarSubTabGestor = function(sub) {
-    window.pestañaActualGestor = sub.toUpperCase();
-    
-    // 1. Limpiar todos los botones (Bordes grises)
-    const tabs = ['dashboard', 'inicio', 'servicios', 'clientes', 'perfiles', 'cuentas', 'importar', 'directorio'];
-    tabs.forEach(s => {
-        const btn = document.getElementById('g-tab-btn-' + s);
-        if(btn) {
-            btn.classList.remove('active');
-            btn.style.border = '1px solid #1e293b';
-            btn.style.color = '#94a3b8';
-        }
-    });
-    
-    // 2. Encender el botón tocado (Borde amarillo)
-    const actBtn = document.getElementById('g-tab-btn-' + sub);
-    if (actBtn) {
-        actBtn.classList.add('active');
-        actBtn.style.border = '1px solid #eab308';
-        actBtn.style.color = '#eab308';
-    }
-
-    // 3. Ocultar todos los contenedores primero
-    const contInicio = document.getElementById('g-tab-inicio');
-    const contDashboard = document.getElementById('g-tab-dashboard');
-    const contImportar = document.getElementById('g-tab-importar');
-    const contDirectorio = document.getElementById('g-tab-clientes') || document.getElementById('g-tab-directorio');
-    const buscador = document.querySelector('input[placeholder*="Buscar"]');
-
-    if(contInicio) contInicio.style.display = 'none';
-    if(contDashboard) contDashboard.style.display = 'none';
-    if(contImportar) contImportar.style.display = 'none';
-    if(contDirectorio) contDirectorio.style.display = 'none';
-    if(buscador) buscador.style.display = 'none';
-
-    // 4. Mostrar solo lo que corresponde
-    if (sub === 'dashboard') {
-        if(contDashboard) contDashboard.style.display = 'block';
-    } else if (sub === 'importar') {
-        if(contImportar) contImportar.style.display = 'block';
-    } else if (sub === 'clientes' || sub === 'directorio') {
-        if(contDirectorio) contDirectorio.style.display = 'block';
-        if(buscador) buscador.style.display = 'block';
-    } else {
-        if(contInicio) contInicio.style.display = 'block';
-        if(buscador) buscador.style.display = 'block';
-        aplicarFiltrosTarjetasG(); // Filtrar tarjetas según pestaña
-    }
-};
-
-// Lógica Maestra: Filtros
-window.aplicarFiltrosTarjetasG = function() {
-    const p = window.pestañaActualGestor;
-    const inputQ = document.querySelector('input[placeholder*="Buscar"]');
-    const q = inputQ ? inputQ.value.toUpperCase().trim() : '';
-    
-    const tarjetas = document.querySelectorAll('.g-card');
-    tarjetas.forEach(card => {
-        const txt = card.innerText.toUpperCase();
-        let show = true;
-        
-        if (p === 'PERFILES' && !txt.includes('PERFIL')) show = false;
-        if (p === 'CUENTAS' && !txt.includes('CUENTA COMPLETA')) show = false;
-        if (q !== '' && !txt.includes(q)) show = false;
-        
-        card.style.display = show ? 'block' : 'none';
-    });
-};
-
-// Conectar buscador
-setTimeout(() => {
-    const inputQ = document.querySelector('input[placeholder*="Buscar"]');
-    if(inputQ) inputQ.addEventListener('input', window.aplicarFiltrosTarjetasG);
-}, 1000);
-
-// Lógica Maestra: Modales
-window.cerrarModalesG = function() {
-    document.querySelectorAll('.modal-g-overlay').forEach(m => m.style.display = 'none');
-};
-
-window.guardarFalsoG = function(tipo) {
-    alert(tipo + ' guardado exitosamente.');
-    cerrarModalesG();
-};
-
-window.abrirModalPorPestaña = function() {
-    cerrarModalesG();
-    const p = window.pestañaActualGestor;
-    if (p === 'SERVICIOS') {
-        document.getElementById('modal-g-servicio').style.display = 'flex';
-    } else if (p === 'CLIENTES' || p === 'DIRECTORIO') {
-        document.getElementById('modal-g-cliente').style.display = 'flex';
-    } else if (p === 'PERFILES' || p === 'CUENTAS' || p === 'INICIO') {
-        const t = document.getElementById('titulo-m-cuenta');
-        if (t) t.innerText = (p === 'PERFILES') ? 'Nuevo perfil' : 'Nueva cuenta completa';
-        document.getElementById('modal-g-cuenta').style.display = 'flex';
-    }
-};
-
-// Vigía del FAB (Asegura que el botón se muestre en el lugar correcto)
-setInterval(() => {
-    const fab = document.getElementById('btn-fab-gestor');
-    const gestorContainer = document.getElementById('tab-gestor-pro');
-    const isGestorOpen = gestorContainer && gestorContainer.style.display !== 'none';
-    
-    if (fab && isGestorOpen) {
-        const p = window.pestañaActualGestor;
-        if (p === 'DASHBOARD' || p === 'IMPORTAR') {
-            fab.style.display = 'none'; // Ocultar en dashboard e importar
-        } else {
-            fab.style.display = 'flex';
-        }
-    } else if (fab) {
-        fab.style.display = 'none';
-    }
-}, 300);
-</script>
-
-<!-- SISTEMA_PRO_UNIFICADO -->
-<style>
-  /* Botón Flotante Circular (FAB) */
-  .btn-nuevo-gestor { background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%); color: #fff; font-weight: bold; border: none; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; width: 60px; height: 60px; font-size: 32px; position: fixed; bottom: 80px; right: 20px; z-index: 1000; box-shadow: 0 4px 15px rgba(34, 197, 94, 0.4); transition: transform 0.2s; line-height:1;} 
-  .btn-nuevo-gestor:active { transform: scale(0.95); }
-  
-  /* Modales Oscuros Premium */
-  .modal-g-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 3000; align-items: center; justify-content: center; backdrop-filter: blur(5px); }
-  .modal-g-content { background: #0b1120; border: 1px solid #1e293b; border-radius: 16px; width: 95%; max-width: 450px; max-height: 85vh; overflow-y: auto; box-shadow: 0 10px 50px rgba(0,0,0,0.9); display: flex; flex-direction: column;}
-  .modal-g-header { display: flex; justify-content: space-between; align-items: center; padding: 16px 20px; border-bottom: 1px solid #1e293b; position: sticky; top: 0; background: #0b1120; z-index: 10;}
-  .modal-g-title { color: #fff; margin: 0; font-size: 16px; font-weight: 600; font-family: 'Orbitron', sans-serif;}
-  .modal-g-close { background: transparent; border: none; color: #94a3b8; font-size: 28px; cursor: pointer; padding: 0; line-height: 1;}
-  .modal-g-body { padding: 20px; display: flex; flex-direction: column; gap: 16px; }
-  .g-input-group { display: flex; flex-direction: column; gap: 6px; }
-  .g-label { color: #94a3b8; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;}
-  .g-input { width: 100%; padding: 14px 12px; background: #0f172a; border: 1px solid #1e293b; color: #fff; border-radius: 10px; box-sizing: border-box; font-size: 14px; outline: none; transition: border 0.2s;}
-  .g-input:focus { border-color: #38bdf8; }
-  .g-footer { padding: 16px 20px; border-top: 1px solid #1e293b; display: flex; gap: 12px; position: sticky; bottom: 0; background: #0b1120; z-index: 10;}
-  .g-btn-cancel { flex: 1; padding: 14px; background: transparent; color: #fff; border: none; font-weight: 600; cursor: pointer; border-radius: 10px; }
-  .g-btn-save { flex: 1; padding: 14px; background: #22c55e; color: #fff; border: none; font-weight: 600; cursor: pointer; border-radius: 10px; }
-</style>
-
-<!-- BOTÓN FAB FLOTANTE -->
-
-
-<!-- 1. MODAL: NUEVO CLIENTE -->
-<div id="modal-g-cliente" class="modal-g-overlay">
-    <div class="modal-g-content">
-        <div class="modal-g-header">
-            <h3 class="modal-g-title">Nuevo cliente</h3>
-            <button class="modal-g-close" onclick="cerrarModalesG()">×</button>
-        </div>
-        <div class="modal-g-body">
-            <div class="g-input-group">
-                <label class="g-label">Cliente *</label>
-                <input type="text" class="g-input" placeholder="Nombre del cliente">
-            </div>
-            <div class="g-input-group">
-                <label class="g-label">WhatsApp</label>
-                <input type="number" class="g-input" placeholder="+593 961347609">
-            </div>
-        </div>
-        <div class="g-footer">
-            <button class="g-btn-cancel" onclick="cerrarModalesG()">Cancelar</button>
-            <button class="g-btn-save" onclick="guardarFalsoG('Cliente')">Guardar</button>
-        </div>
-    </div>
-</div>
-
-<!-- 2. MODAL: NUEVO SERVICIO -->
-<div id="modal-g-servicio" class="modal-g-overlay">
-    <div class="modal-g-content">
-        <div class="modal-g-header">
-            <h3 class="modal-g-title">Nuevo servicio</h3>
-            <button class="modal-g-close" onclick="cerrarModalesG()">×</button>
-        </div>
-        <div class="modal-g-body">
-            <div class="g-input-group">
-                <label class="g-label">Servicio *</label>
-                <input type="text" class="g-input" placeholder="Ej. Netflix Premium 4K">
-            </div>
-            <div class="g-input-group">
-                <label class="g-label">Perfiles</label>
-                <input type="number" class="g-input" placeholder="5">
-            </div>
-            <div class="g-input-group">
-                <label class="g-label">Precio Cliente Final</label>
-                <input type="number" class="g-input" placeholder="0">
-            </div>
-        </div>
-        <div class="g-footer">
-            <button class="g-btn-cancel" onclick="cerrarModalesG()">Cancelar</button>
-            <button class="g-btn-save" onclick="guardarFalsoG('Servicio')">Guardar</button>
-        </div>
-    </div>
-</div>
-
-<!-- 3. MODAL: NUEVA CUENTA / PERFIL -->
-<div id="modal-g-cuenta" class="modal-g-overlay">
-    <div class="modal-g-content">
-        <div class="modal-g-header">
-            <h3 class="modal-g-title" id="titulo-m-cuenta">Nueva cuenta completa</h3>
-            <button class="modal-g-close" onclick="cerrarModalesG()">×</button>
-        </div>
-        <div class="modal-g-body">
-            <div class="g-input-group">
-                <label class="g-label">Servicio *</label>
-                <input type="text" class="g-input" placeholder="Ej. Spotify">
-            </div>
-            <div class="g-input-group">
-                <label class="g-label">Correo o Usuario *</label>
-                <input type="text" class="g-input" placeholder="">
-            </div>
-            <div class="g-input-group">
-                <label class="g-label">Contraseña</label>
-                <input type="text" class="g-input" placeholder="">
-            </div>
-        </div>
-        <div class="g-footer">
-            <button class="g-btn-cancel" onclick="cerrarModalesG()">Cancelar</button>
-            <button class="g-btn-save" onclick="guardarFalsoG('Cuenta/Perfil')">Guardar</button>
-        </div>
-    </div>
-</div>
-
-<script>
-window.pestañaActualGestor = 'INICIO';
-
-// Lógica Maestra: Cambio de Pestañas
-window.cambiarSubTabGestor = function(sub) {
-    window.pestañaActualGestor = sub.toUpperCase();
-    
-    // 1. Limpiar todos los botones (Bordes grises)
-    const tabs = ['dashboard', 'inicio', 'servicios', 'clientes', 'perfiles', 'cuentas', 'importar', 'directorio'];
-    tabs.forEach(s => {
-        const btn = document.getElementById('g-tab-btn-' + s);
-        if(btn) {
-            btn.classList.remove('active');
-            btn.style.border = '1px solid #1e293b';
-            btn.style.color = '#94a3b8';
-        }
-    });
-    
-    // 2. Encender el botón tocado (Borde amarillo)
-    const actBtn = document.getElementById('g-tab-btn-' + sub);
-    if (actBtn) {
-        actBtn.classList.add('active');
-        actBtn.style.border = '1px solid #eab308';
-        actBtn.style.color = '#eab308';
-    }
-
-    // 3. Ocultar todos los contenedores primero
-    const contInicio = document.getElementById('g-tab-inicio');
-    const contDashboard = document.getElementById('g-tab-dashboard');
-    const contImportar = document.getElementById('g-tab-importar');
-    const contDirectorio = document.getElementById('g-tab-clientes') || document.getElementById('g-tab-directorio');
-    const buscador = document.querySelector('input[placeholder*="Buscar"]');
-
-    if(contInicio) contInicio.style.display = 'none';
-    if(contDashboard) contDashboard.style.display = 'none';
-    if(contImportar) contImportar.style.display = 'none';
-    if(contDirectorio) contDirectorio.style.display = 'none';
-    if(buscador) buscador.style.display = 'none';
-
-    // 4. Mostrar solo lo que corresponde
-    if (sub === 'dashboard') {
-        if(contDashboard) contDashboard.style.display = 'block';
-    } else if (sub === 'importar') {
-        if(contImportar) contImportar.style.display = 'block';
-    } else if (sub === 'clientes' || sub === 'directorio') {
-        if(contDirectorio) contDirectorio.style.display = 'block';
-        if(buscador) buscador.style.display = 'block';
-    } else {
-        if(contInicio) contInicio.style.display = 'block';
-        if(buscador) buscador.style.display = 'block';
-        aplicarFiltrosTarjetasG(); // Filtrar tarjetas según pestaña
-    }
-};
-
-// Lógica Maestra: Filtros
-window.aplicarFiltrosTarjetasG = function() {
-    const p = window.pestañaActualGestor;
-    const inputQ = document.querySelector('input[placeholder*="Buscar"]');
-    const q = inputQ ? inputQ.value.toUpperCase().trim() : '';
-    
-    const tarjetas = document.querySelectorAll('.g-card');
-    tarjetas.forEach(card => {
-        const txt = card.innerText.toUpperCase();
-        let show = true;
-        
-        if (p === 'PERFILES' && !txt.includes('PERFIL')) show = false;
-        if (p === 'CUENTAS' && !txt.includes('CUENTA COMPLETA')) show = false;
-        if (q !== '' && !txt.includes(q)) show = false;
-        
-        card.style.display = show ? 'block' : 'none';
-    });
-};
-
-// Conectar buscador
-setTimeout(() => {
-    const inputQ = document.querySelector('input[placeholder*="Buscar"]');
-    if(inputQ) inputQ.addEventListener('input', window.aplicarFiltrosTarjetasG);
-}, 1000);
-
-// Lógica Maestra: Modales
-window.cerrarModalesG = function() {
-    document.querySelectorAll('.modal-g-overlay').forEach(m => m.style.display = 'none');
-};
-
-window.guardarFalsoG = function(tipo) {
-    alert(tipo + ' guardado exitosamente.');
-    cerrarModalesG();
-};
-
-window.abrirModalPorPestaña = function() {
-    cerrarModalesG();
-    const p = window.pestañaActualGestor;
-    if (p === 'SERVICIOS') {
-        document.getElementById('modal-g-servicio').style.display = 'flex';
-    } else if (p === 'CLIENTES' || p === 'DIRECTORIO') {
-        document.getElementById('modal-g-cliente').style.display = 'flex';
-    } else if (p === 'PERFILES' || p === 'CUENTAS' || p === 'INICIO') {
-        const t = document.getElementById('titulo-m-cuenta');
-        if (t) t.innerText = (p === 'PERFILES') ? 'Nuevo perfil' : 'Nueva cuenta completa';
-        document.getElementById('modal-g-cuenta').style.display = 'flex';
-    }
-};
-
-// Vigía del FAB (Asegura que el botón se muestre en el lugar correcto)
-setInterval(() => {
-    const fab = document.getElementById('btn-fab-gestor');
-    const gestorContainer = document.getElementById('tab-gestor-pro');
-    const isGestorOpen = gestorContainer && gestorContainer.style.display !== 'none';
-    
-    if (fab && isGestorOpen) {
-        const p = window.pestañaActualGestor;
-        if (p === 'DASHBOARD' || p === 'IMPORTAR') {
-            fab.style.display = 'none'; // Ocultar en dashboard e importar
-        } else {
-            fab.style.display = 'flex';
-        }
-    } else if (fab) {
-        fab.style.display = 'none';
-    }
-}, 300);
-</script>
-
-<script>
-  // PASE VIP: Gestor Pro siempre activo
-  setInterval(() => {
-      if(window.revendedorActual) window.revendedorActual.gestorPremium = true;
-      if(window.tiendaActual) window.tiendaActual.gestorPremium = true;
-      const bG = document.getElementById('tab-btn-gestor-pro');
-      if(bG) bG.style.display = 'block';
-  }, 1000);
-</script>
-
-
-<!-- FORZAR VIP GESTOR -->
-<style>
-    /* Obligar visualmente a que el botón exista siempre */
-    #tab-btn-gestor-pro { display: block !important; }
-</style>
-<script>
-    // Obligar por JavaScript a que el sistema crea que eres Premium
-    setInterval(() => {
-        const btnGestor = document.getElementById('tab-btn-gestor-pro');
-        if (btnGestor) {
-            btnGestor.style.display = 'block';
-        }
-        if(window.revendedorActual) window.revendedorActual.gestorPremium = true;
-        if(window.tiendaActual) window.tiendaActual.gestorPremium = true;
-    }, 500);
-</script>
-
-
-<!-- FAB BLINDADO -->
-<button id="btn-fab-gestor-pro" class="btn-nuevo-gestor" style="display:none; position:fixed; bottom:80px; right:20px; z-index:99999; box-shadow: 0 4px 15px rgba(34, 197, 94, 0.6);" onclick="abrirModalPorPestaña()">+</button>
-
-<script>
-// Sensor blindado: Vigila la barra de búsqueda para mostrar el botón
-setInterval(() => {
-    const fab = document.getElementById('btn-fab-gestor-pro');
-    const buscador = document.querySelector('input[placeholder*="Buscar"]');
-    
-    // Si el buscador es visible en pantalla, el Gestor está abierto
-    const isGestorActive = buscador && buscador.offsetParent !== null; 
-    const pestana = window.pestañaActualGestor || 'INICIO';
-    
-    if (fab) {
-        if (isGestorActive && pestana !== 'DASHBOARD' && pestana !== 'IMPORTAR') {
-            fab.style.display = 'flex';
-        } else {
-            fab.style.display = 'none';
-        }
-    }
-}, 300);
-</script>
-
-
-<!-- FAB SUPREMO -->
-<script>
-setInterval(() => {
-    let btn = document.getElementById('fab-supremo');
-    let buscador = document.querySelector('input[placeholder*="Buscar"]');
-    
-    // Si el botón no existe en la pantalla, lo creamos a la fuerza
-    if (!btn) {
-        btn = document.createElement('button');
-        btn.id = 'fab-supremo';
-        btn.innerHTML = '+';
-        // CSS inyectado directamente con !important absoluto
-        btn.style.cssText = 'position:fixed !important; bottom:90px !important; right:20px !important; width:65px !important; height:65px !important; border-radius:50px !important; background:linear-gradient(135deg, #22c55e 0%, #16a34a 100%) !important; color:white !important; font-size:40px !important; font-weight:bold !important; border:none !important; box-shadow:0 5px 25px rgba(34,197,94,0.8) !important; z-index:2147483647 !important; display:none !important; align-items:center !important; justify-content:center !important; cursor:pointer !important; line-height:1 !important; padding-bottom:6px !important;';
-        
-        btn.onclick = () => {
-            if(typeof window.abrirModalPorPestaña === 'function') {
-                window.abrirModalPorPestaña();
-            } else {
-                alert('Recarga la página completamente para cargar los formularios.');
-            }
-        };
-        document.body.appendChild(btn);
-    }
-    
-    // Si el buscador está visible, obligamos al botón a mostrarse
-    if (buscador && buscador.offsetParent !== null) {
-        btn.style.setProperty('display', 'flex', 'important');
-    } else {
-        btn.style.setProperty('display', 'none', 'important');
-    }
-}, 500);
-</script>
-
-
-<!-- SISTEMA DE OFERTA RELAMPAGO (ADMIN) -->
-<style>
-  .modal-oferta { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); z-index:99999; align-items:center; justify-content:center; backdrop-filter:blur(5px); }
-  .mo-content { background:#0f172a; border:1px solid #0ea5e9; border-radius:16px; width:90%; max-width:400px; padding:20px; box-shadow:0 10px 40px rgba(14,165,233,0.3); }
-  .mo-header { font-size:18px; color:#fff; font-weight:bold; margin-bottom:20px; display:flex; align-items:center; border-bottom:1px solid #1e293b; padding-bottom:10px; font-family:'Orbitron', sans-serif;}
-  .mo-group { margin-bottom:15px; }
-  .mo-label { color:#94a3b8; font-size:11px; font-weight:bold; margin-bottom:6px; display:block; text-transform:uppercase; }
-  .mo-input { width:100%; padding:12px; background:#0b1120; border:1px solid #1e293b; color:#fff; border-radius:8px; box-sizing:border-box; font-size:14px; }
-  .mo-input:focus { border-color:#0ea5e9; outline:none; }
-  .mo-btn-save { width:100%; padding:14px; background:linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%); color:#fff; font-weight:bold; border:none; border-radius:8px; cursor:pointer; font-size:15px; margin-top:10px;}
-  .mo-btn-cancel { width:100%; padding:12px; background:transparent; color:#ef4444; font-weight:bold; border:1px solid #ef4444; border-radius:8px; margin-top:10px; cursor:pointer; }
-</style>
-
-<div id="modal-oferta" class="modal-oferta">
-    <div class="mo-content">
-        <div class="mo-header">⚡ Configurar Oferta Relámpago</div>
-        
-        <div class="mo-group">
-            <label class="mo-label">Estado de la Oferta</label>
-            <select id="of-estado" class="mo-input">
-                <option value="0">🔴 INACTIVA</option>
-                <option value="1">🟢 ACTIVA (Visible en catálogo)</option>
-            </select>
-        </div>
-        
-        <div class="mo-group" style="display:flex; gap:10px;">
-            <div style="flex:1;">
-                <label class="mo-label">Descuento (%)</label>
-                <input type="number" id="of-porcentaje" class="mo-input" placeholder="Ej: 20">
-            </div>
-        </div>
-        
-        <div class="mo-group">
-            <label class="mo-label">Fecha y Hora de Inicio</label>
-            <input type="datetime-local" id="of-inicio" class="mo-input" style="color-scheme:dark;">
-        </div>
-        
-        <div class="mo-group">
-            <label class="mo-label">Fecha y Hora de Fin</label>
-            <input type="datetime-local" id="of-fin" class="mo-input" style="color-scheme:dark;">
-        </div>
-        
-        
-    
-    
-    <!-- Filtro Interactivo de Ofertas -->
-    <div style="margin-bottom: 15px;">
-        <label style="display: block; color: #8e9cb1; font-size: 11px; font-weight: bold; margin-bottom: 6px; text-transform: uppercase;">Alcance de la Oferta</label>
-        <select id="ofertaAlcance" style="width: 100%; padding: 12px; background: #0f172a; border: 1px solid #1e293b; color: #fff; border-radius: 8px; outline: none; appearance: auto;" onchange="toggleListaServicios(this.value)">
-            <option value="todos">Todos los servicios (Catálogo completo)</option>
-            <option value="especificos">Solo a servicios específicos...</option>
-        </select>
-    </div>
-    
-    <div id="cajaServiciosChecklist" style="display: none; margin-bottom: 15px;">
-        <label style="display: block; color: #8e9cb1; font-size: 11px; font-weight: bold; margin-bottom: 6px; text-transform: uppercase;">Selecciona los servicios (Marca la casilla)</label>
-        <div id="contenedorListaCheckboxes" style="max-height: 160px; overflow-y: auto; background: #0b1120; border: 1px solid #1e293b; border-radius: 8px; padding: 10px; display: flex; flex-direction: column; gap: 8px;">
-            <!-- Aquí cargarán los servicios desde la base de datos -->
-        </div>
-        
-        <!-- CAJA INVISIBLE: Esto evita que el botón Guardar se estrelle -->
-        <input type="hidden" id="ofertaServiciosNombres" value="">
-    </div>
-
-    <script>
     function actualizarCajaInvisible() {
         const checks = document.querySelectorAll('.check-servicio-oferta:checked');
-        const seleccionados = Array.from(checks).map(c => c.value);
+        const seleccionados = Array.from(checks).map(function(c) { return c.value; });
         const inputOculto = document.getElementById('ofertaServiciosNombres');
-        if(inputOculto) {
+        if (inputOculto) {
             inputOculto.value = seleccionados.join(', ');
         }
     }
@@ -2086,32 +483,50 @@ setInterval(() => {
     async function poblarCheckboxesServicios() {
         const contenedor = document.getElementById('contenedorListaCheckboxes');
         if (!contenedor) return;
-        contenedor.innerHTML = '<span style="color:#0ea5e9; font-size:12px;">Cargando catálogo desde Firebase...</span>';
+        contenedor.innerHTML = '<span style="color:#38bdf8; font-size:12px;">Cargando todos tus servicios...</span>';
         
+        let serviciosExtraidos = [];
         try {
-            // Llamada directa y segura a tu servidor
             const res = await fetch('/api/db');
             const data = await res.json();
-            const servicios = data.servicios && data.servicios.length > 0 ? data.servicios : [];
             
-            if (servicios.length === 0) {
-                contenedor.innerHTML = '<span style="color:#ef4444; font-size:12px;">No se encontraron servicios registrados.</span>';
-                return;
+            // 1. Extraer de servicios globales si existen
+            if (Array.isArray(data.servicios)) {
+                data.servicios.forEach(function(s) {
+                    let n = s.nombre || s.titulo || s.servicio || s.name || s.title;
+                    if (n && n !== 'Netflix Premium') serviciosExtraidos.push(n.trim());
+                });
             }
+            // 2. Extraer de las tiendas registradas (donde están los servicios reales de Full Movies Ec)
+            if (Array.isArray(data.tiendas)) {
+                data.tiendas.forEach(function(t) {
+                    const listaProd = t.servicios || t.catalogo || t.productos || t.items || [];
+                    if (Array.isArray(listaProd)) {
+                        listaProd.forEach(function(p) {
+                            let n = p.nombre || p.titulo || p.servicio || p.name || p.title;
+                            if (n) serviciosExtraidos.push(n.trim());
+                        });
+                    }
+                });
+            }
+        } catch(e) {}
 
-            contenedor.innerHTML = '';
-            servicios.forEach((srv) => {
-                const nombre = srv.nombre || srv.titulo || srv.servicio;
-                if (!nombre) return;
-                
-                const div = document.createElement('label');
-                div.style.cssText = 'display: flex; align-items: center; gap: 10px; color: #e2e8f0; font-size: 13px; cursor: pointer; padding: 6px; border-bottom: 1px solid #1e293b;';
-                div.innerHTML = `<input type="checkbox" class="check-servicio-oferta" value="${nombre}" onchange="actualizarCajaInvisible()" style="accent-color: #0ea5e9; width: 18px; height: 18px; cursor: pointer;"> <span style="font-weight: 500;">${nombre}</span>`;
-                contenedor.appendChild(div);
-            });
-        } catch(error) {
-            contenedor.innerHTML = '<span style="color:#ef4444; font-size:12px;">Error al conectar con la base de datos.</span>';
-        }
+        // Combinar los de la base de datos con tu catálogo oficial completo sin repetir
+        let unicos = [];
+        let combinados = serviciosExtraidos.concat(catalogoOficial);
+        combinados.forEach(function(item) {
+            if (item && unicos.indexOf(item) === -1) {
+                unicos.push(item);
+            }
+        });
+
+        contenedor.innerHTML = '';
+        unicos.forEach(function(nombre) {
+            const div = document.createElement('label');
+            div.style.cssText = 'display: flex; align-items: center; gap: 10px; color: #e2e8f0; font-size: 13px; cursor: pointer; padding: 7px 6px; border-bottom: 1px solid #1e293b; user-select: none;';
+            div.innerHTML = '<input type="checkbox" class="check-servicio-oferta" value="' + nombre + '" onchange="actualizarCajaInvisible()" style="accent-color: #0ea5e9; width: 18px; height: 18px; cursor: pointer;"> <span style="font-weight: 500;">' + nombre + '</span>';
+            contenedor.appendChild(div);
+        });
     }
 
     function toggleListaServicios(valor) {
@@ -2124,10 +539,11 @@ setInterval(() => {
             poblarCheckboxesServicios();
         } else {
             caja.style.display = 'none';
-            if(inputOculto) inputOculto.value = ''; // Limpiamos la caja invisible
+            if (inputOculto) inputOculto.value = ''; 
         }
     }
     </script>
+
 
 <button class="mo-btn-save" onclick="guardarOferta()">Guardar Oferta</button>
         <button class="mo-btn-cancel" onclick="document.getElementById('modal-oferta').style.display='none'">Cancelar</button>
@@ -2261,152 +677,168 @@ setInterval(() => {
 
 
 
-<!-- MOTOR UNIVERSAL DE VARIANTES FULL MOVIES EC -->
+
+
+
+<!-- MOTOR UNIVERSAL DE VARIANTES V4 -->
 <script id="motor-universal-variantes">
 (function() {
+    function obtenerPrecioElemento(card) {
+        const todos = Array.from(card.querySelectorAll('*'));
+        let candidatos = todos.filter(function(el) {
+            if (el.tagName === 'BUTTON' || el.tagName === 'A' || el.tagName === 'SELECT' || el.tagName === 'OPTION') return false;
+            if (el.classList && el.classList.contains('selector-planes-fm')) return false;
+            const txt = (el.textContent || '').trim();
+            return txt.charAt(0) === '
+</html>
+ && txt.length >= 2 && txt.length <= 12 && /[0-9]/.test(txt);
+        });
+        // Tomar el elemento más específico (el último en la jerarquía)
+        return candidatos.length > 0 ? candidatos[candidatos.length - 1] : null;
+    }
+
+    function obtenerTituloElemento(card) {
+        let directo = card.querySelector('h1, h2, h3, h4, .card-title, .service-title, .titulo, .prod-title');
+        if (directo) return directo;
+
+        const ignorar = ['streaming', 'video', 'música', 'musica', 'software', 'ia', 'top', 'popular', 'streaming y tv', 'streaming y deportes', 'streaming, anime', 'comprar ahora!', 'pedir', 'app'];
+        const todos = Array.from(card.querySelectorAll('div, span, p, b, strong'));
+        
+        for (let i = 0; i < todos.length; i++) {
+            let el = todos[i];
+            if (el.children.length === 0) {
+                let txt = (el.textContent || '').trim();
+                let low = txt.toLowerCase();
+                if (txt.length > 2 && txt.length < 48 && txt.charAt(0) !== '
+</html>
+ && txt.charAt(0) !== '✓' && txt.charAt(0) !== '✔' && low.indexOf('1 mes') === -1 && ignorar.indexOf(low) === -1) {
+                    return el;
+                }
+            }
+        }
+        return null;
+    }
+
     function fusionarTarjetas() {
-        // 1. Encontrar todos los botones verdes de "Comprar ahora!"
-        const botones = Array.from(document.querySelectorAll('button, a')).filter(b => 
-            b.textContent && b.textContent.trim().toLowerCase().includes('comprar ahora')
-        );
+        const botones = Array.from(document.querySelectorAll('button, a')).filter(function(b) {
+            const t = (b.textContent || '').trim().toLowerCase();
+            return t.indexOf('comprar ahora') !== -1;
+        });
 
         if (botones.length < 2) return;
 
         let tarjetas = [];
-        botones.forEach(btn => {
-            // Subir hasta encontrar la caja de la tarjeta individual
+        botones.forEach(function(btn) {
             let card = btn.parentElement;
             while (card && card !== document.body) {
-                const cantBotones = Array.from(card.querySelectorAll('button, a')).filter(b => 
-                    b.textContent && b.textContent.trim().toLowerCase().includes('comprar ahora')
-                ).length;
-                
-                // Si el contenedor de arriba ya tiene más de 1 botón de comprar, entonces 'card' es nuestra tarjeta exacta
-                if (card.parentElement) {
-                    const cantArriba = Array.from(card.parentElement.querySelectorAll('button, a')).filter(b => 
-                        b.textContent && b.textContent.trim().toLowerCase().includes('comprar ahora')
-                    ).length;
-                    if (cantBotones === 1 && cantArriba > 1) break;
-                }
-                card = card.parentElement;
+                const parent = card.parentElement;
+                if (!parent) break;
+                const btnsEnParent = Array.from(parent.querySelectorAll('button, a')).filter(function(b) {
+                    const t = (b.textContent || '').trim().toLowerCase();
+                    return t.indexOf('comprar ahora') !== -1;
+                });
+                if (btnsEnParent.length > 1) break;
+                card = parent;
             }
 
-            if (!card || card === document.body || card.dataset.oculto === "true") return;
+            if (!card || card === document.body || card.dataset.oculto === 'true') return;
 
-            // Encontrar el elemento del precio ($3.50, $7.50, etc.)
-            const todosElementos = Array.from(card.querySelectorAll('*'));
-            const precioEl = todosElementos.find(el => 
-                el.children.length === 0 && /^$d+(.d+)?$/.test(el.textContent.trim())
-            );
-
-            // Encontrar el título (buscando textos cortos que no sean categorías ni precios)
-            const textosIgnorar = ['streaming', 'video', 'música', 'musica', 'software', 'ia', 'top', 'popular', 'streaming y tv', 'streaming y deportes', 'streaming, anime', 'comprar ahora!'];
-            let tituloEl = null;
-            
-            for (let el of todosElementos) {
-                if (el.children.length === 0 && el.textContent.trim().length > 2) {
-                    let txt = el.textContent.trim();
-                    let txtLow = txt.toLowerCase();
-                    if (!txt.startsWith('
-</html>
-) && !txt.startsWith('✓') && !txtLow.includes('1 mes') && !textosIgnorar.includes(txtLow)) {
-                        tituloEl = el;
-                        break;
-                    }
-                }
-            }
+            const precioEl = obtenerPrecioElemento(card);
+            const tituloEl = obtenerTituloElemento(card);
 
             if (tituloEl && precioEl) {
+                if (!tituloEl.dataset.originalTitle) {
+                    tituloEl.dataset.originalTitle = tituloEl.textContent.trim();
+                }
+                let numStr = precioEl.textContent.replace(/[^0-9.]/g, '');
                 tarjetas.push({
                     card: card,
-                    tituloOriginal: tituloEl.textContent.trim(),
+                    tituloOriginal: tituloEl.dataset.originalTitle,
                     tituloEl: tituloEl,
                     precioEl: precioEl,
-                    precioNum: parseFloat(precioEl.textContent.replace(/[^0-9.]/g, '')) || 0,
+                    precioNum: parseFloat(numStr) || 0,
                     boton: btn
                 });
             }
         });
 
-        // 2. Agrupar por familia de producto
         let familias = {};
-        tarjetas.forEach(t => {
+        tarjetas.forEach(function(t) {
             let low = t.tituloOriginal.toLowerCase();
             let base = t.tituloOriginal;
 
-            if (low.includes('spotify')) base = 'Spotify';
-            else if (low.includes('flujo')) base = 'Flujo TV';
-            else if (low.includes('netflix')) base = 'Netflix';
-            else if (low.includes('disney')) base = 'Disney+ ESPN';
-            else if (low.includes('prime')) base = 'Prime Video';
-            else if (low.includes('hbo') || low.includes('max')) base = 'HBO Max';
-            else if (low.includes('zona movie')) base = 'IPTV Zona Movie';
-            else if (low.includes('stream live') || low.includes('iptv')) base = 'IPTV Stream Live';
-            else if (low.includes('estella') || low.includes('stella')) base = 'Estella TV';
-            else if (low.includes('oleada')) base = 'Oleada TV';
-            else if (low.includes('vix')) base = 'ViX Premium';
-            else if (low.includes('crunchyroll')) base = 'Crunchyroll';
-            else if (low.includes('canva')) base = 'Canva Pro';
-            else if (low.includes('gpt')) base = 'ChatGPT';
+            if (low.indexOf('spotify') !== -1) base = 'Spotify';
+            else if (low.indexOf('flujo') !== -1) base = 'Flujo TV';
+            else if (low.indexOf('netflix') !== -1) base = 'Netflix';
+            else if (low.indexOf('disney') !== -1) base = 'Disney+ ESPN';
+            else if (low.indexOf('prime') !== -1) base = 'Prime Video';
+            else if (low.indexOf('hbo') !== -1 || low.indexOf('max') !== -1) base = 'HBO Max';
+            else if (low.indexOf('zona movie') !== -1) base = 'IPTV Zona Movie';
+            else if (low.indexOf('stream live') !== -1 || low.indexOf('iptv') !== -1) base = 'IPTV Stream Live';
+            else if (low.indexOf('estella') !== -1 || low.indexOf('stella') !== -1) base = 'Estella TV';
+            else if (low.indexOf('oleada') !== -1) base = 'Oleada TV';
+            else if (low.indexOf('vix') !== -1) base = 'ViX Premium';
+            else if (low.indexOf('crunchyroll') !== -1) base = 'Crunchyroll';
+            else if (low.indexOf('canva') !== -1) base = 'Canva Pro';
+            else if (low.indexOf('gpt') !== -1) base = 'ChatGPT';
 
             if (!familias[base]) familias[base] = [];
             familias[base].push(t);
         });
 
-        // 3. Fusionar tarjetas y crear el selector desplegable
-        Object.keys(familias).forEach(base => {
+        Object.keys(familias).forEach(function(base) {
             let grupo = familias[base];
             if (grupo.length > 1) {
-                // Ordenar por precio de menor a mayor
-                grupo.sort((a, b) => a.precioNum - b.precioNum);
+                grupo.sort(function(a, b) { return a.precioNum - b.precioNum; });
 
                 let principal = grupo[0];
                 principal.tituloEl.textContent = base;
 
-                // Ocultar duplicadas
                 for (let i = 1; i < grupo.length; i++) {
-                    grupo[i].card.dataset.oculto = "true";
+                    grupo[i].card.dataset.oculto = 'true';
                     grupo[i].card.style.setProperty('display', 'none', 'important');
                 }
 
                 if (principal.card.querySelector('.selector-planes-fm')) return;
 
                 let cajaSelect = document.createElement('div');
-                cajaSelect.style.cssText = 'margin: 10px 0; background: #0f172a; padding: 8px 10px; border-radius: 10px; border: 1px solid #0284c7;';
+                cajaSelect.style.cssText = 'margin: 10px 0; background: #0f172a; padding: 8px 10px; border-radius: 10px; border: 1px solid #0284c7; width: 100%; box-sizing: border-box;';
                 
-                let html = '<label style="font-size: 10px; color: #38bdf8; font-weight: bold; text-transform: uppercase; display: block; margin-bottom: 5px;">⚡ ELIGE TU PLAN / OPCIÓN:</label>';
-                html += '<select class="selector-planes-fm" style="width: 100%; padding: 8px; border-radius: 6px; background: #090d16; color: #fff; font-weight: bold; font-size: 13px; border: 1px solid #1e293b; outline: none;">';
+                let html = '<label style="font-size: 10px; color: #38bdf8; font-weight: bold; text-transform: uppercase; display: block; margin-bottom: 5px; text-align: left;">⚡ ELIGE TU PLAN / OPCIÓN:</label>';
+                html += '<select class="selector-planes-fm" style="width: 100%; padding: 8px; border-radius: 6px; background: #090d16; color: #fff; font-weight: bold; font-size: 13px; border: 1px solid #1e293b; outline: none; cursor: pointer;">';
 
-                grupo.forEach((item, idx) => {
-                    let nombreVar = item.tituloOriginal.replace(new RegExp(base, 'ig'), '').replace(/[-+]/g, ' ').trim();
+                grupo.forEach(function(item, idx) {
+                    let nombreVar = item.tituloOriginal;
+                    if (nombreVar.toLowerCase().indexOf(base.toLowerCase()) === 0) {
+                        nombreVar = nombreVar.substring(base.length).trim();
+                    }
+                    if (nombreVar.toLowerCase().indexOf('tv') === 0) {
+                        nombreVar = nombreVar.substring(2).trim();
+                    }
                     
-                    // Si tenían exactamente el mismo título (ej. dos "Oleada Tv"), diferenciarlos
                     if (!nombreVar || nombreVar.length < 2) {
-                        nombreVar = idx === 0 ? 'Plan Estándar (1 Mes)' : (item.precioNum >= 7 ? 'Cuenta Completa / Plus' : 'Opción ' + (idx + 1));
+                        nombreVar = idx === 0 ? 'Plan 1 Mes / Perfil' : (item.precioNum >= 7 ? 'Cuenta Completa / Plus' : 'Opción ' + (idx + 1));
                     } else {
                         nombreVar = nombreVar.charAt(0).toUpperCase() + nombreVar.slice(1);
                     }
 
                     let precioTxt = item.precioEl.textContent.trim();
-                    html += `<option value="${idx}" data-precio="${precioTxt}">${nombreVar} ➔ ${precioTxt}</option>`;
+                    html += '<option value="' + idx + '" data-precio="' + precioTxt + '">' + nombreVar + ' ➔ ' + precioTxt + '</option>';
                 });
 
                 html += '</select>';
                 cajaSelect.innerHTML = html;
 
-                // Insertar antes del precio
+                // Insertar justo antes del botón Comprar ahora! o antes del precio
                 principal.precioEl.parentNode.insertBefore(cajaSelect, principal.precioEl);
 
-                // Guardar referencia de los botones originales para clonar su clic exacto
                 let selectEl = cajaSelect.querySelector('select');
                 selectEl.addEventListener('change', function() {
                     let idxElegido = parseInt(this.value, 10);
                     let itemElegido = grupo[idxElegido];
                     
-                    // Actualizar el precio en grande
                     principal.precioEl.textContent = itemElegido.precioEl.textContent;
                     
-                    // Si el cliente presiona "Comprar ahora!" en la tarjeta principal, activar el botón de la variante elegida
                     principal.boton.onclick = function(e) {
                         if (idxElegido !== 0) {
                             e.preventDefault();
@@ -2419,7 +851,7 @@ setInterval(() => {
         });
     }
 
-    setInterval(fusionarTarjetas, 700);
+    setInterval(fusionarTarjetas, 500);
 })();
 </script>
 

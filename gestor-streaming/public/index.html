@@ -1023,28 +1023,65 @@
 </script>
 
 
-<!-- MOTOR UNIVERSAL DE VARIANTES V3 -->
+
+
+
+<!-- MOTOR UNIVERSAL DE VARIANTES V4 -->
 <script id="motor-universal-variantes">
 (function() {
+    function obtenerPrecioElemento(card) {
+        const todos = Array.from(card.querySelectorAll('*'));
+        let candidatos = todos.filter(function(el) {
+            if (el.tagName === 'BUTTON' || el.tagName === 'A' || el.tagName === 'SELECT' || el.tagName === 'OPTION') return false;
+            if (el.classList && el.classList.contains('selector-planes-fm')) return false;
+            const txt = (el.textContent || '').trim();
+            return txt.charAt(0) === '
+</html>
+ && txt.length >= 2 && txt.length <= 12 && /[0-9]/.test(txt);
+        });
+        // Tomar el elemento más específico (el último en la jerarquía)
+        return candidatos.length > 0 ? candidatos[candidatos.length - 1] : null;
+    }
+
+    function obtenerTituloElemento(card) {
+        let directo = card.querySelector('h1, h2, h3, h4, .card-title, .service-title, .titulo, .prod-title');
+        if (directo) return directo;
+
+        const ignorar = ['streaming', 'video', 'música', 'musica', 'software', 'ia', 'top', 'popular', 'streaming y tv', 'streaming y deportes', 'streaming, anime', 'comprar ahora!', 'pedir', 'app'];
+        const todos = Array.from(card.querySelectorAll('div, span, p, b, strong'));
+        
+        for (let i = 0; i < todos.length; i++) {
+            let el = todos[i];
+            if (el.children.length === 0) {
+                let txt = (el.textContent || '').trim();
+                let low = txt.toLowerCase();
+                if (txt.length > 2 && txt.length < 48 && txt.charAt(0) !== '
+</html>
+ && txt.charAt(0) !== '✓' && txt.charAt(0) !== '✔' && low.indexOf('1 mes') === -1 && ignorar.indexOf(low) === -1) {
+                    return el;
+                }
+            }
+        }
+        return null;
+    }
+
     function fusionarTarjetas() {
         const botones = Array.from(document.querySelectorAll('button, a')).filter(function(b) {
             const t = (b.textContent || '').trim().toLowerCase();
-            return t.indexOf('comprar') !== -1 || t.indexOf('pedir') !== -1;
+            return t.indexOf('comprar ahora') !== -1;
         });
 
         if (botones.length < 2) return;
 
         let tarjetas = [];
         botones.forEach(function(btn) {
-            if (btn.closest('#modalOferta') || btn.closest('form') || btn.closest('nav') || btn.closest('header')) return;
-
             let card = btn.parentElement;
             while (card && card !== document.body) {
                 const parent = card.parentElement;
                 if (!parent) break;
                 const btnsEnParent = Array.from(parent.querySelectorAll('button, a')).filter(function(b) {
                     const t = (b.textContent || '').trim().toLowerCase();
-                    return t.indexOf('comprar') !== -1 || t.indexOf('pedir') !== -1;
+                    return t.indexOf('comprar ahora') !== -1;
                 });
                 if (btnsEnParent.length > 1) break;
                 card = parent;
@@ -1052,41 +1089,14 @@
 
             if (!card || card === document.body || card.dataset.oculto === 'true') return;
 
-            const todos = Array.from(card.querySelectorAll('*'));
-            const precioEl = todos.find(function(el) {
-                if (el.children.length > 0) return false;
-                const txt = (el.textContent || '').trim();
-                return txt.charAt(0) === '
-</html>
- && txt.length >= 2 && txt.length <= 12;
-            });
-
-            const ignorar = ['streaming', 'video', 'música', 'musica', 'software', 'ia', 'top', 'popular', 'streaming y tv', 'streaming y deportes', 'streaming, anime', 'comprar ahora!', 'pedir'];
-            let tituloEl = card.querySelector('h1, h2, h3, h4, .card-title, .service-title, .titulo');
-            
-            if (!tituloEl) {
-                for (let i = 0; i < todos.length; i++) {
-                    let el = todos[i];
-                    if (el.children.length === 0) {
-                        let txt = (el.textContent || '').trim();
-                        let low = txt.toLowerCase();
-                        if (txt.length > 2 && txt.charAt(0) !== '
-</html>
- && txt.charAt(0) !== '✓' && txt.charAt(0) !== '✔' && low.indexOf('1 mes') === -1 && ignorar.indexOf(low) === -1) {
-                            tituloEl = el;
-                            break;
-                        }
-                    }
-                }
-            }
+            const precioEl = obtenerPrecioElemento(card);
+            const tituloEl = obtenerTituloElemento(card);
 
             if (tituloEl && precioEl) {
                 if (!tituloEl.dataset.originalTitle) {
                     tituloEl.dataset.originalTitle = tituloEl.textContent.trim();
                 }
-                let numStr = precioEl.textContent.replace('
-</html>
-, '').trim();
+                let numStr = precioEl.textContent.replace(/[^0-9.]/g, '');
                 tarjetas.push({
                     card: card,
                     tituloOriginal: tituloEl.dataset.originalTitle,
@@ -1153,7 +1163,7 @@
                     }
                     
                     if (!nombreVar || nombreVar.length < 2) {
-                        nombreVar = idx === 0 ? 'Plan Estándar (1 Mes)' : (item.precioNum >= 7 ? 'Cuenta Completa / Plus' : 'Opción ' + (idx + 1));
+                        nombreVar = idx === 0 ? 'Plan 1 Mes / Perfil' : (item.precioNum >= 7 ? 'Cuenta Completa / Plus' : 'Opción ' + (idx + 1));
                     } else {
                         nombreVar = nombreVar.charAt(0).toUpperCase() + nombreVar.slice(1);
                     }
@@ -1165,6 +1175,7 @@
                 html += '</select>';
                 cajaSelect.innerHTML = html;
 
+                // Insertar justo antes del botón Comprar ahora! o antes del precio
                 principal.precioEl.parentNode.insertBefore(cajaSelect, principal.precioEl);
 
                 let selectEl = cajaSelect.querySelector('select');
@@ -1186,7 +1197,7 @@
         });
     }
 
-    setInterval(fusionarTarjetas, 600);
+    setInterval(fusionarTarjetas, 500);
 })();
 </script>
 
