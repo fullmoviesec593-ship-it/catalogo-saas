@@ -182,18 +182,7 @@ app.get('/api/backup', async (req, res) => {
 });
 
 
-app.get('/admin', (req, res) => { res.sendFile(__dirname + '/public/admin.html'); });
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => { console.log(`🚀 Servidor ejecutándose en puerto ${PORT}`); });
-
-
-        
-        // Asumiendo que usas Firebase (admin.firestore())
-        if (typeof db !== 'undefined') {
-            const docRef = db.collection('tiendas').doc(slug);
-            docRef.set({ gestorPremium: !!gestorPremium }, { merge: true });
-            res.json({ success: true, message: 'Permiso Gestor Pro actualizado.' });
-        } else {
+app.get('/admin', (req, res) => { res.sendFile(__dirname + '/public/admin.html'); }); else {
             // Fallback por si usas JSON local (aunque Render borra locales, es seguro ponerlo)
 //             res.json({ success: true, warning: 'Se guardó en memoria, db no definida.' });
         }
