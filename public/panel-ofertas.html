@@ -68,32 +68,94 @@
 
 
 
-<!-- MOTOR UNIVERSAL DE VARIANTES V4 -->
-<script id="motor-universal-variantes">
+
+
+
+
+
+
+<!-- ACTUALIZACION FORZADA V5 -->
+<script id="actualizacion-forzada-v5">
 (function() {
-    function obtenerPrecioElemento(card) {
-        const todos = Array.from(card.querySelectorAll('*'));
-        let candidatos = todos.filter(function(el) {
-            if (el.tagName === 'BUTTON' || el.tagName === 'A' || el.tagName === 'SELECT' || el.tagName === 'OPTION') return false;
-            if (el.classList && el.classList.contains('selector-planes-fm')) return false;
-            const txt = (el.textContent || '').trim();
-            return txt.charAt(0) === '
-</html>
- && txt.length >= 2 && txt.length <= 12 && /[0-9]/.test(txt);
+    // A. DESTRUIR CACHÉ DE SERVICE WORKER (PWA) PARA QUE EL CELULAR NO MUESTRE LA VERSIÓN VIEJA
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.getRegistrations().then(function(registrations) {
+            for (let registration of registrations) {
+                registration.unregister();
+            }
         });
-        // Tomar el elemento más específico (el último en la jerarquía)
-        return candidatos.length > 0 ? candidatos[candidatos.length - 1] : null;
+    }
+    if ('caches' in window) {
+        caches.keys().then(function(names) {
+            for (let name of names) caches.delete(name);
+        });
     }
 
-    function obtenerTituloElemento(card) {
-        let directo = card.querySelector('h1, h2, h3, h4, .card-title, .service-title, .titulo, .prod-title');
-        if (directo) return directo;
+    // B. LISTA COMPLETA DE 32 SERVICIOS PARA OFERTA RELÁMPAGO
+    const listaMaestra = [
+        "Netflix cuenta completa", "Disney+ ESPN CUENTA COMPLETA", "Disney+ ESPN",
+        "Prime Video", "HBO Max", "Crunchyroll", "Vix Premium", 
+        "Flujo Tv", "Flujo tv 3 meses", "Flujo tv 6 meses", "Flujo Tv 12 + 2 meses", "Flujo Tv cuenta completa",
+        "Estella Tv", "Oleada Tv", "TeleLatino cuenta completa",
+        "IPTV stream live", "IPTV Zona Movie", "Viki Rakuten", "YouTube Premium",
+        "Spotify", "Spotify 2 meses", "Spotify 3 meses", "Spotify 6 meses", "Spotify 12 meses", 
+        "Deezer 1 mes", "Licencias Windows 10 & 11", "Microsoft Office",
+        "Canva Pro y Edu", "Cap cut", "Chat Gpt Plus", "Chat Gpt Pro (1 dispositivo PC o Móvil)", 
+        "Catálogo Digital"
+    ];
 
+    window.actualizarCajaInvisible = function() {
+        const checks = document.querySelectorAll('.check-servicio-oferta:checked');
+        const seleccionados = Array.from(checks).map(function(c) { return c.value; });
+        let inputOculto = document.getElementById('ofertaServiciosNombres');
+        if (!inputOculto) {
+            inputOculto = document.createElement('input');
+            inputOculto.type = 'hidden';
+            inputOculto.id = 'ofertaServiciosNombres';
+            document.body.appendChild(inputOculto);
+        }
+        inputOculto.value = seleccionados.join(', ');
+    };
+
+    function vigilarModalOfertas() {
+        const contenedor = document.getElementById('contenedorListaCheckboxes');
+        if (contenedor) {
+            const checksActuales = contenedor.querySelectorAll('.check-servicio-oferta');
+            if (checksActuales.length < 5) {
+                contenedor.innerHTML = '';
+                listaMaestra.forEach(function(nombre) {
+                    const div = document.createElement('label');
+                    div.style.cssText = 'display: flex; align-items: center; gap: 10px; color: #e2e8f0; font-size: 13px; cursor: pointer; padding: 7px 6px; border-bottom: 1px solid #1e293b; user-select: none;';
+                    div.innerHTML = '<input type="checkbox" class="check-servicio-oferta" value="' + nombre + '" onchange="window.actualizarCajaInvisible()" style="accent-color: #0ea5e9; width: 18px; height: 18px; cursor: pointer;"> <span style="font-weight: 500;">' + nombre + '</span>';
+                    contenedor.appendChild(div);
+                });
+            }
+        }
+    }
+
+    // C. AGRUPADOR DE VARIANTES EN TARJETAS DEL CATÁLOGO CLIENTE
+    function obtenerPrecioEl(card) {
+        const els = Array.from(card.querySelectorAll('*'));
+        for (let i = els.length - 1; i >= 0; i--) {
+            let el = els[i];
+            if (['BUTTON', 'A', 'SELECT', 'OPTION'].indexOf(el.tagName) !== -1) continue;
+            let txt = (el.textContent || '').trim();
+            if (txt.indexOf('
+</html>
+) === 0 && txt.length >= 2 && txt.length <= 12 && /[0-9]/.test(txt)) {
+                return el;
+            }
+        }
+        return null;
+    }
+
+    function obtenerTituloEl(card) {
+        let h = card.querySelector('h1, h2, h3, h4, .card-title, .service-title, .titulo, .prod-title');
+        if (h) return h;
         const ignorar = ['streaming', 'video', 'música', 'musica', 'software', 'ia', 'top', 'popular', 'streaming y tv', 'streaming y deportes', 'streaming, anime', 'comprar ahora!', 'pedir', 'app'];
-        const todos = Array.from(card.querySelectorAll('div, span, p, b, strong'));
-        
-        for (let i = 0; i < todos.length; i++) {
-            let el = todos[i];
+        const els = Array.from(card.querySelectorAll('div, span, p, b, strong'));
+        for (let i = 0; i < els.length; i++) {
+            let el = els[i];
             if (el.children.length === 0) {
                 let txt = (el.textContent || '').trim();
                 let low = txt.toLowerCase();
@@ -107,7 +169,7 @@
         return null;
     }
 
-    function fusionarTarjetas() {
+    function vigilarTarjetasCliente() {
         const botones = Array.from(document.querySelectorAll('button, a')).filter(function(b) {
             const t = (b.textContent || '').trim().toLowerCase();
             return t.indexOf('comprar ahora') !== -1;
@@ -121,30 +183,29 @@
             while (card && card !== document.body) {
                 const parent = card.parentElement;
                 if (!parent) break;
-                const btnsEnParent = Array.from(parent.querySelectorAll('button, a')).filter(function(b) {
-                    const t = (b.textContent || '').trim().toLowerCase();
-                    return t.indexOf('comprar ahora') !== -1;
+                const btnsParent = Array.from(parent.querySelectorAll('button, a')).filter(function(b) {
+                    return (b.textContent || '').trim().toLowerCase().indexOf('comprar ahora') !== -1;
                 });
-                if (btnsEnParent.length > 1) break;
+                if (btnsParent.length > 1) break;
                 card = parent;
             }
 
             if (!card || card === document.body || card.dataset.oculto === 'true') return;
 
-            const precioEl = obtenerPrecioElemento(card);
-            const tituloEl = obtenerTituloElemento(card);
+            const precioEl = obtenerPrecioEl(card);
+            const tituloEl = obtenerTituloEl(card);
 
             if (tituloEl && precioEl) {
                 if (!tituloEl.dataset.originalTitle) {
                     tituloEl.dataset.originalTitle = tituloEl.textContent.trim();
                 }
-                let numStr = precioEl.textContent.replace(/[^0-9.]/g, '');
+                let num = parseFloat(precioEl.textContent.replace(/[^0-9.]/g, '')) || 0;
                 tarjetas.push({
                     card: card,
                     tituloOriginal: tituloEl.dataset.originalTitle,
                     tituloEl: tituloEl,
                     precioEl: precioEl,
-                    precioNum: parseFloat(numStr) || 0,
+                    precioNum: num,
                     boton: btn
                 });
             }
@@ -203,13 +264,11 @@
                     if (nombreVar.toLowerCase().indexOf('tv') === 0) {
                         nombreVar = nombreVar.substring(2).trim();
                     }
-                    
                     if (!nombreVar || nombreVar.length < 2) {
-                        nombreVar = idx === 0 ? 'Plan 1 Mes / Perfil' : (item.precioNum >= 7 ? 'Cuenta Completa / Plus' : 'Opción ' + (idx + 1));
+                        nombreVar = idx === 0 ? 'Plan 1 Dispositivo / 1 Mes' : (item.precioNum >= 7 ? 'Cuenta Completa / Plus' : 'Opción ' + (idx + 1));
                     } else {
                         nombreVar = nombreVar.charAt(0).toUpperCase() + nombreVar.slice(1);
                     }
-
                     let precioTxt = item.precioEl.textContent.trim();
                     html += '<option value="' + idx + '" data-precio="' + precioTxt + '">' + nombreVar + ' ➔ ' + precioTxt + '</option>';
                 });
@@ -217,16 +276,13 @@
                 html += '</select>';
                 cajaSelect.innerHTML = html;
 
-                // Insertar justo antes del botón Comprar ahora! o antes del precio
                 principal.precioEl.parentNode.insertBefore(cajaSelect, principal.precioEl);
 
                 let selectEl = cajaSelect.querySelector('select');
                 selectEl.addEventListener('change', function() {
                     let idxElegido = parseInt(this.value, 10);
                     let itemElegido = grupo[idxElegido];
-                    
                     principal.precioEl.textContent = itemElegido.precioEl.textContent;
-                    
                     principal.boton.onclick = function(e) {
                         if (idxElegido !== 0) {
                             e.preventDefault();
@@ -239,71 +295,10 @@
         });
     }
 
-    setInterval(fusionarTarjetas, 500);
-})();
-</script>
-
-
-<!-- PARCHE FUERZA BRUTA OFERTAS Y VARIANTES -->
-<script id="parche-fuerza-bruta">
-(function() {
-    const listaMaestra = [
-        "Netflix cuenta completa", "Disney+ ESPN CUENTA COMPLETA", "Disney+ ESPN",
-        "Prime Video", "HBO Max", "Crunchyroll", "Vix Premium", 
-        "Flujo Tv", "Flujo tv 3 meses", "Flujo tv 6 meses", "Flujo Tv 12 + 2 meses", "Flujo Tv cuenta completa",
-        "Estella Tv", "Oleada Tv", "TeleLatino cuenta completa",
-        "IPTV stream live", "IPTV Zona Movie", "Viki Rakuten", "YouTube Premium",
-        "Spotify", "Spotify 2 meses", "Spotify 3 meses", "Spotify 6 meses", "Spotify 12 meses", 
-        "Deezer 1 mes", "Licencias Windows 10 & 11", "Microsoft Office",
-        "Canva Pro y Edu", "Cap cut", "Chat Gpt Plus", "Chat Gpt Pro (1 dispositivo PC o Móvil)", 
-        "Catálogo Digital"
-    ];
-
-    window.actualizarCajaInvisible = function() {
-        const checks = document.querySelectorAll('.check-servicio-oferta:checked');
-        const seleccionados = Array.from(checks).map(function(c) { return c.value; });
-        let inputOculto = document.getElementById('ofertaServiciosNombres');
-        if (!inputOculto) {
-            inputOculto = document.createElement('input');
-            inputOculto.type = 'hidden';
-            inputOculto.id = 'ofertaServiciosNombres';
-            document.body.appendChild(inputOculto);
-        }
-        inputOculto.value = seleccionados.join(', ');
-    };
-
-    function forzarListaCompleta() {
-        const contenedor = document.getElementById('contenedorListaCheckboxes');
-        if (!contenedor) return;
-
-        // Si tiene menos de 5 servicios (ej. cuando solo sale "Netflix Premium" o "Cargando..."), inyectar los 32 a la fuerza
-        const checksActuales = contenedor.querySelectorAll('input[type="checkbox"]');
-        if (checksActuales.length < 5) {
-            contenedor.innerHTML = '';
-            listaMaestra.forEach(function(nombre) {
-                const div = document.createElement('label');
-                div.style.cssText = 'display: flex; align-items: center; gap: 10px; color: #e2e8f0; font-size: 13px; cursor: pointer; padding: 7px 6px; border-bottom: 1px solid #1e293b; user-select: none;';
-                div.innerHTML = '<input type="checkbox" class="check-servicio-oferta" value="' + nombre + '" onchange="window.actualizarCajaInvisible()" style="accent-color: #0ea5e9; width: 18px; height: 18px; cursor: pointer;"> <span style="font-weight: 500;">' + nombre + '</span>';
-                contenedor.appendChild(div);
-            });
-        }
-    }
-
-    // Sobrescribir las funciones globales por si el select las llama
-    window.poblarCheckboxesServicios = forzarListaCompleta;
-    window.toggleListaServicios = function(valor) {
-        const caja = document.getElementById('cajaServiciosChecklist');
-        if (!caja) return;
-        if (valor === 'especificos') {
-            caja.style.display = 'block';
-            forzarListaCompleta();
-        } else {
-            caja.style.display = 'none';
-        }
-    };
-
-    // Vigilante permanente cada 400ms que reemplaza "Netflix Premium" apenas aparezca
-    setInterval(forzarListaCompleta, 400);
+    setInterval(function() {
+        vigilarModalOfertas();
+        vigilarTarjetasCliente();
+    }, 400);
 })();
 </script>
 
