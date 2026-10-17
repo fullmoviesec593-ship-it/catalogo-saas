@@ -182,10 +182,7 @@ app.get('/api/backup', async (req, res) => {
 });
 
 
-app.get('/admin', (req, res) => { res.sendFile(__dirname + '/public/admin.html'); }); else {
-            // Fallback por si usas JSON local (aunque Render borra locales, es seguro ponerlo)
-//             res.json({ success: true, warning: 'Se guardó en memoria, db no definida.' });
-        }
+
 //     } catch (e) {
 //         console.error('Error en /api/db/update:', e);
 //         res.status(500).json({ error: 'Error interno guardando permisos' });
@@ -200,138 +197,7 @@ app.get('/admin', (req, res) => { res.sendFile(__dirname + '/public/admin.html')
 // });
 
 // RUTA INDEPENDIENTE: PANEL DE OFERTAS
-app.get('/panel-ofertas', async (req, res) => {
-    res.send(`
-    <!DOCTYPE html>
-    <html lang="es">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>⚡ Ofertas Relámpago</title>
-        <style>
-            body { background-color: #0f172a; color: #fff; font-family: sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
-            .box { background: #1e293b; padding: 30px; border-radius: 15px; border: 2px solid #0ea5e9; box-shadow: 0 0 20px rgba(14,165,233,0.4); width: 90%; max-width: 400px; }
-            input, select { width: 100%; padding: 12px; margin-top: 5px; margin-bottom: 20px; border-radius: 8px; border: 1px solid #334155; background: #0f172a; color: white; box-sizing: border-box; }
-            button { width: 100%; padding: 15px; background: linear-gradient(135deg, #ef4444 0%, #b91c1c 100%); border: none; border-radius: 8px; color: white; font-weight: bold; font-size: 16px; cursor: pointer; }
-        </style>
-    </head>
-    <body>
-        <div class="box">
-            <h2 style="text-align:center; color:#38bdf8; margin-top:0;">⚡ OFERTA TEMPORAL</h2>
-            
-            <label>ID de tu Tienda (Slug)</label>
-            <input type="text" id="of-slug" placeholder="Ej: fullmoviesstream" value="fullmoviesstream">
-            
-            <label>Estado de la Oferta</label>
-            <select id="of-estado">
-                <option value="1">🟢 ACTIVA (Visible)</option>
-                <option value="0">🔴 INACTIVA</option>
-            </select>
-            
-            <label>Descuento Global (%)</label>
-            <input type="number" id="of-porcentaje" placeholder="Ej: 20">
-            
-            <label>Fecha y Hora de Cierre</label>
-            <input type="datetime-local" id="of-fin" style="color-scheme: dark;">
-            
-            <button onclick="guardarOferta()">🚀 APLICAR OFERTA</button>
-        </div>
-        <script>
-            async function guardarOferta() {
-                const slug = document.getElementById('of-slug').value;
-                if(!slug) return alert('Debes poner el ID de tu tienda');
-                
-                const oferta = {
-                    activa: document.getElementById('of-estado').value === "1",
-                    porcentaje: parseFloat(document.getElementById('of-porcentaje').value),
-                    fin: document.getElementById('of-fin').value
-                };
-                
-                try {
-                    const res = await fetch('/api/tienda/guardar', {
-                        method: 'POST',
-                        headers: {'Content-Type': 'application/json'},
-                        body: JSON.stringify({ slug: slug, ofertaTemporal: oferta })
-                    });
-                    const data = await res.json();
-                    if(data.success) {
-                        alert('✅ ¡Oferta aplicada a tu catálogo exitosamente!');
-                    } else {
-                        alert('⚠️ Hubo un problema al guardar.');
-                    }
-                } catch(e) {
-                    alert('Error de conexión con el servidor.');
-                }
-            }
-        </script>
-    
-<!-- MOTOR UNIVERSAL DE VARIANTES FULL MOVIES EC -->
-<script id="motor-universal-variantes">
-(function() {
-    function fusionarTarjetas() {
-        // 1. Encontrar todos los botones verdes de "Comprar ahora!"
-        const botones = Array.from(document.querySelectorAll('button, a')).filter(b => 
-            b.textContent && b.textContent.trim().toLowerCase().includes('comprar ahora')
-        );
 
-        if (botones.length < 2) return;
-
-        let tarjetas = [];
-        botones.forEach(btn => {
-            // Subir hasta encontrar la caja de la tarjeta individual
-            let card = btn.parentElement;
-            while (card && card !== document.body) {
-                const cantBotones = Array.from(card.querySelectorAll('button, a')).filter(b => 
-                    b.textContent && b.textContent.trim().toLowerCase().includes('comprar ahora')
-                ).length;
-                
-                // Si el contenedor de arriba ya tiene más de 1 botón de comprar, entonces 'card' es nuestra tarjeta exacta
-                if (card.parentElement) {
-                    const cantArriba = Array.from(card.parentElement.querySelectorAll('button, a')).filter(b => 
-                        b.textContent && b.textContent.trim().toLowerCase().includes('comprar ahora')
-                    ).length;
-                    if (cantBotones === 1 && cantArriba > 1) break;
-                }
-                card = card.parentElement;
-            }
-
-            if (!card || card === document.body || card.dataset.oculto === "true") return;
-
-            // Encontrar el elemento del precio ($3.50, $7.50, etc.)
-            const todosElementos = Array.from(card.querySelectorAll('*'));
-            const precioEl = todosElementos.find(el => 
-                el.children.length === 0 && /^$d+(.d+)?$/.test(el.textContent.trim())
-            );
-
-            // Encontrar el título (buscando textos cortos que no sean categorías ni precios)
-            const textosIgnorar = ['streaming', 'video', 'música', 'musica', 'software', 'ia', 'top', 'popular', 'streaming y tv', 'streaming y deportes', 'streaming, anime', 'comprar ahora!'];
-            let tituloEl = null;
-            
-            for (let el of todosElementos) {
-                if (el.children.length === 0 && el.textContent.trim().length > 2) {
-                    let txt = el.textContent.trim();
-                    let txtLow = txt.toLowerCase();
-                    if (!txt.startsWith('
-    </html>
-    `);
-});
-) && !txt.startsWith('✓') && !txtLow.includes('1 mes') && !textosIgnorar.includes(txtLow)) {
-                        tituloEl = el;
-                        break;
-                    }
-                }
-            }
-
-            if (tituloEl && precioEl) {
-                tarjetas.push({
-                    card: card,
-                    tituloOriginal: tituloEl.textContent.trim(),
-                    tituloEl: tituloEl,
-                    precioEl: precioEl,
-                    precioNum: parseFloat(precioEl.textContent.replace(/[^0-9.]/g, '')) || 0,
-                    boton: btn
-                });
-            }
         });
 
         // 2. Agrupar por familia de producto
