@@ -43,10 +43,11 @@
             const email = document.getElementById('email').value.trim();
             const pass = document.getElementById('password').value.trim();
             
-            // Credenciales de acceso directo o validación local/nube
-            if (email.length > 5 && pass.length > 3) {
+            // Permitir el acceso directo al panel general de administración o gestión de tienda
+            if (email.length > 3 && pass.length > 2) {
                 localStorage.setItem('adminLogueado', 'true');
-                window.location.href = '/panel-ofertas';
+                // Redirigir al panel principal de administración de la tienda
+                window.location.href = '/superadmin.html';
             } else {
                 document.getElementById('mensajeError').style.display = 'block';
             }
