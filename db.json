@@ -1,11 +1,196 @@
 {
   "servicios": [
     {
-      "id": "1",
-      "nombre": "Netflix Premium",
-      "categoria": "Streaming",
-      "precio": "2.75",
-      "estado": "Activo"
+      "id": "srv_0",
+      "nombre": "Netflix cuenta completa",
+      "titulo": "Netflix cuenta completa",
+      "servicio": "Netflix cuenta completa"
+    },
+    {
+      "id": "srv_1",
+      "nombre": "Disney+ ESPN CUENTA COMPLETA",
+      "titulo": "Disney+ ESPN CUENTA COMPLETA",
+      "servicio": "Disney+ ESPN CUENTA COMPLETA"
+    },
+    {
+      "id": "srv_2",
+      "nombre": "Disney+ ESPN",
+      "titulo": "Disney+ ESPN",
+      "servicio": "Disney+ ESPN"
+    },
+    {
+      "id": "srv_3",
+      "nombre": "Prime Video",
+      "titulo": "Prime Video",
+      "servicio": "Prime Video"
+    },
+    {
+      "id": "srv_4",
+      "nombre": "HBO Max",
+      "titulo": "HBO Max",
+      "servicio": "HBO Max"
+    },
+    {
+      "id": "srv_5",
+      "nombre": "Crunchyroll",
+      "titulo": "Crunchyroll",
+      "servicio": "Crunchyroll"
+    },
+    {
+      "id": "srv_6",
+      "nombre": "Vix Premium",
+      "titulo": "Vix Premium",
+      "servicio": "Vix Premium"
+    },
+    {
+      "id": "srv_7",
+      "nombre": "Flujo Tv",
+      "titulo": "Flujo Tv",
+      "servicio": "Flujo Tv"
+    },
+    {
+      "id": "srv_8",
+      "nombre": "Flujo tv 3 meses",
+      "titulo": "Flujo tv 3 meses",
+      "servicio": "Flujo tv 3 meses"
+    },
+    {
+      "id": "srv_9",
+      "nombre": "Flujo tv 6 meses",
+      "titulo": "Flujo tv 6 meses",
+      "servicio": "Flujo tv 6 meses"
+    },
+    {
+      "id": "srv_10",
+      "nombre": "Flujo Tv 12 + 2 meses",
+      "titulo": "Flujo Tv 12 + 2 meses",
+      "servicio": "Flujo Tv 12 + 2 meses"
+    },
+    {
+      "id": "srv_11",
+      "nombre": "Flujo Tv cuenta completa",
+      "titulo": "Flujo Tv cuenta completa",
+      "servicio": "Flujo Tv cuenta completa"
+    },
+    {
+      "id": "srv_12",
+      "nombre": "Estella Tv",
+      "titulo": "Estella Tv",
+      "servicio": "Estella Tv"
+    },
+    {
+      "id": "srv_13",
+      "nombre": "Oleada Tv",
+      "titulo": "Oleada Tv",
+      "servicio": "Oleada Tv"
+    },
+    {
+      "id": "srv_14",
+      "nombre": "TeleLatino cuenta completa",
+      "titulo": "TeleLatino cuenta completa",
+      "servicio": "TeleLatino cuenta completa"
+    },
+    {
+      "id": "srv_15",
+      "nombre": "IPTV stream live",
+      "titulo": "IPTV stream live",
+      "servicio": "IPTV stream live"
+    },
+    {
+      "id": "srv_16",
+      "nombre": "IPTV Zona Movie",
+      "titulo": "IPTV Zona Movie",
+      "servicio": "IPTV Zona Movie"
+    },
+    {
+      "id": "srv_17",
+      "nombre": "Viki Rakuten",
+      "titulo": "Viki Rakuten",
+      "servicio": "Viki Rakuten"
+    },
+    {
+      "id": "srv_18",
+      "nombre": "YouTube Premium",
+      "titulo": "YouTube Premium",
+      "servicio": "YouTube Premium"
+    },
+    {
+      "id": "srv_19",
+      "nombre": "Spotify",
+      "titulo": "Spotify",
+      "servicio": "Spotify"
+    },
+    {
+      "id": "srv_20",
+      "nombre": "Spotify 2 meses",
+      "titulo": "Spotify 2 meses",
+      "servicio": "Spotify 2 meses"
+    },
+    {
+      "id": "srv_21",
+      "nombre": "Spotify 3 meses",
+      "titulo": "Spotify 3 meses",
+      "servicio": "Spotify 3 meses"
+    },
+    {
+      "id": "srv_22",
+      "nombre": "Spotify 6 meses",
+      "titulo": "Spotify 6 meses",
+      "servicio": "Spotify 6 meses"
+    },
+    {
+      "id": "srv_23",
+      "nombre": "Spotify 12 meses",
+      "titulo": "Spotify 12 meses",
+      "servicio": "Spotify 12 meses"
+    },
+    {
+      "id": "srv_24",
+      "nombre": "Deezer 1 mes",
+      "titulo": "Deezer 1 mes",
+      "servicio": "Deezer 1 mes"
+    },
+    {
+      "id": "srv_25",
+      "nombre": "Licencias Windows 10 & 11",
+      "titulo": "Licencias Windows 10 & 11",
+      "servicio": "Licencias Windows 10 & 11"
+    },
+    {
+      "id": "srv_26",
+      "nombre": "Microsoft Office",
+      "titulo": "Microsoft Office",
+      "servicio": "Microsoft Office"
+    },
+    {
+      "id": "srv_27",
+      "nombre": "Canva Pro y Edu",
+      "titulo": "Canva Pro y Edu",
+      "servicio": "Canva Pro y Edu"
+    },
+    {
+      "id": "srv_28",
+      "nombre": "Cap cut",
+      "titulo": "Cap cut",
+      "servicio": "Cap cut"
+    },
+    {
+      "id": "srv_29",
+      "nombre": "Chat Gpt Plus",
+      "titulo": "Chat Gpt Plus",
+      "servicio": "Chat Gpt Plus"
+    },
+    {
+      "id": "srv_30",
+      "nombre": "Chat Gpt Pro (1 dispositivo PC o Móvil)",
+      "titulo": "Chat Gpt Pro (1 dispositivo PC o Móvil)",
+      "servicio": "Chat Gpt Pro (1 dispositivo PC o Móvil)"
+    },
+    {
+      "id": "srv_31",
+      "nombre": "Catálogo Digital",
+      "titulo": "Catálogo Digital",
+      "servicio": "Catálogo Digital"
     }
   ],
   "revendedores": [],
