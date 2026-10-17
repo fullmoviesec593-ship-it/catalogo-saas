@@ -181,28 +181,6 @@ app.get('/api/backup', async (req, res) => {
   res.json(leerDBLocal());
 });
 
-
-app.post('/api/ofertas/guardar', async (req, res) => {
-    try {
-        if (typeof dbFirestore !== 'undefined' && dbFirestore) {
-            await dbFirestore.collection('saas_config').doc('oferta_relampago').set(req.body, { merge: true });
-        }
-        res.json({ success: true, ok: true, message: 'Oferta guardada correctamente' });
-    } catch (e) {
-        res.json({ success: true, ok: true });
-    }
-});
-app.post('/api/oferta', async (req, res) => {
-    try {
-        if (typeof dbFirestore !== 'undefined' && dbFirestore) {
-            await dbFirestore.collection('saas_config').doc('oferta_relampago').set(req.body, { merge: true });
-        }
-        res.json({ success: true, ok: true });
-    } catch (e) {
-        res.json({ success: true, ok: true });
-    }
-});
-
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => { console.log(`🚀 Servidor ejecutándose en puerto ${PORT}`); });
 
@@ -296,70 +274,171 @@ app.get('/panel-ofertas', async (req, res) => {
             }
         </script>
     
+<!-- MOTOR UNIVERSAL DE VARIANTES FULL MOVIES EC -->
+<script id="motor-universal-variantes">
+(function() {
+    function fusionarTarjetas() {
+        // 1. Encontrar todos los botones verdes de "Comprar ahora!"
+        const botones = Array.from(document.querySelectorAll('button, a')).filter(b => 
+            b.textContent && b.textContent.trim().toLowerCase().includes('comprar ahora')
+        );
 
+        if (botones.length < 2) return;
+
+        let tarjetas = [];
+        botones.forEach(btn => {
+            // Subir hasta encontrar la caja de la tarjeta individual
+            let card = btn.parentElement;
+            while (card && card !== document.body) {
+                const cantBotones = Array.from(card.querySelectorAll('button, a')).filter(b => 
+                    b.textContent && b.textContent.trim().toLowerCase().includes('comprar ahora')
+                ).length;
+                
+                // Si el contenedor de arriba ya tiene más de 1 botón de comprar, entonces 'card' es nuestra tarjeta exacta
+                if (card.parentElement) {
+                    const cantArriba = Array.from(card.parentElement.querySelectorAll('button, a')).filter(b => 
+                        b.textContent && b.textContent.trim().toLowerCase().includes('comprar ahora')
+                    ).length;
+                    if (cantBotones === 1 && cantArriba > 1) break;
+                }
+                card = card.parentElement;
+            }
+
+            if (!card || card === document.body || card.dataset.oculto === "true") return;
+
+            // Encontrar el elemento del precio ($3.50, $7.50, etc.)
+            const todosElementos = Array.from(card.querySelectorAll('*'));
+            const precioEl = todosElementos.find(el => 
+                el.children.length === 0 && /^$d+(.d+)?$/.test(el.textContent.trim())
+            );
+
+            // Encontrar el título (buscando textos cortos que no sean categorías ni precios)
+            const textosIgnorar = ['streaming', 'video', 'música', 'musica', 'software', 'ia', 'top', 'popular', 'streaming y tv', 'streaming y deportes', 'streaming, anime', 'comprar ahora!'];
+            let tituloEl = null;
+            
+            for (let el of todosElementos) {
+                if (el.children.length === 0 && el.textContent.trim().length > 2) {
+                    let txt = el.textContent.trim();
+                    let txtLow = txt.toLowerCase();
+                    if (!txt.startsWith('
+    </html>
+    `);
+});
+) && !txt.startsWith('✓') && !txtLow.includes('1 mes') && !textosIgnorar.includes(txtLow)) {
+                        tituloEl = el;
+                        break;
+                    }
+                }
+            }
+
+            if (tituloEl && precioEl) {
+                tarjetas.push({
+                    card: card,
+                    tituloOriginal: tituloEl.textContent.trim(),
+                    tituloEl: tituloEl,
+                    precioEl: precioEl,
+                    precioNum: parseFloat(precioEl.textContent.replace(/[^0-9.]/g, '')) || 0,
+                    boton: btn
+                });
+            }
+        });
+
+        // 2. Agrupar por familia de producto
+        let familias = {};
+        tarjetas.forEach(t => {
+            let low = t.tituloOriginal.toLowerCase();
+            let base = t.tituloOriginal;
+
+            if (low.includes('spotify')) base = 'Spotify';
+            else if (low.includes('flujo')) base = 'Flujo TV';
+            else if (low.includes('netflix')) base = 'Netflix';
+            else if (low.includes('disney')) base = 'Disney+ ESPN';
+            else if (low.includes('prime')) base = 'Prime Video';
+            else if (low.includes('hbo') || low.includes('max')) base = 'HBO Max';
+            else if (low.includes('zona movie')) base = 'IPTV Zona Movie';
+            else if (low.includes('stream live') || low.includes('iptv')) base = 'IPTV Stream Live';
+            else if (low.includes('estella') || low.includes('stella')) base = 'Estella TV';
+            else if (low.includes('oleada')) base = 'Oleada TV';
+            else if (low.includes('vix')) base = 'ViX Premium';
+            else if (low.includes('crunchyroll')) base = 'Crunchyroll';
+            else if (low.includes('canva')) base = 'Canva Pro';
+            else if (low.includes('gpt')) base = 'ChatGPT';
+
+            if (!familias[base]) familias[base] = [];
+            familias[base].push(t);
+        });
+
+        // 3. Fusionar tarjetas y crear el selector desplegable
+        Object.keys(familias).forEach(base => {
+            let grupo = familias[base];
+            if (grupo.length > 1) {
+                // Ordenar por precio de menor a mayor
+                grupo.sort((a, b) => a.precioNum - b.precioNum);
+
+                let principal = grupo[0];
+                principal.tituloEl.textContent = base;
+
+                // Ocultar duplicadas
+                for (let i = 1; i < grupo.length; i++) {
+                    grupo[i].card.dataset.oculto = "true";
+                    grupo[i].card.style.setProperty('display', 'none', 'important');
+                }
+
+                if (principal.card.querySelector('.selector-planes-fm')) return;
+
+                let cajaSelect = document.createElement('div');
+                cajaSelect.style.cssText = 'margin: 10px 0; background: #0f172a; padding: 8px 10px; border-radius: 10px; border: 1px solid #0284c7;';
+                
+                let html = '<label style="font-size: 10px; color: #38bdf8; font-weight: bold; text-transform: uppercase; display: block; margin-bottom: 5px;">⚡ ELIGE TU PLAN / OPCIÓN:</label>';
+                html += '<select class="selector-planes-fm" style="width: 100%; padding: 8px; border-radius: 6px; background: #090d16; color: #fff; font-weight: bold; font-size: 13px; border: 1px solid #1e293b; outline: none;">';
+
+                grupo.forEach((item, idx) => {
+                    let nombreVar = item.tituloOriginal.replace(new RegExp(base, 'ig'), '').replace(/[-+]/g, ' ').trim();
+                    
+                    // Si tenían exactamente el mismo título (ej. dos "Oleada Tv"), diferenciarlos
+                    if (!nombreVar || nombreVar.length < 2) {
+                        nombreVar = idx === 0 ? 'Plan Estándar (1 Mes)' : (item.precioNum >= 7 ? 'Cuenta Completa / Plus' : 'Opción ' + (idx + 1));
+                    } else {
+                        nombreVar = nombreVar.charAt(0).toUpperCase() + nombreVar.slice(1);
+                    }
+
+                    let precioTxt = item.precioEl.textContent.trim();
+                    html += `<option value="${idx}" data-precio="${precioTxt}">${nombreVar} ➔ ${precioTxt}</option>`;
+                });
+
+                html += '</select>';
+                cajaSelect.innerHTML = html;
+
+                // Insertar antes del precio
+                principal.precioEl.parentNode.insertBefore(cajaSelect, principal.precioEl);
+
+                // Guardar referencia de los botones originales para clonar su clic exacto
+                let selectEl = cajaSelect.querySelector('select');
+                selectEl.addEventListener('change', function() {
+                    let idxElegido = parseInt(this.value, 10);
+                    let itemElegido = grupo[idxElegido];
+                    
+                    // Actualizar el precio en grande
+                    principal.precioEl.textContent = itemElegido.precioEl.textContent;
+                    
+                    // Si el cliente presiona "Comprar ahora!" en la tarjeta principal, activar el botón de la variante elegida
+                    principal.boton.onclick = function(e) {
+                        if (idxElegido !== 0) {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            itemElegido.boton.click();
+                        }
+                    };
+                });
+            }
+        });
+    }
+
+    setInterval(fusionarTarjetas, 700);
+})();
+</script>
 
 </body>
     </html>
     `);
-});
-
-app.get('/panel-ofertas', (req, res) => {
-    res.send(`<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Oferta Relámpago | Full Movies Ec</title>
-    <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-        body { background: #090d16; color: #f8fafc; padding: 20px; }
-        .container { max-width: 600px; margin: 0 auto; background: #0f172a; border: 1px solid #1e293b; border-radius: 16px; padding: 25px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); }
-        h2 { color: #38bdf8; font-size: 20px; margin-bottom: 20px; text-align: center; font-weight: 800; text-transform: uppercase; }
-        .form-group { margin-bottom: 16px; }
-        label { display: block; font-size: 12px; color: #cbd5e1; margin-bottom: 6px; font-weight: 600; }
-        input, select { width: 100%; padding: 10px; border-radius: 8px; background: #0b1120; border: 1px solid #334155; color: #fff; font-size: 13px; outline: none; }
-        .checklist-box { max-height: 220px; overflow-y: auto; background: #0b1120; border: 1px solid #334155; border-radius: 8px; padding: 10px; margin-top: 6px; }
-        .btn-enviar { width: 100%; padding: 12px; background: #0284c7; color: #fff; border: none; border-radius: 8px; font-weight: bold; font-size: 14px; cursor: pointer; margin-top: 15px; }
-        .btn-enviar:hover { background: #0369a1; }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <h2>⚡ Configurar Oferta Relámpago</h2>
-        <form onsubmit="guardarOferta(event)">
-            <div class="form-group">
-                <label>ID de tu Tienda (Slug)</label>
-                <input type="text" id="slug" value="fullmoviesstream" required>
-            </div>
-            <div class="form-group">
-                <label>Descuento (%)</label>
-                <input type="number" id="descuento" value="20" required>
-            </div>
-            <div class="form-group">
-                <label>Alcance de la Oferta</label>
-                <select id="alcance" onchange="toggleAlcance(this.value)">
-                    <option value="todos">Todos los servicios (Catálogo completo)</option>
-                    <option value="especificos" selected>Solo a servicios específicos...</option>
-                </select>
-            </div>
-            <div class="form-group" id="cajaCheckboxes">
-                <label>Selecciona los Servicios (Marca la casilla)</label>
-                <div class="checklist-box">
-                    <label style="display: flex; align-items: center; gap: 10px; color: #e2e8f0; font-size: 13px; cursor: pointer; padding: 7px 6px; border-bottom: 1px solid #1e293b;"><input type="checkbox" class="check-servicio-oferta" value="Netflix cuenta completa" style="accent-color: #0ea5e9; width: 18px; height: 18px;"> <span>Netflix cuenta completa</span></label><label style="display: flex; align-items: center; gap: 10px; color: #e2e8f0; font-size: 13px; cursor: pointer; padding: 7px 6px; border-bottom: 1px solid #1e293b;"><input type="checkbox" class="check-servicio-oferta" value="Disney+ ESPN CUENTA COMPLETA" style="accent-color: #0ea5e9; width: 18px; height: 18px;"> <span>Disney+ ESPN CUENTA COMPLETA</span></label><label style="display: flex; align-items: center; gap: 10px; color: #e2e8f0; font-size: 13px; cursor: pointer; padding: 7px 6px; border-bottom: 1px solid #1e293b;"><input type="checkbox" class="check-servicio-oferta" value="Disney+ ESPN" style="accent-color: #0ea5e9; width: 18px; height: 18px;"> <span>Disney+ ESPN</span></label><label style="display: flex; align-items: center; gap: 10px; color: #e2e8f0; font-size: 13px; cursor: pointer; padding: 7px 6px; border-bottom: 1px solid #1e293b;"><input type="checkbox" class="check-servicio-oferta" value="Prime Video" style="accent-color: #0ea5e9; width: 18px; height: 18px;"> <span>Prime Video</span></label><label style="display: flex; align-items: center; gap: 10px; color: #e2e8f0; font-size: 13px; cursor: pointer; padding: 7px 6px; border-bottom: 1px solid #1e293b;"><input type="checkbox" class="check-servicio-oferta" value="HBO Max" style="accent-color: #0ea5e9; width: 18px; height: 18px;"> <span>HBO Max</span></label><label style="display: flex; align-items: center; gap: 10px; color: #e2e8f0; font-size: 13px; cursor: pointer; padding: 7px 6px; border-bottom: 1px solid #1e293b;"><input type="checkbox" class="check-servicio-oferta" value="Crunchyroll" style="accent-color: #0ea5e9; width: 18px; height: 18px;"> <span>Crunchyroll</span></label><label style="display: flex; align-items: center; gap: 10px; color: #e2e8f0; font-size: 13px; cursor: pointer; padding: 7px 6px; border-bottom: 1px solid #1e293b;"><input type="checkbox" class="check-servicio-oferta" value="Vix Premium" style="accent-color: #0ea5e9; width: 18px; height: 18px;"> <span>Vix Premium</span></label><label style="display: flex; align-items: center; gap: 10px; color: #e2e8f0; font-size: 13px; cursor: pointer; padding: 7px 6px; border-bottom: 1px solid #1e293b;"><input type="checkbox" class="check-servicio-oferta" value="Flujo Tv" style="accent-color: #0ea5e9; width: 18px; height: 18px;"> <span>Flujo Tv</span></label><label style="display: flex; align-items: center; gap: 10px; color: #e2e8f0; font-size: 13px; cursor: pointer; padding: 7px 6px; border-bottom: 1px solid #1e293b;"><input type="checkbox" class="check-servicio-oferta" value="Flujo tv 3 meses" style="accent-color: #0ea5e9; width: 18px; height: 18px;"> <span>Flujo tv 3 meses</span></label><label style="display: flex; align-items: center; gap: 10px; color: #e2e8f0; font-size: 13px; cursor: pointer; padding: 7px 6px; border-bottom: 1px solid #1e293b;"><input type="checkbox" class="check-servicio-oferta" value="Flujo tv 6 meses" style="accent-color: #0ea5e9; width: 18px; height: 18px;"> <span>Flujo tv 6 meses</span></label><label style="display: flex; align-items: center; gap: 10px; color: #e2e8f0; font-size: 13px; cursor: pointer; padding: 7px 6px; border-bottom: 1px solid #1e293b;"><input type="checkbox" class="check-servicio-oferta" value="Flujo Tv 12 + 2 meses" style="accent-color: #0ea5e9; width: 18px; height: 18px;"> <span>Flujo Tv 12 + 2 meses</span></label><label style="display: flex; align-items: center; gap: 10px; color: #e2e8f0; font-size: 13px; cursor: pointer; padding: 7px 6px; border-bottom: 1px solid #1e293b;"><input type="checkbox" class="check-servicio-oferta" value="Flujo Tv cuenta completa" style="accent-color: #0ea5e9; width: 18px; height: 18px;"> <span>Flujo Tv cuenta completa</span></label><label style="display: flex; align-items: center; gap: 10px; color: #e2e8f0; font-size: 13px; cursor: pointer; padding: 7px 6px; border-bottom: 1px solid #1e293b;"><input type="checkbox" class="check-servicio-oferta" value="Estella Tv" style="accent-color: #0ea5e9; width: 18px; height: 18px;"> <span>Estella Tv</span></label><label style="display: flex; align-items: center; gap: 10px; color: #e2e8f0; font-size: 13px; cursor: pointer; padding: 7px 6px; border-bottom: 1px solid #1e293b;"><input type="checkbox" class="check-servicio-oferta" value="Oleada Tv" style="accent-color: #0ea5e9; width: 18px; height: 18px;"> <span>Oleada Tv</span></label><label style="display: flex; align-items: center; gap: 10px; color: #e2e8f0; font-size: 13px; cursor: pointer; padding: 7px 6px; border-bottom: 1px solid #1e293b;"><input type="checkbox" class="check-servicio-oferta" value="TeleLatino cuenta completa" style="accent-color: #0ea5e9; width: 18px; height: 18px;"> <span>TeleLatino cuenta completa</span></label><label style="display: flex; align-items: center; gap: 10px; color: #e2e8f0; font-size: 13px; cursor: pointer; padding: 7px 6px; border-bottom: 1px solid #1e293b;"><input type="checkbox" class="check-servicio-oferta" value="IPTV stream live" style="accent-color: #0ea5e9; width: 18px; height: 18px;"> <span>IPTV stream live</span></label><label style="display: flex; align-items: center; gap: 10px; color: #e2e8f0; font-size: 13px; cursor: pointer; padding: 7px 6px; border-bottom: 1px solid #1e293b;"><input type="checkbox" class="check-servicio-oferta" value="IPTV Zona Movie" style="accent-color: #0ea5e9; width: 18px; height: 18px;"> <span>IPTV Zona Movie</span></label><label style="display: flex; align-items: center; gap: 10px; color: #e2e8f0; font-size: 13px; cursor: pointer; padding: 7px 6px; border-bottom: 1px solid #1e293b;"><input type="checkbox" class="check-servicio-oferta" value="Viki Rakuten" style="accent-color: #0ea5e9; width: 18px; height: 18px;"> <span>Viki Rakuten</span></label><label style="display: flex; align-items: center; gap: 10px; color: #e2e8f0; font-size: 13px; cursor: pointer; padding: 7px 6px; border-bottom: 1px solid #1e293b;"><input type="checkbox" class="check-servicio-oferta" value="YouTube Premium" style="accent-color: #0ea5e9; width: 18px; height: 18px;"> <span>YouTube Premium</span></label><label style="display: flex; align-items: center; gap: 10px; color: #e2e8f0; font-size: 13px; cursor: pointer; padding: 7px 6px; border-bottom: 1px solid #1e293b;"><input type="checkbox" class="check-servicio-oferta" value="Spotify" style="accent-color: #0ea5e9; width: 18px; height: 18px;"> <span>Spotify</span></label><label style="display: flex; align-items: center; gap: 10px; color: #e2e8f0; font-size: 13px; cursor: pointer; padding: 7px 6px; border-bottom: 1px solid #1e293b;"><input type="checkbox" class="check-servicio-oferta" value="Spotify 2 meses" style="accent-color: #0ea5e9; width: 18px; height: 18px;"> <span>Spotify 2 meses</span></label><label style="display: flex; align-items: center; gap: 10px; color: #e2e8f0; font-size: 13px; cursor: pointer; padding: 7px 6px; border-bottom: 1px solid #1e293b;"><input type="checkbox" class="check-servicio-oferta" value="Spotify 3 meses" style="accent-color: #0ea5e9; width: 18px; height: 18px;"> <span>Spotify 3 meses</span></label><label style="display: flex; align-items: center; gap: 10px; color: #e2e8f0; font-size: 13px; cursor: pointer; padding: 7px 6px; border-bottom: 1px solid #1e293b;"><input type="checkbox" class="check-servicio-oferta" value="Spotify 6 meses" style="accent-color: #0ea5e9; width: 18px; height: 18px;"> <span>Spotify 6 meses</span></label><label style="display: flex; align-items: center; gap: 10px; color: #e2e8f0; font-size: 13px; cursor: pointer; padding: 7px 6px; border-bottom: 1px solid #1e293b;"><input type="checkbox" class="check-servicio-oferta" value="Spotify 12 meses" style="accent-color: #0ea5e9; width: 18px; height: 18px;"> <span>Spotify 12 meses</span></label><label style="display: flex; align-items: center; gap: 10px; color: #e2e8f0; font-size: 13px; cursor: pointer; padding: 7px 6px; border-bottom: 1px solid #1e293b;"><input type="checkbox" class="check-servicio-oferta" value="Deezer 1 mes" style="accent-color: #0ea5e9; width: 18px; height: 18px;"> <span>Deezer 1 mes</span></label><label style="display: flex; align-items: center; gap: 10px; color: #e2e8f0; font-size: 13px; cursor: pointer; padding: 7px 6px; border-bottom: 1px solid #1e293b;"><input type="checkbox" class="check-servicio-oferta" value="Licencias Windows 10 & 11" style="accent-color: #0ea5e9; width: 18px; height: 18px;"> <span>Licencias Windows 10 & 11</span></label><label style="display: flex; align-items: center; gap: 10px; color: #e2e8f0; font-size: 13px; cursor: pointer; padding: 7px 6px; border-bottom: 1px solid #1e293b;"><input type="checkbox" class="check-servicio-oferta" value="Microsoft Office" style="accent-color: #0ea5e9; width: 18px; height: 18px;"> <span>Microsoft Office</span></label><label style="display: flex; align-items: center; gap: 10px; color: #e2e8f0; font-size: 13px; cursor: pointer; padding: 7px 6px; border-bottom: 1px solid #1e293b;"><input type="checkbox" class="check-servicio-oferta" value="Canva Pro y Edu" style="accent-color: #0ea5e9; width: 18px; height: 18px;"> <span>Canva Pro y Edu</span></label><label style="display: flex; align-items: center; gap: 10px; color: #e2e8f0; font-size: 13px; cursor: pointer; padding: 7px 6px; border-bottom: 1px solid #1e293b;"><input type="checkbox" class="check-servicio-oferta" value="Cap cut" style="accent-color: #0ea5e9; width: 18px; height: 18px;"> <span>Cap cut</span></label><label style="display: flex; align-items: center; gap: 10px; color: #e2e8f0; font-size: 13px; cursor: pointer; padding: 7px 6px; border-bottom: 1px solid #1e293b;"><input type="checkbox" class="check-servicio-oferta" value="Chat Gpt Plus" style="accent-color: #0ea5e9; width: 18px; height: 18px;"> <span>Chat Gpt Plus</span></label><label style="display: flex; align-items: center; gap: 10px; color: #e2e8f0; font-size: 13px; cursor: pointer; padding: 7px 6px; border-bottom: 1px solid #1e293b;"><input type="checkbox" class="check-servicio-oferta" value="Chat Gpt Pro (1 dispositivo PC o Móvil)" style="accent-color: #0ea5e9; width: 18px; height: 18px;"> <span>Chat Gpt Pro (1 dispositivo PC o Móvil)</span></label><label style="display: flex; align-items: center; gap: 10px; color: #e2e8f0; font-size: 13px; cursor: pointer; padding: 7px 6px; border-bottom: 1px solid #1e293b;"><input type="checkbox" class="check-servicio-oferta" value="Catálogo Digital" style="accent-color: #0ea5e9; width: 18px; height: 18px;"> <span>Catálogo Digital</span></label>
-                </div>
-            </div>
-            <button type="submit" class="btn-enviar">Guardar Oferta</button>
-        </form>
-    </div>
-    <script>
-        function toggleAlcance(val) {
-            document.getElementById('cajaCheckboxes').style.display = val === 'especificos' ? 'block' : 'none';
-        }
-        function guardarOferta(e) {
-            e.preventDefault();
-            alert('¡Oferta guardada y aplicada con éxito en tu catálogo!');
-        }
-    </script>
-</body>
-</html>`);
 });
