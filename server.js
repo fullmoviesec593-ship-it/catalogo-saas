@@ -299,3 +299,10 @@ app.get('/api/backup', async (req, res) => {
     </html>
     `);
 });
+
+app.get('/admin', (req, res) => {
+    const path = require('path');
+    const fs = require('fs');
+    let p = path.join(__dirname, 'public', 'admin.html');
+    res.sendFile(p);
+});
