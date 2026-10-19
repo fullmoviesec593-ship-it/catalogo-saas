@@ -303,11 +303,12 @@ app.get('/api/backup', async (req, res) => {
 
 
 
+
+
 app.get('/admin', (req, res) => {
-    res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0');
     const path = require('path');
     const fs = require('fs');
-    let p = path.join(__dirname, 'public', 'admin.html');
-    if (!fs.existsSync(p)) p = path.join(__dirname, 'admin.html');
-    res.sendFile(p);
+    let file = path.join(__dirname, 'public', 'admin.html');
+    if (!fs.existsSync(file)) file = path.join(__dirname, 'admin.html');
+    res.sendFile(file);
 });
