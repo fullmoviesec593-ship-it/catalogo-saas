@@ -24,11 +24,7 @@ try {
 
 
 const app = express();
-app.get('/admin', (req, res) => {
-    const fs = require('fs');
-    const p = fs.existsSync(__dirname + '/public/admin.html') ? (__dirname + '/public/admin.html') : (__dirname + '/admin.html');
-    res.sendFile(p);
-});
+
 
 
 // Ruta garantizada al Panel Revendedor
@@ -318,3 +314,12 @@ app.get('/api/backup', async (req, res) => {
 
 
 
+
+app.get('/admin', (req, res) => {
+    res.setHeader('Cache-Control', 'no-store, max-age=0');
+    const path = require('path');
+    const fs = require('fs');
+    let file = path.join(__dirname, 'public', 'admin.html');
+    if (!fs.existsSync(file)) file = path.join(__dirname, 'admin.html');
+    res.sendFile(file);
+});
