@@ -1,0 +1,654 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Catálogo Oficial | Streaming & Software</title>
+  <link id="manifest-link" rel="manifest" href="/manifest.json">
+  <meta id="theme-color-meta" name="theme-color" content="#ff6a00">
+  <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/3074/3074767.png">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    :root { --bg: #090a0f; --card-bg: #10121a; --border: #1e2230; --primary-accent: #ff6a00; --accent-gradient: linear-gradient(135deg, #ff7a00 0%, #ff4500 100%); --glow-accent: rgba(255, 106, 0, 0.25); --accent-green: #22c55e; --text-white: #ffffff; --text-muted: #8e95a5; }
+    body.theme-blue { --primary-accent: #0284c7; --accent-gradient: linear-gradient(135deg, #38bdf8 0%, #0284c7 100%); --glow-accent: rgba(56, 189, 248, 0.25); }
+    body.theme-green { --primary-accent: #10b981; --accent-gradient: linear-gradient(135deg, #34d399 0%, #059669 100%); --glow-accent: rgba(52, 211, 153, 0.25); }
+    body.theme-purple { --primary-accent: #a855f7; --accent-gradient: linear-gradient(135deg, #c084fc 0%, #7e22ce 100%); --glow-accent: rgba(192, 132, 252, 0.25); }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; -webkit-tap-highlight-color: transparent; }
+    body { background-color: var(--bg); color: var(--text-white); min-height: 100vh; padding-bottom: 90px; overflow-x: hidden; }
+    .locked-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #090a0f; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 24px; text-align: center; z-index: 99999; }
+    .locked-card { background: #10131e; border: 1px solid #282f44; border-radius: 20px; padding: 30px 24px; max-width: 440px; box-shadow: 0 10px 40px rgba(0,0,0,0.8); }
+    .locked-card h2 { color: #f87171; font-size: 20px; margin-bottom: 12px; }
+    .navbar { display: flex; align-items: center; justify-content: space-between; padding: 12px 14px; background: rgba(9, 10, 15, 0.95); backdrop-filter: blur(12px); border-bottom: 1px solid rgba(255, 255, 255, 0.06); position: sticky; top: 0; z-index: 100; }
+    .brand-avatar { width: 36px; height: 36px; border-radius: 50%; background: var(--accent-gradient); color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 15px; object-fit: cover; }
+    .btn-download-apk { background: #1e1b4b; border: 1px solid #818cf8; color: #c7d2fe; padding: 7px 11px; border-radius: 8px; font-size: 11px; font-weight: 800; display: inline-flex; align-items: center; gap: 5px; cursor: pointer; }
+    .btn-pedir { background: #00d26a; color: #042512; padding: 7px 13px; border-radius: 8px; font-size: 12px; font-weight: 800; text-decoration: none; display: inline-flex; align-items: center; gap: 5px; }
+    .status-bar-online { display: flex; align-items: center; justify-content: center; gap: 6px; padding: 6px 12px; font-size: 12px; font-weight: 800; }
+    .status-bar-online.online { background: rgba(34, 197, 94, 0.12); color: #4ade80; border-bottom: 1px solid rgba(34, 197, 94, 0.25); }
+    .status-bar-online.offline { background: rgba(245, 158, 11, 0.12); color: #fbbf24; border-bottom: 1px solid rgba(245, 158, 11, 0.25); }
+    .status-dot { width: 8px; height: 8px; border-radius: 50%; background: currentColor; box-shadow: 0 0 8px currentColor; }
+    .hero { text-align: center; padding: 20px 16px 14px 16px; max-width: 600px; margin: 0 auto; }
+    .hero-title { font-size: 26px; font-weight: 900; line-height: 1.15; letter-spacing: -0.5px; margin-bottom: 8px; }
+    .hero-title .highlight { display: block; color: var(--primary-accent); background: var(--accent-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .search-wrapper { max-width: 680px; margin: 0 auto 14px auto; padding: 0 14px; position: relative; }
+    .search-input-box { width: 100%; background: #10131e; border: 1px solid #23293f; border-radius: 12px; padding: 11px 14px 11px 40px; color: #fff; font-size: 14px; outline: none; }
+    .tabs { display: flex; gap: 5px; background: #10131d; padding: 3px; border-radius: 8px; border: 1px solid #1f2436; overflow-x: auto; max-width: 680px; margin: 0 auto 12px auto; }
+    .tab-btn { background: transparent; border: none; color: #8b92a3; padding: 5px 10px; font-size: 11px; font-weight: 700; border-radius: 6px; cursor: pointer; white-space: nowrap; }
+    .tab-btn.active { background: var(--primary-accent); color: #fff; }
+    .products-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; padding: 0 14px; max-width: 680px; margin: 0 auto; }
+    @media (max-width: 380px) { .products-grid { grid-template-columns: 1fr; } }
+    .card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 16px; overflow: hidden; display: flex; flex-direction: column; }
+    .card-thumb { position: relative; width: 100%; height: 150px; background: #000; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+    .card-thumb img { width: 100%; height: 100%; object-fit: cover; }
+    .card-tag { position: absolute; top: 8px; right: 8px; background: var(--primary-accent); color: #fff; font-size: 9px; font-weight: 900; padding: 3px 8px; border-radius: 6px; }
+    .card-tag.discount { background: #22c55e; color: #042f1a; }
+    .card-body { padding: 12px; display: flex; flex-direction: column; flex: 1; }
+    .card-features { list-style: none; margin: 8px 0; flex: 1; }
+    .card-features li { font-size: 11px; color: #a0a6b7; margin-bottom: 4px; display: flex; align-items: center; gap: 5px; }
+    .card-features li::before { content: '✓'; color: var(--accent-green); font-weight: 900; }
+    .btn-buy-ws { background: #00d26a; color: #032412; border: none; border-radius: 9px; padding: 10px 8px; font-size: 13px; font-weight: 800; cursor: pointer; width: 100%; }
+    .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); display: flex; align-items: center; justify-content: center; padding: 16px; z-index: 10000; }
+    .modal-box { background: #111420; border: 1px solid #23283c; border-radius: 18px; padding: 22px; width: 100%; max-width: 440px; max-height: 90vh; overflow-y: auto; }
+    .btn-close { background: #1e2436; border: none; color: #94a3b8; width: 28px; height: 28px; border-radius: 50%; cursor: pointer; }
+    .hidden { display: none !important; }
+  </style>
+</head>
+<body>
+  <div id="locked-container" class="locked-screen hidden">
+    <div class="locked-card">
+      <div style="font-size: 40px; margin-bottom: 10px;">⚠️</div>
+      <h2>Catálogo en Mantenimiento</h2>
+      <p id="locked-msg">Mantenimiento.</p>
+      <a id="locked-btn-soporte" href="https://wa.me/593982766054" class="btn-pedir" style="justify-content:center; width:100%;">💬 Contactar con Soporte</a>
+    </div>
+  </div>
+
+  <nav class="navbar">
+    <a href="#" class="brand" style="display:flex; align-items:center; gap:8px; text-decoration:none;">
+      <img id="nav-logo" class="brand-avatar hidden" src="" alt="L">
+      <div id="nav-initial" class="brand-avatar">F</div>
+      <span id="nav-store-name" style="font-size:15px; font-weight:800; color:#fff;">Full Movies EC</span>
+    </a>
+    <div class="nav-actions">
+      <button class="btn-download-apk" onclick="document.getElementById('modal-descargar-apk').classList.remove('hidden')">📱 App</button>
+      <a id="nav-btn-pedir" href="#" target="_blank" class="btn-pedir">Pedir</a>
+    </div>
+  </nav>
+
+  <div id="store-status-bar" class="status-bar-online online">
+    <div class="status-dot"></div><span id="store-status-text">🟢 En línea</span>
+  </div>
+
+  <section class="hero">
+    <div id="hero-pill" style="border: 1px solid var(--primary-accent); color: var(--primary-accent); font-size: 11px; font-weight: 800; padding: 4px 14px; border-radius: 20px; display:inline-block; margin-bottom:12px;">✦ ATENCIÓN 24/7 ✦</div>
+    <h1 class="hero-title"><span id="hero-line1">CATÁLOGO OFICIAL</span> <span id="hero-line2" class="highlight">FULL MOVIES EC</span></h1>
+    <p id="hero-sub" style="color: #8e95a5; font-size: 13px; margin-bottom: 16px;">Garantía Total</p>
+  </section>
+
+  <div class="search-wrapper"><input type="text" id="catalogo-search" class="search-input-box" placeholder="Buscar..." oninput="aplicarFiltros()"></div>
+  
+  <div class="tabs" style="padding:0 14px;">
+    <button class="tab-btn active" onclick="filtrarCategoria('todos', this)">Todos</button>
+    <button class="tab-btn" onclick="filtrarCategoria('combos', this)">Combos</button>
+    <button class="tab-btn" onclick="filtrarCategoria('streaming', this)">Streaming</button>
+    <button class="tab-btn" onclick="filtrarCategoria('iptv', this)">IPTV</button>
+    <button class="tab-btn" onclick="filtrarCategoria('musica', this)">Música</button>
+    <button class="tab-btn" onclick="filtrarCategoria('software', this)">Software</button>
+  </div>
+
+  <div id="products-grid" class="products-grid"></div>
+
+  <!-- MODAL INDIVIDUAL -->
+  <div id="modal-compra" class="modal-overlay hidden">
+    <div class="modal-box">
+      <div style="display:flex; justify-content:space-between; margin-bottom:12px;"><h3 id="modal-title" style="color:#fff;">Detalles</h3><button class="btn-close" onclick="document.getElementById('modal-compra').classList.add('hidden')">✕</button></div>
+      <div style="display:flex; justify-content:space-between; margin-bottom:8px;"><span id="modal-service-name" style="color:#fff; font-weight:bold;">Servicio</span><span id="modal-service-price" style="color:var(--primary-accent); font-weight:bold;">$0.00</span></div>
+      
+      <!-- INFO PAGOS (Cuentas manuales) -->
+      <div id="modal-payment-info" style="background:#080a11; padding:14px; border-radius:10px; color:#cbd5e1; font-size:13px; line-height:1.6; margin:10px 0;"></div>
+      
+      <!-- BOTÓN EXTRA DE PAGO DIRECTO -->
+      <div id="modal-extra-buttons"></div>
+
+      <!-- BOTONES DE WHATSAPP -->
+      <a id="btn-confirm-paid" href="#" target="_blank" style="display:block; background:#00d26a; color:#032412; padding:12px; border-radius:10px; text-align:center; font-weight:bold; text-decoration:none; margin-top:8px;">✅ YA PAGUÉ (ENVIAR COMPROBANTE)</a>
+      <a id="btn-confirm-info" href="#" target="_blank" style="display:block; background:#171b28; border:1px solid #293046; color:#38bdf8; padding:12px; border-radius:10px; text-align:center; font-weight:bold; text-decoration:none; margin-top:8px;">💬 MÁS INFORMACIÓN</a>
+    </div>
+  </div>
+
+  <!-- MODAL COMBOS -->
+  <div id="modal-combo-selector" class="modal-overlay hidden">
+    <div class="modal-box">
+      <div style="display:flex; justify-content:space-between; margin-bottom:12px;"><h3 id="combo-modal-title" style="color:#fff;">Combo</h3><button class="btn-close" onclick="document.getElementById('modal-combo-selector').classList.add('hidden')">✕</button></div>
+      <div id="combo-items-container" style="max-height:280px; overflow-y:auto; display:flex; flex-direction:column; gap:8px;"></div>
+      <div style="background:#080c16; border:1px dashed var(--primary-accent); padding:12px; border-radius:12px; margin:14px 0;">
+        <div style="display:flex; justify-content:space-between; color:#94a3b8; font-size:13px;"><span>Subtotal:</span><span id="combo-subtotal">$0.00</span></div>
+        <div style="display:flex; justify-content:space-between; color:#22c55e; font-size:13px;"><span>Descuento:</span><span id="combo-discount">-$0.00</span></div>
+        <div style="display:flex; justify-content:space-between; color:#fff; font-size:16px; font-weight:bold; border-top:1px solid #1c243a; padding-top:6px; margin-top:6px;"><span>Total:</span><span id="combo-total-final" style="color:var(--primary-accent);">$0.00</span></div>
+      </div>
+      
+      <!-- INFO PAGOS (Cuentas manuales) -->
+      <div id="combo-payment-info" style="background:#080a11; padding:14px; border-radius:10px; color:#cbd5e1; font-size:13px; line-height:1.6; margin:10px 0;"></div>
+      
+      <!-- BOTÓN EXTRA DE PAGO DIRECTO COMBO -->
+      <div id="combo-extra-buttons"></div>
+
+      <!-- BOTONES DE WHATSAPP -->
+      <a id="btn-combo-order" href="#" target="_blank" style="display:block; background:#00d26a; color:#032412; padding:12px; border-radius:10px; text-align:center; font-weight:bold; text-decoration:none; margin-top:8px;">🛒 ORDENAR POR WHATSAPP</a>
+    </div>
+  </div>
+
+  <div id="modal-descargar-apk" class="modal-overlay hidden">
+    <div class="modal-box" style="text-align:center;">
+      <div style="display:flex; justify-content:space-between;"><h3 style="color:#fff;">📲 Instalar App</h3><button class="btn-close" onclick="document.getElementById('modal-descargar-apk').classList.add('hidden')">✕</button></div>
+      <div style="font-size:45px; margin:10px 0;">🚀</div>
+      <button id="btn-pwa-direct" onclick="ejecutarInstalacionPWA()" style="background:var(--accent-gradient); color:#fff; width:100%; padding:13px; border:none; border-radius:10px; font-weight:bold; font-size:14px; margin-bottom:10px;">⚡ INSTALAR DIRECTO</button>
+      <a id="btn-custom-apk" href="#" target="_blank" class="hidden" style="background:#1e1b4b; border:1px solid #818cf8; color:#c7d2fe; display:block; padding:11px; border-radius:10px; font-weight:bold; font-size:13px; text-decoration:none;">📥 Descargar APK directo</a>
+    </div>
+  </div>
+
+  <script>
+    let tiendaActiva = null; let slugActualDetectado = null; let categoriaSeleccionada = 'todos';
+    let todosLosProductos = []; let itemsParaMostrar = []; let comboSeleccionados = []; let comboActualConfig = null;
+
+    // RASTREADOR DE ESTADÍSTICAS SILENCIOSO
+    function registrarEstadistica(tipo, producto = null) {
+      if (!slugActualDetectado) return;
+      fetch("/api/stats/track", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ slug: slugActualDetectado, tipo, producto })
+      }).catch(()=>{});
+    }
+
+    let deferredPrompt = null;
+    window.addEventListener('beforeinstallprompt', (e) => { e.preventDefault(); deferredPrompt = e; });
+    function ejecutarInstalacionPWA() {
+      if (deferredPrompt) { deferredPrompt.prompt(); deferredPrompt.userChoice.then(() => { deferredPrompt = null; document.getElementById('modal-descargar-apk').classList.add('hidden'); }); }
+      else alert("Toca los 3 puntos (⋮) de tu navegador Chrome y selecciona 'Agregar a la pantalla principal' o 'Instalar aplicación'.");
+    }
+
+    async function cargarTienda() {
+      const urlParams = new URLSearchParams(window.location.search);
+      let tiendaSlug = urlParams.get('tienda') || localStorage.getItem('pwa_tienda_actual') || 'bellstream';
+      slugActualDetectado = tiendaSlug;
+      localStorage.setItem('pwa_tienda_actual', slugActualDetectado);
+      
+      const manifestTag = document.getElementById('manifest-link');
+      if (manifestTag) manifestTag.href = `/manifest.json?tienda=${encodeURIComponent(slugActualDetectado)}`;
+
+      try {
+        const res = await fetch('/api/db'); const db = await res.json();
+        const rev = (db.revendedores || {})[tiendaSlug];
+        if (rev && (rev.activo === false || (new Date(rev.vencimiento) - new Date() <= 0))) {
+          document.getElementById('locked-container').classList.remove('hidden'); return;
+        }
+
+        tiendaActiva = (db.tiendas || {})[tiendaSlug] || { nombre: "Full Movies EC", whatsapp: "593982766054", tema: "orange", estadoAtencion: "online", combos: [], productos: [], textos: {} };
+        const color = tiendaActiva.tema || 'orange';
+        document.body.classList.add('theme-' + color);
+        document.getElementById('theme-color-meta').content = color === 'blue' ? '#0284c7' : color === 'green' ? '#10b981' : color === 'purple' ? '#a855f7' : '#ff6a00';
+
+        document.getElementById('nav-store-name').innerText = tiendaActiva.nombre;
+        document.getElementById('nav-initial').innerText = tiendaActiva.nombre.charAt(0).toUpperCase();
+        if (tiendaActiva.logo) { document.getElementById('nav-logo').src = tiendaActiva.logo; document.getElementById('nav-logo').classList.remove('hidden'); document.getElementById('nav-initial').classList.add('hidden'); }
+
+        const ws = (tiendaActiva.whatsapp || "593982766054").replace(/\D/g, '');
+        document.getElementById('nav-btn-pedir').href = `https://wa.me/${ws}`;
+
+        if (tiendaActiva.apkUrl) { const btnApk = document.getElementById('btn-custom-apk'); btnApk.href = tiendaActiva.apkUrl; btnApk.classList.remove('hidden'); }
+
+        const txt = tiendaActiva.textos || {};
+        document.getElementById('hero-pill').innerText = txt.pill || "✦ ATENCIÓN 24/7 ✦"; document.getElementById('hero-line1').innerText = txt.title1 || "CATÁLOGO OFICIAL"; document.getElementById('hero-line2').innerText = txt.title2 || "FULL MOVIES EC"; document.getElementById('hero-sub').innerText = txt.sub || "Garantía Total";
+        tiendaActiva.moneda = txt.currency || "$"; tiendaActiva.textoBoton = txt.btnBuy || "Comprar ahora!";
+
+        const combosGrid = (tiendaActiva.combos || []).filter(c => c.activo !== false).map((c, idx) => ({ ...c, isCombo: true, comboIdx: idx, categoria: 'combos' }));
+        todosLosProductos = tiendaActiva.productos || [];
+        itemsParaMostrar = [...combosGrid, ...todosLosProductos];
+        
+        aplicarFiltros();
+        registrarEstadistica("vista");
+      } catch (e) {}
+    }
+
+    function aplicarFiltros() {
+      const q = document.getElementById('catalogo-search').value.toLowerCase().trim();
+      const filtrados = itemsParaMostrar.filter(p => {
+        const cat = (p.categoria || 'streaming').toLowerCase();
+        const coincideCat = (categoriaSeleccionada === 'todos') || (categoriaSeleccionada === 'combos' && p.isCombo) || (cat === categoriaSeleccionada);
+        const texto = `${p.nombre} ${p.sub||''} ${p.tag||''}`.toLowerCase();
+        return coincideCat && (!q || texto.includes(q));
+      });
+      renderGrid(filtrados);
+    }
+
+    function filtrarCategoria(cat, btn) {
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active')); btn.classList.add('active');
+      categoriaSeleccionada = cat; aplicarFiltros();
+    }
+
+    function renderGrid(productos) {
+      const grid = document.getElementById('products-grid'); grid.innerHTML = '';
+      if (productos.length === 0) { grid.innerHTML = '<div style="grid-column: 1 / -1; text-align:center; color:#94a3b8; padding:30px;">No hay servicios.</div>'; return; }
+
+      productos.forEach((p, idxEnArr) => {
+        const idx = itemsParaMostrar.indexOf(p);
+        const tag = p.tag ? `<span class="card-tag ${p.isCombo?'discount':''}">${p.tag}</span>` : '';
+        const featuresHtml = (p.features || ["Garantía"]).map(f => `<li>${f}</li>`).join('');
+        const priceHtml = p.isCombo ? `<div style="margin-bottom:10px;"><span style="color:#22c55e; font-size:17px; font-weight:bold;">${p.descuento}% OFF</span></div>` : `<div style="margin-bottom:10px;"><span style="color:var(--primary-accent); font-weight:bold; font-size:20px;">${tiendaActiva.moneda}${p.precio}</span></div>`;
+        const clickFn = p.isCombo ? `abrirModalCombo(${idx})` : `abrirModal(${idx})`;
+        
+        const card = document.createElement('div'); card.className = 'card';
+        card.innerHTML = `<div class="card-thumb"><img src="${p.img||''}">${tag}</div><div class="card-body"><div style="font-weight:800; font-size:15px; color:#fff;">${p.nombre}</div><div style="font-size:11px; color:#7b8293; margin-bottom:6px;">${p.sub||''}</div><ul class="card-features">${featuresHtml}</ul>${priceHtml}<button class="btn-buy-ws" onclick="${clickFn}">${tiendaActiva.textoBoton}</button></div>`;
+        grid.appendChild(card);
+      });
+    }
+
+    function formatearCuentas(texto) {
+      return (texto || "Pregunta por WhatsApp.").replace(/\b(\d{7,22})\b/g, m => `<span style="background:rgba(56,189,248,0.12); border:1px solid rgba(56,189,248,0.35); padding:2px 6px; border-radius:6px; color:#38bdf8; cursor:pointer;" onclick="navigator.clipboard.writeText('${m}'); this.innerText='✅ Copiado'; setTimeout(()=>this.innerText='${m}',1500)">${m} 📋</span>`).replace(/\n/g, '<br>');
+    }
+
+    function abrirModal(idx) {
+      const p = itemsParaMostrar[idx]; const ws = (tiendaActiva.whatsapp || "593982766054").replace(/\D/g, '');
+      document.getElementById('modal-service-name').innerText = p.nombre; document.getElementById('modal-service-price').innerText = tiendaActiva.moneda + p.precio;
+      
+      // Mostrar cuenta bancaria
+      document.getElementById('modal-payment-info').innerHTML = formatearCuentas(tiendaActiva.metodosPago);
+      
+      // Mostrar botón de pago directo si existe
+      let extraHTML = '';
+      if (tiendaActiva.payLink) {
+        extraHTML = `<a href="${tiendaActiva.payLink}" target="_blank" onclick="registrarEstadistica('clic', '${p.nombre}')" style="display:block; background:var(--accent-gradient); color:#fff; padding:12px; border-radius:10px; text-align:center; font-weight:bold; text-decoration:none; margin-top:8px;">💳 ${tiendaActiva.payBtn || 'PAGAR EN LÍNEA'}</a>`;
+      }
+      document.getElementById('modal-extra-buttons').innerHTML = extraHTML;
+      
+      const btnPaid = document.getElementById('btn-confirm-paid'); const btnInfo = document.getElementById('btn-confirm-info');
+      btnPaid.href = `https://wa.me/${ws}?text=${encodeURIComponent(`¡Hola! Pagué mi servicio: *${p.nombre}* (${tiendaActiva.moneda}${p.precio}). Adjunto comprobante.`)}`;
+      btnInfo.href = `https://wa.me/${ws}?text=${encodeURIComponent(`¡Hola! Quisiera info de: *${p.nombre}*.`)}`;
+      
+      btnPaid.onclick = () => registrarEstadistica("clic", p.nombre);
+      btnInfo.onclick = () => registrarEstadistica("clic", p.nombre);
+      
+      document.getElementById('modal-compra').classList.remove('hidden');
+    }
+
+    function abrirModalCombo(idx) {
+      comboActualConfig = itemsParaMostrar[idx]; comboSeleccionados = [];
+      document.getElementById('combo-modal-title').innerText = comboActualConfig.nombre;
+      
+      // Mostrar cuenta bancaria
+      document.getElementById('combo-payment-info').innerHTML = formatearCuentas(tiendaActiva.metodosPago);
+
+      // Mostrar botón de pago directo si existe
+      let extraComboHTML = '';
+      if (tiendaActiva.payLink) {
+        extraComboHTML = `<a href="${tiendaActiva.payLink}" target="_blank" onclick="registrarEstadistica('clic', '${comboActualConfig.nombre}')" style="display:block; background:var(--accent-gradient); color:#fff; padding:12px; border-radius:10px; text-align:center; font-weight:bold; text-decoration:none; margin-top:8px;">💳 ${tiendaActiva.payBtn || 'PAGAR EN LÍNEA'}</a>`;
+      }
+      document.getElementById('combo-extra-buttons').innerHTML = extraComboHTML;
+
+      renderListaComboItems(); actualizarCalculoCombo();
+      document.getElementById('modal-combo-selector').classList.remove('hidden');
+    }
+
+    function renderListaComboItems() {
+      const c = document.getElementById('combo-items-container'); c.innerHTML = '';
+      todosLosProductos.forEach((p, i) => {
+        const isSel = comboSeleccionados.includes(i);
+        const row = document.createElement('div');
+        row.style = `display:flex; justify-content:space-between; align-items:center; background:#090c14; padding:10px; border-radius:10px; border:1px solid ${isSel?'var(--primary-accent)':'#1c2235'}; cursor:pointer;`;
+        row.innerHTML = `<div style="display:flex; gap:10px;"><div style="width:20px; height:20px; border-radius:4px; border:2px solid ${isSel?'var(--primary-accent)':'#334155'}; background:${isSel?'var(--primary-accent)':'transparent'}; color:#fff; text-align:center; font-size:12px;">${isSel?'✓':''}</div><div><div style="font-weight:bold; color:#fff; font-size:13px;">${p.nombre}</div><div style="font-size:10px; color:#94a3b8;">${p.sub}</div></div></div><div style="color:var(--primary-accent); font-weight:bold; font-size:12px;">${tiendaActiva.moneda}${p.precio}</div>`;
+        row.onclick = () => { if (isSel) comboSeleccionados.splice(comboSeleccionados.indexOf(i), 1); else { if (comboSeleccionados.length >= comboActualConfig.comboCantidad) { alert(`Solo ${comboActualConfig.comboCantidad} servicios.`); return; } comboSeleccionados.push(i); } renderListaComboItems(); actualizarCalculoCombo(); };
+        c.appendChild(row);
+      });
+    }
+
+    function actualizarCalculoCombo() {
+      let sub = 0; comboSeleccionados.forEach(i => sub += parseFloat(todosLosProductos[i].precio));
+      const desc = sub * (comboActualConfig.descuento / 100); const tot = sub - desc;
+      document.getElementById('combo-subtotal').innerText = tiendaActiva.moneda + sub.toFixed(2); document.getElementById('combo-discount').innerText = '-' + tiendaActiva.moneda + desc.toFixed(2); document.getElementById('combo-total-final').innerText = tiendaActiva.moneda + tot.toFixed(2);
+      const btn = document.getElementById('btn-combo-order');
+      if (comboSeleccionados.length === comboActualConfig.comboCantidad) {
+        btn.style.opacity = '1'; btn.style.pointerEvents = 'auto';
+        const txt = `¡Hola! Quiero mi *${comboActualConfig.nombre} (${comboActualConfig.descuento}% OFF)*:\n${comboSeleccionados.map(i=>`• ${todosLosProductos[i].nombre}`).join('\n')}\n✅ *Total: ${tiendaActiva.moneda}${tot.toFixed(2)}*\nAdjunto comprobante.`;
+        btn.href = `https://wa.me/${(tiendaActiva.whatsapp || "593982766054").replace(/\D/g, '')}?text=${encodeURIComponent(txt)}`;
+        
+        btn.onclick = () => registrarEstadistica("clic", comboActualConfig.nombre);
+      } else { btn.style.opacity = '0.4'; btn.style.pointerEvents = 'none'; btn.onclick = null; }
+    }
+
+    cargarTienda();
+  </script>
+
+
+
+
+<script id="motor-universal-variantes">
+(function() {
+    function fusionarTarjetas() {
+        const botones = Array.from(document.querySelectorAll('button, a')).filter(b => {
+            const t = (b.textContent || '').trim().toLowerCase();
+            return t.includes('comprar') || t.includes('pedir');
+        });
+
+        if (botones.length < 2) return;
+
+        let tarjetas = [];
+        botones.forEach(btn => {
+            if (btn.closest('#modalOferta') || btn.closest('form') || btn.closest('nav') || btn.closest('header')) return;
+
+            // Subir hasta encontrar la tarjeta individual exacta
+            let card = btn.parentElement;
+            while (card && card !== document.body) {
+                const parent = card.parentElement;
+                const btnsEnParent = Array.from(parent.querySelectorAll('button, a')).filter(b => {
+                    const t = (b.textContent || '').trim().toLowerCase();
+                    return t.includes('comprar') || t.includes('pedir');
+                });
+                if (btnsEnParent.length > 1) break;
+                card = parent;
+            }
+
+
+            // Buscar el precio sin usar barras invertidas que se rompan
+            const todos = Array.from(card.querySelectorAll('*'));
+            const precioEl = todos.find(el => {
+                if (el.children.length > 0) return false;
+                const txt = (el.textContent || '').trim();
+                return txt.startsWith('
+</html>
+) && txt.length >= 2 && txt.length <= 12;
+            });
+
+            // Buscar el título del servicio
+            const ignorar = ['streaming', 'video', 'música', 'musica', 'software', 'ia', 'top', 'popular', 'streaming y tv', 'streaming y deportes', 'streaming, anime', 'comprar ahora!', 'pedir'];
+            let tituloEl = card.querySelector('h1, h2, h3, h4, .card-title, .service-title, .titulo');
+            
+                for (let el of todos) {
+                    if (el.children.length === 0) {
+                        let txt = (el.textContent || '').trim();
+                        let low = txt.toLowerCase();
+                            tituloEl = el;
+                            break;
+                        }
+                    }
+                }
+            }
+
+            if (tituloEl && precioEl) {
+                let numStr = precioEl.textContent.replace('
+</html>
+, '').trim();
+                tarjetas.push({
+                    card: card,
+                    tituloOriginal: (tituloEl.dataset.originalTitle || tituloEl.textContent).trim(),
+                    tituloEl: tituloEl,
+                    precioEl: precioEl,
+                    precioNum: parseFloat(numStr) || 0,
+                    boton: btn
+                });
+                    tituloEl.dataset.originalTitle = tituloEl.textContent.trim();
+                }
+            }
+        });
+
+        // Agrupar por familia de marca
+        let familias = {};
+        tarjetas.forEach(t => {
+            let low = t.tituloOriginal.toLowerCase();
+            let base = t.tituloOriginal;
+
+            if (low.includes('spotify')) base = 'Spotify';
+            else if (low.includes('flujo')) base = 'Flujo TV';
+            else if (low.includes('netflix')) base = 'Netflix';
+            else if (low.includes('disney')) base = 'Disney+ ESPN';
+            else if (low.includes('prime')) base = 'Prime Video';
+            else if (low.includes('hbo') || low.includes('max')) base = 'HBO Max';
+            else if (low.includes('zona movie')) base = 'IPTV Zona Movie';
+            else if (low.includes('stream live') || low.includes('iptv')) base = 'IPTV Stream Live';
+            else if (low.includes('estella') || low.includes('stella')) base = 'Estella TV';
+            else if (low.includes('oleada')) base = 'Oleada TV';
+            else if (low.includes('vix')) base = 'ViX Premium';
+            else if (low.includes('crunchyroll')) base = 'Crunchyroll';
+            else if (low.includes('canva')) base = 'Canva Pro';
+            else if (low.includes('gpt')) base = 'ChatGPT';
+
+            familias[base].push(t);
+        });
+
+        // Fusionar tarjetas de cada familia
+        Object.keys(familias).forEach(base => {
+            let grupo = familias[base];
+            if (grupo.length > 1) {
+                grupo.sort((a, b) => a.precioNum - b.precioNum);
+
+                let principal = grupo[0];
+                principal.tituloEl.textContent = base;
+
+                for (let i = 1; i < grupo.length; i++) {
+                    grupo[i].card.dataset.oculto = 'true';
+                    grupo[i].card.style.setProperty('display', 'none', 'important');
+                }
+
+                if (principal.card.querySelector('.selector-planes-fm')) return;
+
+                let cajaSelect = document.createElement('div');
+                cajaSelect.style.cssText = 'margin: 10px 0; background: #0f172a; padding: 8px 10px; border-radius: 10px; border: 1px solid #0284c7; width: 100%; box-sizing: border-box;';
+                
+                let html = '<label style="font-size: 10px; color: #38bdf8; font-weight: bold; text-transform: uppercase; display: block; margin-bottom: 5px; text-align: left;">⚡ ELIGE TU PLAN / OPCIÓN:</label>';
+                html += '<select class="selector-planes-fm" style="width: 100%; padding: 8px; border-radius: 6px; background: #090d16; color: #fff; font-weight: bold; font-size: 13px; border: 1px solid #1e293b; outline: none; cursor: pointer;">';
+
+                grupo.forEach((item, idx) => {
+                    let nombreVar = item.tituloOriginal;
+                    if (nombreVar.toLowerCase().startsWith(base.toLowerCase())) {
+                        nombreVar = nombreVar.substring(base.length).trim();
+                    }
+                    if (nombreVar.toLowerCase().startsWith('tv')) {
+                        nombreVar = nombreVar.substring(2).trim();
+                    }
+                    
+                        nombreVar = idx === 0 ? 'Plan Estándar (1 Mes)' : (item.precioNum >= 7 ? 'Cuenta Completa / Plus' : 'Opción ' + (idx + 1));
+                    } else {
+                        nombreVar = nombreVar.charAt(0).toUpperCase() + nombreVar.slice(1);
+                    }
+
+                    let precioTxt = item.precioEl.textContent.trim();
+                    html += '<option value="' + idx + '" data-precio="' + precioTxt + '">' + nombreVar + ' ➔ ' + precioTxt + '</option>';
+                });
+
+                html += '</select>';
+                cajaSelect.innerHTML = html;
+
+                principal.precioEl.parentNode.insertBefore(cajaSelect, principal.precioEl);
+
+                let selectEl = cajaSelect.querySelector('select');
+                selectEl.addEventListener('change', function() {
+                    let idxElegido = parseInt(this.value, 10);
+                    let itemElegido = grupo[idxElegido];
+                    
+                    principal.precioEl.textContent = itemElegido.precioEl.textContent;
+                    
+                    principal.boton.onclick = function(e) {
+                        if (idxElegido !== 0) {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            itemElegido.boton.click();
+                        }
+                    };
+                });
+            }
+        });
+    }
+
+    setInterval(fusionarTarjetas, 600);
+})();
+</script>
+
+
+<!-- MOTOR UNIVERSAL DE VARIANTES V3 -->
+<script id="motor-universal-variantes">
+(function() {
+    function fusionarTarjetas() {
+        const botones = Array.from(document.querySelectorAll('button, a')).filter(function(b) {
+            const t = (b.textContent || '').trim().toLowerCase();
+            return t.indexOf('comprar') !== -1 || t.indexOf('pedir') !== -1;
+        });
+
+        if (botones.length < 2) return;
+
+        let tarjetas = [];
+        botones.forEach(function(btn) {
+            if (btn.closest('#modalOferta') || btn.closest('form') || btn.closest('nav') || btn.closest('header')) return;
+
+            let card = btn.parentElement;
+            while (card && card !== document.body) {
+                const parent = card.parentElement;
+                if (!parent) break;
+                const btnsEnParent = Array.from(parent.querySelectorAll('button, a')).filter(function(b) {
+                    const t = (b.textContent || '').trim().toLowerCase();
+                    return t.indexOf('comprar') !== -1 || t.indexOf('pedir') !== -1;
+                });
+                if (btnsEnParent.length > 1) break;
+                card = parent;
+            }
+
+            if (!card || card === document.body || card.dataset.oculto === 'true') return;
+
+            const todos = Array.from(card.querySelectorAll('*'));
+            const precioEl = todos.find(function(el) {
+                if (el.children.length > 0) return false;
+                const txt = (el.textContent || '').trim();
+                return txt.charAt(0) === '
+</html>
+ && txt.length >= 2 && txt.length <= 12;
+            });
+
+            const ignorar = ['streaming', 'video', 'música', 'musica', 'software', 'ia', 'top', 'popular', 'streaming y tv', 'streaming y deportes', 'streaming, anime', 'comprar ahora!', 'pedir'];
+            let tituloEl = card.querySelector('h1, h2, h3, h4, .card-title, .service-title, .titulo');
+            
+            if (!tituloEl) {
+                for (let i = 0; i < todos.length; i++) {
+                    let el = todos[i];
+                    if (el.children.length === 0) {
+                        let txt = (el.textContent || '').trim();
+                        let low = txt.toLowerCase();
+                        if (txt.length > 2 && txt.charAt(0) !== '
+</html>
+ && txt.charAt(0) !== '✓' && txt.charAt(0) !== '✔' && low.indexOf('1 mes') === -1 && ignorar.indexOf(low) === -1) {
+                            tituloEl = el;
+                            break;
+                        }
+                    }
+                }
+            }
+
+            if (tituloEl && precioEl) {
+                if (!tituloEl.dataset.originalTitle) {
+                    tituloEl.dataset.originalTitle = tituloEl.textContent.trim();
+                }
+                let numStr = precioEl.textContent.replace('
+</html>
+, '').trim();
+                tarjetas.push({
+                    card: card,
+                    tituloOriginal: tituloEl.dataset.originalTitle,
+                    tituloEl: tituloEl,
+                    precioEl: precioEl,
+                    precioNum: parseFloat(numStr) || 0,
+                    boton: btn
+                });
+            }
+        });
+
+        let familias = {};
+        tarjetas.forEach(function(t) {
+            let low = t.tituloOriginal.toLowerCase();
+            let base = t.tituloOriginal;
+
+            if (low.indexOf('spotify') !== -1) base = 'Spotify';
+            else if (low.indexOf('flujo') !== -1) base = 'Flujo TV';
+            else if (low.indexOf('netflix') !== -1) base = 'Netflix';
+            else if (low.indexOf('disney') !== -1) base = 'Disney+ ESPN';
+            else if (low.indexOf('prime') !== -1) base = 'Prime Video';
+            else if (low.indexOf('hbo') !== -1 || low.indexOf('max') !== -1) base = 'HBO Max';
+            else if (low.indexOf('zona movie') !== -1) base = 'IPTV Zona Movie';
+            else if (low.indexOf('stream live') !== -1 || low.indexOf('iptv') !== -1) base = 'IPTV Stream Live';
+            else if (low.indexOf('estella') !== -1 || low.indexOf('stella') !== -1) base = 'Estella TV';
+            else if (low.indexOf('oleada') !== -1) base = 'Oleada TV';
+            else if (low.indexOf('vix') !== -1) base = 'ViX Premium';
+            else if (low.indexOf('crunchyroll') !== -1) base = 'Crunchyroll';
+            else if (low.indexOf('canva') !== -1) base = 'Canva Pro';
+            else if (low.indexOf('gpt') !== -1) base = 'ChatGPT';
+
+            if (!familias[base]) familias[base] = [];
+            familias[base].push(t);
+        });
+
+        Object.keys(familias).forEach(function(base) {
+            let grupo = familias[base];
+            if (grupo.length > 1) {
+                grupo.sort(function(a, b) { return a.precioNum - b.precioNum; });
+
+                let principal = grupo[0];
+                principal.tituloEl.textContent = base;
+
+                for (let i = 1; i < grupo.length; i++) {
+                    grupo[i].card.dataset.oculto = 'true';
+                    grupo[i].card.style.setProperty('display', 'none', 'important');
+                }
+
+                if (principal.card.querySelector('.selector-planes-fm')) return;
+
+                let cajaSelect = document.createElement('div');
+                cajaSelect.style.cssText = 'margin: 10px 0; background: #0f172a; padding: 8px 10px; border-radius: 10px; border: 1px solid #0284c7; width: 100%; box-sizing: border-box;';
+                
+                let html = '<label style="font-size: 10px; color: #38bdf8; font-weight: bold; text-transform: uppercase; display: block; margin-bottom: 5px; text-align: left;">⚡ ELIGE TU PLAN / OPCIÓN:</label>';
+                html += '<select class="selector-planes-fm" style="width: 100%; padding: 8px; border-radius: 6px; background: #090d16; color: #fff; font-weight: bold; font-size: 13px; border: 1px solid #1e293b; outline: none; cursor: pointer;">';
+
+                grupo.forEach(function(item, idx) {
+                    let nombreVar = item.tituloOriginal;
+                    if (nombreVar.toLowerCase().indexOf(base.toLowerCase()) === 0) {
+                        nombreVar = nombreVar.substring(base.length).trim();
+                    }
+                    if (nombreVar.toLowerCase().indexOf('tv') === 0) {
+                        nombreVar = nombreVar.substring(2).trim();
+                    }
+                    
+                    if (!nombreVar || nombreVar.length < 2) {
+                        nombreVar = idx === 0 ? 'Plan Estándar (1 Mes)' : (item.precioNum >= 7 ? 'Cuenta Completa / Plus' : 'Opción ' + (idx + 1));
+                    } else {
+                        nombreVar = nombreVar.charAt(0).toUpperCase() + nombreVar.slice(1);
+                    }
+
+                    let precioTxt = item.precioEl.textContent.trim();
+                    html += '<option value="' + idx + '" data-precio="' + precioTxt + '">' + nombreVar + ' ➔ ' + precioTxt + '</option>';
+                });
+
+                html += '</select>';
+                cajaSelect.innerHTML = html;
+
+                principal.precioEl.parentNode.insertBefore(cajaSelect, principal.precioEl);
+
+                let selectEl = cajaSelect.querySelector('select');
+                selectEl.addEventListener('change', function() {
+                    let idxElegido = parseInt(this.value, 10);
+                    let itemElegido = grupo[idxElegido];
+                    
+                    principal.precioEl.textContent = itemElegido.precioEl.textContent;
+                    
+                    principal.boton.onclick = function(e) {
+                        if (idxElegido !== 0) {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            itemElegido.boton.click();
+                        }
+                    };
+                });
+            }
+        });
+    }
+
+    setInterval(fusionarTarjetas, 600);
+})();
+</script>
+
+</body>
+</html>
