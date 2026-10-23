@@ -24,10 +24,17 @@ try {
 
 
 const app = express();
+
 app.get('/admin', (req, res) => {
-        res.setHeader('Cache-Control', 'no-store, max-age=0');
-        res.sendFile(__dirname + '/public/admin.html');
-    });
+    res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0');
+    const fs = require('fs');
+    const path = require('path');
+    let file = path.join(__dirname, 'public', 'admin.html');
+    if (!fs.existsSync(file)) file = path.join(__dirname, 'admin.html');
+    res.sendFile(file);
+});
+
+
 
 
 
