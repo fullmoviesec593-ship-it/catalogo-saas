@@ -26,14 +26,7 @@ try {
 const app = express();
 
 // Ruta garantizada al Panel Revendedor
-app.get('/admin', (req, res) => {
-    res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0');
-    const fs = require('fs');
-    const path = require('path');
-    let file = path.join(__dirname, 'public', 'admin.html');
-    if (!fs.existsSync(file)) file = path.join(__dirname, 'admin.html');
-    res.sendFile(file);
-});
+
 
 
 // Tubería 1: Enviar datos de Firebase al Panel
@@ -317,3 +310,10 @@ app.get('/api/backup', async (req, res) => {
 
 
 
+
+app.get('/admin', (req, res) => {
+    const path = require('path');
+    const fs = require('fs');
+    let file = path.join(__dirname, 'public', 'admin.html');
+    res.sendFile(file);
+});
