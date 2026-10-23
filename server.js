@@ -24,6 +24,14 @@ try {
 
 
 const app = express();
+app.get('/admin', (req, res) => {
+    res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+    const fs = require('fs');
+    const path = require('path');
+    let file = path.join(__dirname, 'public', 'admin.html');
+    res.sendFile(file);
+});
+
 
 
 
@@ -315,11 +323,4 @@ app.get('/api/backup', async (req, res) => {
 
 
 
-app.get('/admin', (req, res) => {
-    res.setHeader('Cache-Control', 'no-store, max-age=0');
-    const path = require('path');
-    const fs = require('fs');
-    let file = path.join(__dirname, 'public', 'admin.html');
-    if (!fs.existsSync(file)) file = path.join(__dirname, 'admin.html');
-    res.sendFile(file);
-});
+
