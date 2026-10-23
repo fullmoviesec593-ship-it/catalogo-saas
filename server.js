@@ -24,6 +24,12 @@ try {
 
 
 const app = express();
+app.get('/admin', (req, res) => {
+    const fs = require('fs');
+    const p = fs.existsSync(__dirname + '/public/admin.html') ? (__dirname + '/public/admin.html') : (__dirname + '/admin.html');
+    res.sendFile(p);
+});
+
 
 // Ruta garantizada al Panel Revendedor
 
@@ -311,9 +317,4 @@ app.get('/api/backup', async (req, res) => {
 
 
 
-app.get('/admin', (req, res) => {
-    const path = require('path');
-    const fs = require('fs');
-    let file = path.join(__dirname, 'public', 'admin.html');
-    res.sendFile(file);
-});
+
